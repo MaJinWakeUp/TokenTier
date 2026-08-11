@@ -134,6 +134,14 @@ test("removes the disposable starter preview", async () => {
   assert.match(styles, /\.columns-reset-btn\s*\{[^}]*color:\s*var\(--accent-readable\);/s);
   assert.doesNotMatch(page, /aria-haspopup="listbox"|className="columns-menu" role="menu"/);
   assert.match(page, /function monthlyPrice\(value: number\)/);
+  assert.ok(
+    page.indexOf('className="freshness"') < page.indexOf('className="theme-toggle"'),
+    "places the update timestamp before the theme control",
+  );
+  assert.match(
+    styles,
+    /\.columns-trigger\s*\{[^}]*font-family:\s*var\(--font-geist-sans\), sans-serif;[^}]*font-size:\s*14px;/s,
+  );
   assert.doesNotMatch(styles, /\.hero-card|\.scenario-tabs|\.price-scenario-tabs|\.call-profile/);
   assert.doesNotMatch(page, /className="hero-card|className="scenario-tabs|className="price-scenario-tabs|className="call-profile/);
   assert.doesNotMatch(page, /codex-preview|_sites-preview/);

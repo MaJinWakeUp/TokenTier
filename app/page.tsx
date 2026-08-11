@@ -992,6 +992,7 @@ export default function Home() {
           <button aria-label="My recommendation" aria-pressed={activeView === "recommendation"} className={activeView === "recommendation" ? "active" : ""} id="recommendation-tab" onClick={() => switchView("recommendation")} type="button"><span aria-hidden="true" className="workspace-tab-long">My recommendation</span><span aria-hidden="true" className="workspace-tab-short">Recommend</span></button>
         </nav>
         <div className="header-actions">
+          <span className="freshness"><i /> Updated {pricingUpdatedAt}</span>
           <button
             aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
             className="theme-toggle"
@@ -1005,7 +1006,6 @@ export default function Home() {
             )}
             <span>{theme === "dark" ? "Light" : "Dark"}</span>
           </button>
-          <span className="freshness"><i /> Updated {pricingUpdatedAt}</span>
         </div>
       </header>
 
