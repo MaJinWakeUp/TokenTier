@@ -17,6 +17,28 @@ type Confidence = "High" | "Medium" | "Low";
 type Lane = "api" | "plans";
 type Preference = "either" | "api" | "plans";
 type View = "explore" | "recommendation";
+type ApiColumnKey = "input" | "cached" | "output" | "context" | "fit" | "cost";
+type PlanColumnKey = "type" | "price" | "quota" | "apiIncluded" | "equivalent" | "fit" | "evidence";
+
+const apiColumnLabels: Record<ApiColumnKey, string> = {
+  input: "Input / 1M",
+  cached: "Cached input",
+  output: "Output / 1M",
+  context: "Context",
+  fit: "Fit",
+  cost: "Est. / call",
+};
+
+const planColumnLabels: Record<PlanColumnKey, string> = {
+  type: "Type",
+  price: "Price",
+  quota: "Published quota",
+  apiIncluded: "API included?",
+  equivalent: "API-cost equivalent",
+  fit: "Fit",
+  evidence: "Evidence",
+};
+
 type UsageSettings = {
   input: number;
   output: number;
@@ -582,8 +604,24 @@ const plans: Plan[] = [
   },
 ];
 
-const providerNames = ["All", ...new Set(models.map((model) => model.provider))];
-const planProviderNames = ["All", ...new Set(plans.map((plan) => plan.provider))];
+function sortProviders(providers: string[]): string[] {
+  const priority = ["OpenAI", "Anthropic", "xAI", "Google"];
+  const unique = Array.from(new Set(providers.filter((p) => p !== "All")));
+  return [
+    "All",
+    ...unique.sort((a, b) => {
+      const aIndex = priority.indexOf(a);
+      const bIndex = priority.indexOf(b);
+      if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+      if (aIndex !== -1) return -1;
+      if (bIndex !== -1) return 1;
+      return a.localeCompare(b);
+    }),
+  ];
+}
+
+const providerNames = sortProviders(models.map((model) => model.provider));
+const planProviderNames = sortProviders(plans.map((plan) => plan.provider));
 const tierDescriptions: Record<Exclude<Tier, "—">, string> = {
   S: "Best default / value",
   A: "Strong alternative",
@@ -725,9 +763,26 @@ export default function Home() {
   const [monthlyCalls, setMonthlyCalls] = useState(500);
   const [monthlyBudget, setMonthlyBudget] = useState(30);
   const [preference, setPreference] = useState<Preference>("either");
-  const [provider, setProvider] = useState("All");
+  const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState("cost");
+  const [visibleApiColumns, setVisibleApiColumns] = useState<Record<ApiColumnKey, boolean>>({
+    input: true,
+    cached: true,
+    output: true,
+    context: true,
+    fit: true,
+    cost: true,
+  });
+  const [visiblePlanColumns, setVisiblePlanColumns] = useState<Record<PlanColumnKey, boolean>>({
+    type: true,
+    price: true,
+    quota: true,
+    apiIncluded: true,
+    equivalent: true,
+    fit: true,
+    evidence: true,
+  });
 
   const theme = useSyncExternalStore(
     (callback) => {
@@ -764,6 +819,19 @@ export default function Home() {
     } catch {
       // ignore
     }
+  };
+
+  const toggleProvider = (name: string) => {
+    if (name === "All") {
+      setSelectedProviders([]);
+      return;
+    }
+    setSelectedProviders((prev) => {
+      if (prev.includes(name)) {
+        return prev.filter((p) => p !== name);
+      }
+      return [...prev, name];
+    });
   };
 
   const exploreScenario = scenarios.find((item) => item.id === exploreScenarioId)!;
@@ -855,7 +923,7 @@ export default function Home() {
     const normalizedQuery = query.trim().toLowerCase();
     return models
       .filter((model) => {
-        const matchesProvider = provider === "All" || model.provider === provider;
+        const matchesProvider = selectedProviders.length === 0 || selectedProviders.includes(model.provider);
         const matchesQuery = !normalizedQuery || `${model.provider} ${model.name}`.toLowerCase().includes(normalizedQuery);
         return matchesProvider && matchesQuery;
       })
@@ -865,13 +933,13 @@ export default function Home() {
         if (sortBy === "context") return contextSize(b.context) - contextSize(a.context);
         return callCost(a, exploreSettings) - callCost(b, exploreSettings);
       });
-  }, [exploreSettings, provider, query, sortBy]);
+  }, [exploreSettings, selectedProviders, query, sortBy]);
 
   const visiblePlans = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     return plans
       .filter((plan) => {
-        const matchesProvider = provider === "All" || plan.provider === provider;
+        const matchesProvider = selectedProviders.length === 0 || selectedProviders.includes(plan.provider);
         const matchesQuery = !normalizedQuery || `${plan.provider} ${plan.name} ${plan.kind}`.toLowerCase().includes(normalizedQuery);
         return matchesProvider && matchesQuery;
       })
@@ -880,7 +948,7 @@ export default function Home() {
         if (sortBy === "fit") return tierScore[b.tiers[exploreScenarioId]] - tierScore[a.tiers[exploreScenarioId]];
         return (a.monthly ?? Infinity) - (b.monthly ?? Infinity);
       });
-  }, [exploreScenarioId, provider, query, sortBy]);
+  }, [exploreScenarioId, selectedProviders, query, sortBy]);
 
   const switchView = (view: View) => {
     setActiveView(view);
@@ -901,7 +969,7 @@ export default function Home() {
 
   const switchPriceLane = (lane: Lane) => {
     setPriceLane(lane);
-    setProvider("All");
+    setSelectedProviders([]);
     setSortBy(lane === "api" ? "cost" : "price");
   };
 
@@ -1042,11 +1110,99 @@ export default function Home() {
         </div>
 
         <div className="table-tools">
-          <label className="search-field"><span>⌕</span><input aria-label={`Search ${priceLane}`} onChange={(event) => setQuery(event.target.value)} placeholder={priceLane === "api" ? "Search model or provider" : "Search plan, client, or provider"} type="search" value={query} /></label>
-          <div className="provider-filters" role="group" aria-label="Filter by provider">
-            {(priceLane === "api" ? providerNames : planProviderNames).map((name) => <button aria-pressed={provider === name} className={provider === name ? "active" : ""} key={name} onClick={() => setProvider(name)} type="button">{name}</button>)}
+          <div className="table-tools-top">
+            <label className="search-field">
+              <span>⌕</span>
+              <input
+                aria-label={`Search ${priceLane}`}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={priceLane === "api" ? "Search model or provider" : "Search plan, client, or provider"}
+                type="search"
+                value={query}
+              />
+            </label>
+            <details className="columns-selector">
+              <summary className="columns-trigger">
+                <span>Columns ({priceLane === "api" ? Object.values(visibleApiColumns).filter(Boolean).length + 1 : Object.values(visiblePlanColumns).filter(Boolean).length + 1})</span>
+                <span aria-hidden="true">▾</span>
+              </summary>
+              <div className="columns-menu">
+                <div className="columns-menu-header">
+                  <span>Show columns</span>
+                  <button
+                    className="columns-reset-btn"
+                    onClick={() => {
+                      if (priceLane === "api") {
+                        setVisibleApiColumns({ input: true, cached: true, output: true, context: true, fit: true, cost: true });
+                      } else {
+                        setVisiblePlanColumns({ type: true, price: true, quota: true, apiIncluded: true, equivalent: true, fit: true, evidence: true });
+                      }
+                    }}
+                    type="button"
+                  >
+                    Reset
+                  </button>
+                </div>
+                {priceLane === "api"
+                  ? (Object.keys(apiColumnLabels) as ApiColumnKey[]).map((col) => (
+                      <label className="column-option" key={col}>
+                        <input
+                          checked={visibleApiColumns[col]}
+                          onChange={(e) => setVisibleApiColumns((prev) => ({ ...prev, [col]: e.target.checked }))}
+                          type="checkbox"
+                        />
+                        <span>{apiColumnLabels[col]}</span>
+                      </label>
+                    ))
+                  : (Object.keys(planColumnLabels) as PlanColumnKey[]).map((col) => (
+                      <label className="column-option" key={col}>
+                        <input
+                          checked={visiblePlanColumns[col]}
+                          onChange={(e) => setVisiblePlanColumns((prev) => ({ ...prev, [col]: e.target.checked }))}
+                          type="checkbox"
+                        />
+                        <span>{planColumnLabels[col]}</span>
+                      </label>
+                    ))}
+              </div>
+            </details>
+            <label className="sort-field">
+              <span>Sort</span>
+              <select onChange={(event) => setSortBy(event.target.value)} value={sortBy}>
+                {priceLane === "api" ? (
+                  <>
+                    <option value="cost">Estimated call cost</option>
+                    <option value="input">Input price</option>
+                    <option value="output">Output price</option>
+                    <option value="context">Context window</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="price">Monthly price</option>
+                    <option value="fit">Scenario fit</option>
+                    <option value="confidence">Quota confidence</option>
+                  </>
+                )}
+              </select>
+            </label>
           </div>
-          <label className="sort-field"><span>Sort</span><select onChange={(event) => setSortBy(event.target.value)} value={sortBy}>{priceLane === "api" ? <><option value="cost">Estimated call cost</option><option value="input">Input price</option><option value="output">Output price</option><option value="context">Context window</option></> : <><option value="price">Monthly price</option><option value="fit">Scenario fit</option><option value="confidence">Quota confidence</option></>}</select></label>
+
+          <div className="provider-filters" role="group" aria-label="Filter by provider">
+            {(priceLane === "api" ? providerNames : planProviderNames).map((name) => {
+              const isSelected = name === "All" ? selectedProviders.length === 0 : selectedProviders.includes(name);
+              return (
+                <button
+                  aria-pressed={isSelected}
+                  className={isSelected ? "active" : ""}
+                  key={name}
+                  onClick={() => toggleProvider(name)}
+                  type="button"
+                >
+                  {name}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <p className="table-scroll-hint">Scroll sideways to see all columns.</p>
@@ -1054,21 +1210,81 @@ export default function Home() {
           {priceLane === "api" ? (
             <table>
               <caption className="visually-hidden">API rates and fit for {exploreScenario.label}</caption>
-              <thead><tr><th>API model</th><th>Input / 1M</th><th>Cached input</th><th>Output / 1M</th><th>Context</th><th>Fit</th><th>Est. / call</th></tr></thead>
-              <tbody>{visibleModels.map((model) => (
-                <tr key={model.id}><td><span className="provider-orb" data-provider={model.provider} /><span className="model-cell"><strong>{model.name}</strong><small>{model.provider}</small></span><a aria-label={`Official pricing source for ${model.name}${model.note ? `. Note: ${model.note}` : ""}`} className="source-link" href={model.source} rel="noreferrer" target="_blank" title={model.note ?? "Official pricing source"}>↗</a></td><td>{price(model.input)}</td><td>{model.cached === null ? "—" : price(model.cached, 4)}</td><td>{price(model.output)}</td><td>{model.context}</td><td><span className={`mini-tier ${model.tiers[exploreScenarioId] === "—" ? "tier-na" : `tier-${model.tiers[exploreScenarioId].toLowerCase()}`}`}>{model.tiers[exploreScenarioId]}</span></td><td><strong>{price(callCost(model, exploreSettings), 3)}</strong></td></tr>
-              ))}</tbody>
+              <thead>
+                <tr>
+                  <th>API model</th>
+                  {visibleApiColumns.input && <th>Input / 1M</th>}
+                  {visibleApiColumns.cached && <th>Cached input</th>}
+                  {visibleApiColumns.output && <th>Output / 1M</th>}
+                  {visibleApiColumns.context && <th>Context</th>}
+                  {visibleApiColumns.fit && <th>Fit</th>}
+                  {visibleApiColumns.cost && <th>Est. / call</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {visibleModels.map((model) => (
+                  <tr key={model.id}>
+                    <td>
+                      <div className="table-item-cell">
+                        <span className="provider-orb" data-provider={model.provider} />
+                        <span className="model-cell">
+                          <strong>{model.name}</strong>
+                          <small>{model.provider}</small>
+                        </span>
+                        <a aria-label={`Official pricing source for ${model.name}${model.note ? `. Note: ${model.note}` : ""}`} className="source-link" href={model.source} rel="noreferrer" target="_blank" title={model.note ?? "Official pricing source"}>↗</a>
+                      </div>
+                    </td>
+                    {visibleApiColumns.input && <td>{price(model.input)}</td>}
+                    {visibleApiColumns.cached && <td>{model.cached === null ? "—" : price(model.cached, 4)}</td>}
+                    {visibleApiColumns.output && <td>{price(model.output)}</td>}
+                    {visibleApiColumns.context && <td>{model.context}</td>}
+                    {visibleApiColumns.fit && <td><span className={`mini-tier ${model.tiers[exploreScenarioId] === "—" ? "tier-na" : `tier-${model.tiers[exploreScenarioId].toLowerCase()}`}`}>{model.tiers[exploreScenarioId]}</span></td>}
+                    {visibleApiColumns.cost && <td><strong>{price(callCost(model, exploreSettings), 3)}</strong></td>}
+                  </tr>
+                ))}
+              </tbody>
             </table>
           ) : (
             <table className="plan-table">
               <caption className="visually-hidden">Plan prices, quotas, and fit for {exploreScenario.label}</caption>
-              <thead><tr><th>Plan or access path</th><th>Type</th><th>Price</th><th>Published quota</th><th>API included?</th><th>API-cost equivalent</th><th>Fit</th><th>Evidence</th></tr></thead>
-              <tbody>{visiblePlans.map((plan) => {
-                const estimate = planEstimate(plan, exploreSettings);
-                return (
-                  <tr key={plan.id}><td><span className="provider-orb" data-provider={plan.provider} /><span className="model-cell"><strong>{plan.name}</strong><small>{plan.provider}</small></span><a aria-label={`Official source for ${plan.name}. Note: ${plan.note}`} className="source-link" href={plan.source} rel="noreferrer" target="_blank" title={plan.note}>↗</a></td><td><span className="kind-pill">{plan.kind}</span></td><td><strong>{planPrice(plan)}</strong>{plan.kind === "Subscription" && <small className="per-month"> / mo</small>}</td><td className="wrap-cell">{planQuota(plan, exploreScenarioId)}</td><td>{plan.apiIncluded}</td><td>{estimate ? <><strong>{formatEstimateRange(estimate.callsLow, estimate.callsHigh)} calls</strong><small className="estimate-detail">{formatMoneyRange(estimate.valueLow, estimate.valueHigh)} · {estimate.basis}</small></> : <span className="muted-dash">Your API bill</span>}</td><td><span className={`mini-tier ${plan.tiers[exploreScenarioId] === "—" ? "tier-na" : `tier-${plan.tiers[exploreScenarioId].toLowerCase()}`}`}>{plan.tiers[exploreScenarioId]}</span></td><td><span className={`evidence-badge evidence-${plan.confidence.toLowerCase()}`}>{plan.confidence}</span><small className="estimate-detail">{plan.evidence}</small></td></tr>
-                );
-              })}</tbody>
+              <thead>
+                <tr>
+                  <th>Plan or access path</th>
+                  {visiblePlanColumns.type && <th>Type</th>}
+                  {visiblePlanColumns.price && <th>Price</th>}
+                  {visiblePlanColumns.quota && <th>Published quota</th>}
+                  {visiblePlanColumns.apiIncluded && <th>API included?</th>}
+                  {visiblePlanColumns.equivalent && <th>API-cost equivalent</th>}
+                  {visiblePlanColumns.fit && <th>Fit</th>}
+                  {visiblePlanColumns.evidence && <th>Evidence</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {visiblePlans.map((plan) => {
+                  const estimate = planEstimate(plan, exploreSettings);
+                  return (
+                    <tr key={plan.id}>
+                      <td>
+                        <div className="table-item-cell">
+                          <span className="provider-orb" data-provider={plan.provider} />
+                          <span className="model-cell">
+                            <strong>{plan.name}</strong>
+                            <small>{plan.provider}</small>
+                          </span>
+                          <a aria-label={`Official source for ${plan.name}. Note: ${plan.note}`} className="source-link" href={plan.source} rel="noreferrer" target="_blank" title={plan.note}>↗</a>
+                        </div>
+                      </td>
+                      {visiblePlanColumns.type && <td><span className="kind-pill">{plan.kind}</span></td>}
+                      {visiblePlanColumns.price && <td><strong>{planPrice(plan)}</strong>{plan.kind === "Subscription" && <small className="per-month"> / mo</small>}</td>}
+                      {visiblePlanColumns.quota && <td className="wrap-cell">{planQuota(plan, exploreScenarioId)}</td>}
+                      {visiblePlanColumns.apiIncluded && <td>{plan.apiIncluded}</td>}
+                      {visiblePlanColumns.equivalent && <td>{estimate ? <><strong>{formatEstimateRange(estimate.callsLow, estimate.callsHigh)} calls</strong><small className="estimate-detail">{formatMoneyRange(estimate.valueLow, estimate.valueHigh)} · {estimate.basis}</small></> : <span className="muted-dash">Your API bill</span>}</td>}
+                      {visiblePlanColumns.fit && <td><span className={`mini-tier ${plan.tiers[exploreScenarioId] === "—" ? "tier-na" : `tier-${plan.tiers[exploreScenarioId].toLowerCase()}`}`}>{plan.tiers[exploreScenarioId]}</span></td>}
+                      {visiblePlanColumns.evidence && <td><span className={`evidence-badge evidence-${plan.confidence.toLowerCase()}`}>{plan.confidence}</span><small className="estimate-detail">{plan.evidence}</small></td>}
+                    </tr>
+                  );
+                })}
+              </tbody>
             </table>
           )}
           {(priceLane === "api" ? visibleModels.length : visiblePlans.length) === 0 && <p className="empty-state">No entries match that search.</p>}

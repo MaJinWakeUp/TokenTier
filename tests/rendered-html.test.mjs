@@ -129,7 +129,10 @@ test("removes the disposable starter preview", async () => {
   assert.match(styles, /@media \(max-width: 680px\)[\s\S]*?\.scenario-dock\s*\{[^}]*grid-template-columns:\s*minmax\(0, 0\.75fr\) minmax\(0, 1\.25fr\);/s);
   assert.match(styles, /@media \(max-width: 1279px\)[\s\S]*?\.scenario-dock\s*\{[^}]*background:\s*var\(--dock-bg\);/s);
   assert.match(styles, /@media \(max-width: 680px\)[\s\S]*?\.hero-diff-line\s*\{[^}]*white-space:\s*normal;/s);
+  assert.match(styles, /@media \(max-width: 680px\)[\s\S]*?\.table-tools-top\s*\{[^}]*display:\s*flex;[^}]*flex-direction:\s*column;/s);
   assert.match(styles, /@media \(max-width: 420px\)[\s\S]*?\.workspace-tab-long\s*\{[^}]*display:\s*none;/s);
+  assert.match(styles, /\.columns-reset-btn\s*\{[^}]*color:\s*var\(--accent-readable\);/s);
+  assert.doesNotMatch(page, /aria-haspopup="listbox"|className="columns-menu" role="menu"/);
   assert.match(page, /function monthlyPrice\(value: number\)/);
   assert.doesNotMatch(styles, /\.hero-card|\.scenario-tabs|\.price-scenario-tabs|\.call-profile/);
   assert.doesNotMatch(page, /className="hero-card|className="scenario-tabs|className="price-scenario-tabs|className="call-profile/);
