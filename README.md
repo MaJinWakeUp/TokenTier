@@ -4,6 +4,12 @@ TokenTier is a price-aware comparison of current AI models and consumer plans.
 It combines scenario tier lists, standard API token rates, and transparent
 subscription-to-API spend estimates.
 
+## Ownership and independence
+
+TokenTier is an independent project created and maintained by Jin Ma. It is not
+affiliated with or endorsed by the AI providers listed on the site. Product
+names and trademarks belong to their respective owners.
+
 ## What it compares
 
 - Daily use, easy/medium/hard coding, research, paper writing, and innovation

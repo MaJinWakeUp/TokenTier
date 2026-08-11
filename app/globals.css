@@ -1420,12 +1420,23 @@ footer {
   color: #f4f3ee;
 }
 
-footer > span {
+.footer-identity {
   justify-self: end;
+  max-width: 760px;
+  text-align: right;
+}
+
+.footer-identity p {
+  margin: 0;
+  color: #f4f3ee;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.footer-identity p + p {
+  margin-top: 5px;
   color: #a0a5af;
-  font-family: var(--font-geist-mono), monospace;
   font-size: 13px;
-  text-transform: uppercase;
 }
 
 .lane-switch {
@@ -2378,8 +2389,9 @@ footer > span {
     min-height: 150px;
   }
 
-  footer > span {
+  .footer-identity {
     justify-self: start;
+    text-align: left;
   }
 }
 

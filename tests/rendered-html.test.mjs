@@ -48,6 +48,9 @@ test("server-renders the TokenTier product", async () => {
   }
   assert.match(html, /Monthly cost by model/i);
   assert.match(html, /Suitable subscriptions/i);
+  assert.match(html, /independent project created and maintained by Jin Ma/i);
+  assert.match(html, /not affiliated with or endorsed by the AI providers/i);
+  assert.match(html, /Product names and trademarks belong to their respective owners/i);
   assert.match(html, /aria-label="Profile assumptions"/);
   assert.match(html, /id="explore-scenario"/);
   assert.match(html, /id="recommendation-profile"/);
@@ -72,11 +75,12 @@ test("server-renders the TokenTier product", async () => {
 });
 
 test("removes the disposable starter preview", async () => {
-  const [page, layout, styles, packageJson] = await Promise.all([
+  const [page, layout, styles, packageJson, readme] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
+    readFile(new URL("../README.md", import.meta.url), "utf8"),
   ]);
 
   assert.match(page, /TokenTier/);
@@ -85,6 +89,8 @@ test("removes the disposable starter preview", async () => {
   assert.match(page, /GLM Coding Lite/);
   assert.match(page, /Kimi Moderato/);
   assert.match(page, /Primary pricing and quota sources/);
+  assert.match(readme, /## Ownership and independence/);
+  assert.match(readme, /independent project created and maintained by Jin Ma/);
   assert.match(page, /api-models\.json/);
   assert.match(layout, /TokenTier/);
   assert.match(styles, /\.scenario-dock\s*\{[^}]*position:\s*fixed;[^}]*max-height:\s*calc\(100vh - 116px\);[^}]*overflow-y:\s*auto;/s);
