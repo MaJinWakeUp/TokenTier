@@ -45,12 +45,20 @@ test("server-renders the TokenTier product", async () => {
     assert.ok(html.includes(model.name), `renders catalog model ${model.name}`);
   }
   assert.match(html, /Monthly API cost by model/i);
+  assert.match(html, /aria-label="Workload profile"/);
+  assert.match(html, /id="global-scenario"/);
+  assert.match(html, /Updates tier lists, recommendations, and costs across the page/);
+  assert.match(html, /How this profile works/);
+  assert.match(html, /18,000/);
+  assert.match(html, /6,000/);
+  assert.match(html, /24,000/);
   assert.match(html, /Easy coding/);
   assert.match(html, /Medium coding/);
   assert.match(html, /Hard coding/);
   assert.match(html, />Research</);
   assert.match(html, /Updated\s*(?:<!-- -->)?\s*Aug 11, 2026/);
   assert.doesNotMatch(html, /(?:01|02|03|04) \/|Editorial value picks|2 LANES|Recommendation choice|Choose the lane\. Know the limit\./i);
+  assert.doesNotMatch(html, /Best value for|Current best value snapshot/i);
   assert.doesNotMatch(html, /Research exploration|Coding · (?:easy|medium|difficult)/i);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 });
@@ -71,7 +79,13 @@ test("removes the disposable starter preview", async () => {
   assert.match(page, /Primary pricing and quota sources/);
   assert.match(page, /api-models\.json/);
   assert.match(layout, /TokenTier/);
-  assert.match(styles, /\.hero-card::before\s*\{[^}]*inset:\s*0;[^}]*border-radius:\s*27px;/s);
+  assert.match(styles, /\.scenario-dock\s*\{[^}]*position:\s*fixed;[^}]*max-height:\s*calc\(100vh - 116px\);[^}]*overflow-y:\s*auto;/s);
+  assert.match(styles, /@media \(max-width: 1279px\)[\s\S]*?\.scenario-dock\s*\{[^}]*position:\s*sticky;/s);
+  assert.equal(
+    [...page.matchAll(/setScenarioId\(event\.target\.value as ScenarioId\)/g)].length,
+    1,
+    "keeps one global workload selector",
+  );
   const visiblePixelFontSizes = [...styles.matchAll(/font-size:\s*(\d+)px/g)]
     .map((match) => Number(match[1]))
     .filter((size) => size > 0);
@@ -82,6 +96,9 @@ test("removes the disposable starter preview", async () => {
   assert.match(styles, /\.tier-models\s*\{[^}]*grid-auto-rows:\s*82px;/s);
   assert.match(styles, /\.tier-model\s*\{[^}]*height:\s*82px;[^}]*min-height:\s*82px;[^}]*overflow:\s*hidden;/s);
   assert.match(styles, /\.tier-model strong\s*\{[^}]*font-size:\s*15px;/s);
+  assert.match(styles, /@media \(max-width: 680px\)[\s\S]*?\.scenario-dock\s*\{[^}]*grid-template-columns:\s*minmax\(0, 0\.75fr\) minmax\(0, 1\.25fr\);/s);
+  assert.doesNotMatch(styles, /\.hero-card|\.scenario-tabs|\.price-scenario-tabs|\.call-profile/);
+  assert.doesNotMatch(page, /className="hero-card|className="scenario-tabs|className="price-scenario-tabs|className="call-profile/);
   assert.doesNotMatch(page, /codex-preview|_sites-preview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   await assert.rejects(access(new URL("app/_sites-preview", projectRoot)));

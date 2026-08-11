@@ -718,22 +718,6 @@ export default function Home() {
 
   const scenario = scenarios.find((item) => item.id === scenarioId)!;
 
-  const bestApi = useMemo(() => {
-    return models
-      .filter((model) => model.tiers[scenarioId] === "S")
-      .sort((a, b) => callCost(a, scenarioId) - callCost(b, scenarioId))[0];
-  }, [scenarioId]);
-
-  const bestPlan = useMemo(() => {
-    return plans
-      .filter((plan) => plan.kind === "Subscription" && plan.tiers[scenarioId] === "S")
-      .sort((a, b) => {
-        const confidenceGap = confidenceScore[b.confidence] - confidenceScore[a.confidence];
-        if (confidenceGap) return confidenceGap;
-        return (a.monthly ?? Infinity) - (b.monthly ?? Infinity);
-      })[0];
-  }, [scenarioId]);
-
   const apiRecommendation = useMemo(() => {
     const candidates = models.filter((model) => model.tiers[scenarioId] !== "—");
     const withinBudget = candidates.filter(
@@ -851,6 +835,34 @@ export default function Home() {
         <span className="freshness"><i /> Updated {pricingUpdatedAt}</span>
       </header>
 
+      <aside className="scenario-dock" aria-label="Workload profile">
+        <div className="scenario-dock-heading">
+          <span>Workload profile</span>
+          <strong aria-live="polite">{scenario.label}</strong>
+        </div>
+        <label className="scenario-dock-select" htmlFor="global-scenario">
+          <span>Use case</span>
+          <select id="global-scenario" value={scenarioId} onChange={(event) => setScenarioId(event.target.value as ScenarioId)}>
+            {scenarios.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+          </select>
+        </label>
+        <p className="scenario-dock-impact">Updates tier lists, recommendations, and costs across the page.</p>
+        <p className="scenario-dock-description">{scenario.description}</p>
+        <dl className="scenario-dock-tokens">
+          <div><dt>Input</dt><dd>{scenario.input.toLocaleString()}</dd></div>
+          <div><dt>Output</dt><dd>{scenario.output.toLocaleString()}</dd></div>
+          <div><dt>Total</dt><dd>{(scenario.input + scenario.output).toLocaleString()}</dd></div>
+        </dl>
+        <p className="scenario-dock-note">Tokens per estimated API call. Input is uncached; reasoning counts as output.</p>
+        <p className="scenario-dock-exclusions">Excludes search, tools, images, storage, taxes, and retries.</p>
+        <details className="scenario-dock-more">
+          <summary>How this profile works <span aria-hidden="true">+</span></summary>
+          <p>{scenario.description}</p>
+          <p>Updates tier lists, recommendations, and costs across the page.</p>
+          <p>Costs exclude search, tools, images, storage, taxes, and retries.</p>
+        </details>
+      </aside>
+
       <section className="hero" id="top">
         <div className="hero-grid" aria-hidden="true" />
         <div className="hero-copy">
@@ -869,42 +881,11 @@ export default function Home() {
             <div><dt>{scenarios.length}</dt><dd>work modes</dd></div>
           </dl>
         </div>
-
-        <aside className="hero-card dual-value-card" aria-label="Current best value snapshot">
-          <div className="hero-card-topline"><span>Best value for {scenario.label}</span><span className="live-pill">USD</span></div>
-          <div className="hero-choice-grid">
-            <div className="hero-choice">
-              <span className="lane-kicker">API</span>
-              <div className="hero-winner">
-                <span className="provider-orb" data-provider={bestApi.provider} />
-                <div><strong>{bestApi.name}</strong><span>{bestApi.provider}</span></div>
-                <b>{price(callCost(bestApi, scenarioId), 3)}</b>
-              </div>
-              <small>Estimated cost per call</small>
-            </div>
-            <div className="hero-choice plan-choice">
-              <span className="lane-kicker">SUBSCRIPTION</span>
-              <div className="hero-winner">
-                <span className="provider-orb" data-provider={bestPlan.provider} />
-                <div><strong>{bestPlan.name}</strong><span>{bestPlan.provider}</span></div>
-                <b>${bestPlan.monthly}</b>
-              </div>
-              <small>{planQuota(bestPlan, scenarioId)}</small>
-            </div>
-          </div>
-        </aside>
       </section>
 
       <section className="section tier-section" id="tier-board">
-        <div className="section-heading">
+        <div className="section-heading single">
           <div><h2>Compare by<br />use case.</h2></div>
-          <div className="section-intro"><p>{scenario.description}</p><span>{scenario.input.toLocaleString()} input + {scenario.output.toLocaleString()} output tokens per API call</span></div>
-        </div>
-
-        <div className="scenario-tabs" role="group" aria-label="Use case">
-          {scenarios.map((item) => (
-            <button aria-pressed={item.id === scenarioId} className={item.id === scenarioId ? "active" : ""} key={item.id} onClick={() => setScenarioId(item.id)} type="button">{item.label}</button>
-          ))}
         </div>
 
         <div className="lane-switch" role="group" aria-label="Tier list lane">
@@ -948,13 +929,12 @@ export default function Home() {
       <section className="section calculator-section" id="calculator">
         <div className="calculator-copy">
           <h2>Compare your<br />monthly options.</h2>
-          <p>Enter your workload, call volume, and budget to compare one API with one subscription plan.</p>
+          <p>The pinned workload profile sets the token assumptions. Enter call volume and budget to compare one API with one subscription plan.</p>
           <div className="formula"><span>API COST</span><code>calls × ((input tokens × input rate) + (output tokens × output rate)) ÷ 1,000,000</code></div>
         </div>
 
         <div className="calculator-card recommendation-card">
           <div className="calculator-fields recommendation-fields">
-            <label>Workload<select value={scenarioId} onChange={(event) => setScenarioId(event.target.value as ScenarioId)}>{scenarios.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
             <label>Calls / month<input inputMode="numeric" min="1" max="100000" type="number" value={monthlyCalls} onChange={(event) => setMonthlyCalls(Math.max(1, Number(event.target.value) || 1))} /></label>
             <label>Budget / month<input inputMode="numeric" min="1" max="10000" type="number" value={monthlyBudget} onChange={(event) => setMonthlyBudget(Math.max(1, Number(event.target.value) || 1))} /></label>
             <label>Preference<select value={preference} onChange={(event) => setPreference(event.target.value as Preference)}><option value="either">Compare both</option><option value="api">API first</option><option value="plans">Plan first</option></select></label>
@@ -982,7 +962,6 @@ export default function Home() {
             </article>
           </div>
 
-          <details className="call-profile"><summary>What counts as one {scenario.label.toLowerCase()} call? <span>+</span></summary><p>{scenario.input.toLocaleString()} uncached input tokens + {scenario.output.toLocaleString()} output tokens. Reasoning tokens count as output. Search, tools, images, storage, taxes, and retries are not included.</p></details>
         </div>
 
         <section className="all-model-costs" aria-labelledby="all-model-costs-title">
@@ -1018,13 +997,7 @@ export default function Home() {
       <section className="section prices-section" id="prices">
         <div className="section-heading compact">
           <div><h2>Compare rates<br />and quotas.</h2></div>
-          <div className="section-intro"><p>Review API token rates alongside plan prices, credits, and published limits.</p><span>Current use case: {scenario.label}</span></div>
-        </div>
-
-        <div className="scenario-tabs price-scenario-tabs" role="group" aria-label="Price-book situation">
-          {scenarios.map((item) => (
-            <button aria-pressed={item.id === scenarioId} className={item.id === scenarioId ? "active" : ""} key={item.id} onClick={() => setScenarioId(item.id)} type="button">{item.label}</button>
-          ))}
+          <div className="section-intro"><p>Review API token rates alongside plan prices, credits, and published limits.</p></div>
         </div>
 
         <div className="book-switch" role="group" aria-label="Price book lane">
