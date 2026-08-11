@@ -1422,21 +1422,11 @@ footer {
 
 .footer-identity {
   justify-self: end;
-  max-width: 760px;
-  text-align: right;
-}
-
-.footer-identity p {
   margin: 0;
-  color: #f4f3ee;
+  color: #a0a5af;
   font-size: 14px;
   line-height: 1.5;
-}
-
-.footer-identity p + p {
-  margin-top: 5px;
-  color: #a0a5af;
-  font-size: 13px;
+  text-align: right;
 }
 
 .lane-switch {

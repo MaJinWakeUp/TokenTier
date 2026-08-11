@@ -1142,10 +1142,7 @@ export default function Home() {
 
       <footer>
         <a className="brand" href={activeView === "explore" ? "#explore-top" : "#recommendation-top"}><span className="brand-mark">T/T</span><span>TokenTier</span></a>
-        <div className="footer-identity">
-          <p>TokenTier is an independent project created and maintained by Jin Ma.</p>
-          <p>It is not affiliated with or endorsed by the AI providers listed on this site. Product names and trademarks belong to their respective owners. Prices in USD.</p>
-        </div>
+        <p className="footer-identity">© 2026 Jin Ma · Open-source code under MIT · Independent project</p>
       </footer>
     </main>
   );

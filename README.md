@@ -8,7 +8,8 @@ subscription-to-API spend estimates.
 
 TokenTier is an independent project created and maintained by Jin Ma. It is not
 affiliated with or endorsed by the AI providers listed on the site. Product
-names and trademarks belong to their respective owners.
+names and trademarks belong to their respective owners. The source code is
+available under the MIT License.
 
 ## What it compares
 
