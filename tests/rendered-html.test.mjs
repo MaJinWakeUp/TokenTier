@@ -37,17 +37,25 @@ test("server-renders the TokenTier product", async () => {
   assert.match(html, /<title>TokenTier — AI APIs vs subscription plans<\/title>/i);
   assert.match(html, /API or plan/);
   assert.match(html, /Compare by/);
-  assert.match(html, /Compare your/);
+  assert.match(html, /Build your/);
+  assert.match(html, /Explore profiles/);
+  assert.match(html, /My recommendation/);
   assert.match(html, /OpenCode Go/);
   assert.match(html, /GLM-5\.2/);
   assert.match(html, /Kimi K3/);
   for (const model of catalog.models) {
     assert.ok(html.includes(model.name), `renders catalog model ${model.name}`);
   }
-  assert.match(html, /Monthly API cost by model/i);
-  assert.match(html, /aria-label="Workload profile"/);
-  assert.match(html, /id="global-scenario"/);
-  assert.match(html, /Updates tier lists, recommendations, and costs across the page/);
+  assert.match(html, /Monthly cost by model/i);
+  assert.match(html, /Suitable subscriptions/i);
+  assert.match(html, /aria-label="Profile assumptions"/);
+  assert.match(html, /id="explore-scenario"/);
+  assert.match(html, /id="recommendation-profile"/);
+  assert.match(html, /Updates the tier list and price book in Explore/);
+  assert.match(html, /Work type/);
+  assert.match(html, /Input tokens \/ call/);
+  assert.match(html, /Output tokens \/ call/);
+  assert.match(html, /BEST PATH/);
   assert.match(html, /How this profile works/);
   assert.match(html, /18,000/);
   assert.match(html, /6,000/);
@@ -81,11 +89,14 @@ test("removes the disposable starter preview", async () => {
   assert.match(layout, /TokenTier/);
   assert.match(styles, /\.scenario-dock\s*\{[^}]*position:\s*fixed;[^}]*max-height:\s*calc\(100vh - 116px\);[^}]*overflow-y:\s*auto;/s);
   assert.match(styles, /@media \(max-width: 1279px\)[\s\S]*?\.scenario-dock\s*\{[^}]*position:\s*sticky;/s);
-  assert.equal(
-    [...page.matchAll(/setScenarioId\(event\.target\.value as ScenarioId\)/g)].length,
-    1,
-    "keeps one global workload selector",
-  );
+  assert.match(page, /const \[exploreScenarioId, setExploreScenarioId\]/);
+  assert.match(page, /const \[recommendationScenarioId, setRecommendationScenarioId\]/);
+  assert.match(page, /const useExploreProfile = \(\) =>/);
+  assert.match(page, /updateRecommendationProfile\(exploreScenarioId\)/);
+  assert.match(page, /callCost\(model, recommendationSettings\)/);
+  assert.match(page, /function planCoverageScore[\s\S]*?return null;\n}/);
+  assert.match(page, /planWithinBudget && planCoversVolume && !apiWithinBudget/);
+  assert.doesNotMatch(page, /calls <= 2000/);
   const visiblePixelFontSizes = [...styles.matchAll(/font-size:\s*(\d+)px/g)]
     .map((match) => Number(match[1]))
     .filter((size) => size > 0);
@@ -96,6 +107,9 @@ test("removes the disposable starter preview", async () => {
   assert.match(styles, /\.tier-models\s*\{[^}]*grid-auto-rows:\s*82px;/s);
   assert.match(styles, /\.tier-model\s*\{[^}]*height:\s*82px;[^}]*min-height:\s*82px;[^}]*overflow:\s*hidden;/s);
   assert.match(styles, /\.tier-model strong\s*\{[^}]*font-size:\s*15px;/s);
+  assert.match(styles, /\.workspace-tabs\s*\{/);
+  assert.match(styles, /\.recommendation-workspace\s*\{/);
+  assert.match(styles, /\.plan-match-grid\s*\{/);
   assert.match(styles, /@media \(max-width: 680px\)[\s\S]*?\.scenario-dock\s*\{[^}]*grid-template-columns:\s*minmax\(0, 0\.75fr\) minmax\(0, 1\.25fr\);/s);
   assert.doesNotMatch(styles, /\.hero-card|\.scenario-tabs|\.price-scenario-tabs|\.call-profile/);
   assert.doesNotMatch(page, /className="hero-card|className="scenario-tabs|className="price-scenario-tabs|className="call-profile/);
