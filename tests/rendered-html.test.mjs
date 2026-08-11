@@ -36,7 +36,7 @@ test("server-renders the TokenTier product", async () => {
   );
   assert.match(html, /<title>TokenTier — AI APIs vs subscription plans<\/title>/i);
   assert.match(html, /API or plan/);
-  assert.match(html, /Compare by/);
+  assert.match(html, /Tier List/);
   assert.match(html, /Build your/);
   assert.match(html, /Explore profiles/);
   assert.match(html, /My recommendation/);
@@ -47,7 +47,7 @@ test("server-renders the TokenTier product", async () => {
     assert.ok(html.includes(model.name), `renders catalog model ${model.name}`);
   }
   assert.match(html, /Monthly cost by model/i);
-  assert.match(html, /Suitable subscriptions/i);
+  assert.match(html, /Subscription Plans/i);
   assert.match(html, /© 2026 Jin Ma · Open-source code under MIT · Independent project/);
   assert.doesNotMatch(html, /not affiliated with or endorsed by the AI providers/i);
   assert.match(html, /aria-label="Profile assumptions"/);
@@ -58,6 +58,7 @@ test("server-renders the TokenTier product", async () => {
   assert.match(html, /Input tokens \/ call/);
   assert.match(html, /Output tokens \/ call/);
   assert.match(html, /BEST PATH/);
+  assert.match(html, /published capacity evidence|published quota cannot confirm/);
   assert.match(html, /How this profile works/);
   assert.match(html, /18,000/);
   assert.match(html, /6,000/);
@@ -95,6 +96,7 @@ test("removes the disposable starter preview", async () => {
   assert.equal(JSON.parse(packageJson).license, "MIT");
   assert.match(page, /api-models\.json/);
   assert.match(layout, /TokenTier/);
+  assert.match(layout, /prefers-color-scheme: light/);
   assert.match(styles, /\.scenario-dock\s*\{[^}]*position:\s*fixed;[^}]*max-height:\s*calc\(100vh - 116px\);[^}]*overflow-y:\s*auto;/s);
   assert.match(styles, /@media \(max-width: 1279px\)[\s\S]*?\.scenario-dock\s*\{[^}]*position:\s*sticky;/s);
   assert.match(page, /const \[exploreScenarioId, setExploreScenarioId\]/);
@@ -117,6 +119,7 @@ test("removes the disposable starter preview", async () => {
   assert.match(styles, /\.tier-model strong\s*\{[^}]*font-size:\s*15px;/s);
   assert.match(styles, /\.workspace-tabs\s*\{/);
   assert.match(styles, /\.workspace-tabs button\s*\{[^}]*min-height:\s*44px;/s);
+  assert.match(styles, /\.theme-toggle\s*\{[^}]*min-width:\s*44px;[^}]*min-height:\s*44px;/s);
   assert.match(styles, /\.provider-filters button\s*\{[^}]*min-width:\s*44px;[^}]*min-height:\s*44px;/s);
   assert.match(styles, /\.book-switch button\s*\{[^}]*min-height:\s*44px;/s);
   assert.match(page, /Scroll sideways to see all columns\./);
@@ -124,6 +127,10 @@ test("removes the disposable starter preview", async () => {
   assert.match(styles, /\.recommendation-workspace\s*\{/);
   assert.match(styles, /\.plan-match-grid\s*\{/);
   assert.match(styles, /@media \(max-width: 680px\)[\s\S]*?\.scenario-dock\s*\{[^}]*grid-template-columns:\s*minmax\(0, 0\.75fr\) minmax\(0, 1\.25fr\);/s);
+  assert.match(styles, /@media \(max-width: 1279px\)[\s\S]*?\.scenario-dock\s*\{[^}]*background:\s*var\(--dock-bg\);/s);
+  assert.match(styles, /@media \(max-width: 680px\)[\s\S]*?\.hero-diff-line\s*\{[^}]*white-space:\s*normal;/s);
+  assert.match(styles, /@media \(max-width: 420px\)[\s\S]*?\.workspace-tab-long\s*\{[^}]*display:\s*none;/s);
+  assert.match(page, /function monthlyPrice\(value: number\)/);
   assert.doesNotMatch(styles, /\.hero-card|\.scenario-tabs|\.price-scenario-tabs|\.call-profile/);
   assert.doesNotMatch(page, /className="hero-card|className="scenario-tabs|className="price-scenario-tabs|className="call-profile/);
   assert.doesNotMatch(page, /codex-preview|_sites-preview/);

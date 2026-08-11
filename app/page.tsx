@@ -1,7 +1,7 @@
 "use client";
 
 import modelCatalog from "@/data/api-models.json";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 type ScenarioId =
   | "daily"
@@ -180,7 +180,7 @@ const plans: Plan[] = [
     modelId: "glm-5-2",
     source: "https://opencode.ai/docs/go/",
     note: "$5 first month. Vendor estimate for GLM-5.2 is 4,300 coding requests/month; model-specific estimates vary.",
-    quota: "$12 / 5h · $30 / week · $60 / month",
+    quota: "$12\u00A0/\u00A05h · $30\u00A0/\u00A0week · $60\u00A0/\u00A0month",
     evidence: "Official quota",
     confidence: "High",
     apiIncluded: "Capped coding endpoint",
@@ -615,6 +615,14 @@ function price(value: number, digits = 2) {
   return `$${value.toFixed(digits)}`;
 }
 
+function monthlyPrice(value: number) {
+  if (value < 10_000) return price(value);
+  return `$${new Intl.NumberFormat("en-US", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(value)}`;
+}
+
 function planPrice(plan: Plan) {
   if (plan.kind === "BYOK client") return "Free client";
   if (plan.kind === "Pay as you go") return "Usage only";
@@ -713,6 +721,7 @@ export default function Home() {
   const [recommendationOutputTokens, setRecommendationOutputTokens] = useState(6_000);
   const [tierLane, setTierLane] = useState<Lane>("api");
   const [priceLane, setPriceLane] = useState<Lane>("api");
+  const [recComparisonTab, setRecComparisonTab] = useState<Lane>("api");
   const [monthlyCalls, setMonthlyCalls] = useState(500);
   const [monthlyBudget, setMonthlyBudget] = useState(30);
   const [preference, setPreference] = useState<Preference>("either");
@@ -720,8 +729,44 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState("cost");
 
+  const theme = useSyncExternalStore(
+    (callback) => {
+      const media = window.matchMedia("(prefers-color-scheme: light)");
+      media.addEventListener("change", callback);
+      window.addEventListener("storage", callback);
+      return () => {
+        media.removeEventListener("change", callback);
+        window.removeEventListener("storage", callback);
+      };
+    },
+    () => {
+      try {
+        const saved = localStorage.getItem("tokentier-theme");
+        if (saved === "light" || saved === "dark") return saved;
+        return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      } catch {
+        return "dark";
+      }
+    },
+    () => "dark",
+  );
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    try {
+      localStorage.setItem("tokentier-theme", nextTheme);
+      document.documentElement.setAttribute("data-theme", nextTheme);
+      window.dispatchEvent(new Event("storage"));
+    } catch {
+      // ignore
+    }
+  };
+
   const exploreScenario = scenarios.find((item) => item.id === exploreScenarioId)!;
-  const recommendationScenario = scenarios.find((item) => item.id === recommendationScenarioId)!;
   const exploreSettings = useMemo<UsageSettings>(() => ({
     input: exploreScenario.input,
     output: exploreScenario.output,
@@ -788,19 +833,14 @@ export default function Home() {
             : "api";
 
   const verdictCopy = preferredPath === "plans"
-    ? "The plan fits your budget and has enough published capacity evidence for this workload."
-    : apiWithinBudget
-      ? "The API has the stronger mix of task fit, inspectable cost, and budget control."
-      : planWithinBudget && !planCoversVolume
-        ? "The API estimate is more inspectable; the affordable plan lacks enough documented quota evidence."
-        : "Neither path cleanly fits the budget; API remains the more inspectable baseline.";
-
-  const verdictReasons = [
-    `${apiRecommendation.name} is estimated at ${price(recommendedApiSpend)} per month for ${monthlyCalls.toLocaleString()} calls.`,
-    recommendedPlanCoverage === null
-      ? `${planRecommendation.name} is $${planRecommendation.monthly} per month, but its published quota cannot be converted to these custom calls.`
-      : `${planRecommendation.name} is $${planRecommendation.monthly} per month with ${recommendedPlanCoverage >= 70 ? "plausible" : "insufficient"} estimated capacity for this volume.`,
-  ];
+    ? `${planRecommendation.name} fits your $${monthlyBudget.toLocaleString()} budget and has enough published capacity evidence for ${monthlyCalls.toLocaleString()} calls.`
+    : !apiWithinBudget
+      ? `${apiRecommendation.name} is the clearest fallback at ${monthlyPrice(recommendedApiSpend)}/month, although it exceeds your budget by ${monthlyPrice(recommendedApiSpend - monthlyBudget)}.`
+      : !planCoversVolume
+        ? `${apiRecommendation.name} fits your budget at ${monthlyPrice(recommendedApiSpend)}/month; the plan's published quota cannot confirm this workload.`
+        : recommendedApiSpend <= (planRecommendation.monthly ?? Infinity)
+          ? `${apiRecommendation.name} is ${monthlyPrice((planRecommendation.monthly ?? 0) - recommendedApiSpend)} less per month and stays within budget.`
+          : `${apiRecommendation.name} matches your API preference and keeps spend transparent at ${monthlyPrice(recommendedApiSpend)}/month.`;
 
   const rankedModelCosts = useMemo(() => {
     return models
@@ -880,17 +920,31 @@ export default function Home() {
           }}
         ><span className="brand-mark">T/T</span><span>TokenTier</span></a>
         <nav className="workspace-tabs" aria-label="Comparison mode">
-          <button aria-pressed={activeView === "explore"} className={activeView === "explore" ? "active" : ""} id="explore-tab" onClick={() => switchView("explore")} type="button">Explore profiles</button>
-          <button aria-pressed={activeView === "recommendation"} className={activeView === "recommendation" ? "active" : ""} id="recommendation-tab" onClick={() => switchView("recommendation")} type="button">My recommendation</button>
+          <button aria-label="Explore profiles" aria-pressed={activeView === "explore"} className={activeView === "explore" ? "active" : ""} id="explore-tab" onClick={() => switchView("explore")} type="button"><span aria-hidden="true" className="workspace-tab-long">Explore profiles</span><span aria-hidden="true" className="workspace-tab-short">Explore</span></button>
+          <button aria-label="My recommendation" aria-pressed={activeView === "recommendation"} className={activeView === "recommendation" ? "active" : ""} id="recommendation-tab" onClick={() => switchView("recommendation")} type="button"><span aria-hidden="true" className="workspace-tab-long">My recommendation</span><span aria-hidden="true" className="workspace-tab-short">Recommend</span></button>
         </nav>
-        <span className="freshness"><i /> Updated {pricingUpdatedAt}</span>
+        <div className="header-actions">
+          <button
+            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+            className="theme-toggle"
+            onClick={toggleTheme}
+            type="button"
+          >
+            {theme === "dark" ? (
+              <svg aria-hidden="true" fill="none" height="15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="15"><circle cx="12" cy="12" r="5"/><line x1="12" x2="12" y1="1" y2="3"/><line x1="12" x2="12" y1="21" y2="23"/><line x1="4.22" x2="5.64" y1="4.22" y2="5.64"/><line x1="18.36" x2="19.78" y1="18.36" y2="19.78"/><line x1="1" x2="3" y1="12" y2="12"/><line x1="21" x2="23" y1="12" y2="12"/><line x1="4.22" x2="5.64" y1="19.78" y2="18.36"/><line x1="18.36" x2="19.78" y1="5.64" y2="4.22"/></svg>
+            ) : (
+              <svg aria-hidden="true" fill="none" height="15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="15"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            )}
+            <span>{theme === "dark" ? "Light" : "Dark"}</span>
+          </button>
+          <span className="freshness"><i /> Updated {pricingUpdatedAt}</span>
+        </div>
       </header>
 
       <div aria-labelledby="explore-tab" className="view-panel explore-panel" hidden={activeView !== "explore"} id="explore-panel" role="region">
       <aside className="scenario-dock" aria-label="Profile assumptions">
         <div className="scenario-dock-heading">
           <span>Profile assumptions</span>
-          <strong aria-live="polite">{exploreScenario.label}</strong>
         </div>
         <label className="scenario-dock-select" htmlFor="explore-scenario">
           <span>Use case</span>
@@ -899,18 +953,15 @@ export default function Home() {
           </select>
         </label>
         <p className="scenario-dock-impact">Updates the tier list and price book in Explore.</p>
-        <p className="scenario-dock-description">{exploreScenario.description}</p>
         <dl className="scenario-dock-tokens">
           <div><dt>Input</dt><dd>{exploreScenario.input.toLocaleString()}</dd></div>
           <div><dt>Output</dt><dd>{exploreScenario.output.toLocaleString()}</dd></div>
           <div><dt>Total</dt><dd>{(exploreScenario.input + exploreScenario.output).toLocaleString()}</dd></div>
         </dl>
-        <p className="scenario-dock-note">Tokens per estimated API call. Input is uncached; reasoning counts as output.</p>
-        <p className="scenario-dock-exclusions">Excludes search, tools, images, storage, taxes, and retries.</p>
+        <p className="scenario-dock-note">Tokens per estimated API call.</p>
         <button className="scenario-dock-action" onClick={useExploreProfile} type="button">Use in My recommendation <span>→</span></button>
         <details className="scenario-dock-more">
           <summary>How this profile works <span aria-hidden="true">+</span></summary>
-          <p>{exploreScenario.description}</p>
           <p>Updates the tier list and price book in Explore.</p>
           <p>Costs exclude search, tools, images, storage, taxes, and retries.</p>
         </details>
@@ -920,7 +971,7 @@ export default function Home() {
         <div className="hero-grid" aria-hidden="true" />
         <div className="hero-copy">
           <p className="eyebrow">Independent API and plan comparison</p>
-          <h1>API or plan?<br /><em>Know the difference.</em></h1>
+          <h1>API or plan?<br /><span className="hero-diff-line"><em>Know the difference.</em></span></h1>
           <p className="hero-lede">
             Compare direct API costs with subscription prices and published quotas, then choose the best fit for your work.
           </p>
@@ -938,7 +989,7 @@ export default function Home() {
 
       <section className="section tier-section" id="tier-board">
         <div className="section-heading single">
-          <div><h2>Compare by<br />use case.</h2></div>
+          <div><h2>Tier List</h2></div>
         </div>
 
         <div className="lane-switch" role="group" aria-label="Tier list lane">
@@ -981,7 +1032,7 @@ export default function Home() {
 
       <section className="section prices-section" id="prices">
         <div className="section-heading compact">
-          <div><h2>Compare rates<br />and quotas.</h2></div>
+          <div><h2>Price Book</h2></div>
           <div className="section-intro"><p>Review API token rates alongside plan prices, credits, and published limits.</p></div>
         </div>
 
@@ -1047,32 +1098,39 @@ export default function Home() {
 
       <div aria-labelledby="recommendation-tab" className="view-panel recommendation-panel" hidden={activeView !== "recommendation"} id="recommendation-panel" role="region">
         <section className="recommendation-view" id="recommendation-top">
+          <div className="hero-grid" aria-hidden="true" />
           <header className="recommendation-intro">
             <p className="eyebrow">Your workload · your budget · both paths</p>
-            <h1>Build your<br /><em>best-fit month.</em></h1>
-            <p>Set the work type, token assumptions, and monthly limits. We compare direct API spend with subscription price and published capacity, then explain the strongest path.</p>
+            <h1>Build your<br /><span className="hero-diff-line"><em>best-fit month.</em></span></h1>
+            <p className="hero-lede">Set the work type, token assumptions, and monthly limits. We compare direct API spend with subscription price and published capacity, then explain the strongest path.</p>
           </header>
 
           <div className="recommendation-workspace">
             <section className="settings-card" id="recommendation-settings" aria-labelledby="settings-title">
-              <div className="settings-heading"><div><span>01</span><h2 id="settings-title">Your settings</h2></div><p>{recommendationScenario.description}</p></div>
-              <fieldset>
-                <legend>Workload</legend>
-                <div className="custom-settings-grid">
-                  <label>Work type<select id="recommendation-profile" value={recommendationScenarioId} onChange={(event) => updateRecommendationProfile(event.target.value as ScenarioId)}>{scenarios.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
-                  <label>Input tokens / call<input inputMode="numeric" min="1" max="1000000" type="number" value={recommendationInputTokens} onChange={(event) => setRecommendationInputTokens(Math.max(1, Number(event.target.value) || 1))} /></label>
-                  <label>Output tokens / call<input inputMode="numeric" min="1" max="500000" type="number" value={recommendationOutputTokens} onChange={(event) => setRecommendationOutputTokens(Math.max(1, Number(event.target.value) || 1))} /></label>
-                </div>
-              </fieldset>
-              <fieldset>
-                <legend>Monthly needs</legend>
-                <div className="custom-settings-grid">
-                  <label>Calls / month<input inputMode="numeric" min="1" max="100000" type="number" value={monthlyCalls} onChange={(event) => setMonthlyCalls(Math.max(1, Number(event.target.value) || 1))} /></label>
-                  <label>Budget / month<input inputMode="numeric" min="1" max="10000" type="number" value={monthlyBudget} onChange={(event) => setMonthlyBudget(Math.max(1, Number(event.target.value) || 1))} /></label>
-                  <label>Preference<select value={preference} onChange={(event) => setPreference(event.target.value as Preference)}><option value="either">Compare both</option><option value="api">API first</option><option value="plans">Plan first</option></select></label>
-                </div>
-              </fieldset>
-              <p className="settings-note"><strong>Work type</strong> controls task-fit and quota class. <strong>Token fields</strong> control API cost and plan-equivalent estimates.</p>
+              <div className="settings-heading"><div><span>01</span><h2 id="settings-title">Your settings</h2></div></div>
+              <div className="settings-body">
+                <fieldset>
+                  <legend>Workload</legend>
+                  <div className="custom-settings-grid">
+                    <label>Work type<select id="recommendation-profile" value={recommendationScenarioId} onChange={(event) => updateRecommendationProfile(event.target.value as ScenarioId)}>{scenarios.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
+                    <label>Input tokens / call<input inputMode="numeric" min="1" max="1000000" type="number" value={recommendationInputTokens} onChange={(event) => setRecommendationInputTokens(Math.min(1_000_000, Math.max(1, Number(event.target.value) || 1)))} /></label>
+                    <label>Output tokens / call<input inputMode="numeric" min="1" max="500000" type="number" value={recommendationOutputTokens} onChange={(event) => setRecommendationOutputTokens(Math.min(500_000, Math.max(1, Number(event.target.value) || 1)))} /></label>
+                  </div>
+                </fieldset>
+                <fieldset>
+                  <legend>Monthly needs</legend>
+                  <div className="custom-settings-grid">
+                    <label>Calls / month<input inputMode="numeric" min="1" max="100000" type="number" value={monthlyCalls} onChange={(event) => setMonthlyCalls(Math.min(100_000, Math.max(1, Number(event.target.value) || 1)))} /></label>
+                    <label>Budget / month<input inputMode="numeric" min="1" max="10000" type="number" value={monthlyBudget} onChange={(event) => setMonthlyBudget(Math.min(10_000, Math.max(1, Number(event.target.value) || 1)))} /></label>
+                    <label>Preference<select value={preference} onChange={(event) => setPreference(event.target.value as Preference)}><option value="either">Compare both</option><option value="api">API first</option><option value="plans">Plan first</option></select></label>
+                  </div>
+                </fieldset>
+                <p className="settings-note">
+                  <span><strong>Work type</strong> controls task-fit and quota class.</span>
+                  <br />
+                  <span><strong>Token fields</strong> control API cost and plan-equivalent estimates.</span>
+                </p>
+              </div>
             </section>
 
             <section className="recommendation-card recommendation-output" aria-labelledby="recommendation-title">
@@ -1082,61 +1140,141 @@ export default function Home() {
                 <p>{verdictCopy}</p>
               </div>
 
-              <ul className="decision-reasons">
-                {verdictReasons.map((reason) => <li key={reason}>{reason}</li>)}
-              </ul>
-
               <div className="recommendation-grid">
                 <article className={preferredPath === "api" ? "path-card primary" : "path-card"}>
                   <div className="path-card-label"><span>BEST API</span><span className={`mini-tier tier-${apiRecommendation.tiers[recommendationScenarioId].toLowerCase()}`}>{apiRecommendation.tiers[recommendationScenarioId]}</span></div>
-                  {preferredPath === "api" && <span className="winner-badge">Recommended path</span>}
-                  <div className="path-title"><span className="provider-orb" data-provider={apiRecommendation.provider} /><div><strong>{apiRecommendation.name}</strong><small>{apiRecommendation.provider} · direct API</small></div></div>
-                  <p className="path-price">{price(recommendedApiSpend)}<span>/ month</span></p>
-                  <dl><div><dt>Per call</dt><dd>{price(callCost(apiRecommendation, recommendationSettings), 3)}</dd></div><div><dt>Budget</dt><dd>{apiWithinBudget ? "Fits" : `Over by ${price(recommendedApiSpend - monthlyBudget)}`}</dd></div><div><dt>Basis</dt><dd>Published token rates</dd></div></dl>
+                  <div className="path-title">
+                    <span className="provider-orb" data-provider={apiRecommendation.provider} />
+                    <div><strong>{apiRecommendation.name}</strong><small>{apiRecommendation.provider} · direct API</small></div>
+                    {preferredPath === "api" && <span className="recommendation-badge">Best</span>}
+                  </div>
+                  <p className="path-price" title={`${price(recommendedApiSpend)} per month`}>{monthlyPrice(recommendedApiSpend)}<span>/ month</span></p>
+                  <dl><div><dt>Per call</dt><dd>{price(callCost(apiRecommendation, recommendationSettings), 3)}</dd></div><div><dt>Budget</dt><dd>{apiWithinBudget ? "Fits" : `Over by ${monthlyPrice(recommendedApiSpend - monthlyBudget)}`}</dd></div><div><dt>Basis</dt><dd>Published token rates</dd></div></dl>
+                  <div className="path-card-verdict"><p>{apiRecommendation.name} is estimated at {monthlyPrice(recommendedApiSpend)}/mo for {monthlyCalls.toLocaleString()} calls.</p></div>
                 </article>
 
                 <article className={preferredPath === "plans" ? "path-card primary" : "path-card"}>
                   <div className="path-card-label"><span>BEST PLAN</span><span className={`mini-tier tier-${planRecommendation.tiers[recommendationScenarioId].toLowerCase()}`}>{planRecommendation.tiers[recommendationScenarioId]}</span></div>
-                  {preferredPath === "plans" && <span className="winner-badge">Recommended path</span>}
-                  <div className="path-title"><span className="provider-orb" data-provider={planRecommendation.provider} /><div><strong>{planRecommendation.name}</strong><small>{planRecommendation.provider} · subscription</small></div></div>
+                  <div className="path-title">
+                    <span className="provider-orb" data-provider={planRecommendation.provider} />
+                    <div><strong>{planRecommendation.name}</strong><small>{planRecommendation.provider} · subscription</small></div>
+                    {preferredPath === "plans" && <span className="recommendation-badge">Best</span>}
+                  </div>
                   <p className="path-price">${planRecommendation.monthly}<span>/ month</span></p>
                   <dl><div><dt>{recommendedPlanEstimate.basis === "Price break-even only" ? "API-cost parity" : "Est. capacity"}</dt><dd>{formatEstimateRange(recommendedPlanEstimate.callsLow, recommendedPlanEstimate.callsHigh)} calls</dd></div><div><dt>Published quota</dt><dd>{planQuota(planRecommendation, recommendationScenarioId)}</dd></div><div><dt>Confidence</dt><dd>{planRecommendation.confidence} · {recommendedPlanEstimate.basis}</dd></div></dl>
+                  <div className="path-card-verdict"><p>{recommendedPlanCoverage === null ? `${planRecommendation.name} is $${planRecommendation.monthly}/mo (quota not convertible to custom tokens).` : `${planRecommendation.name} is $${planRecommendation.monthly}/mo with ${recommendedPlanCoverage >= 70 ? "plausible" : "insufficient"} estimated capacity.`}</p></div>
                 </article>
               </div>
             </section>
           </div>
 
-          <section className="all-model-costs recommendation-list" aria-labelledby="all-model-costs-title">
-            <div className="cost-list-heading">
-              <div><span>API COMPARISON</span><h2 id="all-model-costs-title">Monthly cost by model</h2></div>
-              <p>{monthlyCalls.toLocaleString()} calls · {recommendationInputTokens.toLocaleString()} in + {recommendationOutputTokens.toLocaleString()} out · ${monthlyBudget.toLocaleString()} budget</p>
+          <section className="unified-comparison-card" aria-labelledby="unified-comparison-title">
+            <div className="unified-comparison-header">
+              <div className="unified-comparison-heading">
+                <span>Detailed Comparison</span>
+                <h2 id="unified-comparison-title">
+                  {recComparisonTab === "api" ? "Monthly cost by model" : "Suitable subscriptions"}
+                </h2>
+                <p className="unified-comparison-meta">
+                  {monthlyCalls.toLocaleString()} calls · {recommendationInputTokens.toLocaleString()} in + {recommendationOutputTokens.toLocaleString()} out · ${monthlyBudget.toLocaleString()} budget
+                </p>
+              </div>
             </div>
-            <div className="model-cost-list">
-              {rankedModelCosts.map(({ model, perCall, monthly }) => {
-                const recommended = model.id === apiRecommendation.id;
-                const tier = model.tiers[recommendationScenarioId];
-                return (
-                  <article className={`model-cost-row ${recommended ? "recommended" : ""}`} key={model.id}>
-                    <div className="cost-model"><span className="provider-orb" data-provider={model.provider} /><div><strong>{model.name}</strong><small>{model.provider} · {tier === "—" ? "Not ranked" : `${tier} tier`}</small></div>{recommended && <span className="recommendation-badge">Best API</span>}</div>
-                    <div className="cost-total"><strong>{price(monthly)}</strong><span>{price(perCall, 4)} / call</span></div>
-                  </article>
-                );
-              })}
-            </div>
-          </section>
 
-          <section className="plan-matches" aria-labelledby="plan-matches-title">
-            <div className="plan-matches-heading"><div><span>PLAN COMPARISON</span><h2 id="plan-matches-title">Suitable subscriptions</h2></div><p>Ranked by task fit, monthly budget, published capacity, and evidence confidence.</p></div>
-            <div className="plan-match-grid">
-              {rankedPlanOptions.slice(0, 6).map(({ plan, estimate, coverage, withinBudget }, index) => (
-                <article className={`plan-match-card ${index === 0 ? "recommended" : ""}`} key={plan.id}>
-                  <div className="plan-match-title"><span className="provider-orb" data-provider={plan.provider} /><div><strong>{plan.name}</strong><small>{plan.provider}</small></div>{index === 0 && <span className="recommendation-badge">Best plan</span>}</div>
-                  <p className="plan-match-price">${plan.monthly}<span>/ month</span></p>
-                  <dl><div><dt>Budget</dt><dd>{withinBudget ? "Fits" : "Over budget"}</dd></div><div><dt>{estimate.basis === "Price break-even only" ? "API-cost parity" : "Est. capacity"}</dt><dd>{formatEstimateRange(estimate.callsLow, estimate.callsHigh)} calls</dd></div><div><dt>Coverage signal</dt><dd>{coverage === null ? "Not quantifiable" : coverage >= 70 ? "Plausible" : "Insufficient"}</dd></div><div><dt>Evidence</dt><dd>{plan.confidence} · {plan.evidence}</dd></div></dl>
-                </article>
-              ))}
+            <div className="lane-switch comparison-lane-switch" role="group" aria-label="Detailed comparison lane">
+              <button
+                aria-pressed={recComparisonTab === "api"}
+                className={recComparisonTab === "api" ? "active" : ""}
+                onClick={() => setRecComparisonTab("api")}
+                type="button"
+              >
+                <strong>API models ({rankedModelCosts.length})</strong>
+                <small>Ranked monthly cost</small>
+              </button>
+              <button
+                aria-pressed={recComparisonTab === "plans"}
+                className={recComparisonTab === "plans" ? "active" : ""}
+                onClick={() => setRecComparisonTab("plans")}
+                type="button"
+              >
+                <strong>Subscription plans ({rankedPlanOptions.length})</strong>
+                <small>Workload suitability</small>
+              </button>
             </div>
-            <p className="plan-match-note">Price break-even shows economic parity only. It is not a promised quota unless the provider publishes credits or limits.</p>
+
+            {recComparisonTab === "api" ? (
+              <div className="model-cost-columns">
+                <div className="model-cost-column">
+                  {rankedModelCosts.slice(0, Math.ceil(rankedModelCosts.length / 2)).map(({ model, perCall, monthly }) => {
+                    const recommended = model.id === apiRecommendation.id;
+                    const tier = model.tiers[recommendationScenarioId];
+                    return (
+                      <article className={`model-cost-row ${recommended ? "recommended" : ""}`} key={model.id}>
+                        <div className="cost-model">
+                          <span className="provider-orb" data-provider={model.provider} />
+                          <div>
+                            <strong>{model.name}</strong>
+                            <small>{model.provider} · {tier === "—" ? "Not ranked" : `${tier} tier`}</small>
+                          </div>
+                          {recommended && <span className="recommendation-badge">Best API</span>}
+                        </div>
+                        <div className="cost-total">
+                          <strong title={price(monthly)}>{monthlyPrice(monthly)}</strong>
+                          <span>{price(perCall, 4)} / call</span>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+                <div className="model-cost-column">
+                  {rankedModelCosts.slice(Math.ceil(rankedModelCosts.length / 2)).map(({ model, perCall, monthly }) => {
+                    const recommended = model.id === apiRecommendation.id;
+                    const tier = model.tiers[recommendationScenarioId];
+                    return (
+                      <article className={`model-cost-row ${recommended ? "recommended" : ""}`} key={model.id}>
+                        <div className="cost-model">
+                          <span className="provider-orb" data-provider={model.provider} />
+                          <div>
+                            <strong>{model.name}</strong>
+                            <small>{model.provider} · {tier === "—" ? "Not ranked" : `${tier} tier`}</small>
+                          </div>
+                          {recommended && <span className="recommendation-badge">Best API</span>}
+                        </div>
+                        <div className="cost-total">
+                          <strong title={price(monthly)}>{monthlyPrice(monthly)}</strong>
+                          <span>{price(perCall, 4)} / call</span>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="plan-match-grid">
+                  {rankedPlanOptions.slice(0, 6).map(({ plan, estimate, coverage, withinBudget }, index) => (
+                    <article className={`plan-match-card ${index === 0 ? "recommended" : ""}`} key={plan.id}>
+                      <div className="plan-match-title">
+                        <span className="provider-orb" data-provider={plan.provider} />
+                        <div>
+                          <strong>{plan.name}</strong>
+                          <small>{plan.provider}</small>
+                        </div>
+                        {index === 0 && <span className="recommendation-badge">Best plan</span>}
+                      </div>
+                      <p className="plan-match-price">${plan.monthly}<span>/ month</span></p>
+                      <dl>
+                        <div><dt>Budget</dt><dd>{withinBudget ? "Fits" : "Over budget"}</dd></div>
+                        <div><dt>{estimate.basis === "Price break-even only" ? "API-cost parity" : "Est. capacity"}</dt><dd>{formatEstimateRange(estimate.callsLow, estimate.callsHigh)} calls</dd></div>
+                        <div><dt>Coverage signal</dt><dd>{coverage === null ? "Not quantifiable" : coverage >= 70 ? "Plausible" : "Insufficient"}</dd></div>
+                        <div><dt>Evidence</dt><dd>{plan.confidence} · {plan.evidence}</dd></div>
+                      </dl>
+                    </article>
+                  ))}
+                </div>
+                <p className="plan-match-note">Price break-even shows economic parity only. It is not a promised quota unless the provider publishes credits or limits.</p>
+              </>
+            )}
           </section>
         </section>
       </div>
