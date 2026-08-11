@@ -71,7 +71,7 @@ test("removes the disposable starter preview", async () => {
   assert.match(page, /Primary pricing and quota sources/);
   assert.match(page, /api-models\.json/);
   assert.match(layout, /TokenTier/);
-  assert.match(styles, /\.hero-card::before\s*\{[^}]*inset:\s*-12px;[^}]*border-radius:\s*39px;/s);
+  assert.match(styles, /\.hero-card::before\s*\{[^}]*inset:\s*0;[^}]*border-radius:\s*27px;/s);
   assert.doesNotMatch(page, /codex-preview|_sites-preview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   await assert.rejects(access(new URL("app/_sites-preview", projectRoot)));
