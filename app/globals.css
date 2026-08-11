@@ -147,7 +147,7 @@ main {
 }
 
 .workspace-tabs button {
-  min-height: 38px;
+  min-height: 44px;
   padding: 0 15px;
   border: 0;
   border-radius: 8px;
@@ -1069,6 +1069,7 @@ main {
 }
 
 .search-field input {
+  align-self: stretch;
   min-width: 0;
   flex: 1;
   border: 0;
@@ -1086,12 +1087,27 @@ main {
   display: flex;
   gap: 5px;
   min-width: 0;
+  padding: 4px 1px;
   overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-color: #4a505d transparent;
+  scrollbar-width: thin;
+}
+
+.provider-filters::-webkit-scrollbar {
+  height: 6px;
+}
+
+.provider-filters::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #4a505d;
 }
 
 .provider-filters button {
   flex: 0 0 auto;
-  padding: 9px 11px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 11px;
   border: 1px solid transparent;
   border-radius: 8px;
   background: transparent;
@@ -1117,7 +1133,7 @@ main {
 }
 
 .sort-field select {
-  height: 40px;
+  height: 44px;
   padding: 0 31px 0 11px;
   border: 1px solid #343741;
   border-radius: 9px;
@@ -1133,6 +1149,10 @@ main {
   border: 1px solid #30333c;
   border-radius: 18px;
   background: #151820;
+}
+
+.table-scroll-hint {
+  display: none;
 }
 
 table {
@@ -1399,6 +1419,9 @@ td:first-child {
 }
 
 .sources a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
   padding: 9px 11px;
   border: 1px solid rgba(13, 15, 20, 0.2);
   border-radius: 8px;
@@ -1749,6 +1772,7 @@ footer {
 }
 
 .book-switch button {
+  min-height: 44px;
   padding: 10px 13px;
   border: 0;
   border-radius: 8px;
@@ -2157,7 +2181,7 @@ footer {
   }
 
   .workspace-tabs button {
-    min-height: 42px;
+    min-height: 44px;
     padding: 0 8px;
     font-size: 13px;
   }
@@ -2205,6 +2229,10 @@ footer {
   }
 
   .scenario-dock-action {
+    min-height: 44px;
+  }
+
+  .scenario-dock-more summary {
     min-height: 44px;
   }
 
@@ -2348,8 +2376,47 @@ footer {
     text-align: left;
   }
 
+  .model-cost-row {
+    gap: 12px;
+    padding: 14px 12px;
+  }
+
+  .cost-model {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .cost-model strong,
+  .plan-match-title strong {
+    overflow: visible;
+    line-height: 1.25;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .cost-model .recommendation-badge,
+  .plan-match-title .recommendation-badge {
+    grid-column: 1 / -1;
+    justify-self: start;
+    margin-left: 30px;
+  }
+
+  .cost-total {
+    min-width: 74px;
+  }
+
+  .plan-match-title {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
   .table-tools {
     grid-template-columns: 1fr;
+  }
+
+  .table-scroll-hint {
+    display: block;
+    margin: -4px 0 12px;
+    color: #aeb3bd;
+    font-size: 13px;
   }
 
   .provider-filters {

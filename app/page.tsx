@@ -998,6 +998,7 @@ export default function Home() {
           <label className="sort-field"><span>Sort</span><select onChange={(event) => setSortBy(event.target.value)} value={sortBy}>{priceLane === "api" ? <><option value="cost">Estimated call cost</option><option value="input">Input price</option><option value="output">Output price</option><option value="context">Context window</option></> : <><option value="price">Monthly price</option><option value="fit">Scenario fit</option><option value="confidence">Quota confidence</option></>}</select></label>
         </div>
 
+        <p className="table-scroll-hint">Scroll sideways to see all columns.</p>
         <div className="table-wrap">
           {priceLane === "api" ? (
             <table>

@@ -116,6 +116,11 @@ test("removes the disposable starter preview", async () => {
   assert.match(styles, /\.tier-model\s*\{[^}]*height:\s*82px;[^}]*min-height:\s*82px;[^}]*overflow:\s*hidden;/s);
   assert.match(styles, /\.tier-model strong\s*\{[^}]*font-size:\s*15px;/s);
   assert.match(styles, /\.workspace-tabs\s*\{/);
+  assert.match(styles, /\.workspace-tabs button\s*\{[^}]*min-height:\s*44px;/s);
+  assert.match(styles, /\.provider-filters button\s*\{[^}]*min-width:\s*44px;[^}]*min-height:\s*44px;/s);
+  assert.match(styles, /\.book-switch button\s*\{[^}]*min-height:\s*44px;/s);
+  assert.match(page, /Scroll sideways to see all columns\./);
+  assert.match(styles, /@media \(max-width: 680px\)[\s\S]*?\.cost-model \.recommendation-badge,[\s\S]*?grid-column:\s*1 \/ -1;/s);
   assert.match(styles, /\.recommendation-workspace\s*\{/);
   assert.match(styles, /\.plan-match-grid\s*\{/);
   assert.match(styles, /@media \(max-width: 680px\)[\s\S]*?\.scenario-dock\s*\{[^}]*grid-template-columns:\s*minmax\(0, 0\.75fr\) minmax\(0, 1\.25fr\);/s);
