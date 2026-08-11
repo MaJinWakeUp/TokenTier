@@ -31,11 +31,14 @@ test("server-renders the TokenTier product", async () => {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /<title>TokenTier — AI model prices, ranked by the work<\/title>/i);
-  assert.match(html, /Know what every/);
-  assert.match(html, /Pick the work/);
-  assert.match(html, /subscription-equivalent estimate/i);
-  assert.match(html, /Checked Aug 10, 2026/);
+  assert.match(html, /<title>TokenTier — AI APIs vs subscription plans<\/title>/i);
+  assert.match(html, /API or plan/);
+  assert.match(html, /Choose the lane/);
+  assert.match(html, /API VS PLAN RECOMMENDER/i);
+  assert.match(html, /OpenCode Go/);
+  assert.match(html, /GLM-5\.2/);
+  assert.match(html, /Kimi K3/);
+  assert.match(html, /Checked Aug 11, 2026/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 });
 
@@ -47,8 +50,12 @@ test("removes the disposable starter preview", async () => {
   ]);
 
   assert.match(page, /TokenTier/);
+  assert.match(page, /Cursor Pro/);
+  assert.match(page, /OpenCode Zen/);
+  assert.match(page, /GLM Coding Lite/);
+  assert.match(page, /Kimi Moderato/);
   assert.match(layout, /TokenTier/);
   assert.doesNotMatch(page, /codex-preview|_sites-preview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
-  await assert.rejects(access(new URL("app\/_sites-preview", projectRoot)));
+  await assert.rejects(access(new URL("app/_sites-preview", projectRoot)));
 });

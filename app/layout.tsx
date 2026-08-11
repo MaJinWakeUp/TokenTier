@@ -13,20 +13,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TokenTier — AI model prices, ranked by the work",
+  title: "TokenTier — AI APIs vs subscription plans",
   description:
-    "Compare current AI API and subscription prices, scenario tier lists, and transparent subscription-to-API call estimates.",
+    "Compare AI API prices with subscription quotas, credits, scenario tier lists, and a transparent API-versus-plan recommender.",
   openGraph: {
-    title: "TokenTier — Know what every prompt costs",
+    title: "TokenTier — API or plan? Know the difference",
     description:
-      "Price-aware AI model tier lists, API rates, and subscription break-even estimates.",
+      "Separate AI API and subscription tier lists, real quota evidence, and workload-based recommendations.",
     type: "website",
   },
   twitter: {
     card: "summary",
-    title: "TokenTier — Know what every prompt costs",
+    title: "TokenTier — API or plan? Know the difference",
     description:
-      "Price-aware AI model tier lists, API rates, and subscription break-even estimates.",
+      "Separate AI API and subscription tier lists, real quota evidence, and workload-based recommendations.",
   },
 };
 
