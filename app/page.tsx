@@ -67,31 +67,31 @@ const scenarios: Array<{
   },
   {
     id: "code-easy",
-    label: "Coding · easy",
-    shortLabel: "Easy code",
+    label: "Easy coding",
+    shortLabel: "Easy coding",
     input: 4000,
     output: 1500,
     description: "Small functions, explanations, tests, and local fixes.",
   },
   {
     id: "code-medium",
-    label: "Coding · medium",
-    shortLabel: "Medium code",
+    label: "Medium coding",
+    shortLabel: "Medium coding",
     input: 18000,
     output: 6000,
     description: "Multi-file features, debugging, and tool-assisted iteration.",
   },
   {
     id: "code-hard",
-    label: "Coding · difficult",
-    shortLabel: "Hard code",
+    label: "Hard coding",
+    shortLabel: "Hard coding",
     input: 60000,
     output: 18000,
     description: "Repository-scale reasoning, migrations, and agentic work.",
   },
   {
     id: "research",
-    label: "Research exploration",
+    label: "Research",
     shortLabel: "Research",
     input: 35000,
     output: 10000,
@@ -243,6 +243,18 @@ const models: Model[] = [
     context: "1M",
     source: "https://api-docs.deepseek.com/quick_start/pricing/",
     note: "A published price increase is planned; re-check before production use.",
+    tiers: { daily: "S", "code-easy": "S", "code-medium": "A", "code-hard": "B", research: "A", writing: "B", innovation: "B" },
+  },
+  {
+    id: "deepseek-v4-flash",
+    provider: "DeepSeek",
+    name: "DeepSeek V4 Flash",
+    input: 0.14,
+    cached: 0.0028,
+    output: 0.28,
+    context: "1M",
+    source: "https://api-docs.deepseek.com/quick_start/pricing/",
+    note: "Cache hits are automatic and best-effort; a published price increase is planned, and the official limit is 2,500 concurrent requests per account.",
     tiers: { daily: "S", "code-easy": "S", "code-medium": "A", "code-hard": "B", research: "A", writing: "B", innovation: "B" },
   },
   {
@@ -913,13 +925,15 @@ export default function Home() {
 
   const apiRecommendation = useMemo(() => {
     const candidates = models.filter((model) => model.tiers[scenarioId] !== "—");
-    return [...candidates].sort((a, b) => {
+    const withinBudget = candidates.filter(
+      (model) => callCost(model, scenarioId) * monthlyCalls <= monthlyBudget,
+    );
+    const eligible = withinBudget.length > 0 ? withinBudget : candidates;
+    return [...eligible].sort((a, b) => {
       const aSpend = callCost(a, scenarioId) * monthlyCalls;
       const bSpend = callCost(b, scenarioId) * monthlyCalls;
-      const aBudget = aSpend <= monthlyBudget ? 100 : 0;
-      const bBudget = bSpend <= monthlyBudget ? 100 : 0;
-      const aScore = tierScore[a.tiers[scenarioId]] * 0.7 + aBudget * 0.3;
-      const bScore = tierScore[b.tiers[scenarioId]] * 0.7 + bBudget * 0.3;
+      const aScore = tierScore[a.tiers[scenarioId]];
+      const bScore = tierScore[b.tiers[scenarioId]];
       return bScore - aScore || aSpend - bSpend;
     })[0];
   }, [monthlyBudget, monthlyCalls, scenarioId]);
@@ -965,6 +979,15 @@ export default function Home() {
       : planWithinBudget && !planCoversVolume
         ? "The API estimate is more inspectable; the affordable plan lacks enough documented quota evidence."
         : "Neither path cleanly fits the budget; API remains the more inspectable baseline.";
+
+  const rankedModelCosts = useMemo(() => {
+    return models
+      .map((model) => {
+        const perCall = callCost(model, scenarioId);
+        return { model, perCall, monthly: perCall * monthlyCalls };
+      })
+      .sort((a, b) => a.monthly - b.monthly);
+  }, [monthlyCalls, scenarioId]);
 
   const visibleModels = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -1013,7 +1036,6 @@ export default function Home() {
           <a href="#tier-board">Tier lists</a>
           <a href="#calculator">Recommender</a>
           <a href="#prices">Price book</a>
-          <a href="#method">Method</a>
         </nav>
         <span className="freshness"><i /> Checked Aug 11, 2026</span>
       </header>
@@ -1062,7 +1084,7 @@ export default function Home() {
           <div className="hero-card-foot"><span>Editorial value picks</span><span>List prices · USD</span></div>
           <div className="hero-switcher" aria-label="Quick scenario selection">
             {scenarios.slice(0, 4).map((item) => (
-              <button className={item.id === scenarioId ? "active" : ""} key={item.id} onClick={() => setScenarioId(item.id)} type="button">{item.shortLabel}</button>
+              <button aria-pressed={item.id === scenarioId} className={item.id === scenarioId ? "active" : ""} key={item.id} onClick={() => setScenarioId(item.id)} type="button">{item.shortLabel}</button>
             ))}
           </div>
         </aside>
@@ -1158,12 +1180,47 @@ export default function Home() {
 
           <details className="call-profile"><summary>What counts as one {scenario.label.toLowerCase()} call? <span>+</span></summary><p>{scenario.input.toLocaleString()} uncached input tokens + {scenario.output.toLocaleString()} output tokens. Reasoning tokens count as output. Search, tools, images, storage, taxes, and retries are not included.</p></details>
         </div>
+
+        <section className="all-model-costs" aria-labelledby="all-model-costs-title">
+          <div className="cost-list-heading">
+            <div><span>ALL API MODELS</span><h3 id="all-model-costs-title">Every model at your monthly volume.</h3></div>
+            <p>{monthlyCalls.toLocaleString()} {scenario.label.toLowerCase()} calls · ${monthlyBudget.toLocaleString()} budget</p>
+          </div>
+          <div className="model-cost-list">
+            {rankedModelCosts.map(({ model, perCall, monthly }) => {
+              const recommended = model.id === apiRecommendation.id;
+              const tier = model.tiers[scenarioId];
+              return (
+                <article className={`model-cost-row ${recommended ? "recommended" : ""}`} key={model.id}>
+                  <div className="cost-model">
+                    <span className="provider-orb" data-provider={model.provider} />
+                    <div>
+                      <strong>{model.name}</strong>
+                      <small>{model.provider} · {tier === "—" ? "Not ranked" : `${tier} tier`}</small>
+                    </div>
+                    {recommended && <span className="recommendation-badge">Recommendation choice</span>}
+                  </div>
+                  <div className="cost-total">
+                    <strong>{price(monthly)}</strong>
+                    <span>{price(perCall, 4)} / call</span>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
       </section>
 
       <section className="section prices-section" id="prices">
         <div className="section-heading compact">
           <div><p className="section-index">03 / TWO-LANE PRICE BOOK</p><h2>Rates and quotas,<br />side by side.</h2></div>
           <div className="section-intro"><p>Switch between direct API economics and the plans, clients, credits, and caps that wrap them.</p><span>Active profile: {scenario.label}</span></div>
+        </div>
+
+        <div className="scenario-tabs price-scenario-tabs" role="group" aria-label="Price-book situation">
+          {scenarios.map((item) => (
+            <button aria-pressed={item.id === scenarioId} className={item.id === scenarioId ? "active" : ""} key={item.id} onClick={() => setScenarioId(item.id)} type="button">{item.label}</button>
+          ))}
         </div>
 
         <div className="book-switch" aria-label="Price book lane">
@@ -1201,17 +1258,7 @@ export default function Home() {
           {(priceLane === "api" ? visibleModels.length : visiblePlans.length) === 0 && <p className="empty-state">No entries match that search.</p>}
         </div>
         <p className="book-note"><span>API-cost equivalent is not always quota.</span> “Included API credit” and “official token quota” describe real capacity. “Price break-even” only shows how many direct API calls the same dollars could buy.</p>
-      </section>
-
-      <section className="section methodology-section" id="method">
-        <div><p className="section-index">04 / READ THE LABEL</p><h2>Three kinds<br />of “value.”</h2></div>
-        <div className="method-grid">
-          <article><span>01</span><h3>Included credit</h3><p>Cursor, Claude Agent SDK, and some Google plans publish a real dollar pool. We divide that pool—not the sticker price—by the reference API call cost.</p></article>
-          <article><span>02</span><h3>Published quota</h3><p>OpenCode Go and GLM publish caps or credit formulas. We preserve rolling windows and convert only where the vendor provides enough inputs.</p></article>
-          <article><span>03</span><h3>Price break-even</h3><p>If a plan hides capacity, the call count is economic parity only. It is never presented as promised monthly usage.</p></article>
-          <article><span>04</span><h3>Separate surfaces</h3><p>A chat plan, coding endpoint, client, API credit, and production API are not interchangeable. Each row says what is actually included.</p></article>
-        </div>
-        <details className="sources"><summary>Primary pricing and quota sources <span>+</span></summary><div>
+        <details className="sources price-sources"><summary>Primary pricing and quota sources <span>+</span></summary><div>
           <a href="https://developers.openai.com/api/docs/models/compare" target="_blank" rel="noreferrer">OpenAI API ↗</a>
           <a href="https://learn.chatgpt.com/docs/pricing" target="_blank" rel="noreferrer">ChatGPT plans ↗</a>
           <a href="https://claude.com/pricing" target="_blank" rel="noreferrer">Claude API ↗</a>
@@ -1225,13 +1272,14 @@ export default function Home() {
           <a href="https://docs.z.ai/devpack/overview" target="_blank" rel="noreferrer">GLM Coding plans ↗</a>
           <a href="https://www.kimi.com/help/membership/membership-pricing" target="_blank" rel="noreferrer">Kimi membership ↗</a>
           <a href="https://www.kimi.com/en/resources/kimi-k2-7-code" target="_blank" rel="noreferrer">Kimi API ↗</a>
+          <a href="https://api-docs.deepseek.com/quick_start/pricing/" target="_blank" rel="noreferrer">DeepSeek API ↗</a>
           <a href="https://docs.x.ai/developers/pricing" target="_blank" rel="noreferrer">xAI API ↗</a>
           <a href="https://mistral.ai/pricing/" target="_blank" rel="noreferrer">Mistral plans ↗</a>
           <a href="https://www.perplexity.ai/help-center/en/articles/11187416-which-perplexity-subscription-plan-is-right-for-you" target="_blank" rel="noreferrer">Perplexity plans ↗</a>
         </div></details>
       </section>
 
-      <footer><a className="brand" href="#top"><span className="brand-mark">T/T</span><span>TokenTier</span></a><p>Choose the lane. Know the limit.</p><span>Prices checked Aug 11, 2026 · USD · v2.0</span></footer>
+      <footer><a className="brand" href="#top"><span className="brand-mark">T/T</span><span>TokenTier</span></a><p>Choose the lane. Know the limit.</p><span>Prices checked Aug 11, 2026 · USD · v2.1</span></footer>
     </main>
   );
 }

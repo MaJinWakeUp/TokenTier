@@ -38,7 +38,15 @@ test("server-renders the TokenTier product", async () => {
   assert.match(html, /OpenCode Go/);
   assert.match(html, /GLM-5\.2/);
   assert.match(html, /Kimi K3/);
+  assert.match(html, /DeepSeek V4 Flash/);
+  assert.match(html, /Every model at your monthly volume/i);
+  assert.match(html, /Easy coding/);
+  assert.match(html, /Medium coding/);
+  assert.match(html, /Hard coding/);
+  assert.match(html, />Research</);
   assert.match(html, /Checked Aug 11, 2026/);
+  assert.doesNotMatch(html, /04 \/ READ THE LABEL/);
+  assert.doesNotMatch(html, /Research exploration|Coding · (?:easy|medium|difficult)/i);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 });
 
@@ -54,6 +62,7 @@ test("removes the disposable starter preview", async () => {
   assert.match(page, /OpenCode Zen/);
   assert.match(page, /GLM Coding Lite/);
   assert.match(page, /Kimi Moderato/);
+  assert.match(page, /Primary pricing and quota sources/);
   assert.match(layout, /TokenTier/);
   assert.doesNotMatch(page, /codex-preview|_sites-preview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
