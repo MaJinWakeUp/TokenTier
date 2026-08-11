@@ -335,9 +335,9 @@ main {
 .hero-card::before {
   position: absolute;
   z-index: -1;
-  inset: 12px -12px -12px 12px;
+  inset: -12px;
   border: 1px solid rgba(202, 255, 77, 0.2);
-  border-radius: 27px;
+  border-radius: 39px;
   content: "";
 }
 

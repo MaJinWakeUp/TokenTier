@@ -1,5 +1,6 @@
 "use client";
 
+import modelCatalog from "@/data/api-models.json";
 import { useMemo, useState } from "react";
 
 type ScenarioId =
@@ -25,6 +26,7 @@ type Model = {
   output: number;
   context: string;
   source: string;
+  verifiedAt: string;
   note?: string;
   tiers: Record<ScenarioId, Tier>;
 };
@@ -115,196 +117,13 @@ const scenarios: Array<{
   },
 ];
 
-const models: Model[] = [
-  {
-    id: "gpt-5-6-sol",
-    provider: "OpenAI",
-    name: "GPT-5.6 Sol",
-    input: 5,
-    cached: 0.5,
-    output: 30,
-    context: "1.05M",
-    source: "https://developers.openai.com/api/docs/models/compare",
-    note: "Prompts above 272K input use 2× input and 1.5× output rates.",
-    tiers: { daily: "B", "code-easy": "B", "code-medium": "A", "code-hard": "S", research: "S", writing: "S", innovation: "S" },
-  },
-  {
-    id: "gpt-5-6-terra",
-    provider: "OpenAI",
-    name: "GPT-5.6 Terra",
-    input: 2,
-    cached: 0.2,
-    output: 12,
-    context: "1.05M",
-    source: "https://developers.openai.com/api/docs/models/compare",
-    note: "Live comparison-page rate; some search snippets remain stale.",
-    tiers: { daily: "S", "code-easy": "A", "code-medium": "S", "code-hard": "A", research: "S", writing: "A", innovation: "A" },
-  },
-  {
-    id: "gpt-5-6-luna",
-    provider: "OpenAI",
-    name: "GPT-5.6 Luna",
-    input: 0.2,
-    cached: 0.02,
-    output: 1.2,
-    context: "1.05M",
-    source: "https://developers.openai.com/api/docs/models/compare",
-    note: "Live comparison-page rate; some model-detail snippets remain stale.",
-    tiers: { daily: "S", "code-easy": "S", "code-medium": "A", "code-hard": "A", research: "A", writing: "A", innovation: "A" },
-  },
-  {
-    id: "claude-fable-5",
-    provider: "Anthropic",
-    name: "Claude Fable 5",
-    input: 10,
-    cached: 1,
-    output: 50,
-    context: "1M",
-    source: "https://www.anthropic.com/news/claude-fable-5-mythos-5",
-    note: "Special safeguards can limit some bio, chemistry, and cyber workflows.",
-    tiers: { daily: "B", "code-easy": "B", "code-medium": "A", "code-hard": "S", research: "S", writing: "A", innovation: "S" },
-  },
-  {
-    id: "claude-opus-4-8",
-    provider: "Anthropic",
-    name: "Claude Opus 4.8",
-    input: 5,
-    cached: 0.5,
-    output: 25,
-    context: "1M",
-    source: "https://claude.com/pricing",
-    tiers: { daily: "B", "code-easy": "B", "code-medium": "S", "code-hard": "S", research: "S", writing: "S", innovation: "S" },
-  },
-  {
-    id: "claude-sonnet-5",
-    provider: "Anthropic",
-    name: "Claude Sonnet 5",
-    input: 2,
-    cached: 0.2,
-    output: 10,
-    context: "1M",
-    source: "https://www.anthropic.com/news/claude-sonnet-5",
-    note: "Introductory API price through Aug 31, 2026; then $3 / $15.",
-    tiers: { daily: "S", "code-easy": "S", "code-medium": "S", "code-hard": "A", research: "A", writing: "S", innovation: "A" },
-  },
-  {
-    id: "gemini-3-1-pro",
-    provider: "Google",
-    name: "Gemini 3.1 Pro",
-    input: 2,
-    cached: 0.2,
-    output: 12,
-    context: "1M",
-    source: "https://ai.google.dev/gemini-api/docs/pricing",
-    note: "Standard price shown for prompts up to 200K tokens.",
-    tiers: { daily: "A", "code-easy": "S", "code-medium": "S", "code-hard": "S", research: "S", writing: "S", innovation: "S" },
-  },
-  {
-    id: "gemini-3-6-flash",
-    provider: "Google",
-    name: "Gemini 3.6 Flash",
-    input: 1.5,
-    cached: 0.15,
-    output: 7.5,
-    context: "1M",
-    source: "https://ai.google.dev/gemini-api/docs/pricing",
-    tiers: { daily: "S", "code-easy": "S", "code-medium": "A", "code-hard": "B", research: "A", writing: "A", innovation: "A" },
-  },
-  {
-    id: "grok-4-5",
-    provider: "xAI",
-    name: "Grok 4.5",
-    input: 2,
-    cached: 0.3,
-    output: 6,
-    context: "500K",
-    source: "https://docs.x.ai/developers/pricing",
-    note: "Prompts at or above 200K use higher long-context rates.",
-    tiers: { daily: "A", "code-easy": "S", "code-medium": "S", "code-hard": "A", research: "A", writing: "A", innovation: "A" },
-  },
-  {
-    id: "gemini-3-5-flash-lite",
-    provider: "Google",
-    name: "Gemini 3.5 Flash-Lite",
-    input: 0.3,
-    cached: 0.03,
-    output: 2.5,
-    context: "1M",
-    source: "https://ai.google.dev/gemini-api/docs/pricing",
-    tiers: { daily: "A", "code-easy": "S", "code-medium": "B", "code-hard": "B", research: "B", writing: "B", innovation: "B" },
-  },
-  {
-    id: "deepseek-v4-pro",
-    provider: "DeepSeek",
-    name: "DeepSeek V4 Pro",
-    input: 0.435,
-    cached: 0.003625,
-    output: 0.87,
-    context: "1M",
-    source: "https://api-docs.deepseek.com/quick_start/pricing/",
-    note: "A published price increase is planned; re-check before production use.",
-    tiers: { daily: "S", "code-easy": "S", "code-medium": "A", "code-hard": "B", research: "A", writing: "B", innovation: "B" },
-  },
-  {
-    id: "deepseek-v4-flash",
-    provider: "DeepSeek",
-    name: "DeepSeek V4 Flash",
-    input: 0.14,
-    cached: 0.0028,
-    output: 0.28,
-    context: "1M",
-    source: "https://api-docs.deepseek.com/quick_start/pricing/",
-    note: "Cache hits are automatic and best-effort; a published price increase is planned, and the official limit is 2,500 concurrent requests per account.",
-    tiers: { daily: "S", "code-easy": "S", "code-medium": "A", "code-hard": "B", research: "A", writing: "B", innovation: "B" },
-  },
-  {
-    id: "mistral-large-3",
-    provider: "Mistral",
-    name: "Mistral Large 3",
-    input: 0.5,
-    cached: null,
-    output: 1.5,
-    context: "256K",
-    source: "https://mistral.ai/pricing/api/",
-    tiers: { daily: "A", "code-easy": "A", "code-medium": "A", "code-hard": "B", research: "A", writing: "A", innovation: "A" },
-  },
-  {
-    id: "glm-5-2",
-    provider: "Z.ai",
-    name: "GLM-5.2",
-    input: 1.4,
-    cached: 0.26,
-    output: 4.4,
-    context: "200K",
-    source: "https://docs.z.ai/guides/overview/pricing",
-    note: "Also available through OpenCode Zen; web search costs $0.01/use.",
-    tiers: { daily: "A", "code-easy": "S", "code-medium": "S", "code-hard": "A", research: "A", writing: "A", innovation: "A" },
-  },
-  {
-    id: "kimi-k3",
-    provider: "Kimi",
-    name: "Kimi K3",
-    input: 3,
-    cached: 0.3,
-    output: 15,
-    context: "1M",
-    source: "https://www.kimi.com/resources/kimi-k3-pricing",
-    note: "Also available through OpenCode Zen; web search is billed separately.",
-    tiers: { daily: "A", "code-easy": "A", "code-medium": "S", "code-hard": "A", research: "S", writing: "A", innovation: "S" },
-  },
-  {
-    id: "kimi-k2-7-code",
-    provider: "Kimi",
-    name: "Kimi K2.7 Code",
-    input: 0.95,
-    cached: 0.19,
-    output: 4,
-    context: "256K",
-    source: "https://www.kimi.com/en/resources/kimi-k2-7-code",
-    note: "Coding-specialized API; not ranked for general writing or research.",
-    tiers: { daily: "—", "code-easy": "S", "code-medium": "A", "code-hard": "B", research: "—", writing: "—", innovation: "—" },
-  },
-];
+const models = modelCatalog.models as unknown as Model[];
+const pricingUpdatedAt = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
+}).format(new Date(`${modelCatalog.updatedAt}T00:00:00Z`));
 
 const planTiers = (
   daily: Tier,
@@ -1037,7 +856,7 @@ export default function Home() {
           <a href="#calculator">Recommender</a>
           <a href="#prices">Price book</a>
         </nav>
-        <span className="freshness"><i /> Checked Aug 11, 2026</span>
+        <span className="freshness"><i /> Updated {pricingUpdatedAt}</span>
       </header>
 
       <section className="hero" id="top">
@@ -1279,7 +1098,7 @@ export default function Home() {
         </div></details>
       </section>
 
-      <footer><a className="brand" href="#top"><span className="brand-mark">T/T</span><span>TokenTier</span></a><p>Choose the lane. Know the limit.</p><span>Prices checked Aug 11, 2026 · USD · v2.1</span></footer>
+      <footer><a className="brand" href="#top"><span className="brand-mark">T/T</span><span>TokenTier</span></a><p>Choose the lane. Know the limit.</p><span>Model data updated {pricingUpdatedAt} · USD · v2.1</span></footer>
     </main>
   );
 }

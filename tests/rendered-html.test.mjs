@@ -31,6 +31,9 @@ test("server-renders the TokenTier product", async () => {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
+  const catalog = JSON.parse(
+    await readFile(new URL("../data/api-models.json", import.meta.url), "utf8"),
+  );
   assert.match(html, /<title>TokenTier — AI APIs vs subscription plans<\/title>/i);
   assert.match(html, /API or plan/);
   assert.match(html, /Choose the lane/);
@@ -38,22 +41,25 @@ test("server-renders the TokenTier product", async () => {
   assert.match(html, /OpenCode Go/);
   assert.match(html, /GLM-5\.2/);
   assert.match(html, /Kimi K3/);
-  assert.match(html, /DeepSeek V4 Flash/);
+  for (const model of catalog.models) {
+    assert.ok(html.includes(model.name), `renders catalog model ${model.name}`);
+  }
   assert.match(html, /Every model at your monthly volume/i);
   assert.match(html, /Easy coding/);
   assert.match(html, /Medium coding/);
   assert.match(html, /Hard coding/);
   assert.match(html, />Research</);
-  assert.match(html, /Checked Aug 11, 2026/);
+  assert.match(html, /Updated\s*(?:<!-- -->)?\s*Aug 11, 2026/);
   assert.doesNotMatch(html, /04 \/ READ THE LABEL/);
   assert.doesNotMatch(html, /Research exploration|Coding · (?:easy|medium|difficult)/i);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 });
 
 test("removes the disposable starter preview", async () => {
-  const [page, layout, packageJson] = await Promise.all([
+  const [page, layout, styles, packageJson] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
   ]);
 
@@ -63,7 +69,9 @@ test("removes the disposable starter preview", async () => {
   assert.match(page, /GLM Coding Lite/);
   assert.match(page, /Kimi Moderato/);
   assert.match(page, /Primary pricing and quota sources/);
+  assert.match(page, /api-models\.json/);
   assert.match(layout, /TokenTier/);
+  assert.match(styles, /\.hero-card::before\s*\{[^}]*inset:\s*-12px;[^}]*border-radius:\s*39px;/s);
   assert.doesNotMatch(page, /codex-preview|_sites-preview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   await assert.rejects(access(new URL("app/_sites-preview", projectRoot)));
