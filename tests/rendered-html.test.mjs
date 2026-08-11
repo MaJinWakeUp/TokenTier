@@ -36,21 +36,21 @@ test("server-renders the TokenTier product", async () => {
   );
   assert.match(html, /<title>TokenTier — AI APIs vs subscription plans<\/title>/i);
   assert.match(html, /API or plan/);
-  assert.match(html, /Choose the lane/);
-  assert.match(html, /API VS PLAN RECOMMENDER/i);
+  assert.match(html, /Compare by/);
+  assert.match(html, /Compare your/);
   assert.match(html, /OpenCode Go/);
   assert.match(html, /GLM-5\.2/);
   assert.match(html, /Kimi K3/);
   for (const model of catalog.models) {
     assert.ok(html.includes(model.name), `renders catalog model ${model.name}`);
   }
-  assert.match(html, /Every model at your monthly volume/i);
+  assert.match(html, /Monthly API cost by model/i);
   assert.match(html, /Easy coding/);
   assert.match(html, /Medium coding/);
   assert.match(html, /Hard coding/);
   assert.match(html, />Research</);
   assert.match(html, /Updated\s*(?:<!-- -->)?\s*Aug 11, 2026/);
-  assert.doesNotMatch(html, /04 \/ READ THE LABEL/);
+  assert.doesNotMatch(html, /(?:01|02|03|04) \/|Editorial value picks|2 LANES|Recommendation choice|Choose the lane\. Know the limit\./i);
   assert.doesNotMatch(html, /Research exploration|Coding · (?:easy|medium|difficult)/i);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 });
@@ -72,6 +72,16 @@ test("removes the disposable starter preview", async () => {
   assert.match(page, /api-models\.json/);
   assert.match(layout, /TokenTier/);
   assert.match(styles, /\.hero-card::before\s*\{[^}]*inset:\s*0;[^}]*border-radius:\s*27px;/s);
+  const visiblePixelFontSizes = [...styles.matchAll(/font-size:\s*(\d+)px/g)]
+    .map((match) => Number(match[1]))
+    .filter((size) => size > 0);
+  assert.ok(
+    visiblePixelFontSizes.every((size) => size >= 13),
+    "keeps every visible fixed pixel font at 13px or larger",
+  );
+  assert.match(styles, /\.tier-models\s*\{[^}]*grid-auto-rows:\s*82px;/s);
+  assert.match(styles, /\.tier-model\s*\{[^}]*height:\s*82px;[^}]*min-height:\s*82px;[^}]*overflow:\s*hidden;/s);
+  assert.match(styles, /\.tier-model strong\s*\{[^}]*font-size:\s*15px;/s);
   assert.doesNotMatch(page, /codex-preview|_sites-preview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   await assert.rejects(access(new URL("app/_sites-preview", projectRoot)));
