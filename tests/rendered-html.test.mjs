@@ -119,7 +119,8 @@ test("removes the disposable starter preview", async () => {
   assert.match(styles, /\.tier-model strong\s*\{[^}]*font-size:\s*15px;/s);
   assert.match(styles, /\.workspace-tabs\s*\{/);
   assert.match(styles, /\.workspace-tabs button\s*\{[^}]*min-height:\s*44px;/s);
-  assert.match(styles, /\.theme-toggle\s*\{[^}]*min-width:\s*44px;[^}]*min-height:\s*44px;/s);
+  assert.match(styles, /\.theme-switcher\s*\{/);
+  assert.match(styles, /\.theme-switcher button\s*\{[^}]*min-width:\s*38px;[^}]*min-height:\s*44px;/s);
   assert.match(styles, /\.provider-filters button\s*\{[^}]*min-width:\s*44px;[^}]*min-height:\s*44px;/s);
   assert.match(styles, /\.book-switch button\s*\{[^}]*min-height:\s*44px;/s);
   assert.match(page, /Scroll sideways to see all columns\./);
@@ -134,8 +135,11 @@ test("removes the disposable starter preview", async () => {
   assert.match(styles, /\.columns-reset-btn\s*\{[^}]*color:\s*var\(--accent-readable\);/s);
   assert.doesNotMatch(page, /aria-haspopup="listbox"|className="columns-menu" role="menu"/);
   assert.match(page, /function monthlyPrice\(value: number\)/);
+  assert.match(page, /setRecommendationInputTokens\(selectedScenario\.input\)/);
+  assert.match(page, /setRecommendationOutputTokens\(selectedScenario\.output\)/);
+  assert.match(page, /activeView === "recommendation" \? recommendationScenarioId : exploreScenarioId/);
   assert.ok(
-    page.indexOf('className="freshness"') < page.indexOf('className="theme-toggle"'),
+    page.indexOf('className="freshness"') < page.indexOf('className="theme-switcher"'),
     "places the update timestamp before the theme control",
   );
   assert.match(

@@ -792,6 +792,8 @@ export default function Home() {
   const [monthlyCalls, setMonthlyCalls] = useState(500);
   const [monthlyBudget, setMonthlyBudget] = useState(30);
   const [preference, setPreference] = useState<Preference>("either");
+  const [showAllPlans, setShowAllPlans] = useState(false);
+  const [dockCollapsed, setDockCollapsed] = useState(false);
   const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState("cost");
@@ -813,6 +815,11 @@ export default function Home() {
     evidence: true,
   });
 
+  const switchView = (view: View) => {
+    setActiveView(view);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const themeSnapshot = useSyncExternalStore(subscribeTheme, getThemeSnapshot, getServerThemeSnapshot);
   const [themeMode, activeTheme] = themeSnapshot.split(":") as [ThemeMode, "light" | "dark"];
 
@@ -820,21 +827,52 @@ export default function Home() {
     document.documentElement.setAttribute("data-theme", activeTheme);
   }, [activeTheme]);
 
-  const cycleTheme = () => {
-    const nextMode: ThemeMode =
-      themeMode === "system"
-        ? "light"
-        : themeMode === "light"
-          ? "dark"
-          : "system";
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const viewParam = params.get("view");
+    const scenarioParam = params.get("scenario");
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time URL param read on mount
+    if (viewParam === "explore" || viewParam === "recommendation") setActiveView(viewParam);
+    const selectedScenario = scenarios.find((scenario) => scenario.id === scenarioParam);
+    if (selectedScenario) {
+      setExploreScenarioId(selectedScenario.id);
+      setRecommendationScenarioId(selectedScenario.id);
+      setRecommendationInputTokens(selectedScenario.input);
+      setRecommendationOutputTokens(selectedScenario.output);
+    }
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    params.set("view", activeView);
+    params.set("scenario", activeView === "recommendation" ? recommendationScenarioId : exploreScenarioId);
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState(null, "", newUrl);
+  }, [activeView, exploreScenarioId, recommendationScenarioId]);
+
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === "1") {
+        event.preventDefault();
+        switchView("explore");
+      } else if ((event.metaKey || event.ctrlKey) && event.key === "2") {
+        event.preventDefault();
+        switchView("recommendation");
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  const setThemeMode = (mode: ThemeMode) => {
     try {
-      if (nextMode === "system") {
+      if (mode === "system") {
         localStorage.removeItem("tokentier-theme");
       } else {
-        localStorage.setItem("tokentier-theme", nextMode);
+        localStorage.setItem("tokentier-theme", mode);
       }
       const system = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
-      const effective = nextMode === "system" ? system : nextMode;
+      const effective = mode === "system" ? system : mode;
       document.documentElement.setAttribute("data-theme", effective);
       window.dispatchEvent(new Event("storage"));
     } catch {
@@ -971,11 +1009,6 @@ export default function Home() {
       });
   }, [exploreScenarioId, selectedProviders, query, sortBy]);
 
-  const switchView = (view: View) => {
-    setActiveView(view);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   const updateRecommendationProfile = (id: ScenarioId) => {
     const selected = scenarios.find((item) => item.id === id)!;
     setRecommendationScenarioId(id);
@@ -1009,44 +1042,32 @@ export default function Home() {
           }}
         ><span className="brand-mark">T/T</span><span>TokenTier</span></a>
         <nav className="workspace-tabs" aria-label="Comparison mode">
-          <button aria-label="Explore profiles" aria-pressed={activeView === "explore"} className={activeView === "explore" ? "active" : ""} id="explore-tab" onClick={() => switchView("explore")} type="button"><span aria-hidden="true" className="workspace-tab-long">Explore profiles</span><span aria-hidden="true" className="workspace-tab-short">Explore</span></button>
-          <button aria-label="My recommendation" aria-pressed={activeView === "recommendation"} className={activeView === "recommendation" ? "active" : ""} id="recommendation-tab" onClick={() => switchView("recommendation")} type="button"><span aria-hidden="true" className="workspace-tab-long">My recommendation</span><span aria-hidden="true" className="workspace-tab-short">Recommend</span></button>
+          <button aria-label="Explore profiles" aria-pressed={activeView === "explore"} className={activeView === "explore" ? "active" : ""} id="explore-tab" onClick={() => switchView("explore")} title="Explore profiles (⌘1)" type="button"><span aria-hidden="true" className="workspace-tab-long">Explore profiles</span><span aria-hidden="true" className="workspace-tab-short">Explore</span></button>
+          <button aria-label="My recommendation" aria-pressed={activeView === "recommendation"} className={activeView === "recommendation" ? "active" : ""} id="recommendation-tab" onClick={() => switchView("recommendation")} title="My recommendation (⌘2)" type="button"><span aria-hidden="true" className="workspace-tab-long">My recommendation</span><span aria-hidden="true" className="workspace-tab-short">Recommend</span></button>
         </nav>
         <div className="header-actions">
           <span className="freshness"><i /> Updated {pricingUpdatedAt}</span>
-          <button
-            aria-label={`Theme: ${themeMode === "system" ? `Auto (${activeTheme})` : themeMode}. Click to cycle.`}
-            className="theme-toggle"
-            onClick={cycleTheme}
-            title={
-              themeMode === "system"
-                ? `Auto: following system (${activeTheme}). Click for Light.`
-                : themeMode === "light"
-                  ? "Light theme. Click for Dark."
-                  : "Dark theme. Click for Auto (System)."
-            }
-            type="button"
-          >
-            {themeMode === "system" ? (
-              <svg aria-hidden="true" fill="none" height="15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="15">
-                <rect height="14" rx="2" ry="2" width="20" x="2" y="3"/>
-                <line x1="8" x2="16" y1="21" y2="21"/>
-                <line x1="12" x2="12" y1="17" y2="21"/>
-              </svg>
-            ) : themeMode === "light" ? (
-              <svg aria-hidden="true" fill="none" height="15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="15"><circle cx="12" cy="12" r="5"/><line x1="12" x2="12" y1="1" y2="3"/><line x1="12" x2="12" y1="21" y2="23"/><line x1="4.22" x2="5.64" y1="4.22" y2="5.64"/><line x1="18.36" x2="19.78" y1="18.36" y2="19.78"/><line x1="1" x2="3" y1="12" y2="12"/><line x1="21" x2="23" y1="12" y2="12"/><line x1="4.22" x2="5.64" y1="19.78" y2="18.36"/><line x1="18.36" x2="19.78" y1="5.64" y2="4.22"/></svg>
-            ) : (
-              <svg aria-hidden="true" fill="none" height="15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="15"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-            )}
-            <span>{themeMode === "system" ? "Auto" : themeMode === "light" ? "Light" : "Dark"}</span>
-          </button>
+          <div className="theme-switcher" role="group" aria-label="Theme">
+            <button aria-label="Auto theme (follow system)" aria-pressed={themeMode === "system"} className={themeMode === "system" ? "active" : ""} onClick={() => setThemeMode("system")} title="Auto (system)" type="button">
+              <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="16"><rect height="14" rx="2" ry="2" width="20" x="2" y="3"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+            </button>
+            <button aria-label="Light theme" aria-pressed={themeMode === "light"} className={themeMode === "light" ? "active" : ""} onClick={() => setThemeMode("light")} title="Light" type="button">
+              <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="16"><circle cx="12" cy="12" r="5"/><line x1="12" x2="12" y1="1" y2="3"/><line x1="12" x2="12" y1="21" y2="23"/><line x1="4.22" x2="5.64" y1="4.22" y2="5.64"/><line x1="18.36" x2="19.78" y1="18.36" y2="19.78"/><line x1="1" x2="3" y1="12" y2="12"/><line x1="21" x2="23" y1="12" y2="12"/><line x1="4.22" x2="5.64" y1="19.78" y2="18.36"/><line x1="18.36" x2="19.78" y1="5.64" y2="4.22"/></svg>
+            </button>
+            <button aria-label="Dark theme" aria-pressed={themeMode === "dark"} className={themeMode === "dark" ? "active" : ""} onClick={() => setThemeMode("dark")} title="Dark" type="button">
+              <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="16"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+          </div>
         </div>
       </header>
 
-      <div aria-labelledby="explore-tab" className="view-panel explore-panel" hidden={activeView !== "explore"} id="explore-panel" role="region">
-      <aside className="scenario-dock" aria-label="Profile assumptions">
+      <div aria-labelledby="explore-tab" className="view-panel explore-panel" data-dock-collapsed={dockCollapsed ? "true" : undefined} hidden={activeView !== "explore"} id="explore-panel" role="region">
+      <aside className="scenario-dock" aria-label="Profile assumptions" data-collapsed={dockCollapsed ? "true" : undefined}>
         <div className="scenario-dock-heading">
           <span>Profile assumptions</span>
+          <button aria-label={dockCollapsed ? "Expand profile panel" : "Minimize profile panel"} className="dock-toggle" onClick={() => setDockCollapsed((prev) => !prev)} type="button">
+            <span aria-hidden="true">{dockCollapsed ? "▸" : "▾"}</span>
+          </button>
         </div>
         <label className="scenario-dock-select" htmlFor="explore-scenario">
           <span>Use case</span>
@@ -1104,27 +1125,35 @@ export default function Home() {
             <div className={`tier-row tier-${tier.toLowerCase()}`} key={tier}>
               <div className="tier-label"><strong>{tier}</strong><span>{tierDescriptions[tier]}</span></div>
               <div className="tier-models">
-                {tierLane === "api"
-                  ? models
-                    .filter((model) => model.tiers[exploreScenarioId] === tier)
-                    .sort((a, b) => callCost(a, exploreSettings) - callCost(b, exploreSettings))
-                    .map((model) => (
-                      <article aria-label={`${model.name}, ${model.provider}, ${price(callCost(model, exploreSettings), 3)} per call`} className="tier-model" key={model.id}>
-                        <span className="provider-orb" data-provider={model.provider} />
-                        <span><strong title={model.name}>{model.name}</strong><small>{model.provider}</small></span>
-                        <b>{price(callCost(model, exploreSettings), 3)}<small>/ call</small></b>
-                      </article>
-                    ))
-                  : plans
-                    .filter((plan) => plan.kind === "Subscription" && plan.tiers[exploreScenarioId] === tier)
-                    .sort((a, b) => (a.monthly ?? Infinity) - (b.monthly ?? Infinity))
-                    .map((plan) => (
-                      <article aria-label={`${plan.name}, ${plan.provider}, $${plan.monthly} per month`} className="tier-model" key={plan.id}>
-                        <span className="provider-orb" data-provider={plan.provider} />
-                        <span><strong title={plan.name}>{plan.name}</strong><small>{plan.confidence} quota confidence</small></span>
-                        <b>${plan.monthly}<small>/ month</small></b>
-                      </article>
-                    ))}
+                {(() => {
+                  const items = tierLane === "api"
+                    ? models
+                        .filter((model) => model.tiers[exploreScenarioId] === tier)
+                        .sort((a, b) => callCost(a, exploreSettings) - callCost(b, exploreSettings))
+                    : plans
+                        .filter((plan) => plan.kind === "Subscription" && plan.tiers[exploreScenarioId] === tier)
+                        .sort((a, b) => (a.monthly ?? Infinity) - (b.monthly ?? Infinity));
+                  if (items.length === 0) {
+                    return <p className="tier-empty">No {tierLane === "api" ? "models" : "plans"} ranked in this tier for this scenario.</p>;
+                  }
+                  return items.map((item) =>
+                    tierLane === "api"
+                      ? (
+                        <article aria-label={`${item.name}, ${item.provider}, ${price(callCost(item, exploreSettings), 3)} per call`} className="tier-model" key={item.id}>
+                          <span className="provider-orb" data-provider={item.provider} />
+                          <span><strong title={item.name}>{item.name}</strong><small>{item.provider}</small></span>
+                          <b>{price(callCost(item, exploreSettings), 3)}<small>/ call</small></b>
+                        </article>
+                      )
+                      : (
+                        <article aria-label={`${item.name}, ${item.provider}, $${item.monthly} per month`} className="tier-model" key={item.id}>
+                          <span className="provider-orb" data-provider={item.provider} />
+                          <span><strong title={item.name}>{item.name}</strong><small>{item.confidence} quota confidence</small></span>
+                          <b>${item.monthly}<small>/ month</small></b>
+                        </article>
+                      ),
+                  );
+                })()}
               </div>
             </div>
           ))}
@@ -1236,6 +1265,9 @@ export default function Home() {
                 </button>
               );
             })}
+            {selectedProviders.length > 0 && (
+              <button aria-label="Clear provider filters" className="provider-clear" onClick={() => setSelectedProviders([])} type="button">Clear</button>
+            )}
           </div>
         </div>
 
@@ -1357,7 +1389,7 @@ export default function Home() {
 
           <div className="recommendation-workspace">
             <section className="settings-card" id="recommendation-settings" aria-labelledby="settings-title">
-              <div className="settings-heading"><div><span>01</span><h2 id="settings-title">Your settings</h2></div></div>
+              <div className="settings-heading"><h2 id="settings-title">Your settings</h2></div>
               <div className="settings-body">
                 <fieldset>
                   <legend>Workload</legend>
@@ -1384,9 +1416,10 @@ export default function Home() {
             </section>
 
             <section className="recommendation-card recommendation-output" aria-labelledby="recommendation-title">
+              <div className="settings-heading"><h2 id="recommendation-title">Best path</h2></div>
               <div className={`decision-banner decision-${preferredPath}`} aria-live="polite">
                 <span>BEST PATH</span>
-                <strong id="recommendation-title">{preferredPath === "api" ? "Use the API" : "Choose the plan"}</strong>
+                <strong>{preferredPath === "api" ? "Use the API" : "Choose the plan"}</strong>
                 <p>{verdictCopy}</p>
               </div>
 
@@ -1429,80 +1462,39 @@ export default function Home() {
                   {monthlyCalls.toLocaleString()} calls · {recommendationInputTokens.toLocaleString()} in + {recommendationOutputTokens.toLocaleString()} out · ${monthlyBudget.toLocaleString()} budget
                 </p>
               </div>
-            </div>
-
-            <div className="lane-switch comparison-lane-switch" role="group" aria-label="Detailed comparison lane">
-              <button
-                aria-pressed={recComparisonTab === "api"}
-                className={recComparisonTab === "api" ? "active" : ""}
-                onClick={() => setRecComparisonTab("api")}
-                type="button"
-              >
-                <strong>API models ({rankedModelCosts.length})</strong>
-                <small>Ranked monthly cost</small>
-              </button>
-              <button
-                aria-pressed={recComparisonTab === "plans"}
-                className={recComparisonTab === "plans" ? "active" : ""}
-                onClick={() => setRecComparisonTab("plans")}
-                type="button"
-              >
-                <strong>Subscription plans ({rankedPlanOptions.length})</strong>
-                <small>Workload suitability</small>
-              </button>
+              <div className="book-switch comparison-lane-switch" role="group" aria-label="Detailed comparison lane">
+<button aria-pressed={recComparisonTab === "api"} className={recComparisonTab === "api" ? "active" : ""} onClick={() => setRecComparisonTab("api")} type="button">API <span>{rankedModelCosts.length}</span></button>
+                <button aria-pressed={recComparisonTab === "plans"} className={recComparisonTab === "plans" ? "active" : ""} onClick={() => setRecComparisonTab("plans")} type="button">Plans <span>{rankedPlanOptions.length}</span></button>
+              </div>
             </div>
 
             {recComparisonTab === "api" ? (
               <div className="model-cost-columns">
-                <div className="model-cost-column">
-                  {rankedModelCosts.slice(0, Math.ceil(rankedModelCosts.length / 2)).map(({ model, perCall, monthly }) => {
-                    const recommended = model.id === apiRecommendation.id;
-                    const tier = model.tiers[recommendationScenarioId];
-                    return (
-                      <article className={`model-cost-row ${recommended ? "recommended" : ""}`} key={model.id}>
-                        <div className="cost-model">
-                          <span className="provider-orb" data-provider={model.provider} />
-                          <div>
-                            <strong>{model.name}</strong>
-                            <small>{model.provider} · {tier === "—" ? "Not ranked" : `${tier} tier`}</small>
-                          </div>
-                          {recommended && <span className="recommendation-badge">Best API</span>}
+                {rankedModelCosts.map(({ model, perCall, monthly }) => {
+                  const recommended = model.id === apiRecommendation.id;
+                  const tier = model.tiers[recommendationScenarioId];
+                  return (
+                    <article className={`model-cost-row ${recommended ? "recommended" : ""}`} key={model.id}>
+                      <div className="cost-model">
+                        <span className="provider-orb" data-provider={model.provider} />
+                        <div>
+                          <strong>{model.name}</strong>
+                          <small>{model.provider} · {tier === "—" ? "Not ranked" : `${tier} tier`}</small>
                         </div>
-                        <div className="cost-total">
-                          <strong title={price(monthly)}>{monthlyPrice(monthly)}</strong>
-                          <span>{price(perCall, 4)} / call</span>
-                        </div>
-                      </article>
-                    );
-                  })}
-                </div>
-                <div className="model-cost-column">
-                  {rankedModelCosts.slice(Math.ceil(rankedModelCosts.length / 2)).map(({ model, perCall, monthly }) => {
-                    const recommended = model.id === apiRecommendation.id;
-                    const tier = model.tiers[recommendationScenarioId];
-                    return (
-                      <article className={`model-cost-row ${recommended ? "recommended" : ""}`} key={model.id}>
-                        <div className="cost-model">
-                          <span className="provider-orb" data-provider={model.provider} />
-                          <div>
-                            <strong>{model.name}</strong>
-                            <small>{model.provider} · {tier === "—" ? "Not ranked" : `${tier} tier`}</small>
-                          </div>
-                          {recommended && <span className="recommendation-badge">Best API</span>}
-                        </div>
-                        <div className="cost-total">
-                          <strong title={price(monthly)}>{monthlyPrice(monthly)}</strong>
-                          <span>{price(perCall, 4)} / call</span>
-                        </div>
-                      </article>
-                    );
-                  })}
-                </div>
+                        {recommended && <span className="recommendation-badge">Best API</span>}
+                      </div>
+                      <div className="cost-total">
+                        <strong title={price(monthly)}>{monthlyPrice(monthly)}</strong>
+                        <span>{price(perCall, 4)} / call</span>
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
             ) : (
               <>
                 <div className="plan-match-grid">
-                  {rankedPlanOptions.slice(0, 6).map(({ plan, estimate, coverage, withinBudget }, index) => (
+                  {rankedPlanOptions.slice(0, showAllPlans ? rankedPlanOptions.length : 6).map(({ plan, estimate, coverage, withinBudget }, index) => (
                     <article className={`plan-match-card ${index === 0 ? "recommended" : ""}`} key={plan.id}>
                       <div className="plan-match-title">
                         <span className="provider-orb" data-provider={plan.provider} />
@@ -1522,6 +1514,11 @@ export default function Home() {
                     </article>
                   ))}
                 </div>
+                {rankedPlanOptions.length > 6 && (
+                  <button className="show-more-btn" onClick={() => setShowAllPlans((prev) => !prev)} type="button">
+                    {showAllPlans ? "Show fewer plans" : `Show all ${rankedPlanOptions.length} plans`}
+                  </button>
+                )}
                 <p className="plan-match-note">Price break-even shows economic parity only. It is not a promised quota unless the provider publishes credits or limits.</p>
               </>
             )}
