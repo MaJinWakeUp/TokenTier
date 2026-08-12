@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-08-11",
+  "updatedAt": "2026-08-12",
   "currency": "USD",
   "unit": "per-million-tokens",
   "models": [
@@ -334,6 +334,27 @@
         "research": "—",
         "writing": "—",
         "innovation": "—"
+      }
+    },
+    {
+      "id": "grok-4-6",
+      "provider": "xAI",
+      "name": "Grok 4.6",
+      "input": 2,
+      "cached": 0.5,
+      "output": 6,
+      "context": "500K",
+      "source": "https://docs.x.ai/developers/models/grok-4.6",
+      "verifiedAt": "2026-08-12",
+      "note": "Prompts at or above 200K use $4 input, $1 cached input, and $12 output per million tokens.",
+      "tiers": {
+        "daily": "A",
+        "code-easy": "S",
+        "code-medium": "S",
+        "code-hard": "S",
+        "research": "S",
+        "writing": "S",
+        "innovation": "S"
       }
     }
   ]

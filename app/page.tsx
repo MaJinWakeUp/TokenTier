@@ -578,13 +578,13 @@ const plans: Plan[] = [
     name: "SuperGrok",
     kind: "Subscription",
     monthly: 30,
-    modelId: "grok-4-5",
+    modelId: "grok-4-6",
     source: "https://x.ai/pricing",
-    note: "One compute-weighted weekly pool is shared across chat, coding, media, voice, and API; amount is unpublished.",
+    note: "Includes Grok 4.6. One compute-weighted weekly pool is shared across chat, coding, media, voice, and Build; amount is unpublished.",
     quota: "Shared weekly pool · amount undisclosed",
     evidence: "Price break-even",
     confidence: "Low",
-    apiIncluded: "Shared access only",
+    apiIncluded: "No · API separate",
     tiers: planTiers("A", "A", "A", "A", "A", "A", "A"),
   },
   {
@@ -593,13 +593,13 @@ const plans: Plan[] = [
     name: "SuperGrok Plus",
     kind: "Subscription",
     monthly: 100,
-    modelId: "grok-4-5",
+    modelId: "grok-4-6",
     source: "https://x.ai/pricing",
-    note: "Higher shared weekly usage is promised, but xAI does not publish a numeric multiplier.",
+    note: "Includes Grok 4.6 and significantly higher shared usage across Chat, Imagine, Voice, and Build, but xAI does not publish a numeric multiplier.",
     quota: "Significantly higher shared usage",
     evidence: "Price break-even",
     confidence: "Low",
-    apiIncluded: "Shared access only",
+    apiIncluded: "No · API separate",
     tiers: planTiers("B", "B", "A", "S", "A", "A", "A"),
   },
 ];
@@ -1372,6 +1372,7 @@ export default function Home() {
           <a href="https://www.kimi.com/en/resources/kimi-k2-7-code" target="_blank" rel="noreferrer">Kimi API ↗</a>
           <a href="https://api-docs.deepseek.com/quick_start/pricing/" target="_blank" rel="noreferrer">DeepSeek API ↗</a>
           <a href="https://docs.x.ai/developers/pricing" target="_blank" rel="noreferrer">xAI API ↗</a>
+          <a href="https://x.ai/pricing" target="_blank" rel="noreferrer">Grok plans ↗</a>
           <a href="https://mistral.ai/pricing/" target="_blank" rel="noreferrer">Mistral plans ↗</a>
           <a href="https://www.perplexity.ai/help-center/en/articles/11187416-which-perplexity-subscription-plan-is-right-for-you" target="_blank" rel="noreferrer">Perplexity plans ↗</a>
         </div></details>

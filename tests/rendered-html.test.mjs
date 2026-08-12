@@ -34,6 +34,12 @@ test("server-renders the TokenTier product", async () => {
   const catalog = JSON.parse(
     await readFile(new URL("../data/api-models.json", import.meta.url), "utf8"),
   );
+  const catalogDate = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${catalog.updatedAt}T00:00:00Z`));
   assert.match(html, /<title>TokenTier — AI APIs vs subscription plans<\/title>/i);
   assert.match(html, /API or plan/);
   assert.match(html, /Tier List/);
@@ -43,6 +49,7 @@ test("server-renders the TokenTier product", async () => {
   assert.match(html, /OpenCode Go/);
   assert.match(html, /GLM-5\.2/);
   assert.match(html, /Kimi K3/);
+  assert.match(html, /Grok 4\.6/);
   for (const model of catalog.models) {
     assert.ok(html.includes(model.name), `renders catalog model ${model.name}`);
   }
@@ -67,7 +74,10 @@ test("server-renders the TokenTier product", async () => {
   assert.match(html, /Medium coding/);
   assert.match(html, /Hard coding/);
   assert.match(html, />Research</);
-  assert.match(html, /Updated\s*(?:<!-- -->)?\s*Aug 11, 2026/);
+  assert.ok(
+    html.includes(`Updated <!-- -->${catalogDate}`) || html.includes(`Updated ${catalogDate}`),
+    "renders the catalog update date",
+  );
   assert.doesNotMatch(html, /(?:01|02|03|04) \/|Editorial value picks|2 LANES|Recommendation choice|Choose the lane\. Know the limit\./i);
   assert.doesNotMatch(html, /Best value for|Current best value snapshot/i);
   assert.doesNotMatch(html, /Research exploration|Coding · (?:easy|medium|difficult)/i);
@@ -90,6 +100,9 @@ test("removes the disposable starter preview", async () => {
   assert.match(page, /GLM Coding Lite/);
   assert.match(page, /Kimi Moderato/);
   assert.match(page, /Primary pricing and quota sources/);
+  assert.match(page, /modelId: "grok-4-6"/);
+  assert.match(page, /Includes Grok 4\.6/);
+  assert.match(page, /Grok plans ↗/);
   assert.match(readme, /## Ownership and independence/);
   assert.match(readme, /independent project created and maintained by Jin Ma/);
   assert.match(license, /^MIT License\n\nCopyright \(c\) 2026 Jin Ma/);
