@@ -751,6 +751,35 @@ function planCoverageScore(plan: Plan, settings: UsageSettings, calls: number) {
   return null;
 }
 
+type ThemeMode = "system" | "light" | "dark";
+
+function getThemeSnapshot(): string {
+  if (typeof window === "undefined") return "system:dark";
+  const system = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  try {
+    const saved = localStorage.getItem("tokentier-theme");
+    if (saved === "light" || saved === "dark") return `${saved}:${saved}`;
+    if (saved === "system") return `system:${system}`;
+  } catch {
+    // ignore
+  }
+  return `system:${system}`;
+}
+
+function getServerThemeSnapshot(): string {
+  return "system:dark";
+}
+
+function subscribeTheme(callback: () => void) {
+  const media = window.matchMedia("(prefers-color-scheme: light)");
+  media.addEventListener("change", callback);
+  window.addEventListener("storage", callback);
+  return () => {
+    media.removeEventListener("change", callback);
+    window.removeEventListener("storage", callback);
+  };
+}
+
 export default function Home() {
   const [activeView, setActiveView] = useState<View>("explore");
   const [exploreScenarioId, setExploreScenarioId] = useState<ScenarioId>("code-medium");
@@ -784,37 +813,29 @@ export default function Home() {
     evidence: true,
   });
 
-  const theme = useSyncExternalStore(
-    (callback) => {
-      const media = window.matchMedia("(prefers-color-scheme: light)");
-      media.addEventListener("change", callback);
-      window.addEventListener("storage", callback);
-      return () => {
-        media.removeEventListener("change", callback);
-        window.removeEventListener("storage", callback);
-      };
-    },
-    () => {
-      try {
-        const saved = localStorage.getItem("tokentier-theme");
-        if (saved === "light" || saved === "dark") return saved;
-        return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
-      } catch {
-        return "dark";
-      }
-    },
-    () => "dark",
-  );
+  const themeSnapshot = useSyncExternalStore(subscribeTheme, getThemeSnapshot, getServerThemeSnapshot);
+  const [themeMode, activeTheme] = themeSnapshot.split(":") as [ThemeMode, "light" | "dark"];
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
+    document.documentElement.setAttribute("data-theme", activeTheme);
+  }, [activeTheme]);
 
-  const toggleTheme = () => {
-    const nextTheme = theme === "dark" ? "light" : "dark";
+  const cycleTheme = () => {
+    const nextMode: ThemeMode =
+      themeMode === "system"
+        ? "light"
+        : themeMode === "light"
+          ? "dark"
+          : "system";
     try {
-      localStorage.setItem("tokentier-theme", nextTheme);
-      document.documentElement.setAttribute("data-theme", nextTheme);
+      if (nextMode === "system") {
+        localStorage.removeItem("tokentier-theme");
+      } else {
+        localStorage.setItem("tokentier-theme", nextMode);
+      }
+      const system = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      const effective = nextMode === "system" ? system : nextMode;
+      document.documentElement.setAttribute("data-theme", effective);
       window.dispatchEvent(new Event("storage"));
     } catch {
       // ignore
@@ -994,17 +1015,30 @@ export default function Home() {
         <div className="header-actions">
           <span className="freshness"><i /> Updated {pricingUpdatedAt}</span>
           <button
-            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
+            aria-label={`Theme: ${themeMode === "system" ? `Auto (${activeTheme})` : themeMode}. Click to cycle.`}
             className="theme-toggle"
-            onClick={toggleTheme}
+            onClick={cycleTheme}
+            title={
+              themeMode === "system"
+                ? `Auto: following system (${activeTheme}). Click for Light.`
+                : themeMode === "light"
+                  ? "Light theme. Click for Dark."
+                  : "Dark theme. Click for Auto (System)."
+            }
             type="button"
           >
-            {theme === "dark" ? (
+            {themeMode === "system" ? (
+              <svg aria-hidden="true" fill="none" height="15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="15">
+                <rect height="14" rx="2" ry="2" width="20" x="2" y="3"/>
+                <line x1="8" x2="16" y1="21" y2="21"/>
+                <line x1="12" x2="12" y1="17" y2="21"/>
+              </svg>
+            ) : themeMode === "light" ? (
               <svg aria-hidden="true" fill="none" height="15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="15"><circle cx="12" cy="12" r="5"/><line x1="12" x2="12" y1="1" y2="3"/><line x1="12" x2="12" y1="21" y2="23"/><line x1="4.22" x2="5.64" y1="4.22" y2="5.64"/><line x1="18.36" x2="19.78" y1="18.36" y2="19.78"/><line x1="1" x2="3" y1="12" y2="12"/><line x1="21" x2="23" y1="12" y2="12"/><line x1="4.22" x2="5.64" y1="19.78" y2="18.36"/><line x1="18.36" x2="19.78" y1="5.64" y2="4.22"/></svg>
             ) : (
               <svg aria-hidden="true" fill="none" height="15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="15"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
             )}
-            <span>{theme === "dark" ? "Light" : "Dark"}</span>
+            <span>{themeMode === "system" ? "Auto" : themeMode === "light" ? "Light" : "Dark"}</span>
           </button>
         </div>
       </header>
