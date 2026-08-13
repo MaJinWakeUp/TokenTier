@@ -101,7 +101,7 @@
       "tiers": {
         "daily": "B",
         "code-easy": "B",
-        "code-medium": "S",
+        "code-medium": "A",
         "code-hard": "S",
         "research": "S",
         "writing": "S",
@@ -184,7 +184,7 @@
       "tiers": {
         "daily": "A",
         "code-easy": "S",
-        "code-medium": "S",
+        "code-medium": "A",
         "code-hard": "A",
         "research": "A",
         "writing": "A",
@@ -308,7 +308,7 @@
       "tiers": {
         "daily": "A",
         "code-easy": "A",
-        "code-medium": "S",
+        "code-medium": "A",
         "code-hard": "A",
         "research": "S",
         "writing": "A",

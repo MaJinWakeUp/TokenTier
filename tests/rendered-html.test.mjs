@@ -42,8 +42,9 @@ test("server-renders the TokenTier product", async () => {
   }).format(new Date(`${catalog.updatedAt}T00:00:00Z`));
   assert.match(html, /<title>TokenTier — AI APIs vs subscription plans<\/title>/i);
   assert.match(html, /API or plan/);
-  assert.match(html, /Tier List/);
-  assert.match(html, /Build your/);
+  assert.match(html, /Tier list/i);
+  assert.match(html, /Compare AI APIs and plans/);
+  assert.match(html, /Your recommendation/);
   assert.match(html, /Explore profiles/);
   assert.match(html, /My recommendation/);
   assert.match(html, /OpenCode Go/);
@@ -54,22 +55,20 @@ test("server-renders the TokenTier product", async () => {
     assert.ok(html.includes(model.name), `renders catalog model ${model.name}`);
   }
   assert.match(html, /Monthly cost by model/i);
-  assert.match(html, /Subscription Plans/i);
+  assert.match(html, /Plans &amp; access/i);
   assert.match(html, /© 2026 Jin Ma · Open-source code under MIT · Independent project/);
   assert.doesNotMatch(html, /not affiliated with or endorsed by the AI providers/i);
-  assert.match(html, /aria-label="Profile assumptions"/);
+  assert.match(html, /id="profile-preset-title"/);
   assert.match(html, /id="explore-scenario"/);
   assert.match(html, /id="recommendation-profile"/);
-  assert.match(html, /Updates the tier list and price book in Explore/);
+  assert.match(html, /Preset per API call/);
   assert.match(html, /Work type/);
   assert.match(html, /Input tokens \/ call/);
   assert.match(html, /Output tokens \/ call/);
   assert.match(html, /BEST PATH/);
-  assert.match(html, /published capacity evidence|published quota cannot confirm/);
-  assert.match(html, /How this profile works/);
+  assert.match(html, /\$[\d,.]+[^<]*[\s\S]*?[\d,]+ calls/);
   assert.match(html, /18,000/);
   assert.match(html, /6,000/);
-  assert.match(html, /24,000/);
   assert.match(html, /Easy coding/);
   assert.match(html, /Medium coding/);
   assert.match(html, /Hard coding/);
@@ -79,20 +78,22 @@ test("server-renders the TokenTier product", async () => {
     "renders the catalog update date",
   );
   assert.doesNotMatch(html, /(?:01|02|03|04) \/|Editorial value picks|2 LANES|Recommendation choice|Choose the lane\. Know the limit\./i);
-  assert.doesNotMatch(html, /Best value for|Current best value snapshot/i);
+  assert.doesNotMatch(html, /Best value for|Current best value snapshot|Use this profile|Use in My recommendation/i);
   assert.doesNotMatch(html, /Research exploration|Coding · (?:easy|medium|difficult)/i);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 });
 
 test("removes the disposable starter preview", async () => {
-  const [page, layout, styles, packageJson, readme, license] = await Promise.all([
+  const [page, layout, styles, packageJson, readme, license, catalogSource] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
     readFile(new URL("../README.md", import.meta.url), "utf8"),
     readFile(new URL("../LICENSE", import.meta.url), "utf8"),
+    readFile(new URL("../data/api-models.json", import.meta.url), "utf8"),
   ]);
+  const catalog = JSON.parse(catalogSource);
 
   assert.match(page, /TokenTier/);
   assert.match(page, /Cursor Pro/);
@@ -110,12 +111,19 @@ test("removes the disposable starter preview", async () => {
   assert.match(page, /api-models\.json/);
   assert.match(layout, /TokenTier/);
   assert.match(layout, /prefers-color-scheme: light/);
-  assert.match(styles, /\.scenario-dock\s*\{[^}]*position:\s*fixed;[^}]*max-height:\s*calc\(100vh - 116px\);[^}]*overflow-y:\s*auto;/s);
-  assert.match(styles, /@media \(max-width: 1279px\)[\s\S]*?\.scenario-dock\s*\{[^}]*position:\s*sticky;/s);
+  assert.match(styles, /\.explore-workspace\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) 300px;/s);
+  assert.match(styles, /\.scenario-dock\s*\{[^}]*position:\s*sticky;[^}]*grid-column:\s*2;/s);
+  assert.match(styles, /@media \(max-width: 1120px\)[\s\S]*?\.scenario-dock\s*\{[^}]*position:\s*static;/s);
   assert.match(page, /const \[exploreScenarioId, setExploreScenarioId\]/);
   assert.match(page, /const \[recommendationScenarioId, setRecommendationScenarioId\]/);
+  assert.match(page, /const \[exploreLane, setExploreLane\]/);
+  assert.doesNotMatch(page, /const \[(?:tierLane|priceLane),/);
+  assert.equal((page.match(/aria-pressed=\{exploreLane === "api"\}/g) ?? []).length, 2);
+  assert.equal((page.match(/aria-pressed=\{exploreLane === "plans"\}/g) ?? []).length, 2);
   assert.match(page, /const useExploreProfile = \(\) =>/);
   assert.match(page, /updateRecommendationProfile\(exploreScenarioId\)/);
+  assert.equal((page.match(/onClick=\{useExploreProfile\}/g) ?? []).length, 1);
+  assert.equal((page.match(/Get a recommendation/g) ?? []).length, 1);
   assert.match(page, /callCost\(model, recommendationSettings\)/);
   assert.match(page, /function planCoverageScore[\s\S]*?return null;\n}/);
   assert.match(page, /planWithinBudget && planCoversVolume && !apiWithinBudget/);
@@ -140,9 +148,7 @@ test("removes the disposable starter preview", async () => {
   assert.match(styles, /@media \(max-width: 680px\)[\s\S]*?\.cost-model \.recommendation-badge,[\s\S]*?grid-column:\s*1 \/ -1;/s);
   assert.match(styles, /\.recommendation-workspace\s*\{/);
   assert.match(styles, /\.plan-match-grid\s*\{/);
-  assert.match(styles, /@media \(max-width: 680px\)[\s\S]*?\.scenario-dock\s*\{[^}]*grid-template-columns:\s*minmax\(0, 0\.75fr\) minmax\(0, 1\.25fr\);/s);
-  assert.match(styles, /@media \(max-width: 1279px\)[\s\S]*?\.scenario-dock\s*\{[^}]*background:\s*var\(--dock-bg\);/s);
-  assert.match(styles, /@media \(max-width: 680px\)[\s\S]*?\.hero-diff-line\s*\{[^}]*white-space:\s*normal;/s);
+  assert.match(styles, /@media \(max-width: 680px\)[\s\S]*?\.scenario-dock\s*\{[^}]*grid-template-columns:\s*minmax\(0, 0\.8fr\) minmax\(0, 1\.2fr\);/s);
   assert.match(styles, /@media \(max-width: 680px\)[\s\S]*?\.table-tools-top\s*\{[^}]*display:\s*flex;[^}]*flex-direction:\s*column;/s);
   assert.match(styles, /@media \(max-width: 420px\)[\s\S]*?\.workspace-tab-long\s*\{[^}]*display:\s*none;/s);
   assert.match(styles, /\.columns-reset-btn\s*\{[^}]*color:\s*var\(--accent-readable\);/s);
@@ -159,6 +165,19 @@ test("removes the disposable starter preview", async () => {
     styles,
     /\.columns-trigger\s*\{[^}]*font-family:\s*var\(--font-geist-sans\), sans-serif;[^}]*font-size:\s*14px;/s,
   );
+  assert.match(page, /<details className="row-note"><summary>Note<\/summary><p>\{model\.note\}<\/p><\/details>/);
+  assert.match(page, /<details className="row-note"><summary>Note<\/summary><p>\{plan\.note\}<\/p><\/details>/);
+  assert.match(styles, /\.row-note summary\s*\{[^}]*background:\s*var\(--note-soft\);/s);
+  assert.doesNotMatch(page, /className="recommendation-intro"|Build your|best-fit month|published capacity evidence/);
+  assert.doesNotMatch(styles, /\.recommendation-intro/);
+  assert.ok(
+    page.indexOf('className={`decision-banner recommendation-summary') < page.indexOf('className="recommendation-workspace"'),
+    "shows the numerical verdict before the recommendation settings workspace",
+  );
+  assert.match(styles, /@media \(max-width: 420px\)[\s\S]*?\.tier-model\s*\{[^}]*grid-template-rows:[^}]*height:\s*94px;/s);
+  assert.doesNotMatch(styles, /@media \(max-width: 360px\)[\s\S]*?\.theme-switcher button:first-child\s*\{[^}]*display:\s*none;/s);
+  const mediumSModels = catalog.models.filter((model) => model.tiers["code-medium"] === "S");
+  assert.ok(mediumSModels.length >= 1 && mediumSModels.length <= 5, `keeps Medium coding selective; found ${mediumSModels.length} S-tier models`);
   assert.doesNotMatch(styles, /\.hero-card|\.scenario-tabs|\.price-scenario-tabs|\.call-profile/);
   assert.doesNotMatch(page, /className="hero-card|className="scenario-tabs|className="price-scenario-tabs|className="call-profile/);
   assert.doesNotMatch(page, /codex-preview|_sites-preview/);
