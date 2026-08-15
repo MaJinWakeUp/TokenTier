@@ -1113,33 +1113,34 @@ export default function Home() {
               <div className="tier-label"><strong>{tier}</strong><span>{tierDescriptions[tier]}</span></div>
               <div className="tier-models">
                 {(() => {
-                  const items = exploreLane === "api"
-                    ? models
-                        .filter((model) => model.tiers[exploreScenarioId] === tier)
-                        .sort((a, b) => callCost(a, exploreSettings) - callCost(b, exploreSettings))
-                    : plans
-                        .filter((plan) => plan.kind === "Subscription" && plan.tiers[exploreScenarioId] === tier)
-                        .sort((a, b) => (a.monthly ?? Infinity) - (b.monthly ?? Infinity));
-                  if (items.length === 0) {
-                    return <p className="tier-empty">No {exploreLane === "api" ? "models" : "plans"} ranked in this tier for this scenario.</p>;
+                  if (exploreLane === "api") {
+                    const items = models
+                      .filter((model) => model.tiers[exploreScenarioId] === tier)
+                      .sort((a, b) => callCost(a, exploreSettings) - callCost(b, exploreSettings));
+                    if (items.length === 0) {
+                      return <p className="tier-empty">No models ranked in this tier for this scenario.</p>;
+                    }
+                    return items.map((item) => (
+                      <article aria-label={`${item.name}, ${item.provider}, ${price(callCost(item, exploreSettings), 3)} per call`} className="tier-model" key={item.id}>
+                        <span className="provider-orb" data-provider={item.provider} />
+                        <span><strong title={item.name}>{item.name}</strong><small>{item.provider}</small></span>
+                        <b>{price(callCost(item, exploreSettings), 3)}<small>/ call</small></b>
+                      </article>
+                    ));
                   }
-                  return items.map((item) =>
-                    exploreLane === "api"
-                      ? (
-                        <article aria-label={`${item.name}, ${item.provider}, ${price(callCost(item, exploreSettings), 3)} per call`} className="tier-model" key={item.id}>
-                          <span className="provider-orb" data-provider={item.provider} />
-                          <span><strong title={item.name}>{item.name}</strong><small>{item.provider}</small></span>
-                          <b>{price(callCost(item, exploreSettings), 3)}<small>/ call</small></b>
-                        </article>
-                      )
-                      : (
-                        <article aria-label={`${item.name}, ${item.provider}, $${item.monthly} per month`} className="tier-model" key={item.id}>
-                          <span className="provider-orb" data-provider={item.provider} />
-                          <span><strong title={item.name}>{item.name}</strong><small>{item.confidence} quota confidence</small></span>
-                          <b>${item.monthly}<small>/ month</small></b>
-                        </article>
-                      ),
-                  );
+                  const items = plans
+                    .filter((plan) => plan.kind === "Subscription" && plan.tiers[exploreScenarioId] === tier)
+                    .sort((a, b) => (a.monthly ?? Infinity) - (b.monthly ?? Infinity));
+                  if (items.length === 0) {
+                    return <p className="tier-empty">No plans ranked in this tier for this scenario.</p>;
+                  }
+                  return items.map((item) => (
+                    <article aria-label={`${item.name}, ${item.provider}, $${item.monthly} per month`} className="tier-model" key={item.id}>
+                      <span className="provider-orb" data-provider={item.provider} />
+                      <span><strong title={item.name}>{item.name}</strong><small>{item.confidence} quota confidence</small></span>
+                      <b>${item.monthly}<small>/ month</small></b>
+                    </article>
+                  ));
                 })()}
               </div>
             </div>
