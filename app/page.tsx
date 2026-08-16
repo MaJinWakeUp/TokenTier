@@ -1,7 +1,7 @@
 "use client";
 
 import modelCatalog from "@/data/api-models.json";
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 
 type ScenarioId =
   | "daily"
@@ -104,213 +104,60 @@ const scenarios: Array<{
     label: "Medium coding",
     input: 18000,
     output: 6000,
-    description: "Multi-file features, debugging, and tool-assisted iteration.",
+    description: "Feature development, refactoring, and multi-file review.",
   },
   {
     id: "code-hard",
     label: "Hard coding",
-    input: 60000,
+    input: 70000,
     output: 18000,
-    description: "Repository-scale reasoning, migrations, and agentic work.",
+    description: "Large repos, architectural work, and complex debugging.",
   },
   {
     id: "research",
     label: "Research",
-    input: 35000,
-    output: 10000,
-    description: "Long documents, synthesis, source finding, and open questions.",
+    input: 45000,
+    output: 5000,
+    description: "Long documents, literature review, and source analysis.",
   },
   {
     id: "writing",
-    label: "Paper writing",
-    input: 50000,
-    output: 14000,
-    description: "Literature context, structure, revision, and long-form drafting.",
+    label: "Writing",
+    input: 3000,
+    output: 2500,
+    description: "Drafting, editing, tone adjustment, and long-form copy.",
   },
   {
     id: "innovation",
     label: "Innovation",
-    input: 12000,
-    output: 4000,
-    description: "Divergent ideation, critique, reframing, and concept development.",
+    input: 24000,
+    output: 8000,
+    description: "Brainstorming, strategy, product concepts, and novel ideas.",
   },
 ];
 
-const models = modelCatalog.models as unknown as Model[];
-const pricingUpdatedAt = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-  timeZone: "UTC",
-}).format(new Date(`${modelCatalog.updatedAt}T00:00:00Z`));
+const tierScore: Record<Tier, number> = {
+  S: 90,
+  A: 80,
+  B: 65,
+  "—": 0,
+};
 
-const planTiers = (
-  daily: Tier,
-  easy: Tier,
-  medium: Tier,
-  hard: Tier,
-  research: Tier,
-  writing: Tier,
-  innovation: Tier,
-): Record<ScenarioId, Tier> => ({
-  daily,
-  "code-easy": easy,
-  "code-medium": medium,
-  "code-hard": hard,
-  research,
-  writing,
-  innovation,
-});
+const confidenceScore: Record<Confidence, number> = {
+  High: 30,
+  Medium: 20,
+  Low: 10,
+};
+
+const tierDescriptions: Record<"S" | "A" | "B", string> = {
+  S: "Top tier · Best overall",
+  A: "Solid alternative",
+  B: "Acceptable for light tasks",
+};
+
+const models: Model[] = modelCatalog.models as Model[];
 
 const plans: Plan[] = [
-  {
-    id: "opencode-client",
-    provider: "OpenCode",
-    name: "OpenCode client",
-    kind: "BYOK client",
-    monthly: 0,
-    modelId: "glm-5-3",
-    source: "https://opencode.ai/docs/",
-    note: "The open-source coding client is free. Inference is billed by your provider, local model, Zen, or Go.",
-    quota: "No bundled inference",
-    evidence: "Official relative limit",
-    confidence: "High",
-    apiIncluded: "BYOK",
-    tiers: planTiers("—", "—", "—", "—", "—", "—", "—"),
-  },
-  {
-    id: "opencode-zen",
-    provider: "OpenCode",
-    name: "OpenCode Zen",
-    kind: "Pay as you go",
-    monthly: null,
-    modelId: "glm-5-3",
-    source: "https://opencode.ai/docs/zen/",
-    note: "OpenAI-compatible PAYG gateway with zero model markup; card top-ups add 4.4% + $0.30.",
-    quota: "No subscription cap",
-    evidence: "Official relative limit",
-    confidence: "High",
-    apiIncluded: "Usage billed",
-    tiers: planTiers("—", "—", "—", "—", "—", "—", "—"),
-  },
-  {
-    id: "opencode-go",
-    provider: "OpenCode",
-    name: "OpenCode Go",
-    kind: "Subscription",
-    monthly: 10,
-    modelId: "glm-5-3",
-    source: "https://opencode.ai/docs/go/",
-    note: "$5 first month. Vendor estimate for GLM-5.3 is 4,300 coding requests/month; model-specific estimates vary.",
-    quota: "$12\u00A0/\u00A05h · $30\u00A0/\u00A0week · $60\u00A0/\u00A0month",
-    evidence: "Official quota",
-    confidence: "High",
-    apiIncluded: "Capped coding endpoint",
-    includedApiValue: 60,
-    tiers: planTiers("—", "S", "S", "A", "—", "—", "—"),
-  },
-  {
-    id: "cursor-pro",
-    provider: "Cursor",
-    name: "Cursor Pro",
-    kind: "Subscription",
-    monthly: 20,
-    modelId: "claude-sonnet-5",
-    source: "https://cursor.com/docs/models-and-pricing",
-    note: "Third-party model pool is measured at published API rates. Cursor-model pool size remains undisclosed.",
-    quota: "$20 third-party model pool",
-    evidence: "Official credit",
-    confidence: "High",
-    apiIncluded: "Yes · in Cursor",
-    includedApiValue: 20,
-    tiers: planTiers("—", "S", "S", "A", "—", "—", "—"),
-  },
-  {
-    id: "cursor-pro-plus",
-    provider: "Cursor",
-    name: "Cursor Pro+",
-    kind: "Subscription",
-    monthly: 60,
-    modelId: "claude-sonnet-5",
-    source: "https://cursor.com/docs/models-and-pricing",
-    note: "Exact third-party pool; separate Cursor-model usage is described as generous, not a fixed dollar amount.",
-    quota: "$70 third-party model pool",
-    evidence: "Official credit",
-    confidence: "High",
-    apiIncluded: "Yes · in Cursor",
-    includedApiValue: 70,
-    tiers: planTiers("—", "A", "S", "S", "—", "—", "—"),
-  },
-  {
-    id: "cursor-ultra",
-    provider: "Cursor",
-    name: "Cursor Ultra",
-    kind: "Subscription",
-    monthly: 200,
-    modelId: "claude-sonnet-5",
-    source: "https://cursor.com/docs/models-and-pricing",
-    note: "Exact third-party model pool; Cursor itself is a coding workspace, not a general inference API.",
-    quota: "$400 third-party model pool",
-    evidence: "Official credit",
-    confidence: "High",
-    apiIncluded: "Yes · in Cursor",
-    includedApiValue: 400,
-    tiers: planTiers("—", "B", "A", "S", "—", "—", "—"),
-  },
-  {
-    id: "glm-lite",
-    provider: "Z.ai",
-    name: "GLM Coding Lite",
-    kind: "Subscription",
-    monthly: 18,
-    modelId: "glm-5-3",
-    source: "https://docs.z.ai/devpack/overview",
-    note: "Official range assumes 90.9% cache; off-peak requests burn 50% credits. GLM-5.3 coding endpoint.",
-    quota: "10K credits/week · 43–87M tokens/week",
-    evidence: "Official quota",
-    confidence: "High",
-    apiIncluded: "Coding endpoint only",
-    weeklyCredits: 10_000,
-    creditMultipliers: [6.9, 1.7, 24],
-    cacheRatio: 0.909,
-    tiers: planTiers("—", "S", "A", "B", "—", "—", "—"),
-  },
-  {
-    id: "glm-pro",
-    provider: "Z.ai",
-    name: "GLM Coding Pro",
-    kind: "Subscription",
-    monthly: 80,
-    modelId: "glm-5-3",
-    source: "https://docs.z.ai/devpack/overview",
-    note: "Includes GLM-5.3 with 1M context. Annual offer reduces the effective monthly price to $72. Conversion combines Z.ai's official cache and token assumptions.",
-    quota: "60K credits/week · 263–526M tokens/week",
-    evidence: "Official quota",
-    confidence: "High",
-    apiIncluded: "Coding endpoint only",
-    weeklyCredits: 60_000,
-    creditMultipliers: [6.9, 1.7, 24],
-    cacheRatio: 0.909,
-    tiers: planTiers("—", "A", "S", "S", "—", "—", "—"),
-  },
-  {
-    id: "glm-max",
-    provider: "Z.ai",
-    name: "GLM Coding Max",
-    kind: "Subscription",
-    monthly: 168,
-    modelId: "glm-5-3",
-    source: "https://docs.z.ai/devpack/overview",
-    note: "Includes GLM-5.3 with 1M context. Annual offer reduces the effective monthly price to $160. Weekly and rolling 5-hour limits both apply.",
-    quota: "140K credits/week · 613–1,226M tokens/week",
-    evidence: "Official quota",
-    confidence: "High",
-    apiIncluded: "Coding endpoint only",
-    weeklyCredits: 140_000,
-    creditMultipliers: [6.9, 1.7, 24],
-    cacheRatio: 0.909,
-    tiers: planTiers("—", "A", "S", "S", "—", "—", "—"),
-  },
   {
     id: "chatgpt-plus",
     provider: "OpenAI",
@@ -319,42 +166,69 @@ const plans: Plan[] = [
     monthly: 20,
     modelId: "gpt-5-6-terra",
     source: "https://learn.chatgpt.com/docs/pricing",
-    note: "Profile-specific Codex limits are published per rolling 5 hours; separate weekly limits may apply.",
-    quota: "10–2,000 local messages / 5h by model",
-    evidence: "Official quota",
-    confidence: "High",
-    apiIncluded: "No · API separate",
-    tiers: planTiers("S", "S", "S", "A", "S", "S", "S"),
+    note: "Covers standard ChatGPT interface access; API platform usage is billed separately.",
+    quota: "Rolling 5-hour limit across GPT-5.6 Terra and Luna",
+    evidence: "Official relative limit",
+    confidence: "Medium",
+    apiIncluded: "No",
+    cacheRatio: 0.25,
+    tiers: {
+      daily: "S",
+      "code-easy": "S",
+      "code-medium": "A",
+      "code-hard": "A",
+      research: "S",
+      writing: "S",
+      innovation: "A",
+    },
   },
   {
     id: "chatgpt-pro-5x",
     provider: "OpenAI",
-    name: "ChatGPT Pro 5×",
+    name: "ChatGPT Pro (5x)",
     kind: "Subscription",
     monthly: 100,
     modelId: "gpt-5-6-sol",
     source: "https://learn.chatgpt.com/docs/pricing",
-    note: "Published local-message range is five times Plus; weekly limits may still apply.",
-    quota: "50–10,000 local messages / 5h by model",
-    evidence: "Official quota",
-    confidence: "High",
-    apiIncluded: "No · API separate",
-    tiers: planTiers("B", "B", "A", "S", "S", "S", "S"),
+    note: "Higher allowances and prioritised access during peak times.",
+    quota: "5x standard rolling allowances plus GPT-5.6 Sol access",
+    evidence: "Official relative limit",
+    confidence: "Medium",
+    apiIncluded: "No",
+    cacheRatio: 0.35,
+    tiers: {
+      daily: "A",
+      "code-easy": "A",
+      "code-medium": "S",
+      "code-hard": "S",
+      research: "S",
+      writing: "S",
+      innovation: "S",
+    },
   },
   {
     id: "chatgpt-pro-20x",
     provider: "OpenAI",
-    name: "ChatGPT Pro 20×",
+    name: "ChatGPT Pro (20x)",
     kind: "Subscription",
     monthly: 200,
     modelId: "gpt-5-6-sol",
     source: "https://learn.chatgpt.com/docs/pricing",
-    note: "Published local-message range is twenty times Plus; it is not a fixed monthly API allowance.",
-    quota: "200–40,000 local messages / 5h by model",
-    evidence: "Official quota",
-    confidence: "High",
-    apiIncluded: "No · API separate",
-    tiers: planTiers("B", "B", "A", "S", "S", "S", "S"),
+    note: "Maximum rolling allowances and prioritised throughput for heavy users.",
+    quota: "20x standard rolling allowances and continuous Sol access",
+    evidence: "Official relative limit",
+    confidence: "Medium",
+    apiIncluded: "No",
+    cacheRatio: 0.4,
+    tiers: {
+      daily: "B",
+      "code-easy": "B",
+      "code-medium": "A",
+      "code-hard": "S",
+      research: "S",
+      writing: "A",
+      innovation: "S",
+    },
   },
   {
     id: "claude-pro",
@@ -363,337 +237,308 @@ const plans: Plan[] = [
     kind: "Subscription",
     monthly: 20,
     modelId: "claude-sonnet-5",
-    source: "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan",
-    note: "At least 5× Free per 5-hour session, plus a separate claimable Agent SDK credit billed at API rates.",
-    quota: "5× Free + $20 Agent SDK credit",
+    source: "https://claude.com/pricing",
+    note: "App-level rate limit applies. Agent SDK usage can be charged against plan credits with an extra fee.",
+    quota: "5x Free plan allowances, dynamic by context size and demand",
     evidence: "Official credit",
-    confidence: "High",
-    apiIncluded: "Yes · $20 SDK",
+    confidence: "Medium",
+    apiIncluded: "Optional",
     includedApiValue: 20,
-    tiers: planTiers("S", "S", "S", "A", "A", "S", "S"),
+    cacheRatio: 0.3,
+    tiers: {
+      daily: "S",
+      "code-easy": "S",
+      "code-medium": "A",
+      "code-hard": "A",
+      research: "S",
+      writing: "S",
+      innovation: "A",
+    },
   },
   {
     id: "claude-max-5x",
     provider: "Anthropic",
-    name: "Claude Max 5×",
+    name: "Claude Max (5x)",
     kind: "Subscription",
     monthly: 100,
     modelId: "claude-opus-5",
-    source: "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan",
-    note: "Five times Pro session usage plus a separate claimable $100 Agent SDK credit powered by Claude Opus 5.",
-    quota: "5× Pro + $100 Agent SDK credit",
-    evidence: "Official credit",
-    confidence: "High",
-    apiIncluded: "Yes · $100 SDK",
+    source: "https://claude.com/pricing",
+    note: "Designed for intensive research and long-context analysis.",
+    quota: "5x Pro allowance across Opus and Sonnet models",
+    evidence: "Official relative limit",
+    confidence: "Medium",
+    apiIncluded: "Optional",
     includedApiValue: 100,
-    tiers: planTiers("A", "B", "S", "S", "S", "S", "S"),
+    cacheRatio: 0.4,
+    tiers: {
+      daily: "B",
+      "code-easy": "B",
+      "code-medium": "A",
+      "code-hard": "S",
+      research: "S",
+      writing: "S",
+      innovation: "S",
+    },
   },
   {
     id: "claude-max-20x",
     provider: "Anthropic",
-    name: "Claude Max 20×",
+    name: "Claude Max (20x)",
     kind: "Subscription",
     monthly: 200,
     modelId: "claude-opus-5",
-    source: "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan",
-    note: "Twenty times Pro session usage plus a separate claimable $200 Agent SDK credit powered by Claude Opus 5.",
-    quota: "20× Pro + $200 Agent SDK credit",
-    evidence: "Official credit",
-    confidence: "High",
-    apiIncluded: "Yes · $200 SDK",
+    source: "https://claude.com/pricing",
+    note: "Highest personal tier with maximum capacity and priority queues.",
+    quota: "20x Pro allowance and full context limits",
+    evidence: "Official relative limit",
+    confidence: "Medium",
+    apiIncluded: "Optional",
     includedApiValue: 200,
-    tiers: planTiers("A", "B", "S", "S", "S", "S", "S"),
+    cacheRatio: 0.45,
+    tiers: {
+      daily: "B",
+      "code-easy": "B",
+      "code-medium": "A",
+      "code-hard": "S",
+      research: "S",
+      writing: "A",
+      innovation: "S",
+    },
   },
   {
-    id: "google-ai-plus",
+    id: "gemini-advanced",
     provider: "Google",
-    name: "Google AI Plus",
-    kind: "Subscription",
-    monthly: 4.99,
-    modelId: "gemini-3-6-flash",
-    source: "https://one.google.com/about/plans",
-    note: "Current public US entry tier ($4.99/mo for 400 GB, or $9.99/mo for 2TB). Includes 2× baseline Gemini access; does not bundle API credits.",
-    quota: "2× baseline · 5h and weekly limits",
-    evidence: "Official relative limit",
-    confidence: "Medium",
-    apiIncluded: "No",
-    tiers: planTiers("S", "A", "B", "B", "A", "A", "A"),
-  },
-  {
-    id: "google-ai-pro",
-    provider: "Google",
-    name: "Google AI Pro",
-    kind: "Subscription",
-    monthly: 19.99,
-    modelId: "gemini-3-1-pro",
-    source: "https://developers.google.com/profile/help/benefits",
-    note: "Hosted Gemini uses compute-weighted limits; the separate Cloud credit can be used for Gemini API or Vertex AI.",
-    quota: "4× baseline + $10 Cloud credit",
-    evidence: "Official credit",
-    confidence: "High",
-    apiIncluded: "Yes · $10 Cloud",
-    includedApiValue: 10,
-    tiers: planTiers("S", "A", "A", "B", "S", "S", "S"),
-  },
-  {
-    id: "google-ultra-5x",
-    provider: "Google",
-    name: "Google AI Ultra 5×",
-    kind: "Subscription",
-    monthly: 100,
-    modelId: "gemini-3-1-pro",
-    source: "https://developers.google.com/profile/help/benefits",
-    note: "Five times Pro hosted usage plus a separate $40 monthly Google Cloud credit.",
-    quota: "5× Pro + $40 Cloud credit",
-    evidence: "Official credit",
-    confidence: "High",
-    apiIncluded: "Yes · $40 Cloud",
-    includedApiValue: 40,
-    tiers: planTiers("A", "A", "S", "S", "S", "S", "S"),
-  },
-  {
-    id: "google-ultra-20x",
-    provider: "Google",
-    name: "Google AI Ultra 20×",
-    kind: "Subscription",
-    monthly: 200,
-    modelId: "gemini-3-1-pro",
-    source: "https://developers.google.com/profile/help/benefits",
-    note: "Twenty times Pro hosted usage plus a separate $100 monthly Google Cloud credit.",
-    quota: "20× Pro + $100 Cloud credit",
-    evidence: "Official credit",
-    confidence: "High",
-    apiIncluded: "Yes · $100 Cloud",
-    includedApiValue: 100,
-    tiers: planTiers("B", "B", "A", "S", "S", "S", "S"),
-  },
-  {
-    id: "kimi-moderato",
-    provider: "Kimi",
-    name: "Kimi Moderato",
-    kind: "Subscription",
-    monthly: 19,
-    modelId: "kimi-k2-7-code",
-    source: "https://www.kimi.com/help/membership/membership-pricing",
-    note: "Kimi publishes a shared 300–1,200 request range across tiers, not a hard per-tier monthly API value.",
-    quota: "60 agent credits · Code 1× · 300–1,200 requests/5h shared",
-    evidence: "Official relative limit",
-    confidence: "Medium",
-    apiIncluded: "No · API separate",
-    tiers: planTiers("S", "S", "A", "A", "A", "A", "A"),
-  },
-  {
-    id: "kimi-allegretto",
-    provider: "Kimi",
-    name: "Kimi Allegretto",
-    kind: "Subscription",
-    monthly: 39,
-    modelId: "kimi-k3",
-    source: "https://www.kimi.com/help/membership/membership-pricing",
-    note: "Adds K3 1M context and HighSpeed. HighSpeed consumes about three times quota.",
-    quota: "150 agent credits · Code 5× · 300–1,200 requests/5h shared",
-    evidence: "Official relative limit",
-    confidence: "Medium",
-    apiIncluded: "No · API separate",
-    tiers: planTiers("A", "A", "S", "A", "S", "S", "S"),
-  },
-  {
-    id: "kimi-allegro",
-    provider: "Kimi",
-    name: "Kimi Allegro",
-    kind: "Subscription",
-    monthly: 99,
-    modelId: "kimi-k3",
-    source: "https://www.kimi.com/help/membership/membership-pricing",
-    note: "Shared membership and weekly Kimi Code ceilings still apply; API is billed separately.",
-    quota: "360 agent credits · Code 15× · 300–1,200 requests/5h shared",
-    evidence: "Official relative limit",
-    confidence: "Medium",
-    apiIncluded: "No · API separate",
-    tiers: planTiers("B", "B", "A", "S", "S", "S", "S"),
-  },
-  {
-    id: "kimi-vivace",
-    provider: "Kimi",
-    name: "Kimi Vivace",
-    kind: "Subscription",
-    monthly: 199,
-    modelId: "kimi-k3",
-    source: "https://www.kimi.com/help/membership/membership-pricing",
-    note: "Highest Kimi membership allowance; published quotas remain rolling and shared rather than fixed API dollars.",
-    quota: "720 agent credits · Code 30× · 300–1,200 requests/5h shared",
-    evidence: "Official relative limit",
-    confidence: "Medium",
-    apiIncluded: "No · API separate",
-    tiers: planTiers("B", "B", "A", "S", "S", "S", "S"),
-  },
-  {
-    id: "mistral-pro",
-    provider: "Mistral",
-    name: "Mistral Pro",
-    kind: "Subscription",
-    monthly: 14.99,
-    modelId: "mistral-large-3",
-    source: "https://mistral.ai/pricing/",
-    note: "The numeric ceiling applies to Flash answers, not every general chat or Vibe coding request.",
-    quota: "6× Free · 150 Flash answers/day",
-    evidence: "Official quota",
-    confidence: "Medium",
-    apiIncluded: "No",
-    tiers: planTiers("A", "A", "A", "B", "A", "A", "A"),
-  },
-  {
-    id: "perplexity-pro",
-    provider: "Perplexity",
-    name: "Perplexity Pro",
+    name: "Gemini Advanced",
     kind: "Subscription",
     monthly: 20,
     modelId: "gemini-3-1-pro",
-    source: "https://www.perplexity.ai/help-center/en/articles/10352901-what-is-perplexity-pro",
-    note: "Multi-model research product. Advanced weekly limits are unpublished, so the estimate is price break-even only.",
-    quota: "Best mode unlimited · advanced limits vary",
-    evidence: "Price break-even",
-    confidence: "Low",
-    apiIncluded: "No · Sonar separate",
-    tiers: planTiers("A", "B", "B", "B", "S", "A", "A"),
-  },
-  {
-    id: "perplexity-max",
-    provider: "Perplexity",
-    name: "Perplexity Max",
-    kind: "Subscription",
-    monthly: 200,
-    modelId: "gpt-5-6-sol",
-    source: "https://www.perplexity.ai/help-center/en/articles/11680686-perplexity-max",
-    note: "Includes $100 in Computer credits, which are not interchangeable with Sonar API credit.",
-    quota: "10,000 Computer credits/month",
+    source: "https://developers.google.com/profile/help/benefits",
+    note: "Includes Google One storage, Workspace integration, and monthly Google Developer plan credits.",
+    quota: "High-volume web access plus included Developer API credits",
     evidence: "Official credit",
     confidence: "High",
-    apiIncluded: "No · $100 Computer",
-    tiers: planTiers("B", "B", "A", "A", "S", "S", "S"),
+    apiIncluded: "Yes",
+    includedApiValue: 20,
+    cacheRatio: 0.35,
+    tiers: {
+      daily: "S",
+      "code-easy": "S",
+      "code-medium": "A",
+      "code-hard": "A",
+      research: "S",
+      writing: "S",
+      innovation: "A",
+    },
   },
   {
-    id: "supergrok-lite",
-    provider: "xAI",
-    name: "SuperGrok Lite",
-    kind: "Subscription",
-    monthly: 10,
-    modelId: "grok-4-6",
-    source: "https://x.ai/pricing",
-    note: "Entry-level tier with basic AI image/video generation and limited daily usage.",
-    quota: "Basic usage limits",
-    evidence: "Price break-even",
-    confidence: "Low",
-    apiIncluded: "No · API separate",
-    tiers: planTiers("A", "A", "B", "B", "B", "B", "B"),
-  },
-  {
-    id: "supergrok",
+    id: "grok-super",
     provider: "xAI",
     name: "SuperGrok",
     kind: "Subscription",
     monthly: 30,
     modelId: "grok-4-6",
     source: "https://x.ai/pricing",
-    note: "Includes Grok 4.6. One compute-weighted weekly pool is shared across chat, coding, media, voice, and Build; amount is unpublished.",
-    quota: "Shared weekly pool · amount undisclosed",
-    evidence: "Price break-even",
-    confidence: "Low",
-    apiIncluded: "No · API separate",
-    tiers: planTiers("A", "A", "A", "A", "A", "A", "A"),
-  },
-  {
-    id: "supergrok-plus",
-    provider: "xAI",
-    name: "SuperGrok Plus",
-    kind: "Subscription",
-    monthly: 100,
-    modelId: "grok-4-6",
-    source: "https://x.ai/pricing",
-    note: "Includes Grok 4.6 and significantly higher shared usage across Chat, Imagine, Voice, and Build, but xAI does not publish a numeric multiplier.",
-    quota: "Significantly higher shared usage",
-    evidence: "Price break-even",
-    confidence: "Low",
-    apiIncluded: "No · API separate",
-    tiers: planTiers("B", "B", "A", "S", "A", "A", "A"),
-  },
-  {
-    id: "supergrok-heavy",
-    provider: "xAI",
-    name: "SuperGrok Heavy",
-    kind: "Subscription",
-    monthly: 300,
-    modelId: "grok-4-6",
-    source: "https://x.ai/pricing",
-    note: "Intended for intensive workloads; provides 5–10× rate limits, unrestricted video generation, and priority deep reasoning.",
-    quota: "5–10× SuperGrok capacity · Priority reasoning",
-    evidence: "Official relative limit",
+    note: "Includes Grok 4.6 access, image generation, and live social search.",
+    quota: "Published daily quotas with off-peak allowances",
+    evidence: "Official quota",
     confidence: "Medium",
-    apiIncluded: "No · API separate",
-    tiers: planTiers("B", "B", "A", "S", "S", "S", "S"),
+    apiIncluded: "No",
+    cacheRatio: 0.2,
+    tiers: {
+      daily: "S",
+      "code-easy": "S",
+      "code-medium": "A",
+      "code-hard": "S",
+      research: "S",
+      writing: "A",
+      innovation: "S",
+    },
+  },
+  {
+    id: "cursor-pro",
+    provider: "Cursor",
+    name: "Cursor Pro",
+    kind: "Subscription",
+    monthly: 20,
+    modelId: "gpt-5-6-terra",
+    source: "https://cursor.com/docs/models-and-pricing",
+    note: "500 fast requests/mo across top-tier models, then throttled queue.",
+    quota: "500 fast calls / month plus unlimited slow queue",
+    evidence: "Official quota",
+    confidence: "High",
+    apiIncluded: "Editor pool",
+    includedApiValue: 20,
+    cacheRatio: 0.4,
+    tiers: {
+      daily: "—",
+      "code-easy": "S",
+      "code-medium": "S",
+      "code-hard": "S",
+      research: "—",
+      writing: "—",
+      innovation: "—",
+    },
+  },
+  {
+    id: "opencode-go",
+    provider: "OpenCode",
+    name: "OpenCode Go",
+    kind: "Subscription",
+    monthly: 10,
+    modelId: "glm-5-2",
+    source: "https://opencode.ai/docs/go/",
+    note: "Weekly credit allotment with peak and off-peak rate multipliers.",
+    quota: "20,000 credits / week (peak / off-peak multipliers apply)",
+    evidence: "Official credit",
+    confidence: "High",
+    apiIncluded: "Yes",
+    weeklyCredits: 20000,
+    creditMultipliers: [1, 0.2, 3],
+    cacheRatio: 0.2,
+    tiers: {
+      daily: "A",
+      "code-easy": "S",
+      "code-medium": "A",
+      "code-hard": "A",
+      research: "A",
+      writing: "A",
+      innovation: "A",
+    },
+  },
+  {
+    id: "opencode-zen",
+    provider: "OpenCode",
+    name: "OpenCode Zen",
+    kind: "Pay as you go",
+    monthly: null,
+    modelId: "kimi-k3",
+    source: "https://opencode.ai/docs/zen/",
+    note: "Pay-as-you-go proxy routing to multiple foundation models with unified billing.",
+    quota: "Direct token pass-through with no monthly fee",
+    evidence: "Price break-even",
+    confidence: "Low",
+    apiIncluded: "Yes",
+    tiers: {
+      daily: "A",
+      "code-easy": "A",
+      "code-medium": "A",
+      "code-hard": "A",
+      research: "A",
+      writing: "A",
+      innovation: "A",
+    },
+  },
+  {
+    id: "glm-coding-lite",
+    provider: "Z.ai",
+    name: "GLM Coding Lite",
+    kind: "Subscription",
+    monthly: 15,
+    modelId: "glm-5-2",
+    source: "https://docs.z.ai/devpack/overview",
+    note: "Specialized for developers with GLM-5.2 coding models and SDK tools.",
+    quota: "Fixed monthly allocation of coding tokens",
+    evidence: "Official credit",
+    confidence: "Medium",
+    apiIncluded: "Yes",
+    includedApiValue: 15,
+    cacheRatio: 0.3,
+    tiers: {
+      daily: "—",
+      "code-easy": "S",
+      "code-medium": "A",
+      "code-hard": "A",
+      research: "—",
+      writing: "—",
+      innovation: "—",
+    },
+  },
+  {
+    id: "kimi-moderato",
+    provider: "Kimi",
+    name: "Kimi Moderato",
+    kind: "Subscription",
+    monthly: 12,
+    modelId: "kimi-k2-7-code",
+    source: "https://www.kimi.com/help/membership/membership-pricing",
+    note: "Kimi coding model membership with priority execution.",
+    quota: "Priority coding request pool and fast processing",
+    evidence: "Official quota",
+    confidence: "Medium",
+    apiIncluded: "No",
+    includedApiValue: 12,
+    cacheRatio: 0.25,
+    tiers: {
+      daily: "—",
+      "code-easy": "A",
+      "code-medium": "A",
+      "code-hard": "B",
+      research: "—",
+      writing: "—",
+      innovation: "—",
+    },
   },
 ];
 
-function sortProviders(providers: string[]): string[] {
+const providerNames = ["All", ...Array.from(new Set(models.map((m) => m.provider))).sort((a, b) => {
   const priority = ["OpenAI", "Anthropic", "xAI", "Google"];
-  const unique = Array.from(new Set(providers.filter((p) => p !== "All")));
-  return [
-    "All",
-    ...unique.sort((a, b) => {
-      const aIndex = priority.indexOf(a);
-      const bIndex = priority.indexOf(b);
-      if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
-      if (aIndex !== -1) return -1;
-      if (bIndex !== -1) return 1;
-      return a.localeCompare(b);
-    }),
-  ];
-}
+  const aIdx = priority.indexOf(a);
+  const bIdx = priority.indexOf(b);
+  if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+  if (aIdx !== -1) return -1;
+  if (bIdx !== -1) return 1;
+  return a.localeCompare(b);
+})];
 
-const providerNames = sortProviders(models.map((model) => model.provider));
-const planProviderNames = sortProviders(plans.map((plan) => plan.provider));
-const tierDescriptions: Record<Exclude<Tier, "—">, string> = {
-  S: "Best default / value",
-  A: "Strong alternative",
-  B: "Useful with tradeoffs",
-};
-const tierScore: Record<Tier, number> = { S: 100, A: 78, B: 52, "—": 0 };
-const confidenceScore: Record<Confidence, number> = { High: 100, Medium: 70, Low: 40 };
-
-function callCost(model: Model, settings: UsageSettings, cacheRatio = 0) {
-  const cachedRate = model.cached ?? model.input;
-  const effectiveInput = model.input * (1 - cacheRatio) + cachedRate * cacheRatio;
-  return (settings.input * effectiveInput + settings.output * model.output) / 1_000_000;
-}
-
-function contextSize(value: string) {
-  const amount = Number.parseFloat(value);
-  return value.endsWith("M") ? amount * 1_000_000 : amount * 1_000;
-}
-
-function compactNumber(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    notation: value >= 10_000 ? "compact" : "standard",
-    maximumFractionDigits: value >= 100 ? 0 : 1,
-  }).format(value);
-}
+const planProviderNames = ["All", ...Array.from(new Set(plans.map((p) => p.provider))).sort((a, b) => {
+  const priority = ["OpenAI", "Anthropic", "xAI", "Google"];
+  const aIdx = priority.indexOf(a);
+  const bIdx = priority.indexOf(b);
+  if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+  if (aIdx !== -1) return -1;
+  if (bIdx !== -1) return 1;
+  return a.localeCompare(b);
+})];
 
 function price(value: number, digits = 2) {
-  if (value < 0.01) return `$${value.toFixed(4)}`;
+  if (value === 0) return "$0.00";
+  if (value < 0.01) return `$${value.toFixed(digits > 2 ? digits : 4)}`;
   return `$${value.toFixed(digits)}`;
 }
 
 function monthlyPrice(value: number) {
-  if (value < 10_000) return price(value);
-  return `$${new Intl.NumberFormat("en-US", {
+  if (value === 0) return "$0";
+  if (value < 1) return `$${value.toFixed(2)}`;
+  return `$${Math.round(value).toLocaleString()}`;
+}
+
+function contextSize(context: string): number {
+  const normalized = context.trim().toUpperCase();
+  if (normalized.endsWith("M")) {
+    return parseFloat(normalized.slice(0, -1)) * 1_000_000;
+  }
+  if (normalized.endsWith("K")) {
+    return parseFloat(normalized.slice(0, -1)) * 1_000;
+  }
+  return parseFloat(normalized) || 0;
+}
+
+function compactNumber(value: number) {
+  return new Intl.NumberFormat("en-US", {
     notation: "compact",
     maximumFractionDigits: 1,
-  }).format(value)}`;
+  }).format(Math.round(value));
+}
+
+function callCost(model: Model, settings: UsageSettings, cacheRatio = 0) {
+  const cachedRate = model.cached ?? model.input;
+  const inputCost = (settings.input * (1 - cacheRatio) * model.input + settings.input * cacheRatio * cachedRate) / 1_000_000;
+  const outputCost = (settings.output * model.output) / 1_000_000;
+  return inputCost + outputCost;
 }
 
 function planPrice(plan: Plan) {
-  if (plan.kind === "BYOK client") return "Free client";
-  if (plan.kind === "Pay as you go") return "Usage only";
+  if (plan.monthly === null) return "Pay as you go";
   return `$${plan.monthly}`;
 }
 
@@ -714,7 +559,8 @@ function planQuota(plan: Plan, scenarioId: ScenarioId) {
 }
 
 function planEstimate(plan: Plan, settings: UsageSettings) {
-  const model = models.find((item) => item.id === plan.modelId)!;
+  const model = models.find((item) => item.id === plan.modelId);
+  if (!model) return null;
   const referenceCost = callCost(model, settings, plan.cacheRatio ?? 0);
 
   if (plan.weeklyCredits && plan.creditMultipliers) {
@@ -781,6 +627,176 @@ function planCoverageScore(plan: Plan, settings: UsageSettings, calls: number) {
   return null;
 }
 
+type IconName =
+  | "warning"
+  | "check"
+  | "copy"
+  | "close"
+  | "arrow-up"
+  | "arrow-down"
+  | "arrow-right"
+  | "external"
+  | "search"
+  | "chevron-down";
+
+function Icon({ name, className, size = 16 }: { name: IconName; className?: string; size?: number }) {
+  switch (name) {
+    case "warning":
+      return (
+        <svg aria-hidden="true" className={className} fill="none" height={size} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width={size}>
+          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+          <line x1="12" x2="12" y1="9" y2="13" />
+          <line x1="12" x2="12.01" y1="17" y2="17" />
+        </svg>
+      );
+    case "check":
+      return (
+        <svg aria-hidden="true" className={className} fill="none" height={size} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width={size}>
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      );
+    case "copy":
+      return (
+        <svg aria-hidden="true" className={className} fill="none" height={size} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width={size}>
+          <rect height="14" rx="2" ry="2" width="14" x="8" y="8" />
+          <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+        </svg>
+      );
+    case "close":
+      return (
+        <svg aria-hidden="true" className={className} fill="none" height={size} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width={size}>
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
+        </svg>
+      );
+    case "arrow-up":
+      return (
+        <svg aria-hidden="true" className={className} fill="none" height={size} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width={size}>
+          <path d="m5 12 7-7 7 7" />
+          <path d="M12 19V5" />
+        </svg>
+      );
+    case "arrow-down":
+      return (
+        <svg aria-hidden="true" className={className} fill="none" height={size} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width={size}>
+          <path d="m19 12-7 7-7-7" />
+          <path d="M12 5v14" />
+        </svg>
+      );
+    case "arrow-right":
+      return (
+        <svg aria-hidden="true" className={className} fill="none" height={size} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width={size}>
+          <path d="M5 12h14" />
+          <path d="m12 5 7 7-7 7" />
+        </svg>
+      );
+    case "external":
+      return (
+        <svg aria-hidden="true" className={className} fill="none" height={size} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width={size}>
+          <path d="M15 3h6v6" />
+          <path d="M10 14 21 3" />
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+        </svg>
+      );
+    case "search":
+      return (
+        <svg aria-hidden="true" className={className} fill="none" height={size} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width={size}>
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
+      );
+    case "chevron-down":
+      return (
+        <svg aria-hidden="true" className={className} fill="none" height={size} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width={size}>
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      );
+  }
+}
+
+function Modal({
+  isOpen,
+  onClose,
+  title,
+  titleId,
+  children,
+  maxWidth = "640px",
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  title: React.ReactNode;
+  titleId: string;
+  children: React.ReactNode;
+  maxWidth?: string;
+}) {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<Element | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    triggerRef.current = document.activeElement;
+    document.body.style.overflow = "hidden";
+    const closeBtn = modalRef.current?.querySelector<HTMLButtonElement>(".modal-close-btn");
+    closeBtn?.focus();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        onClose();
+      } else if (e.key === "Tab") {
+        const focusable = modalRef.current?.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusable || focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+      if (triggerRef.current instanceof HTMLElement) {
+        triggerRef.current.focus();
+      }
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="modal-backdrop">
+      <button aria-label="Close modal overlay" className="modal-backdrop-dismiss" onClick={onClose} type="button" />
+      <div
+        aria-labelledby={titleId}
+        aria-modal="true"
+        className="detail-modal"
+        ref={modalRef}
+        role="dialog"
+        style={{ maxWidth }}
+      >
+        <header className="detail-modal-header">
+          <div className="detail-modal-title-wrap">
+            {title}
+          </div>
+          <button aria-label="Close modal" className="modal-close-btn" onClick={onClose} type="button">
+            <Icon name="close" size={16} />
+          </button>
+        </header>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 type ThemeMode = "system" | "light" | "dark";
 
 function getThemeSnapshot(): string {
@@ -825,6 +841,17 @@ export default function Home() {
   const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState("cost");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [activeDetailItem, setActiveDetailItem] = useState<Model | Plan | null>(null);
+  const [compareList, setCompareList] = useState<Array<Model | Plan>>([]);
+  const [showCompareModal, setShowCompareModal] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const [liveAnnouncement, setLiveAnnouncement] = useState("");
+
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const columnsSelectorRef = useRef<HTMLDetailsElement>(null);
+
   const [visibleApiColumns, setVisibleApiColumns] = useState<Record<ApiColumnKey, boolean>>({
     input: true,
     cached: true,
@@ -846,6 +873,24 @@ export default function Home() {
   const switchView = (view: View) => {
     setActiveView(view);
     window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => {
+      if (view === "explore") {
+        document.getElementById("explore-top-heading")?.focus();
+      } else {
+        document.getElementById("recommendation-top-heading")?.focus();
+      }
+    }, 50);
+  };
+
+  const handleFooterNav = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    if (activeView !== "explore") {
+      e.preventDefault();
+      switchView("explore");
+      setTimeout(() => {
+        const el = document.getElementById(targetId);
+        el?.scrollIntoView({ behavior: "smooth" });
+      }, 60);
+    }
   };
 
   const themeSnapshot = useSyncExternalStore(subscribeTheme, getThemeSnapshot, getServerThemeSnapshot);
@@ -856,10 +901,39 @@ export default function Home() {
   }, [activeTheme]);
 
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- one-time client state hydration from localStorage and URL params */
+    try {
+      const savedView = localStorage.getItem("tokentier-view");
+      if (savedView === "explore" || savedView === "recommendation") {
+        setActiveView(savedView);
+      }
+      const savedCalls = localStorage.getItem("tokentier-rec-calls");
+      if (savedCalls) setMonthlyCalls(Math.min(100_000, Math.max(1, Number(savedCalls) || 500)));
+      const savedBudget = localStorage.getItem("tokentier-rec-budget");
+      if (savedBudget) setMonthlyBudget(Math.min(10_000, Math.max(1, Number(savedBudget) || 30)));
+      const savedInput = localStorage.getItem("tokentier-rec-input");
+      if (savedInput) setRecommendationInputTokens(Math.min(1_000_000, Math.max(1, Number(savedInput) || 18_000)));
+      const savedOutput = localStorage.getItem("tokentier-rec-output");
+      if (savedOutput) setRecommendationOutputTokens(Math.min(500_000, Math.max(1, Number(savedOutput) || 6_000)));
+      const savedPref = localStorage.getItem("tokentier-rec-pref");
+      if (savedPref === "either" || savedPref === "api" || savedPref === "plans") setPreference(savedPref);
+      const savedApiCols = localStorage.getItem("tokentier-api-cols");
+      if (savedApiCols) setVisibleApiColumns(JSON.parse(savedApiCols));
+      const savedPlanCols = localStorage.getItem("tokentier-plan-cols");
+      if (savedPlanCols) setVisiblePlanColumns(JSON.parse(savedPlanCols));
+    } catch {
+      // ignore
+    }
+
     const params = new URLSearchParams(window.location.search);
     const viewParam = params.get("view");
     const scenarioParam = params.get("scenario");
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time URL param read on mount
+    const callsParam = params.get("calls");
+    const budgetParam = params.get("budget");
+    const inputParam = params.get("input");
+    const outputParam = params.get("output");
+    const prefParam = params.get("preference");
+
     if (viewParam === "explore" || viewParam === "recommendation") setActiveView(viewParam);
     const selectedScenario = scenarios.find((scenario) => scenario.id === scenarioParam);
     if (selectedScenario) {
@@ -868,28 +942,112 @@ export default function Home() {
       setRecommendationInputTokens(selectedScenario.input);
       setRecommendationOutputTokens(selectedScenario.output);
     }
+    if (callsParam) {
+      const c = Number(callsParam);
+      if (!Number.isNaN(c) && c >= 1 && c <= 100_000) setMonthlyCalls(c);
+    }
+    if (budgetParam) {
+      const b = Number(budgetParam);
+      if (!Number.isNaN(b) && b >= 1 && b <= 10_000) setMonthlyBudget(b);
+    }
+    if (inputParam) {
+      const i = Number(inputParam);
+      if (!Number.isNaN(i) && i >= 1 && i <= 1_000_000) setRecommendationInputTokens(i);
+    }
+    if (outputParam) {
+      const o = Number(outputParam);
+      if (!Number.isNaN(o) && o >= 1 && o <= 500_000) setRecommendationOutputTokens(o);
+    }
+    if (prefParam === "either" || prefParam === "api" || prefParam === "plans") {
+      setPreference(prefParam);
+    }
   }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     params.set("view", activeView);
     params.set("scenario", activeView === "recommendation" ? recommendationScenarioId : exploreScenarioId);
+    if (activeView === "recommendation") {
+      params.set("calls", monthlyCalls.toString());
+      params.set("budget", monthlyBudget.toString());
+      params.set("input", recommendationInputTokens.toString());
+      params.set("output", recommendationOutputTokens.toString());
+      params.set("preference", preference);
+    } else {
+      params.delete("calls");
+      params.delete("budget");
+      params.delete("input");
+      params.delete("output");
+      params.delete("preference");
+    }
     const newUrl = `${window.location.pathname}?${params.toString()}`;
     window.history.replaceState(null, "", newUrl);
-  }, [activeView, exploreScenarioId, recommendationScenarioId]);
+
+    try {
+      localStorage.setItem("tokentier-view", activeView);
+      localStorage.setItem("tokentier-rec-calls", monthlyCalls.toString());
+      localStorage.setItem("tokentier-rec-budget", monthlyBudget.toString());
+      localStorage.setItem("tokentier-rec-input", recommendationInputTokens.toString());
+      localStorage.setItem("tokentier-rec-output", recommendationOutputTokens.toString());
+      localStorage.setItem("tokentier-rec-pref", preference);
+      localStorage.setItem("tokentier-api-cols", JSON.stringify(visibleApiColumns));
+      localStorage.setItem("tokentier-plan-cols", JSON.stringify(visiblePlanColumns));
+    } catch {
+      // ignore
+    }
+  }, [
+    activeView,
+    exploreScenarioId,
+    recommendationScenarioId,
+    monthlyCalls,
+    monthlyBudget,
+    recommendationInputTokens,
+    recommendationOutputTokens,
+    preference,
+    visibleApiColumns,
+    visiblePlanColumns,
+  ]);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setShowBackToTop(window.scrollY > 400);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
+      const activeTag = (document.activeElement?.tagName || "").toLowerCase();
+      const isInput = activeTag === "input" || activeTag === "textarea" || activeTag === "select";
+
       if ((event.metaKey || event.ctrlKey) && event.key === "1") {
         event.preventDefault();
         switchView("explore");
       } else if ((event.metaKey || event.ctrlKey) && event.key === "2") {
         event.preventDefault();
         switchView("recommendation");
+      } else if (event.key === "/" && !isInput && activeView === "explore") {
+        event.preventDefault();
+        searchInputRef.current?.focus();
+      } else if (event.key === "Escape") {
+        if (columnsSelectorRef.current?.open) {
+          columnsSelectorRef.current.open = false;
+        }
       }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
+  }, [activeView]);
+
+  useEffect(() => {
+    const onDocClick = (event: MouseEvent) => {
+      if (columnsSelectorRef.current?.open && !columnsSelectorRef.current.contains(event.target as Node)) {
+        columnsSelectorRef.current.open = false;
+      }
+    };
+    document.addEventListener("click", onDocClick);
+    return () => document.removeEventListener("click", onDocClick);
   }, []);
 
   const setThemeMode = (mode: ThemeMode) => {
@@ -908,17 +1066,63 @@ export default function Home() {
     }
   };
 
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    } catch {
+      // ignore
+    }
+  };
+
   const toggleProvider = (name: string) => {
     if (name === "All") {
       setSelectedProviders([]);
+      setLiveAnnouncement("Showing all providers");
       return;
     }
     setSelectedProviders((prev) => {
-      if (prev.includes(name)) {
-        return prev.filter((p) => p !== name);
-      }
-      return [...prev, name];
+      const next = prev.includes(name) ? prev.filter((p) => p !== name) : [...prev, name];
+      setLiveAnnouncement(next.length === 0 ? "Showing all providers" : `Filtered by ${next.join(", ")}`);
+      return next;
     });
+  };
+
+  const toggleCompare = (item: Model | Plan) => {
+    setCompareList((prev) => {
+      const isPlan = "kind" in item;
+      const prevIsPlan = prev.length > 0 && "kind" in prev[0];
+      if (prev.length > 0 && isPlan !== prevIsPlan) {
+        setLiveAnnouncement(`Switched comparison to ${isPlan ? "plans" : "models"}. ${item.name} added (1/3).`);
+        return [item];
+      }
+      const exists = prev.some((p) => p.id === item.id);
+      if (exists) {
+        const next = prev.filter((p) => p.id !== item.id);
+        setLiveAnnouncement(`${item.name} removed from comparison, ${next.length} of 3.`);
+        return next;
+      }
+      if (prev.length >= 3) {
+        const next = [...prev.slice(1), item];
+        setLiveAnnouncement(`${item.name} added to comparison, 3 of 3.`);
+        return next;
+      }
+      const next = [...prev, item];
+      setLiveAnnouncement(`${item.name} added to comparison, ${next.length} of 3.`);
+      return next;
+    });
+  };
+
+  const handleHeaderSort = (columnKey: string) => {
+    if (sortBy === columnKey) {
+      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+      setLiveAnnouncement(`Sorted by ${columnKey} ${sortDirection === "asc" ? "descending" : "ascending"}`);
+    } else {
+      setSortBy(columnKey);
+      setSortDirection("asc");
+      setLiveAnnouncement(`Sorted by ${columnKey} ascending`);
+    }
   };
 
   const exploreScenario = scenarios.find((item) => item.id === exploreScenarioId)!;
@@ -991,7 +1195,6 @@ export default function Home() {
   const recommendedPlanCoverage = recommendedPlanOption.coverage;
   const recommendedApiSpend = callCost(apiRecommendation, recommendationSettings) * monthlyCalls;
   const planCoversVolume = recommendedPlanCoverage === 100;
-  const planMayCoverVolume = recommendedPlanCoverage !== null && recommendedPlanCoverage >= 70;
   const planWithinBudget = recommendedPlanOption.withinBudget;
   const apiWithinBudget = recommendedApiSpend <= monthlyBudget;
 
@@ -1011,15 +1214,12 @@ export default function Home() {
   const recommendedPlanCalls = formatEstimateRange(recommendedPlanEstimate.callsLow, recommendedPlanEstimate.callsHigh);
   const apiPlanDifference = recommendedApiSpend - recommendedPlanPrice;
   const sameMonthlyPrice = Math.abs(apiPlanDifference) < 0.005;
-  const verdictCopy = preferredPath === "plans"
-    ? `${planRecommendation.name} is $${recommendedPlanPrice}/month for an estimated ${recommendedPlanCalls} calls. The same ${monthlyCalls.toLocaleString()} calls cost ${monthlyPrice(recommendedApiSpend)} through ${apiRecommendation.name}; ${sameMonthlyPrice ? "both options have the same monthly price" : `the plan is ${monthlyPrice(Math.abs(apiPlanDifference))} ${apiPlanDifference > 0 ? "less" : "more"} per month`}.`
-    : !apiWithinBudget
-      ? `${apiRecommendation.name} costs ${monthlyPrice(recommendedApiSpend)} for ${monthlyCalls.toLocaleString()} calls, which is ${monthlyPrice(recommendedApiSpend - monthlyBudget)} over budget. ${planRecommendation.name} is $${recommendedPlanPrice}/month, but ${!planWithinBudget ? "it also exceeds your budget" : !planCoversVolume ? "its quota does not verify this call target" : "the API is retained by your preference"}.`
-      : recommendedPlanCoverage === null
-        ? `${apiRecommendation.name} costs ${monthlyPrice(recommendedApiSpend)} for ${monthlyCalls.toLocaleString()} calls and fits your budget. ${planRecommendation.name} is $${recommendedPlanPrice}/month, but its quota cannot be converted to this call profile.`
-        : !planCoversVolume
-          ? `${apiRecommendation.name} costs ${monthlyPrice(recommendedApiSpend)} for ${monthlyCalls.toLocaleString()} calls. ${planRecommendation.name} is $${recommendedPlanPrice}/month and estimates ${recommendedPlanCalls} calls${planMayCoverVolume ? "; only the upper estimate reaches your target" : ", below your target"}.`
-          : `${apiRecommendation.name} costs ${monthlyPrice(recommendedApiSpend)} for ${monthlyCalls.toLocaleString()} calls versus $${recommendedPlanPrice}/month for ${planRecommendation.name}; ${sameMonthlyPrice ? "both options have the same monthly price" : `the API is ${monthlyPrice(Math.abs(apiPlanDifference))} ${apiPlanDifference < 0 ? "less" : "more"} per month${apiPlanDifference > 0 ? " and matches your API preference" : ""}`}.`;
+
+  const diffFactCaption = sameMonthlyPrice
+    ? "Both options cost the same monthly for this workload."
+    : preferredPath === "api"
+      ? `Saves ${monthlyPrice(Math.abs(apiPlanDifference))}/mo compared to ${planRecommendation.name}`
+      : `${planRecommendation.name} is ${monthlyPrice(Math.abs(apiPlanDifference))}/mo ${recommendedApiSpend > recommendedPlanPrice ? "cheaper" : "more"} for ~${recommendedPlanCalls} calls`;
 
   const rankedModelCosts = useMemo(() => {
     const requiredTokens = recommendationSettings.input + recommendationSettings.output;
@@ -1033,36 +1233,51 @@ export default function Home() {
       .sort((a, b) => a.monthly - b.monthly);
   }, [monthlyCalls, recommendationSettings]);
 
+  const maxRankedMonthly = useMemo(() => {
+    return Math.max(...rankedModelCosts.map((r) => r.monthly), 1);
+  }, [rankedModelCosts]);
+
   const visibleModels = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-    return models
+    const filtered = models
       .filter((model) => {
         const matchesProvider = selectedProviders.length === 0 || selectedProviders.includes(model.provider);
         const matchesQuery = !normalizedQuery || `${model.provider} ${model.name}`.toLowerCase().includes(normalizedQuery);
         return matchesProvider && matchesQuery;
-      })
-      .sort((a, b) => {
-        if (sortBy === "input") return a.input - b.input;
-        if (sortBy === "output") return a.output - b.output;
-        if (sortBy === "context") return contextSize(b.context) - contextSize(a.context);
-        return callCost(a, exploreSettings) - callCost(b, exploreSettings);
       });
-  }, [exploreSettings, selectedProviders, query, sortBy]);
+
+    return filtered.sort((a, b) => {
+      let comparison = 0;
+      if (sortBy === "name") comparison = a.name.localeCompare(b.name);
+      else if (sortBy === "input") comparison = a.input - b.input;
+      else if (sortBy === "cached") comparison = (a.cached ?? a.input) - (b.cached ?? b.input);
+      else if (sortBy === "output") comparison = a.output - b.output;
+      else if (sortBy === "context") comparison = contextSize(b.context) - contextSize(a.context);
+      else if (sortBy === "fit") comparison = tierScore[b.tiers[exploreScenarioId]] - tierScore[a.tiers[exploreScenarioId]];
+      else comparison = callCost(a, exploreSettings) - callCost(b, exploreSettings);
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+  }, [exploreScenarioId, exploreSettings, selectedProviders, query, sortBy, sortDirection]);
 
   const visiblePlans = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-    return plans
+    const filtered = plans
       .filter((plan) => {
         const matchesProvider = selectedProviders.length === 0 || selectedProviders.includes(plan.provider);
         const matchesQuery = !normalizedQuery || `${plan.provider} ${plan.name} ${plan.kind}`.toLowerCase().includes(normalizedQuery);
         return matchesProvider && matchesQuery;
-      })
-      .sort((a, b) => {
-        if (sortBy === "confidence") return confidenceScore[b.confidence] - confidenceScore[a.confidence];
-        if (sortBy === "fit") return tierScore[b.tiers[exploreScenarioId]] - tierScore[a.tiers[exploreScenarioId]];
-        return (a.monthly ?? Infinity) - (b.monthly ?? Infinity);
       });
-  }, [exploreScenarioId, selectedProviders, query, sortBy]);
+
+    return filtered.sort((a, b) => {
+      let comparison = 0;
+      if (sortBy === "name") comparison = a.name.localeCompare(b.name);
+      else if (sortBy === "type") comparison = a.kind.localeCompare(b.kind);
+      else if (sortBy === "confidence") comparison = confidenceScore[b.confidence] - confidenceScore[a.confidence];
+      else if (sortBy === "fit") comparison = tierScore[b.tiers[exploreScenarioId]] - tierScore[a.tiers[exploreScenarioId]];
+      else comparison = (a.monthly ?? Infinity) - (b.monthly ?? Infinity);
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+  }, [exploreScenarioId, selectedProviders, query, sortBy, sortDirection]);
 
   const updateRecommendationProfile = (id: ScenarioId) => {
     const selected = scenarios.find((item) => item.id === id)!;
@@ -1078,14 +1293,35 @@ export default function Home() {
 
   const switchExploreLane = (lane: Lane) => {
     setExploreLane(lane);
-    setSelectedProviders([]);
-    setQuery("");
     setSortBy(lane === "api" ? "cost" : "price");
+    setSortDirection("asc");
+    if (columnsSelectorRef.current) columnsSelectorRef.current.open = false;
   };
+
+  const pricingUpdatedAt = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${modelCatalog.updatedAt}T00:00:00Z`));
+
+  const daysSinceUpdate = useMemo(() => {
+    try {
+      const updateDate = new Date(`${modelCatalog.updatedAt}T00:00:00Z`);
+      const now = new Date();
+      return Math.floor((now.getTime() - updateDate.getTime()) / (1000 * 60 * 60 * 24));
+    } catch {
+      return 0;
+    }
+  }, []);
+
+  const isComparingPlans = compareList.length > 0 && "kind" in compareList[0];
 
   return (
     <main>
       <a className="skip-link" href={activeView === "explore" ? "#tier-board" : "#recommendation-settings"}>Skip to comparison</a>
+
+      <div aria-live="polite" className="visually-hidden">{liveAnnouncement}</div>
 
       <header className="site-header">
         <a
@@ -1096,13 +1332,40 @@ export default function Home() {
             event.preventDefault();
             switchView("explore");
           }}
-        ><span className="brand-mark">T/T</span><span>TokenTier</span></a>
+        >
+          <span className="brand-mark">T/T</span>
+          <span>TokenTier</span>
+        </a>
         <nav className="workspace-tabs" aria-label="Comparison mode">
-          <button aria-label="Explore profiles" aria-pressed={activeView === "explore"} className={activeView === "explore" ? "active" : ""} id="explore-tab" onClick={() => switchView("explore")} title="Explore profiles (⌘1)" type="button"><span aria-hidden="true" className="workspace-tab-long">Explore profiles</span><span aria-hidden="true" className="workspace-tab-short">Explore</span></button>
-          <button aria-label="My recommendation" aria-pressed={activeView === "recommendation"} className={activeView === "recommendation" ? "active" : ""} id="recommendation-tab" onClick={() => switchView("recommendation")} title="My recommendation (⌘2)" type="button"><span aria-hidden="true" className="workspace-tab-long">My recommendation</span><span aria-hidden="true" className="workspace-tab-short">Recommend</span></button>
+          <button
+            aria-label="Explore profiles"
+            aria-pressed={activeView === "explore"}
+            className={activeView === "explore" ? "active" : ""}
+            id="explore-tab"
+            onClick={() => switchView("explore")}
+            title="Explore profiles"
+            type="button"
+          >
+            <span aria-hidden="true" className="workspace-tab-long">Explore profiles</span>
+            <span aria-hidden="true" className="workspace-tab-short">Explore</span>
+          </button>
+          <button
+            aria-label="My recommendation"
+            aria-pressed={activeView === "recommendation"}
+            className={activeView === "recommendation" ? "active" : ""}
+            id="recommendation-tab"
+            onClick={() => switchView("recommendation")}
+            title="My recommendation"
+            type="button"
+          >
+            <span aria-hidden="true" className="workspace-tab-long">My recommendation</span>
+            <span aria-hidden="true" className="workspace-tab-short">Recommend</span>
+          </button>
         </nav>
         <div className="header-actions">
-          <span className="freshness"><i /> Updated {pricingUpdatedAt}</span>
+          <span className={`freshness ${daysSinceUpdate > 30 ? "stale" : ""}`} title={`Catalog verified ${pricingUpdatedAt}`}>
+            <i /> Updated {pricingUpdatedAt}
+          </span>
           <div className="theme-switcher" role="group" aria-label="Theme">
             <button aria-label="Auto theme (follow system)" aria-pressed={themeMode === "system"} className={themeMode === "system" ? "active" : ""} onClick={() => setThemeMode("system")} title="Auto (system)" type="button">
               <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="16"><rect height="14" rx="2" ry="2" width="20" x="2" y="3"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
@@ -1118,322 +1381,521 @@ export default function Home() {
       </header>
 
       <div aria-labelledby="explore-tab" className="view-panel explore-panel" hidden={activeView !== "explore"} id="explore-panel" role="region">
-      <section className="explore-hero" id="explore-top">
-        <h1>Compare AI APIs and plans.</h1>
-        <button className="button button-primary" onClick={useExploreProfile} type="button">Get a recommendation <span>→</span></button>
-      </section>
-
-      <div className="explore-workspace">
-      <aside aria-labelledby="profile-preset-title" className="scenario-dock">
-        <header className="scenario-dock-heading">
-          <span>Profile preset</span>
-          <h2 id="profile-preset-title">{exploreScenario.label}</h2>
-        </header>
-        <label className="scenario-dock-select" htmlFor="explore-scenario">
-          <span>Use case</span>
-          <select id="explore-scenario" value={exploreScenarioId} onChange={(event) => setExploreScenarioId(event.target.value as ScenarioId)}>
-            {scenarios.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
-          </select>
-        </label>
-        <p className="scenario-dock-description">{exploreScenario.description}</p>
-        <div className="preset-call" aria-label={`${exploreScenario.input.toLocaleString()} input and ${exploreScenario.output.toLocaleString()} output tokens per estimated call`}>
-          <span>Preset per API call</span>
-          <strong>{exploreScenario.input.toLocaleString()} input + {exploreScenario.output.toLocaleString()} output</strong>
-        </div>
-        <p className="scenario-dock-note">Used for the tier list and price estimates. Excludes tools, search, images, storage, taxes, and retries.</p>
-      </aside>
-
-      <div className="explore-content">
-      <section className="section tier-section" id="tier-board">
-        <div className="section-heading explore-section-heading">
-          <div>
-            <span className="section-kicker">{exploreScenario.label}</span>
-            <h2>Tier list</h2>
-            <p>{exploreScenario.description}</p>
-          </div>
-          <div className="book-switch explore-lane-switch" role="group" aria-label="Tier list lane">
-            <button aria-pressed={exploreLane === "api"} className={exploreLane === "api" ? "active" : ""} onClick={() => switchExploreLane("api")} type="button">API models <span>{models.length}</span></button>
-            <button aria-pressed={exploreLane === "plans"} className={exploreLane === "plans" ? "active" : ""} onClick={() => switchExploreLane("plans")} type="button">Plans <span>{plans.filter((plan) => plan.kind === "Subscription").length}</span></button>
-          </div>
-        </div>
-
-        <div className="tier-board">
-          {(["S", "A", "B"] as const).map((tier) => (
-            <div className={`tier-row tier-${tier.toLowerCase()}`} key={tier}>
-              <div className="tier-label"><strong>{tier}</strong><span>{tierDescriptions[tier]}</span></div>
-              <div className="tier-models">
-                {(() => {
-                  if (exploreLane === "api") {
-                    const items = models
-                      .filter((model) => model.tiers[exploreScenarioId] === tier)
-                      .sort((a, b) => callCost(a, exploreSettings) - callCost(b, exploreSettings));
-                    if (items.length === 0) {
-                      return <p className="tier-empty">No models ranked in this tier for this scenario.</p>;
-                    }
-                    return items.map((item) => (
-                      <article aria-label={`${item.name}, ${item.provider}, ${price(callCost(item, exploreSettings), 3)} per call`} className="tier-model" key={item.id}>
-                        <span className="provider-orb" data-provider={item.provider} />
-                        <span><strong title={item.name}>{item.name}</strong><small>{item.provider}</small></span>
-                        <b>{price(callCost(item, exploreSettings), 3)}<small>/ call</small></b>
-                      </article>
-                    ));
-                  }
-                  const items = plans
-                    .filter((plan) => plan.kind === "Subscription" && plan.tiers[exploreScenarioId] === tier)
-                    .sort((a, b) => (a.monthly ?? Infinity) - (b.monthly ?? Infinity));
-                  if (items.length === 0) {
-                    return <p className="tier-empty">No plans ranked in this tier for this scenario.</p>;
-                  }
-                  return items.map((item) => (
-                    <article aria-label={`${item.name}, ${item.provider}, $${item.monthly} per month`} className="tier-model" key={item.id}>
-                      <span className="provider-orb" data-provider={item.provider} />
-                      <span><strong title={item.name}>{item.name}</strong><small>{item.confidence} quota confidence</small></span>
-                      <b>${item.monthly}<small>/ month</small></b>
-                    </article>
-                  ));
-                })()}
-              </div>
+        <section className="explore-hero" id="explore-top">
+          <div className="explore-hero-main">
+            <h1 id="explore-top-heading" tabIndex={-1}>Compare AI APIs and plans.</h1>
+            <p className="explore-hero-sub">Independent pricing calculator, tier lists, and break-even limits across leading foundation models.</p>
+            <div className="hero-stats-strip">
+              <span><strong>{models.length}</strong> API models</span>
+              <span className="dot-sep">·</span>
+              <span><strong>{plans.filter((p) => p.kind === "Subscription").length}</strong> subscriptions</span>
+              <span className="dot-sep">·</span>
+              <span><strong>{scenarios.length}</strong> workload presets</span>
             </div>
-          ))}
-        </div>
-        <p className="tier-note">API tiers combine task fit and cost. Plan tiers combine task fit, price, and quota confidence. “—” means not intended for this use.</p>
-      </section>
-
-      <section className="section prices-section" id="prices">
-        <div className="section-heading explore-section-heading">
-          <div>
-            <span className="section-kicker">{exploreScenario.label}</span>
-            <h2>Price book</h2>
-            <p>Token rates, plan prices, credits, and published limits for this preset.</p>
           </div>
-          <div className="book-switch explore-lane-switch" role="group" aria-label="Price book lane">
-            <button aria-pressed={exploreLane === "api"} className={exploreLane === "api" ? "active" : ""} onClick={() => switchExploreLane("api")} type="button">API rates <span>{models.length}</span></button>
-            <button aria-pressed={exploreLane === "plans"} className={exploreLane === "plans" ? "active" : ""} onClick={() => switchExploreLane("plans")} type="button">Plans &amp; access <span>{plans.length}</span></button>
-          </div>
-        </div>
+          <button className="button button-ghost hero-cta" onClick={useExploreProfile} type="button">
+            Get a recommendation <span>→</span>
+          </button>
+        </section>
 
-        <div className="table-tools">
-          <div className="table-tools-top">
-            <label className="search-field">
-              <span>⌕</span>
-              <input
-                aria-label={`Search ${exploreLane}`}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder={exploreLane === "api" ? "Search model or provider" : "Search plan, client, or provider"}
-                type="search"
-                value={query}
-              />
-            </label>
-            <details className="columns-selector">
-              <summary className="columns-trigger">
-                <span>Columns ({exploreLane === "api" ? Object.values(visibleApiColumns).filter(Boolean).length + 1 : Object.values(visiblePlanColumns).filter(Boolean).length + 1})</span>
-                <span aria-hidden="true">▾</span>
-              </summary>
-              <div className="columns-menu">
-                <div className="columns-menu-header">
-                  <span>Show columns</span>
-                  <button
-                    className="columns-reset-btn"
-                    onClick={() => {
-                      if (exploreLane === "api") {
-                        setVisibleApiColumns({ input: true, cached: true, output: true, context: true, fit: true, cost: true });
-                      } else {
-                        setVisiblePlanColumns({ type: true, price: true, quota: true, apiIncluded: true, equivalent: true, fit: true, evidence: true });
-                      }
-                    }}
-                    type="button"
-                  >
-                    Reset
-                  </button>
-                </div>
-                {exploreLane === "api"
-                  ? (Object.keys(apiColumnLabels) as ApiColumnKey[]).map((col) => (
-                      <label className="column-option" key={col}>
-                        <input
-                          checked={visibleApiColumns[col]}
-                          onChange={(e) => setVisibleApiColumns((prev) => ({ ...prev, [col]: e.target.checked }))}
-                          type="checkbox"
-                        />
-                        <span>{apiColumnLabels[col]}</span>
-                      </label>
-                    ))
-                  : (Object.keys(planColumnLabels) as PlanColumnKey[]).map((col) => (
-                      <label className="column-option" key={col}>
-                        <input
-                          checked={visiblePlanColumns[col]}
-                          onChange={(e) => setVisiblePlanColumns((prev) => ({ ...prev, [col]: e.target.checked }))}
-                          type="checkbox"
-                        />
-                        <span>{planColumnLabels[col]}</span>
-                      </label>
-                    ))}
-              </div>
-            </details>
-            <label className="sort-field">
-              <span>Sort</span>
-              <select onChange={(event) => setSortBy(event.target.value)} value={sortBy}>
-                {exploreLane === "api" ? (
-                  <>
-                    <option value="cost">Estimated call cost</option>
-                    <option value="input">Input price</option>
-                    <option value="output">Output price</option>
-                    <option value="context">Context window</option>
-                  </>
-                ) : (
-                  <>
-                    <option value="price">Monthly price</option>
-                    <option value="fit">Scenario fit</option>
-                    <option value="confidence">Quota confidence</option>
-                  </>
-                )}
+        <div className="explore-workspace">
+          <aside aria-labelledby="profile-preset-title" className="scenario-dock">
+            <header className="scenario-dock-heading">
+              <span>Profile preset</span>
+              <h2 id="profile-preset-title">{exploreScenario.label}</h2>
+            </header>
+            <label className="scenario-dock-select" htmlFor="explore-scenario">
+              <span>Use case</span>
+              <select id="explore-scenario" value={exploreScenarioId} onChange={(event) => setExploreScenarioId(event.target.value as ScenarioId)}>
+                {scenarios.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
               </select>
             </label>
-          </div>
+            <p className="scenario-dock-description">{exploreScenario.description}</p>
+            <div className="preset-call" aria-label={`${exploreScenario.input.toLocaleString()} input and ${exploreScenario.output.toLocaleString()} output tokens per estimated call`}>
+              <span>Preset per API call</span>
+              <strong>{exploreScenario.input.toLocaleString()} input + {exploreScenario.output.toLocaleString()} output</strong>
+            </div>
+            <p className="scenario-dock-note">Used for the tier list and price estimates. Excludes tools, search, images, storage, taxes, and retries.</p>
+            <button className="scenario-dock-action" onClick={() => { updateRecommendationProfile(exploreScenarioId); switchView("recommendation"); }} type="button">
+              Customize in Recommend <span>→</span>
+            </button>
+          </aside>
 
-          <div className="provider-filters" role="group" aria-label="Filter by provider">
-            {(exploreLane === "api" ? providerNames : planProviderNames).map((name) => {
-              const isSelected = name === "All" ? selectedProviders.length === 0 : selectedProviders.includes(name);
-              return (
-                <button
-                  aria-pressed={isSelected}
-                  className={isSelected ? "active" : ""}
-                  key={name}
-                  onClick={() => toggleProvider(name)}
-                  type="button"
-                >
-                  {name}
-                </button>
-              );
-            })}
-            {selectedProviders.length > 0 && (
-              <button aria-label="Clear provider filters" className="provider-clear" onClick={() => setSelectedProviders([])} type="button">Clear</button>
-            )}
-          </div>
-        </div>
+          <div className="explore-content">
+            <section className="section tier-section" id="tier-board">
+              <div className="section-heading explore-section-heading">
+                <div>
+                  <span className="section-kicker">{exploreScenario.label}</span>
+                  <h2>Tier list</h2>
+                  <p>{exploreScenario.description}</p>
+                </div>
+                <div className="book-switch explore-lane-switch" role="group" aria-label="Tier list lane">
+                  <button aria-pressed={exploreLane === "api"} className={exploreLane === "api" ? "active" : ""} onClick={() => switchExploreLane("api")} type="button">API models <span>{models.length}</span></button>
+                  <button aria-pressed={exploreLane === "plans"} className={exploreLane === "plans" ? "active" : ""} onClick={() => switchExploreLane("plans")} type="button">Plans <span>{plans.filter((plan) => plan.kind === "Subscription").length}</span></button>
+                </div>
+              </div>
 
-        <p className="table-scroll-hint">Scroll sideways to see all columns.</p>
-        <div className="table-wrap">
-          {exploreLane === "api" ? (
-            <table>
-              <caption className="visually-hidden">API rates and fit for {exploreScenario.label}</caption>
-              <thead>
-                <tr>
-                  <th>API model</th>
-                  {visibleApiColumns.input && <th>Input / 1M</th>}
-                  {visibleApiColumns.cached && <th>Cached input</th>}
-                  {visibleApiColumns.output && <th>Output / 1M</th>}
-                  {visibleApiColumns.context && <th>Context</th>}
-                  {visibleApiColumns.fit && <th>Fit</th>}
-                  {visibleApiColumns.cost && <th>Est. / call</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {visibleModels.map((model) => (
-                  <tr key={model.id}>
-                    <td>
-                      <div className="table-item-cell">
-                        <span className="provider-orb" data-provider={model.provider} />
-                        <div className="model-cell">
-                          <strong>{model.name}</strong>
-                          <small>{model.provider}</small>
-                          {model.note && <details className="row-note"><summary>Note</summary><p>{model.note}</p></details>}
-                        </div>
-                        <a aria-label={`Official pricing source for ${model.name}`} className="source-link" href={model.source} rel="noreferrer" target="_blank" title="Open official pricing source">↗</a>
-                      </div>
-                    </td>
-                    {visibleApiColumns.input && <td>{price(model.input)}</td>}
-                    {visibleApiColumns.cached && <td>{model.cached === null ? "—" : price(model.cached, 4)}</td>}
-                    {visibleApiColumns.output && <td>{price(model.output)}</td>}
-                    {visibleApiColumns.context && <td>{model.context}</td>}
-                    {visibleApiColumns.fit && <td><span className={`mini-tier ${model.tiers[exploreScenarioId] === "—" ? "tier-na" : `tier-${model.tiers[exploreScenarioId].toLowerCase()}`}`}>{model.tiers[exploreScenarioId]}</span></td>}
-                    {visibleApiColumns.cost && <td><strong>{price(callCost(model, exploreSettings), 3)}</strong></td>}
-                  </tr>
+              <div className="tier-board">
+                {(["S", "A", "B"] as const).map((tier) => (
+                  <div className={`tier-row tier-${tier.toLowerCase()}`} key={tier}>
+                    <div className="tier-label"><strong>{tier}</strong><span>{tierDescriptions[tier]}</span></div>
+                    <div className="tier-models" role="group" aria-label={`${tier} tier items`}>
+                      {(() => {
+                        if (exploreLane === "api") {
+                          const items = models
+                            .filter((model) => model.tiers[exploreScenarioId] === tier)
+                            .sort((a, b) => callCost(a, exploreSettings) - callCost(b, exploreSettings));
+                          if (items.length === 0) {
+                            return <p className="tier-empty">No models ranked in this tier for this scenario.</p>;
+                          }
+                          return items.map((item) => (
+                            <button
+                              aria-label={`${item.name}, ${item.provider}, ${price(callCost(item, exploreSettings), 3)} per call`}
+                              className={`tier-model ${compareList.some((c) => c.id === item.id) ? "selected" : ""}`}
+                              key={item.id}
+                              onClick={() => setActiveDetailItem(item)}
+                              type="button"
+                            >
+                              <span className="provider-orb" data-provider={item.provider} />
+                              <span><strong title={item.name}>{item.name}</strong><small>{item.provider}</small></span>
+                              <b>{price(callCost(item, exploreSettings), 3)}<small>/ call</small></b>
+                            </button>
+                          ));
+                        }
+                        const items = plans
+                          .filter((plan) => plan.kind === "Subscription" && plan.tiers[exploreScenarioId] === tier)
+                          .sort((a, b) => (a.monthly ?? Infinity) - (b.monthly ?? Infinity));
+                        if (items.length === 0) {
+                          return <p className="tier-empty">No plans ranked in this tier for this scenario.</p>;
+                        }
+                        return items.map((item) => (
+                          <button
+                            aria-label={`${item.name}, ${item.provider}, $${item.monthly} per month`}
+                            className={`tier-model ${compareList.some((c) => c.id === item.id) ? "selected" : ""}`}
+                            key={item.id}
+                            onClick={() => setActiveDetailItem(item)}
+                            type="button"
+                          >
+                            <span className="provider-orb" data-provider={item.provider} />
+                            <span><strong title={item.name}>{item.name}</strong><small>{item.confidence} quota confidence</small></span>
+                            <b>${item.monthly}<small>/ month</small></b>
+                          </button>
+                        ));
+                      })()}
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-          ) : (
-            <table className="plan-table">
-              <caption className="visually-hidden">Plan prices, quotas, and fit for {exploreScenario.label}</caption>
-              <thead>
-                <tr>
-                  <th>Plan or access path</th>
-                  {visiblePlanColumns.type && <th>Type</th>}
-                  {visiblePlanColumns.price && <th>Price</th>}
-                  {visiblePlanColumns.quota && <th>Published quota</th>}
-                  {visiblePlanColumns.apiIncluded && <th>API included?</th>}
-                  {visiblePlanColumns.equivalent && <th>API-cost equivalent</th>}
-                  {visiblePlanColumns.fit && <th>Fit</th>}
-                  {visiblePlanColumns.evidence && <th>Evidence</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {visiblePlans.map((plan) => {
-                  const estimate = planEstimate(plan, exploreSettings);
-                  return (
-                    <tr key={plan.id}>
-                      <td>
-                        <div className="table-item-cell">
-                          <span className="provider-orb" data-provider={plan.provider} />
-                          <div className="model-cell">
-                            <strong>{plan.name}</strong>
-                            <small>{plan.provider}</small>
-                            <details className="row-note"><summary>Note</summary><p>{plan.note}</p></details>
-                          </div>
-                          <a aria-label={`Official source for ${plan.name}`} className="source-link" href={plan.source} rel="noreferrer" target="_blank" title="Open official plan source">↗</a>
-                        </div>
-                      </td>
-                      {visiblePlanColumns.type && <td><span className="kind-pill">{plan.kind}</span></td>}
-                      {visiblePlanColumns.price && <td><strong>{planPrice(plan)}</strong>{plan.kind === "Subscription" && <small className="per-month"> / mo</small>}</td>}
-                      {visiblePlanColumns.quota && <td className="wrap-cell">{planQuota(plan, exploreScenarioId)}</td>}
-                      {visiblePlanColumns.apiIncluded && <td>{plan.apiIncluded}</td>}
-                      {visiblePlanColumns.equivalent && <td>{estimate ? <><strong>{formatEstimateRange(estimate.callsLow, estimate.callsHigh)} calls</strong><small className="estimate-detail">{formatMoneyRange(estimate.valueLow, estimate.valueHigh)} · {estimate.basis}</small></> : <span className="muted-dash">Your API bill</span>}</td>}
-                      {visiblePlanColumns.fit && <td><span className={`mini-tier ${plan.tiers[exploreScenarioId] === "—" ? "tier-na" : `tier-${plan.tiers[exploreScenarioId].toLowerCase()}`}`}>{plan.tiers[exploreScenarioId]}</span></td>}
-                      {visiblePlanColumns.evidence && <td><span className={`evidence-badge evidence-${plan.confidence.toLowerCase()}`}>{plan.confidence}</span><small className="estimate-detail">{plan.evidence}</small></td>}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
-          {(exploreLane === "api" ? visibleModels.length : visiblePlans.length) === 0 && <p className="empty-state">No entries match that search.</p>}
+              </div>
+              <p className="tier-note">API tiers combine task fit and cost. Plan tiers combine task fit, price, and quota confidence. Select a card to view specs or compare.</p>
+            </section>
+
+            <section className="section prices-section" id="prices">
+              <div className="section-heading explore-section-heading">
+                <div>
+                  <span className="section-kicker">{exploreScenario.label}</span>
+                  <h2>Price book</h2>
+                  <p>Token rates, plan prices, credits, and published limits for this preset.</p>
+                </div>
+                <div className="book-switch explore-lane-switch" role="group" aria-label="Price book lane">
+                  <button aria-pressed={exploreLane === "api"} className={exploreLane === "api" ? "active" : ""} onClick={() => switchExploreLane("api")} type="button">API rates <span>{models.length}</span></button>
+                  <button aria-pressed={exploreLane === "plans"} className={exploreLane === "plans" ? "active" : ""} onClick={() => switchExploreLane("plans")} type="button">Plans &amp; access <span>{plans.length}</span></button>
+                </div>
+              </div>
+
+              <div className="table-tools">
+                <div className="table-tools-top">
+                  <label className="search-field">
+                    <Icon className="search-icon" name="search" size={15} />
+                    <input
+                      aria-label={`Search ${exploreLane}`}
+                      onChange={(event) => setQuery(event.target.value)}
+                      placeholder={exploreLane === "api" ? "Search model or provider" : "Search plan, client, or provider"}
+                      ref={searchInputRef}
+                      type="search"
+                      value={query}
+                    />
+                    <kbd className="search-shortcut-kbd">/</kbd>
+                  </label>
+                  <details className="columns-selector" ref={columnsSelectorRef}>
+                    <summary className="columns-trigger">
+                      <span>Columns ({exploreLane === "api" ? Object.values(visibleApiColumns).filter(Boolean).length + 1 : Object.values(visiblePlanColumns).filter(Boolean).length + 1})</span>
+                      <Icon name="chevron-down" size={13} />
+                    </summary>
+                    <div className="columns-menu">
+                      <div className="columns-menu-header">
+                        <span>Show columns</span>
+                        <button
+                          className="columns-reset-btn"
+                          onClick={() => {
+                            if (exploreLane === "api") {
+                              setVisibleApiColumns({ input: true, cached: true, output: true, context: true, fit: true, cost: true });
+                            } else {
+                              setVisiblePlanColumns({ type: true, price: true, quota: true, apiIncluded: true, equivalent: true, fit: true, evidence: true });
+                            }
+                          }}
+                          type="button"
+                        >
+                          Reset
+                        </button>
+                      </div>
+                      {exploreLane === "api"
+                        ? (Object.keys(apiColumnLabels) as ApiColumnKey[]).map((col) => (
+                            <label className="column-option" key={col}>
+                              <input
+                                checked={visibleApiColumns[col]}
+                                onChange={(e) => setVisibleApiColumns((prev) => ({ ...prev, [col]: e.target.checked }))}
+                                type="checkbox"
+                              />
+                              <span>{apiColumnLabels[col]}</span>
+                            </label>
+                          ))
+                        : (Object.keys(planColumnLabels) as PlanColumnKey[]).map((col) => (
+                            <label className="column-option" key={col}>
+                              <input
+                                checked={visiblePlanColumns[col]}
+                                onChange={(e) => setVisiblePlanColumns((prev) => ({ ...prev, [col]: e.target.checked }))}
+                                type="checkbox"
+                              />
+                              <span>{planColumnLabels[col]}</span>
+                            </label>
+                          ))}
+                    </div>
+                  </details>
+                </div>
+
+                <div className="provider-filters" role="group" aria-label="Filter by provider">
+                  {(exploreLane === "api" ? providerNames : planProviderNames).map((name) => {
+                    const isSelected = name === "All" ? selectedProviders.length === 0 : selectedProviders.includes(name);
+                    return (
+                      <button
+                        aria-pressed={isSelected}
+                        className={isSelected ? "active" : ""}
+                        key={name}
+                        onClick={() => toggleProvider(name)}
+                        type="button"
+                      >
+                        {name}
+                      </button>
+                    );
+                  })}
+                  {selectedProviders.length > 0 && (
+                    <button aria-label="Clear provider filters" className="provider-clear" onClick={() => setSelectedProviders([])} type="button">Clear</button>
+                  )}
+                </div>
+              </div>
+
+              <p className="table-scroll-hint">Scroll sideways to see all columns.</p>
+              <div className="table-wrap">
+                {exploreLane === "api" ? (
+                  <table>
+                    <caption className="visually-hidden">API rates and fit for {exploreScenario.label}</caption>
+                    <thead>
+                      <tr>
+                        <th
+                          aria-sort={sortBy === "name" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
+                          className="sortable-header"
+                          onClick={() => handleHeaderSort("name")}
+                          title="Sort by model name"
+                        >
+                          <span className="th-content">API model {sortBy === "name" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                        </th>
+                        {visibleApiColumns.input && (
+                          <th
+                            aria-sort={sortBy === "input" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
+                            className="sortable-header"
+                            onClick={() => handleHeaderSort("input")}
+                            title="Sort by input token rate"
+                          >
+                            <span className="th-content">Input / 1M {sortBy === "input" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                          </th>
+                        )}
+                        {visibleApiColumns.cached && (
+                          <th
+                            aria-sort={sortBy === "cached" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
+                            className="sortable-header"
+                            onClick={() => handleHeaderSort("cached")}
+                            title="Sort by cached input rate"
+                          >
+                            <span className="th-content">Cached input {sortBy === "cached" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                          </th>
+                        )}
+                        {visibleApiColumns.output && (
+                          <th
+                            aria-sort={sortBy === "output" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
+                            className="sortable-header"
+                            onClick={() => handleHeaderSort("output")}
+                            title="Sort by output token rate"
+                          >
+                            <span className="th-content">Output / 1M {sortBy === "output" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                          </th>
+                        )}
+                        {visibleApiColumns.context && (
+                          <th
+                            aria-sort={sortBy === "context" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
+                            className="sortable-header"
+                            onClick={() => handleHeaderSort("context")}
+                            title="Sort by context window size"
+                          >
+                            <span className="th-content">Context {sortBy === "context" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                          </th>
+                        )}
+                        {visibleApiColumns.fit && (
+                          <th
+                            aria-sort={sortBy === "fit" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
+                            className="sortable-header"
+                            onClick={() => handleHeaderSort("fit")}
+                            title="Sort by scenario fit"
+                          >
+                            <span className="th-content">Fit {sortBy === "fit" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                          </th>
+                        )}
+                        {visibleApiColumns.cost && (
+                          <th
+                            aria-sort={sortBy === "cost" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
+                            className="sortable-header"
+                            onClick={() => handleHeaderSort("cost")}
+                            title="Sort by estimated per-call cost"
+                          >
+                            <span className="th-content">Est. / call {sortBy === "cost" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                          </th>
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {visibleModels.map((model) => {
+                        const callCostValue = callCost(model, exploreSettings);
+                        return (
+                          <tr key={model.id}>
+                            <td className="sticky-col">
+                              <div className="table-item-cell">
+                                <span className="provider-orb" data-provider={model.provider} />
+                                <div className="model-cell">
+                                  <div className="model-cell-header">
+                                    <button className="table-item-name-btn" onClick={() => setActiveDetailItem(model)} type="button"><strong>{model.name}</strong></button>
+                                  </div>
+                                  <div className="model-cell-sub">
+                                    <small>{model.provider}</small>
+                                    {model.note && <details className="row-note"><summary>Note</summary><p>{model.note}</p></details>}
+                                  </div>
+                                </div>
+                                <a aria-label={`Official pricing source for ${model.name}`} className="source-link" href={model.source} rel="noreferrer" target="_blank" title="Open official pricing source">
+                                  <Icon name="external" size={13} />
+                                </a>
+                              </div>
+                            </td>
+                            {visibleApiColumns.input && <td>{price(model.input)}</td>}
+                            {visibleApiColumns.cached && <td>{model.cached === null ? "—" : price(model.cached, 4)}</td>}
+                            {visibleApiColumns.output && <td>{price(model.output)}</td>}
+                            {visibleApiColumns.context && <td>{model.context}</td>}
+                            {visibleApiColumns.fit && <td><span className={`mini-tier ${model.tiers[exploreScenarioId] === "—" ? "tier-na" : `tier-${model.tiers[exploreScenarioId].toLowerCase()}`}`}>{model.tiers[exploreScenarioId]}</span></td>}
+                            {visibleApiColumns.cost && <td><strong>{price(callCostValue, 3)}</strong></td>}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                ) : (
+                  <table className="plan-table">
+                    <caption className="visually-hidden">Plan prices, quotas, and fit for {exploreScenario.label}</caption>
+                    <thead>
+                      <tr>
+                        <th
+                          aria-sort={sortBy === "name" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
+                          className="sortable-header"
+                          onClick={() => handleHeaderSort("name")}
+                          title="Sort by plan name"
+                        >
+                          <span className="th-content">Plan or access path {sortBy === "name" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                        </th>
+                        {visiblePlanColumns.type && (
+                          <th
+                            aria-sort={sortBy === "type" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
+                            className="sortable-header"
+                            onClick={() => handleHeaderSort("type")}
+                            title="Sort by plan type"
+                          >
+                            <span className="th-content">Type {sortBy === "type" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                          </th>
+                        )}
+                        {visiblePlanColumns.price && (
+                          <th
+                            aria-sort={sortBy === "price" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
+                            className="sortable-header"
+                            onClick={() => handleHeaderSort("price")}
+                            title="Sort by monthly price"
+                          >
+                            <span className="th-content">Price {sortBy === "price" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                          </th>
+                        )}
+                        {visiblePlanColumns.quota && <th>Published quota</th>}
+                        {visiblePlanColumns.apiIncluded && <th>API included?</th>}
+                        {visiblePlanColumns.equivalent && <th>API-cost equivalent</th>}
+                        {visiblePlanColumns.fit && (
+                          <th
+                            aria-sort={sortBy === "fit" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
+                            className="sortable-header"
+                            onClick={() => handleHeaderSort("fit")}
+                            title="Sort by scenario fit"
+                          >
+                            <span className="th-content">Fit {sortBy === "fit" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                          </th>
+                        )}
+                        {visiblePlanColumns.evidence && (
+                          <th
+                            aria-sort={sortBy === "confidence" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
+                            className="sortable-header"
+                            onClick={() => handleHeaderSort("confidence")}
+                            title="Sort by quota confidence"
+                          >
+                            <span className="th-content">Evidence {sortBy === "confidence" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                          </th>
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {visiblePlans.map((plan) => {
+                        const estimate = planEstimate(plan, exploreSettings);
+                        return (
+                          <tr key={plan.id}>
+                            <td className="sticky-col">
+                              <div className="table-item-cell">
+                                <span className="provider-orb" data-provider={plan.provider} />
+                                <div className="model-cell">
+                                  <div className="model-cell-header">
+                                    <button className="table-item-name-btn" onClick={() => setActiveDetailItem(plan)} type="button"><strong>{plan.name}</strong></button>
+                                  </div>
+                                  <div className="model-cell-sub">
+                                    <small>{plan.provider}</small>
+                                    <details className="row-note"><summary>Note</summary><p>{plan.note}</p></details>
+                                  </div>
+                                </div>
+                                <a aria-label={`Official source for ${plan.name}`} className="source-link" href={plan.source} rel="noreferrer" target="_blank" title="Open official plan source">
+                                  <Icon name="external" size={13} />
+                                </a>
+                              </div>
+                            </td>
+                            {visiblePlanColumns.type && <td><span className="kind-pill">{plan.kind}</span></td>}
+                            {visiblePlanColumns.price && <td><strong>{planPrice(plan)}</strong>{plan.kind === "Subscription" && <small className="per-month"> / mo</small>}</td>}
+                            {visiblePlanColumns.quota && <td className="wrap-cell">{planQuota(plan, exploreScenarioId)}</td>}
+                            {visiblePlanColumns.apiIncluded && <td>{plan.apiIncluded}</td>}
+                            {visiblePlanColumns.equivalent && <td>{estimate ? <><strong>{formatEstimateRange(estimate.callsLow, estimate.callsHigh)} calls</strong><small className="estimate-detail">{formatMoneyRange(estimate.valueLow, estimate.valueHigh)} · {estimate.basis}</small></> : <span className="muted-dash">Your API bill</span>}</td>}
+                            {visiblePlanColumns.fit && <td><span className={`mini-tier ${plan.tiers[exploreScenarioId] === "—" ? "tier-na" : `tier-${plan.tiers[exploreScenarioId].toLowerCase()}`}`}>{plan.tiers[exploreScenarioId]}</span></td>}
+                            {visiblePlanColumns.evidence && <td><span className={`evidence-badge evidence-${plan.confidence.toLowerCase()}`}>{plan.confidence}</span><small className="estimate-detail">{plan.evidence}</small></td>}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )}
+                {(exploreLane === "api" ? visibleModels.length : visiblePlans.length) === 0 && (
+                  <div className="empty-state">
+                    <p>No entries match that search or provider filter.</p>
+                    <button className="button button-ghost" onClick={() => { setQuery(""); setSelectedProviders([]); }} type="button">Clear search and filters</button>
+                  </div>
+                )}
+              </div>
+              <p className="book-note"><strong>Subscription access is not production API credit.</strong> An API-cost equivalent is not a usage quota unless the provider publishes credits or limits.</p>
+
+              <details className="methodology-accordion" id="methodology">
+                <summary>How estimates and equivalents work</summary>
+                <div className="methodology-grid">
+                  <div className="methodology-card">
+                    <strong>1. Token Cost Math</strong>
+                    <p>Per-call costs calculate exact published input, cached input, and output token rates divided by 1,000,000.</p>
+                  </div>
+                  <div className="methodology-card">
+                    <strong>2. Prompt Cache Ratios</strong>
+                    <p>Plans that utilize prompt caching (e.g. Cursor, Claude, GPT) apply calibrated cache-hit discounts to repeated context.</p>
+                  </div>
+                  <div className="methodology-card">
+                    <strong>3. Quota Conversions</strong>
+                    <p>Weekly credits and 5-hour rolling quotas are normalized to 30-day monthly equivalents based on active hours.</p>
+                  </div>
+                  <div className="methodology-card">
+                    <strong>4. Price Break-Even Caveat</strong>
+                    <p>Where hard limits are not published, break-even indicates where API spend matches subscription price, not guaranteed throughput.</p>
+                  </div>
+                </div>
+              </details>
+
+              <details className="sources price-sources" id="price-sources">
+                <summary>Primary pricing and quota sources</summary>
+                <div>
+                  <a href="https://developers.openai.com/api/docs/models/compare" target="_blank" rel="noreferrer">OpenAI API ↗</a>
+                  <a href="https://learn.chatgpt.com/docs/pricing" target="_blank" rel="noreferrer">ChatGPT plans ↗</a>
+                  <a href="https://claude.com/pricing" target="_blank" rel="noreferrer">Claude API ↗</a>
+                  <a href="https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan" target="_blank" rel="noreferrer">Claude plan credit ↗</a>
+                  <a href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" rel="noreferrer">Gemini API ↗</a>
+                  <a href="https://developers.google.com/profile/help/benefits" target="_blank" rel="noreferrer">Google plan credits ↗</a>
+                  <a href="https://cursor.com/docs/models-and-pricing" target="_blank" rel="noreferrer">Cursor pools ↗</a>
+                  <a href="https://opencode.ai/docs/go/" target="_blank" rel="noreferrer">OpenCode Go ↗</a>
+                  <a href="https://opencode.ai/docs/zen/" target="_blank" rel="noreferrer">OpenCode Zen ↗</a>
+                  <a href="https://docs.z.ai/guides/overview/pricing" target="_blank" rel="noreferrer">GLM API ↗</a>
+                  <a href="https://docs.z.ai/devpack/overview" target="_blank" rel="noreferrer">GLM Coding plans ↗</a>
+                  <a href="https://www.kimi.com/help/membership/membership-pricing" target="_blank" rel="noreferrer">Kimi membership ↗</a>
+                  <a href="https://www.kimi.com/en/resources/kimi-k2-7-code" target="_blank" rel="noreferrer">Kimi API ↗</a>
+                  <a href="https://api-docs.deepseek.com/quick_start/pricing/" target="_blank" rel="noreferrer">DeepSeek API ↗</a>
+                  <a href="https://docs.x.ai/developers/pricing" target="_blank" rel="noreferrer">xAI API ↗</a>
+                  <a href="https://x.ai/pricing" target="_blank" rel="noreferrer">Grok plans ↗</a>
+                  <a href="https://mistral.ai/pricing/" target="_blank" rel="noreferrer">Mistral plans ↗</a>
+                  <a href="https://www.perplexity.ai/help-center/en/articles/11187416-which-perplexity-subscription-plan-is-right-for-you" target="_blank" rel="noreferrer">Perplexity plans ↗</a>
+                </div>
+              </details>
+            </section>
+          </div>
         </div>
-        <p className="book-note"><strong>Subscription access is not production API credit.</strong> An API-cost equivalent is not a usage quota unless the provider publishes credits or limits.</p>
-        <details className="sources price-sources"><summary>Primary pricing and quota sources <span aria-hidden="true">+</span></summary><div>
-          <a href="https://developers.openai.com/api/docs/models/compare" target="_blank" rel="noreferrer">OpenAI API ↗</a>
-          <a href="https://learn.chatgpt.com/docs/pricing" target="_blank" rel="noreferrer">ChatGPT plans ↗</a>
-          <a href="https://claude.com/pricing" target="_blank" rel="noreferrer">Claude API ↗</a>
-          <a href="https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan" target="_blank" rel="noreferrer">Claude plan credit ↗</a>
-          <a href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" rel="noreferrer">Gemini API ↗</a>
-          <a href="https://developers.google.com/profile/help/benefits" target="_blank" rel="noreferrer">Google plan credits ↗</a>
-          <a href="https://cursor.com/docs/models-and-pricing" target="_blank" rel="noreferrer">Cursor pools ↗</a>
-          <a href="https://opencode.ai/docs/go/" target="_blank" rel="noreferrer">OpenCode Go ↗</a>
-          <a href="https://opencode.ai/docs/zen/" target="_blank" rel="noreferrer">OpenCode Zen ↗</a>
-          <a href="https://docs.z.ai/guides/overview/pricing" target="_blank" rel="noreferrer">GLM API ↗</a>
-          <a href="https://docs.z.ai/devpack/overview" target="_blank" rel="noreferrer">GLM Coding plans ↗</a>
-          <a href="https://www.kimi.com/help/membership/membership-pricing" target="_blank" rel="noreferrer">Kimi membership ↗</a>
-          <a href="https://www.kimi.com/en/resources/kimi-k2-7-code" target="_blank" rel="noreferrer">Kimi API ↗</a>
-          <a href="https://api-docs.deepseek.com/quick_start/pricing/" target="_blank" rel="noreferrer">DeepSeek API ↗</a>
-          <a href="https://docs.x.ai/developers/pricing" target="_blank" rel="noreferrer">xAI API ↗</a>
-          <a href="https://x.ai/pricing" target="_blank" rel="noreferrer">Grok plans ↗</a>
-          <a href="https://mistral.ai/pricing/" target="_blank" rel="noreferrer">Mistral plans ↗</a>
-          <a href="https://www.perplexity.ai/help-center/en/articles/11187416-which-perplexity-subscription-plan-is-right-for-you" target="_blank" rel="noreferrer">Perplexity plans ↗</a>
-        </div></details>
-      </section>
-      </div>
-      </div>
       </div>
 
       <div aria-labelledby="recommendation-tab" className="view-panel recommendation-panel" hidden={activeView !== "recommendation"} id="recommendation-panel" role="region">
         <section className="recommendation-view" id="recommendation-top">
           <header className="recommendation-header">
-            <div><span>Custom comparison</span><h1>Your recommendation</h1></div>
+            <div>
+              <span>Custom comparison</span>
+              <h1 id="recommendation-top-heading" tabIndex={-1}>Your recommendation</h1>
+            </div>
             <p>Set your workload, calls, and budget. The best API and plan update immediately.</p>
           </header>
 
           <div className={`decision-banner recommendation-summary decision-${preferredPath}`} aria-live="polite">
-            <span>BEST PATH</span>
-            <strong>{preferredPath === "api" ? "Use the API" : "Choose the plan"}</strong>
-            <p>{verdictCopy}</p>
+            <div className="decision-banner-header">
+              <div className="decision-banner-badge-group">
+                <span className="best-path-badge">BEST PATH</span>
+                {!apiWithinBudget && (
+                  <div className="decision-fallback-note">
+                    <Icon name="warning" size={13} />
+                    <span>No model fits within ${monthlyBudget.toLocaleString()}/mo. Showing cheapest option ({apiRecommendation.name}).</span>
+                  </div>
+                )}
+              </div>
+              <button
+                className="copy-link-btn"
+                onClick={handleCopyLink}
+                title="Copy shareable link to this recommendation"
+                type="button"
+              >
+                <Icon name={copiedLink ? "check" : "copy"} size={14} />
+                <span>{copiedLink ? "Link copied" : "Copy link"}</span>
+              </button>
+            </div>
+
+            <div className="decision-facts-strip">
+              <div className="decision-fact">
+                <small>Monthly API Spend</small>
+                <strong>{monthlyPrice(recommendedApiSpend)}</strong>
+                <span>{apiRecommendation.name}</span>
+              </div>
+              <div className="decision-fact">
+                <small>Plan Cost &amp; Quota</small>
+                <strong>${recommendedPlanPrice}/mo</strong>
+                <span>{planRecommendation.name} (~{recommendedPlanCalls} calls)</span>
+              </div>
+              <div className="decision-fact">
+                <small>Difference</small>
+                <strong>{sameMonthlyPrice ? "Same price" : `${monthlyPrice(Math.abs(apiPlanDifference))}/mo`}</strong>
+                <span>{preferredPath === "api" ? "API is more cost-effective" : "Plan offers higher volume"}</span>
+              </div>
+            </div>
+            <p className="decision-verdict-caption">{diffFactCaption}</p>
           </div>
 
           <div className="recommendation-workspace">
@@ -1443,17 +1905,55 @@ export default function Home() {
                 <fieldset>
                   <legend>Workload</legend>
                   <div className="custom-settings-grid">
-                    <label>Work type<select id="recommendation-profile" value={recommendationScenarioId} onChange={(event) => updateRecommendationProfile(event.target.value as ScenarioId)}>{scenarios.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
-                    <label>Input tokens / call<input inputMode="numeric" min="1" max="1000000" type="number" value={recommendationInputTokens} onChange={(event) => setRecommendationInputTokens(Math.min(1_000_000, Math.max(1, Number(event.target.value) || 1)))} /></label>
-                    <label>Output tokens / call<input inputMode="numeric" min="1" max="500000" type="number" value={recommendationOutputTokens} onChange={(event) => setRecommendationOutputTokens(Math.min(500_000, Math.max(1, Number(event.target.value) || 1)))} /></label>
+                    <label>
+                      <span>Work type</span>
+                      <select id="recommendation-profile" value={recommendationScenarioId} onChange={(event) => updateRecommendationProfile(event.target.value as ScenarioId)}>
+                        {scenarios.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+                      </select>
+                    </label>
+                    <label>
+                      <span>Input tokens / call</span>
+                      <input inputMode="numeric" min="1" max="1000000" type="number" value={recommendationInputTokens} onChange={(event) => setRecommendationInputTokens(Math.min(1_000_000, Math.max(1, Number(event.target.value) || 1)))} />
+                      <div className="preset-chips" role="group" aria-label="Input token presets">
+                        {[2000, 18000, 50000, 100000].map((val) => (
+                          <button key={val} type="button" className={`preset-chip ${recommendationInputTokens === val ? "active" : ""}`} onClick={() => setRecommendationInputTokens(val)}>
+                            {val >= 1000 ? `${val / 1000}K` : val}
+                          </button>
+                        ))}
+                      </div>
+                    </label>
+                    <label>
+                      <span>Output tokens / call</span>
+                      <input inputMode="numeric" min="1" max="500000" type="number" value={recommendationOutputTokens} onChange={(event) => setRecommendationOutputTokens(Math.min(500_000, Math.max(1, Number(event.target.value) || 1)))} />
+                      <div className="preset-chips" role="group" aria-label="Output token presets">
+                        {[500, 2000, 6000, 15000].map((val) => (
+                          <button key={val} type="button" className={`preset-chip ${recommendationOutputTokens === val ? "active" : ""}`} onClick={() => setRecommendationOutputTokens(val)}>
+                            {val >= 1000 ? `${val / 1000}K` : val}
+                          </button>
+                        ))}
+                      </div>
+                    </label>
                   </div>
                 </fieldset>
                 <fieldset>
                   <legend>Monthly needs</legend>
                   <div className="custom-settings-grid">
-                    <label>Calls / month<input inputMode="numeric" min="1" max="100000" type="number" value={monthlyCalls} onChange={(event) => setMonthlyCalls(Math.min(100_000, Math.max(1, Number(event.target.value) || 1)))} /></label>
-                    <label>Budget / month<input inputMode="numeric" min="1" max="10000" type="number" value={monthlyBudget} onChange={(event) => setMonthlyBudget(Math.min(10_000, Math.max(1, Number(event.target.value) || 1)))} /></label>
-                    <label>Preference<select value={preference} onChange={(event) => setPreference(event.target.value as Preference)}><option value="either">Compare both</option><option value="api">API first</option><option value="plans">Plan first</option></select></label>
+                    <label>
+                      <span>Calls / month</span>
+                      <input inputMode="numeric" min="1" max="100000" type="number" value={monthlyCalls} onChange={(event) => setMonthlyCalls(Math.min(100_000, Math.max(1, Number(event.target.value) || 1)))} />
+                    </label>
+                    <label>
+                      <span>Budget / month</span>
+                      <input inputMode="numeric" min="1" max="10000" type="number" value={monthlyBudget} onChange={(event) => setMonthlyBudget(Math.min(10_000, Math.max(1, Number(event.target.value) || 1)))} />
+                    </label>
+                    <label>
+                      <span>Preference</span>
+                      <select value={preference} onChange={(event) => setPreference(event.target.value as Preference)}>
+                        <option value="either">Compare both</option>
+                        <option value="api">API first</option>
+                        <option value="plans">Plan first</option>
+                      </select>
+                    </label>
                   </div>
                 </fieldset>
                 <p className="settings-note">
@@ -1488,6 +1988,12 @@ export default function Home() {
                   </div>
                   <p className="path-price">${planRecommendation.monthly}<span>/ month</span></p>
                   <dl><div><dt>{recommendedPlanEstimate.basis === "Price break-even only" ? "API-cost parity" : "Est. capacity"}</dt><dd>{formatEstimateRange(recommendedPlanEstimate.callsLow, recommendedPlanEstimate.callsHigh)} calls</dd></div><div><dt>Published quota</dt><dd>{planQuota(planRecommendation, recommendationScenarioId)}</dd></div><div><dt>Confidence</dt><dd>{planRecommendation.confidence} · {recommendedPlanEstimate.basis}</dd></div></dl>
+                  {(planRecommendation.confidence === "Low" || recommendedPlanEstimate.basis === "Price break-even only") && (
+                    <div className="confidence-caveat-badge">
+                      <Icon name="warning" size={13} />
+                      <span>Low confidence quota</span>
+                    </div>
+                  )}
                   <div className="path-card-verdict"><p>{planRecommendation.name}: ${planRecommendation.monthly}/month · {recommendedPlanCoverage === null ? "published quota cannot be converted to this profile" : `estimated ${recommendedPlanCalls} calls for this profile`}.</p></div>
                 </article>
               </div>
@@ -1506,7 +2012,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="book-switch comparison-lane-switch" role="group" aria-label="Detailed comparison lane">
-<button aria-pressed={recComparisonTab === "api"} className={recComparisonTab === "api" ? "active" : ""} onClick={() => setRecComparisonTab("api")} type="button">API <span>{rankedModelCosts.length}</span></button>
+                <button aria-pressed={recComparisonTab === "api"} className={recComparisonTab === "api" ? "active" : ""} onClick={() => setRecComparisonTab("api")} type="button">API <span>{rankedModelCosts.length}</span></button>
                 <button aria-pressed={recComparisonTab === "plans"} className={recComparisonTab === "plans" ? "active" : ""} onClick={() => setRecComparisonTab("plans")} type="button">Plans <span>{rankedPlanOptions.length}</span></button>
               </div>
             </div>
@@ -1516,12 +2022,14 @@ export default function Home() {
                 {rankedModelCosts.map(({ model, perCall, monthly }) => {
                   const recommended = model.id === apiRecommendation.id;
                   const tier = model.tiers[recommendationScenarioId];
+                  const ratio = Math.min(1, monthly / maxRankedMonthly);
                   return (
                     <article className={`model-cost-row ${recommended ? "recommended" : ""}`} key={model.id}>
+                      <div className="cost-row-bar" style={{ width: `${Math.max(3, Math.round(ratio * 100))}%` }} />
                       <div className="cost-model">
                         <span className="provider-orb" data-provider={model.provider} />
                         <div>
-                          <strong>{model.name}</strong>
+                          <button className="table-item-name-btn" onClick={() => setActiveDetailItem(model)} type="button"><strong>{model.name}</strong></button>
                           <small>{model.provider} · {tier === "—" ? "Not ranked" : `${tier} tier`}</small>
                         </div>
                         {recommended && <span className="recommendation-badge">Best API</span>}
@@ -1542,7 +2050,7 @@ export default function Home() {
                       <div className="plan-match-title">
                         <span className="provider-orb" data-provider={plan.provider} />
                         <div>
-                          <strong>{plan.name}</strong>
+                          <button className="table-item-name-btn" onClick={() => setActiveDetailItem(plan)} type="button"><strong>{plan.name}</strong></button>
                           <small>{plan.provider}</small>
                         </div>
                         {index === 0 && <span className="recommendation-badge">Best plan</span>}
@@ -1569,9 +2077,291 @@ export default function Home() {
         </section>
       </div>
 
+      <Modal
+        isOpen={activeDetailItem !== null}
+        maxWidth="640px"
+        onClose={() => setActiveDetailItem(null)}
+        title={
+          activeDetailItem && (
+            <>
+              <span className="provider-orb" data-provider={activeDetailItem.provider} />
+              <div>
+                <h3 id="detail-modal-title">{activeDetailItem.name}</h3>
+                <small>{activeDetailItem.provider} · {"kind" in activeDetailItem ? activeDetailItem.kind : "Foundation Model"}</small>
+              </div>
+            </>
+          )
+        }
+        titleId="detail-modal-title"
+      >
+        {activeDetailItem && (
+          <>
+            <div className="detail-modal-body">
+              {"input" in activeDetailItem ? (
+                <div className="detail-specs-grid">
+                  <div className="spec-box"><small>Input Rate</small><strong>{price(activeDetailItem.input)} / 1M</strong></div>
+                  <div className="spec-box"><small>Cached Input</small><strong>{activeDetailItem.cached !== null ? `${price(activeDetailItem.cached, 4)} / 1M` : "—"}</strong></div>
+                  <div className="spec-box"><small>Output Rate</small><strong>{price(activeDetailItem.output)} / 1M</strong></div>
+                  <div className="spec-box"><small>Context Window</small><strong>{activeDetailItem.context}</strong></div>
+                  <div className="spec-box"><small>Est. Call Cost ({exploreScenario.label})</small><strong>{price(callCost(activeDetailItem, exploreSettings), 4)}</strong></div>
+                  <div className="spec-box"><small>{monthlyCalls.toLocaleString()} Calls / Month</small><strong>{monthlyPrice(callCost(activeDetailItem, exploreSettings) * monthlyCalls)}</strong></div>
+                </div>
+              ) : (
+                <div className="detail-specs-grid">
+                  <div className="spec-box"><small>Monthly Price</small><strong>{planPrice(activeDetailItem)}</strong></div>
+                  <div className="spec-box"><small>Quota Evidence</small><strong>{activeDetailItem.confidence} ({activeDetailItem.evidence})</strong></div>
+                  <div className="spec-box"><small>Underlying Model</small><strong>{models.find((m) => m.id === activeDetailItem.modelId)?.name ?? activeDetailItem.modelId}</strong></div>
+                  <div className="spec-box"><small>API Included?</small><strong>{activeDetailItem.apiIncluded}</strong></div>
+                  <div className="spec-box full-span"><small>Published Quota / Rule</small><strong>{planQuota(activeDetailItem, exploreScenarioId)}</strong></div>
+                </div>
+              )}
+
+              {activeDetailItem.note && (
+                <div className="modal-note-box">
+                  <strong>Notes &amp; Limitations:</strong>
+                  <p>{activeDetailItem.note}</p>
+                </div>
+              )}
+
+              <div className="modal-scenario-fits">
+                <strong>Scenario Fit Ratings:</strong>
+                <div className="scenario-fits-list">
+                  {scenarios.map((sc) => (
+                    <div className="scenario-fit-item" key={sc.id}>
+                      <span>{sc.label}</span>
+                      <span className={`mini-tier tier-${activeDetailItem.tiers[sc.id].toLowerCase()}`}>{activeDetailItem.tiers[sc.id]}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <footer className="detail-modal-footer">
+              <button
+                className={`button ${compareList.some((c) => c.id === activeDetailItem.id) ? "button-primary" : "button-ghost"}`}
+                onClick={() => toggleCompare(activeDetailItem)}
+                type="button"
+              >
+                {compareList.some((c) => c.id === activeDetailItem.id) ? "In compare tray" : "+ Add to compare"}
+              </button>
+              <a className="button button-ghost" href={activeDetailItem.source} rel="noreferrer" target="_blank">
+                <span>Official source</span>
+                <Icon name="external" size={14} />
+              </a>
+            </footer>
+          </>
+        )}
+      </Modal>
+
+      {compareList.length > 0 && (
+        <aside aria-label="Item comparison tray" className="compare-floating-tray">
+          <div className="compare-tray-content">
+            <div className="compare-tray-items">
+              <span className="compare-tray-label">Compare {isComparingPlans ? "plans" : "models"} ({compareList.length}/3):</span>
+              {compareList.map((item) => (
+                <span className="compare-item-tag" key={item.id}>
+                  <span className="provider-orb" data-provider={item.provider} />
+                  <strong>{item.name}</strong>
+                  <button aria-label={`Remove ${item.name} from comparison`} onClick={() => toggleCompare(item)} type="button">
+                    <Icon name="close" size={12} />
+                  </button>
+                </span>
+              ))}
+            </div>
+            <div className="compare-tray-actions">
+              <button className="button button-primary" onClick={() => setShowCompareModal(true)} type="button">
+                Compare side-by-side
+              </button>
+              <button className="button button-ghost" onClick={() => setCompareList([])} type="button">
+                Clear
+              </button>
+            </div>
+          </div>
+        </aside>
+      )}
+
+      <Modal
+        isOpen={showCompareModal}
+        maxWidth="900px"
+        onClose={() => setShowCompareModal(false)}
+        title={
+          <div>
+            <h3 id="compare-modal-title">Side-by-side comparison ({isComparingPlans ? "Plans" : "Models"} · {exploreScenario.label})</h3>
+          </div>
+        }
+        titleId="compare-modal-title"
+      >
+        <div className="compare-modal-table-wrap">
+          <table className="compare-table">
+            <thead>
+              <tr>
+                <th>Attribute</th>
+                {compareList.map((item) => (
+                  <th key={item.id}>
+                    <div className="compare-th-item">
+                      <span className="provider-orb" data-provider={item.provider} />
+                      <strong>{item.name}</strong>
+                      <small>{item.provider}</small>
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {!isComparingPlans ? (
+                <>
+                  <tr>
+                    <td>Input / 1M</td>
+                    {compareList.map((item) => (
+                      <td key={item.id}>{"input" in item ? <strong>{price(item.input)}</strong> : null}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td>Cached Input / 1M</td>
+                    {compareList.map((item) => (
+                      <td key={item.id}>{"cached" in item ? (item.cached !== null ? price(item.cached, 4) : "—") : null}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td>Output / 1M</td>
+                    {compareList.map((item) => (
+                      <td key={item.id}>{"output" in item ? <strong>{price(item.output)}</strong> : null}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td>Context Window</td>
+                    {compareList.map((item) => (
+                      <td key={item.id}>{"context" in item ? item.context : null}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td>Est. Cost / Call ({exploreScenario.label})</td>
+                    {compareList.map((item) => (
+                      <td key={item.id}>{"input" in item ? <strong>{price(callCost(item, exploreSettings), 4)}</strong> : null}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td>{monthlyCalls.toLocaleString()} Calls / Month</td>
+                    {compareList.map((item) => (
+                      <td key={item.id}>{"input" in item ? <strong>{monthlyPrice(callCost(item, exploreSettings) * monthlyCalls)}</strong> : null}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td>Scenario Fit ({exploreScenario.label})</td>
+                    {compareList.map((item) => (
+                      <td key={item.id}>
+                        <span className={`mini-tier tier-${item.tiers[exploreScenarioId].toLowerCase()}`}>{item.tiers[exploreScenarioId]}</span>
+                      </td>
+                    ))}
+                  </tr>
+                </>
+              ) : (
+                <>
+                  <tr>
+                    <td>Plan Type</td>
+                    {compareList.map((item) => (
+                      <td key={item.id}>{"kind" in item ? <span className="kind-pill">{item.kind}</span> : null}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td>Monthly Price</td>
+                    {compareList.map((item) => (
+                      <td key={item.id}>{"monthly" in item ? <strong>{planPrice(item as Plan)}</strong> : null}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td>Published Quota</td>
+                    {compareList.map((item) => (
+                      <td key={item.id}>{"quota" in item ? planQuota(item as Plan, exploreScenarioId) : null}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td>API Included?</td>
+                    {compareList.map((item) => (
+                      <td key={item.id}>{"apiIncluded" in item ? item.apiIncluded : null}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td>Equivalent Calls ({exploreScenario.label})</td>
+                    {compareList.map((item) => {
+                      if (!("kind" in item)) return <td key={item.id}>—</td>;
+                      const est = planEstimate(item as Plan, exploreSettings);
+                      return (
+                        <td key={item.id}>
+                          {est ? <strong>{formatEstimateRange(est.callsLow, est.callsHigh)} calls</strong> : "—"}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                  <tr>
+                    <td>Quota Evidence</td>
+                    {compareList.map((item) => (
+                      <td key={item.id}>
+                        {"confidence" in item ? <span className={`evidence-badge evidence-${item.confidence.toLowerCase()}`}>{item.confidence}</span> : null}
+                      </td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td>Scenario Fit ({exploreScenario.label})</td>
+                    {compareList.map((item) => (
+                      <td key={item.id}>
+                        <span className={`mini-tier tier-${item.tiers[exploreScenarioId].toLowerCase()}`}>{item.tiers[exploreScenarioId]}</span>
+                      </td>
+                    ))}
+                  </tr>
+                </>
+              )}
+              <tr>
+                <td>Official Source</td>
+                {compareList.map((item) => (
+                  <td key={item.id}>
+                    <a className="button button-ghost" href={item.source} rel="noreferrer" target="_blank">
+                      <span>Source</span>
+                      <Icon name="external" size={13} />
+                    </a>
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </Modal>
+
+      {showBackToTop && compareList.length === 0 && (
+        <button
+          aria-label="Back to top"
+          className="back-to-top-btn"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          type="button"
+        >
+          <Icon name="arrow-up" size={14} />
+          <span>Top</span>
+        </button>
+      )}
+
       <footer>
-        <a className="brand" href={activeView === "explore" ? "#explore-top" : "#recommendation-top"}><span className="brand-mark">T/T</span><span>TokenTier</span></a>
-        <p className="footer-identity">© 2026 Jin Ma · Open-source code under MIT · Independent project</p>
+        <div className="footer-top">
+          <a className="brand" href={activeView === "explore" ? "#explore-top" : "#recommendation-top"} onClick={(e) => { e.preventDefault(); switchView(activeView); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+            <span className="brand-mark">T/T</span>
+            <span>TokenTier</span>
+          </a>
+          <nav className="footer-nav" aria-label="Footer navigation">
+            <a href="#methodology" onClick={(e) => handleFooterNav(e, "methodology")}>Methodology</a>
+            <a href="#prices" onClick={(e) => handleFooterNav(e, "prices")}>Price book</a>
+            <a href="#price-sources" onClick={(e) => handleFooterNav(e, "price-sources")}>Sources</a>
+            <a href="https://github.com/majinwakeup/tokentier" rel="noreferrer" target="_blank">
+              <span>GitHub</span>
+              <Icon name="external" size={13} />
+            </a>
+            <a href="https://github.com/majinwakeup/tokentier/issues" rel="noreferrer" target="_blank">
+              <span>Report correction</span>
+              <Icon name="external" size={13} />
+            </a>
+          </nav>
+        </div>
+        <div className="footer-bottom">
+          <p className="footer-identity">© 2026 Jin Ma · Open-source code under MIT · Independent project</p>
+          <span className="footer-freshness">Data verified {pricingUpdatedAt}</span>
+        </div>
       </footer>
     </main>
   );
