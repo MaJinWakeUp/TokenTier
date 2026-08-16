@@ -932,11 +932,17 @@ export default function Home() {
   }), [recommendationInputTokens, recommendationOutputTokens]);
 
   const apiRecommendation = useMemo(() => {
-    const candidates = models.filter((model) => model.tiers[recommendationScenarioId] !== "—");
-    const withinBudget = candidates.filter(
+    const requiredTokens = recommendationSettings.input + recommendationSettings.output;
+    const candidates = models.filter(
+      (model) => model.tiers[recommendationScenarioId] !== "—" && contextSize(model.context) >= requiredTokens,
+    );
+    const validCandidates = candidates.length > 0
+      ? candidates
+      : models.filter((model) => model.tiers[recommendationScenarioId] !== "—");
+    const withinBudget = validCandidates.filter(
       (model) => callCost(model, recommendationSettings) * monthlyCalls <= monthlyBudget,
     );
-    const eligible = withinBudget.length > 0 ? withinBudget : candidates;
+    const eligible = withinBudget.length > 0 ? withinBudget : validCandidates;
     return [...eligible].sort((a, b) => {
       const aSpend = callCost(a, recommendationSettings) * monthlyCalls;
       const bSpend = callCost(b, recommendationSettings) * monthlyCalls;
@@ -947,10 +953,21 @@ export default function Home() {
   }, [monthlyBudget, monthlyCalls, recommendationScenarioId, recommendationSettings]);
 
   const rankedPlanOptions = useMemo(() => {
-    const candidates = plans.filter(
-      (plan) => plan.kind === "Subscription" && plan.tiers[recommendationScenarioId] !== "—",
-    );
-    const options = candidates
+    const requiredTokens = recommendationSettings.input + recommendationSettings.output;
+    const candidates = plans.filter((plan) => {
+      if (plan.kind !== "Subscription" || plan.tiers[recommendationScenarioId] === "—") return false;
+      const underlyingModel = models.find((m) => m.id === plan.modelId);
+      if (underlyingModel && contextSize(underlyingModel.context) < requiredTokens) {
+        return false;
+      }
+      return true;
+    });
+    const validCandidates = candidates.length > 0
+      ? candidates
+      : plans.filter(
+          (plan) => plan.kind === "Subscription" && plan.tiers[recommendationScenarioId] !== "—",
+        );
+    const options = validCandidates
       .map((plan) => {
         const estimate = planEstimate(plan, recommendationSettings);
         if (!estimate) return null;
@@ -1005,7 +1022,10 @@ export default function Home() {
           : `${apiRecommendation.name} costs ${monthlyPrice(recommendedApiSpend)} for ${monthlyCalls.toLocaleString()} calls versus $${recommendedPlanPrice}/month for ${planRecommendation.name}; ${sameMonthlyPrice ? "both options have the same monthly price" : `the API is ${monthlyPrice(Math.abs(apiPlanDifference))} ${apiPlanDifference < 0 ? "less" : "more"} per month${apiPlanDifference > 0 ? " and matches your API preference" : ""}`}.`;
 
   const rankedModelCosts = useMemo(() => {
-    return models
+    const requiredTokens = recommendationSettings.input + recommendationSettings.output;
+    const candidates = models.filter((model) => contextSize(model.context) >= requiredTokens);
+    const displayModels = candidates.length > 0 ? candidates : models;
+    return displayModels
       .map((model) => {
         const perCall = callCost(model, recommendationSettings);
         return { model, perCall, monthly: perCall * monthlyCalls };
