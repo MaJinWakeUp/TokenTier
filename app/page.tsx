@@ -169,7 +169,7 @@ const plans: Plan[] = [
     name: "OpenCode client",
     kind: "BYOK client",
     monthly: 0,
-    modelId: "glm-5-2",
+    modelId: "glm-5-3",
     source: "https://opencode.ai/docs/",
     note: "The open-source coding client is free. Inference is billed by your provider, local model, Zen, or Go.",
     quota: "No bundled inference",
@@ -184,7 +184,7 @@ const plans: Plan[] = [
     name: "OpenCode Zen",
     kind: "Pay as you go",
     monthly: null,
-    modelId: "glm-5-2",
+    modelId: "glm-5-3",
     source: "https://opencode.ai/docs/zen/",
     note: "OpenAI-compatible PAYG gateway with zero model markup; card top-ups add 4.4% + $0.30.",
     quota: "No subscription cap",
@@ -199,9 +199,9 @@ const plans: Plan[] = [
     name: "OpenCode Go",
     kind: "Subscription",
     monthly: 10,
-    modelId: "glm-5-2",
+    modelId: "glm-5-3",
     source: "https://opencode.ai/docs/go/",
-    note: "$5 first month. Vendor estimate for GLM-5.2 is 4,300 coding requests/month; model-specific estimates vary.",
+    note: "$5 first month. Vendor estimate for GLM-5.3 is 4,300 coding requests/month; model-specific estimates vary.",
     quota: "$12\u00A0/\u00A05h · $30\u00A0/\u00A0week · $60\u00A0/\u00A0month",
     evidence: "Official quota",
     confidence: "High",
@@ -263,9 +263,9 @@ const plans: Plan[] = [
     name: "GLM Coding Lite",
     kind: "Subscription",
     monthly: 18,
-    modelId: "glm-5-2",
+    modelId: "glm-5-3",
     source: "https://docs.z.ai/devpack/overview",
-    note: "Official range assumes 90.9% cache; off-peak requests burn 50% credits. Coding endpoints cannot power apps or SaaS.",
+    note: "Official range assumes 90.9% cache; off-peak requests burn 50% credits. GLM-5.3 coding endpoint.",
     quota: "10K credits/week · 43–87M tokens/week",
     evidence: "Official quota",
     confidence: "High",
@@ -280,10 +280,10 @@ const plans: Plan[] = [
     provider: "Z.ai",
     name: "GLM Coding Pro",
     kind: "Subscription",
-    monthly: 72,
-    modelId: "glm-5-2",
+    monthly: 80,
+    modelId: "glm-5-3",
     source: "https://docs.z.ai/devpack/overview",
-    note: "Annual offer can reduce the effective monthly price. Conversion combines Z.ai's official cache and token assumptions.",
+    note: "Includes GLM-5.3 with 1M context. Annual offer reduces the effective monthly price to $72. Conversion combines Z.ai's official cache and token assumptions.",
     quota: "60K credits/week · 263–526M tokens/week",
     evidence: "Official quota",
     confidence: "High",
@@ -298,10 +298,10 @@ const plans: Plan[] = [
     provider: "Z.ai",
     name: "GLM Coding Max",
     kind: "Subscription",
-    monthly: 160,
-    modelId: "glm-5-2",
+    monthly: 168,
+    modelId: "glm-5-3",
     source: "https://docs.z.ai/devpack/overview",
-    note: "Annual offer can reduce the effective monthly price. Weekly and rolling 5-hour limits both apply.",
+    note: "Includes GLM-5.3 with 1M context. Annual offer reduces the effective monthly price to $160. Weekly and rolling 5-hour limits both apply.",
     quota: "140K credits/week · 613–1,226M tokens/week",
     evidence: "Official quota",
     confidence: "High",
@@ -378,9 +378,9 @@ const plans: Plan[] = [
     name: "Claude Max 5×",
     kind: "Subscription",
     monthly: 100,
-    modelId: "claude-opus-4-8",
+    modelId: "claude-opus-5",
     source: "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan",
-    note: "Five times Pro session usage plus a separate claimable $100 Agent SDK credit.",
+    note: "Five times Pro session usage plus a separate claimable $100 Agent SDK credit powered by Claude Opus 5.",
     quota: "5× Pro + $100 Agent SDK credit",
     evidence: "Official credit",
     confidence: "High",
@@ -394,9 +394,9 @@ const plans: Plan[] = [
     name: "Claude Max 20×",
     kind: "Subscription",
     monthly: 200,
-    modelId: "claude-opus-4-8",
+    modelId: "claude-opus-5",
     source: "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan",
-    note: "Twenty times Pro session usage plus a separate claimable $200 Agent SDK credit.",
+    note: "Twenty times Pro session usage plus a separate claimable $200 Agent SDK credit powered by Claude Opus 5.",
     quota: "20× Pro + $200 Agent SDK credit",
     evidence: "Official credit",
     confidence: "High",
@@ -409,10 +409,10 @@ const plans: Plan[] = [
     provider: "Google",
     name: "Google AI Plus",
     kind: "Subscription",
-    monthly: 9.99,
+    monthly: 4.99,
     modelId: "gemini-3-6-flash",
     source: "https://one.google.com/about/plans",
-    note: "Current public US 2TB SKU. The older $7.99 launch SKU is no longer the current public price.",
+    note: "Current public US entry tier ($4.99/mo for 400 GB, or $9.99/mo for 2TB). Includes 2× baseline Gemini access; does not bundle API credits.",
     quota: "2× baseline · 5h and weekly limits",
     evidence: "Official relative limit",
     confidence: "Medium",
@@ -573,6 +573,21 @@ const plans: Plan[] = [
     tiers: planTiers("B", "B", "A", "A", "S", "S", "S"),
   },
   {
+    id: "supergrok-lite",
+    provider: "xAI",
+    name: "SuperGrok Lite",
+    kind: "Subscription",
+    monthly: 10,
+    modelId: "grok-4-6",
+    source: "https://x.ai/pricing",
+    note: "Entry-level tier with basic AI image/video generation and limited daily usage.",
+    quota: "Basic usage limits",
+    evidence: "Price break-even",
+    confidence: "Low",
+    apiIncluded: "No · API separate",
+    tiers: planTiers("A", "A", "B", "B", "B", "B", "B"),
+  },
+  {
     id: "supergrok",
     provider: "xAI",
     name: "SuperGrok",
@@ -601,6 +616,21 @@ const plans: Plan[] = [
     confidence: "Low",
     apiIncluded: "No · API separate",
     tiers: planTiers("B", "B", "A", "S", "A", "A", "A"),
+  },
+  {
+    id: "supergrok-heavy",
+    provider: "xAI",
+    name: "SuperGrok Heavy",
+    kind: "Subscription",
+    monthly: 300,
+    modelId: "grok-4-6",
+    source: "https://x.ai/pricing",
+    note: "Intended for intensive workloads; provides 5–10× rate limits, unrestricted video generation, and priority deep reasoning.",
+    quota: "5–10× SuperGrok capacity · Priority reasoning",
+    evidence: "Official relative limit",
+    confidence: "Medium",
+    apiIncluded: "No · API separate",
+    tiers: planTiers("B", "B", "A", "S", "S", "S", "S"),
   },
 ];
 
@@ -902,11 +932,17 @@ export default function Home() {
   }), [recommendationInputTokens, recommendationOutputTokens]);
 
   const apiRecommendation = useMemo(() => {
-    const candidates = models.filter((model) => model.tiers[recommendationScenarioId] !== "—");
-    const withinBudget = candidates.filter(
+    const requiredTokens = recommendationSettings.input + recommendationSettings.output;
+    const candidates = models.filter(
+      (model) => model.tiers[recommendationScenarioId] !== "—" && contextSize(model.context) >= requiredTokens,
+    );
+    const validCandidates = candidates.length > 0
+      ? candidates
+      : models.filter((model) => model.tiers[recommendationScenarioId] !== "—");
+    const withinBudget = validCandidates.filter(
       (model) => callCost(model, recommendationSettings) * monthlyCalls <= monthlyBudget,
     );
-    const eligible = withinBudget.length > 0 ? withinBudget : candidates;
+    const eligible = withinBudget.length > 0 ? withinBudget : validCandidates;
     return [...eligible].sort((a, b) => {
       const aSpend = callCost(a, recommendationSettings) * monthlyCalls;
       const bSpend = callCost(b, recommendationSettings) * monthlyCalls;
@@ -917,10 +953,21 @@ export default function Home() {
   }, [monthlyBudget, monthlyCalls, recommendationScenarioId, recommendationSettings]);
 
   const rankedPlanOptions = useMemo(() => {
-    const candidates = plans.filter(
-      (plan) => plan.kind === "Subscription" && plan.tiers[recommendationScenarioId] !== "—",
-    );
-    const options = candidates
+    const requiredTokens = recommendationSettings.input + recommendationSettings.output;
+    const candidates = plans.filter((plan) => {
+      if (plan.kind !== "Subscription" || plan.tiers[recommendationScenarioId] === "—") return false;
+      const underlyingModel = models.find((m) => m.id === plan.modelId);
+      if (underlyingModel && contextSize(underlyingModel.context) < requiredTokens) {
+        return false;
+      }
+      return true;
+    });
+    const validCandidates = candidates.length > 0
+      ? candidates
+      : plans.filter(
+          (plan) => plan.kind === "Subscription" && plan.tiers[recommendationScenarioId] !== "—",
+        );
+    const options = validCandidates
       .map((plan) => {
         const estimate = planEstimate(plan, recommendationSettings);
         if (!estimate) return null;
@@ -975,7 +1022,10 @@ export default function Home() {
           : `${apiRecommendation.name} costs ${monthlyPrice(recommendedApiSpend)} for ${monthlyCalls.toLocaleString()} calls versus $${recommendedPlanPrice}/month for ${planRecommendation.name}; ${sameMonthlyPrice ? "both options have the same monthly price" : `the API is ${monthlyPrice(Math.abs(apiPlanDifference))} ${apiPlanDifference < 0 ? "less" : "more"} per month${apiPlanDifference > 0 ? " and matches your API preference" : ""}`}.`;
 
   const rankedModelCosts = useMemo(() => {
-    return models
+    const requiredTokens = recommendationSettings.input + recommendationSettings.output;
+    const candidates = models.filter((model) => contextSize(model.context) >= requiredTokens);
+    const displayModels = candidates.length > 0 ? candidates : models;
+    return displayModels
       .map((model) => {
         const perCall = callCost(model, recommendationSettings);
         return { model, perCall, monthly: perCall * monthlyCalls };
