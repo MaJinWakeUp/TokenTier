@@ -19,7 +19,7 @@ available under the MIT License.
 - Consumer subscription prices and their theoretical API-cost equivalents
 
 The equivalence figures are economic comparisons, not provider quotas or API
-credits. Prices were checked against official provider sources on August 11,
+credits. Prices were checked against official provider sources on August 16,
 2026; temporary, threshold, and volatile prices are labeled in the interface.
 
 ## Refresh the API model catalog
