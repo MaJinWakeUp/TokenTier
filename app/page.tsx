@@ -466,7 +466,6 @@ const plans: Plan[] = [
     evidence: "Official quota",
     confidence: "Medium",
     apiIncluded: "No",
-    includedApiValue: 12,
     cacheRatio: 0.25,
     tiers: {
       daily: "—",
@@ -1217,9 +1216,13 @@ export default function Home() {
 
   const diffFactCaption = sameMonthlyPrice
     ? "Both options cost the same monthly for this workload."
-    : preferredPath === "api"
-      ? `Saves ${monthlyPrice(Math.abs(apiPlanDifference))}/mo compared to ${planRecommendation.name}`
-      : `${planRecommendation.name} is ${monthlyPrice(Math.abs(apiPlanDifference))}/mo ${recommendedApiSpend > recommendedPlanPrice ? "cheaper" : "more"} for ~${recommendedPlanCalls} calls`;
+    : apiPlanDifference < 0
+      ? preferredPath === "api"
+        ? `API saves ${monthlyPrice(Math.abs(apiPlanDifference))}/mo compared to ${planRecommendation.name}`
+        : `${apiRecommendation.name} API is ${monthlyPrice(Math.abs(apiPlanDifference))}/mo cheaper than ${planRecommendation.name}`
+      : preferredPath === "plans"
+        ? `${planRecommendation.name} saves ${monthlyPrice(Math.abs(apiPlanDifference))}/mo compared to API spend (~${recommendedPlanCalls} calls)`
+        : `API costs ${monthlyPrice(Math.abs(apiPlanDifference))}/mo more than ${planRecommendation.name} (~${recommendedPlanCalls} calls)`;
 
   const rankedModelCosts = useMemo(() => {
     const requiredTokens = recommendationSettings.input + recommendationSettings.output;
@@ -1252,8 +1255,8 @@ export default function Home() {
       else if (sortBy === "input") comparison = a.input - b.input;
       else if (sortBy === "cached") comparison = (a.cached ?? a.input) - (b.cached ?? b.input);
       else if (sortBy === "output") comparison = a.output - b.output;
-      else if (sortBy === "context") comparison = contextSize(b.context) - contextSize(a.context);
-      else if (sortBy === "fit") comparison = tierScore[b.tiers[exploreScenarioId]] - tierScore[a.tiers[exploreScenarioId]];
+      else if (sortBy === "context") comparison = contextSize(a.context) - contextSize(b.context);
+      else if (sortBy === "fit") comparison = tierScore[a.tiers[exploreScenarioId]] - tierScore[b.tiers[exploreScenarioId]];
       else comparison = callCost(a, exploreSettings) - callCost(b, exploreSettings);
       return sortDirection === "asc" ? comparison : -comparison;
     });
@@ -1272,8 +1275,8 @@ export default function Home() {
       let comparison = 0;
       if (sortBy === "name") comparison = a.name.localeCompare(b.name);
       else if (sortBy === "type") comparison = a.kind.localeCompare(b.kind);
-      else if (sortBy === "confidence") comparison = confidenceScore[b.confidence] - confidenceScore[a.confidence];
-      else if (sortBy === "fit") comparison = tierScore[b.tiers[exploreScenarioId]] - tierScore[a.tiers[exploreScenarioId]];
+      else if (sortBy === "confidence") comparison = confidenceScore[a.confidence] - confidenceScore[b.confidence];
+      else if (sortBy === "fit") comparison = tierScore[a.tiers[exploreScenarioId]] - tierScore[b.tiers[exploreScenarioId]];
       else comparison = (a.monthly ?? Infinity) - (b.monthly ?? Infinity);
       return sortDirection === "asc" ? comparison : -comparison;
     });
@@ -1892,7 +1895,7 @@ export default function Home() {
               <div className="decision-fact">
                 <small>Difference</small>
                 <strong>{sameMonthlyPrice ? "Same price" : `${monthlyPrice(Math.abs(apiPlanDifference))}/mo`}</strong>
-                <span>{preferredPath === "api" ? "API is more cost-effective" : "Plan offers higher volume"}</span>
+                <span>{sameMonthlyPrice ? "Same monthly cost" : apiPlanDifference < 0 ? "API is more cost-effective" : "Plan is more cost-effective"}</span>
               </div>
             </div>
             <p className="decision-verdict-caption">{diffFactCaption}</p>

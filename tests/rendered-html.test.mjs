@@ -179,6 +179,10 @@ test("removes the disposable starter preview", async () => {
   assert.ok(mediumSModels.length >= 1 && mediumSModels.length <= 5, `keeps Medium coding selective; found ${mediumSModels.length} S-tier models`);
   assert.doesNotMatch(styles, /\.hero-card|\.scenario-tabs|\.price-scenario-tabs|\.call-profile/);
   assert.doesNotMatch(page, /className="hero-card|className="scenario-tabs|className="price-scenario-tabs|className="call-profile/);
+  assert.doesNotMatch(page, /id:\s*"kimi-moderato"[\s\S]*?includedApiValue:/);
+  assert.match(page, /apiPlanDifference < 0/);
+  assert.match(page, /contextSize\(a\.context\) - contextSize\(b\.context\)/);
+  assert.match(page, /tierScore\[a\.tiers\[exploreScenarioId\]\] - tierScore\[b\.tiers\[exploreScenarioId\]\]/);
   assert.doesNotMatch(page, /codex-preview|_sites-preview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   await assert.rejects(access(new URL("app/_sites-preview", projectRoot)));
