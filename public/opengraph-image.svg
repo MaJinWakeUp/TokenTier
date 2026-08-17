@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" fill="#08090d"/>
+  <circle cx="1050" cy="150" r="350" fill="#caff4d" fill-opacity="0.08" filter="blur(80px)"/>
+  <circle cx="150" cy="480" r="350" fill="#38bdf8" fill-opacity="0.08" filter="blur(80px)"/>
+  <rect x="60" y="60" width="1080" height="510" rx="24" stroke="#222736" stroke-width="2" fill="#0f121a" fill-opacity="0.8"/>
+  
+  <g transform="translate(100, 120)">
+    <rect width="52" height="52" rx="12" fill="#caff4d"/>
+    <text x="26" y="34" fill="#08090d" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="900" text-anchor="middle">T/T</text>
+    <text x="68" y="35" fill="#f1f5f9" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="800" letter-spacing="-0.03em">TokenTier</text>
+  </g>
+
+  <g transform="translate(100, 230)">
+    <text fill="#caff4d" font-family="ui-monospace, SFMono-Regular, monospace" font-size="16" font-weight="700" letter-spacing="0.1em" text-transform="uppercase">AI APIS VS SUBSCRIPTION PLANS</text>
+    <text y="60" fill="#f8fafc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="52" font-weight="800" letter-spacing="-0.04em">API or Plan? Know the Difference.</text>
+    <text y="115" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="400">Independent tier list, pricing calculator, and quota break-even comparisons.</text>
+  </g>
+
+  <g transform="translate(100, 440)">
+    <rect width="220" height="70" rx="12" fill="#181d28" stroke="#2a3142"/>
+    <text x="24" y="32" fill="#94a3b8" font-family="ui-monospace, SFMono-Regular, monospace" font-size="13" font-weight="600">API MODELS</text>
+    <text x="24" y="56" fill="#f8fafc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700">22 Models</text>
+
+    <rect x="240" y="0" width="220" height="70" rx="12" fill="#181d28" stroke="#2a3142"/>
+    <text x="264" y="32" fill="#94a3b8" font-family="ui-monospace, SFMono-Regular, monospace" font-size="13" font-weight="600">SUBSCRIPTIONS</text>
+    <text x="264" y="56" fill="#f8fafc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700">7 Access Paths</text>
+
+    <rect x="480" y="0" width="260" height="70" rx="12" fill="#181d28" stroke="#2a3142"/>
+    <text x="504" y="32" fill="#94a3b8" font-family="ui-monospace, SFMono-Regular, monospace" font-size="13" font-weight="600">WORKLOAD SCENARIOS</text>
+    <text x="504" y="56" fill="#f8fafc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700">7 Work Types</text>
+  </g>
+</svg>
