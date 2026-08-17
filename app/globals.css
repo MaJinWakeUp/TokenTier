@@ -1601,28 +1601,6 @@ td:first-child {
   background: var(--bg-elevated);
 }
 
-footer {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 25px;
-  min-height: 130px;
-  padding: 30px var(--gutter);
-  border-top: 1px solid var(--border-subtle);
-  background: var(--bg-canvas);
-  color: var(--text-secondary);
-  transition: background-color 200ms ease, color 200ms ease;
-}
-
-.footer-identity {
-  justify-self: end;
-  margin: 0;
-  color: var(--text-muted);
-  font-size: 14px;
-  line-height: 1.5;
-  text-align: right;
-}
-
 .recommendation-card {
   padding: 20px;
 }
@@ -2461,11 +2439,6 @@ footer {
   .decision-banner p {
     grid-column: 1 / -1;
   }
-
-  footer {
-    grid-template-columns: 1fr 1fr;
-  }
-
 }
 
 @media (max-width: 680px) {
@@ -2781,16 +2754,6 @@ footer {
     max-width: none;
     padding: 10px 14px;
   }
-
-  footer {
-    grid-template-columns: 1fr;
-    min-height: 150px;
-  }
-
-  .footer-identity {
-    justify-self: start;
-    text-align: left;
-  }
 }
 
 @media (max-width: 420px) {
@@ -3030,9 +2993,11 @@ footer {
 
 .detail-modal-footer {
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
+  min-height: auto;
   padding: 16px 24px;
   border-top: 1px solid var(--border-subtle);
   background: var(--bg-elevated);
@@ -3579,7 +3544,7 @@ tbody tr:hover .sticky-col {
   margin-left: 6px;
 }
 
-footer {
+footer.site-footer {
   display: flex;
   flex-direction: column;
   gap: 20px;

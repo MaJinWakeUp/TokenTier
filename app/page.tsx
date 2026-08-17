@@ -2341,7 +2341,7 @@ export default function Home() {
         </button>
       )}
 
-      <footer>
+      <footer className="site-footer">
         <div className="footer-top">
           <a className="brand" href={activeView === "explore" ? "#explore-top" : "#recommendation-top"} onClick={(e) => { e.preventDefault(); switchView(activeView); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
             <span className="brand-mark">T/T</span>
