@@ -38,14 +38,18 @@ test("server-renders the TokenTier product", async () => {
     day: "numeric",
     year: "numeric",
     timeZone: "UTC",
-  }).format(new Date(`${catalog.updatedAt}T00:00:00Z`));
+  }).format(new Date(`${[catalog.updatedAt, "2026-08-19"].sort().at(-1)}T00:00:00Z`));
   assert.match(html, /<title>TokenTier — AI APIs vs subscription plans<\/title>/i);
   assert.match(html, /API or plan/);
   assert.match(html, /Tier list/i);
   assert.match(html, /Compare AI APIs and plans/);
   assert.match(html, /Your recommendation/);
   assert.match(html, /Explore profiles/);
-  assert.match(html, /My recommendation/);
+  assert.match(html, />Recommendation</);
+  assert.match(html, /Rank plans/);
+  assert.match(html, /Rank plans your way/);
+  assert.match(html, /Unranked plans/);
+  assert.match(html, /Copy share link/);
   assert.match(html, /OpenCode Go/);
   assert.match(html, /GLM-5\.2/);
   assert.match(html, /Kimi K3/);
@@ -83,8 +87,9 @@ test("server-renders the TokenTier product", async () => {
 });
 
 test("removes the disposable starter preview", async () => {
-  const [page, layout, styles, packageJson, readme, license, catalogSource] = await Promise.all([
+  const [page, rankPage, layout, styles, packageJson, readme, license, catalogSource] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/rank-plans.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
@@ -96,9 +101,21 @@ test("removes the disposable starter preview", async () => {
 
   assert.match(page, /TokenTier/);
   assert.match(page, /Cursor Pro/);
+  assert.match(page, /Cursor Pro Plus/);
+  assert.match(page, /Cursor Ultra/);
   assert.match(page, /OpenCode Zen/);
   assert.match(page, /GLM Coding Lite/);
+  assert.match(page, /GLM Coding Pro/);
+  assert.match(page, /GLM Coding Max/);
   assert.match(page, /Kimi Moderato/);
+  assert.match(page, /Kimi Allegretto/);
+  assert.match(page, /Kimi Allegro/);
+  assert.match(page, /Kimi Vivace/);
+  assert.match(page, /Google AI Plus/);
+  assert.match(page, /Google AI Pro/);
+  assert.match(page, /Google AI Ultra \(5x\)/);
+  assert.match(page, /Google AI Ultra \(20x\)/);
+  assert.match(page, /SuperGrok Heavy/);
   assert.match(page, /Primary pricing and quota sources/);
   assert.match(page, /modelId: "grok-4-6"/);
   assert.match(page, /Includes Grok 4\.6/);
@@ -114,6 +131,18 @@ test("removes the disposable starter preview", async () => {
   assert.match(styles, /\.scenario-dock\s*\{[^}]*position:\s*sticky;[^}]*grid-column:\s*2;/s);
   assert.match(styles, /@media \(max-width: 1120px\)[\s\S]*?\.scenario-dock\s*\{[^}]*position:\s*static;/s);
   assert.match(page, /const \[exploreScenarioId, setExploreScenarioId\]/);
+  assert.match(page, /type View = "explore" \| "recommendation" \| "rank"/);
+  assert.match(page, /<RankPlans plans=\{rankablePlans\} \/>/);
+  assert.match(page, /<span aria-hidden="true" className="workspace-tab-long">Recommendation<\/span>/);
+  assert.doesNotMatch(page, /My recommendation/);
+  assert.match(rankPage, /draggable/);
+  assert.match(rankPage, /onDrop=\{\(event\) => handleDrop\(event, tier\.id\)\}/);
+  assert.match(rankPage, /params\.set\("board", JSON\.stringify/);
+  assert.match(rankPage, /navigator\.clipboard\.writeText\(url\)/);
+  assert.match(rankPage, /unrankedGroups\.map\(\(\[provider, providerPlans\]\)/);
+  assert.match(rankPage, /className="rank-company-grid"/);
+  assert.match(rankPage, /\+ Add tier/);
+  assert.match(rankPage, /Move \{plan\.name\}/);
   assert.match(page, /const \[recommendationScenarioId, setRecommendationScenarioId\]/);
   assert.match(page, /const \[exploreLane, setExploreLane\]/);
   assert.doesNotMatch(page, /const \[(?:tierLane|priceLane),/);
@@ -126,6 +155,8 @@ test("removes the disposable starter preview", async () => {
   assert.match(page, /callCost\(model, recommendationSettings\)/);
   assert.match(page, /function planCoverageScore[\s\S]*?return null;\n}/);
   assert.match(page, /planWithinBudget && planCoversVolume && !apiWithinBudget/);
+  assert.match(page, /Number\(b\.withinBudget\) - Number\(a\.withinBudget\)/);
+  assert.doesNotMatch(page, /const withinBudgetOptions/);
   assert.doesNotMatch(page, /calls <= 2000/);
   const visiblePixelFontSizes = [...styles.matchAll(/font-size:\s*(\d+)px/g)]
     .map((match) => Number(match[1]))
@@ -138,6 +169,10 @@ test("removes the disposable starter preview", async () => {
   assert.match(styles, /\.tier-model\s*\{[^}]*height:\s*82px;[^}]*min-height:\s*82px;[^}]*overflow:\s*hidden;/s);
   assert.match(styles, /\.tier-model strong\s*\{[^}]*font-size:\s*15px;/s);
   assert.match(styles, /\.workspace-tabs\s*\{/);
+  assert.match(styles, /\.workspace-tabs\s*\{[^}]*grid-template-columns:\s*repeat\(3,/s);
+  assert.match(styles, /\.rank-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\);/s);
+  assert.match(styles, /\.rank-pool\s*\{[^}]*position:\s*static;[^}]*max-height:\s*none;/s);
+  assert.match(styles, /\.rank-company-grid\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit, minmax\(300px, 1fr\)\);/s);
   assert.match(styles, /\.workspace-tabs button\s*\{[^}]*min-height:\s*44px;/s);
   assert.match(styles, /\.theme-switcher\s*\{/);
   assert.match(styles, /\.theme-switcher button\s*\{[^}]*min-width:\s*38px;[^}]*min-height:\s*44px;/s);
