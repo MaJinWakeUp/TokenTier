@@ -141,6 +141,7 @@ test("removes the disposable starter preview", async () => {
   assert.match(rankPage, /navigator\.clipboard\.writeText\(url\)/);
   assert.match(rankPage, /unrankedGroups\.map\(\(\[provider, providerPlans\]\)/);
   assert.match(rankPage, /className="rank-company-grid"/);
+  assert.match(rankPage, /className="provider-orb" data-provider=\{plan\.provider\}/);
   assert.match(rankPage, /\+ Add tier/);
   assert.match(rankPage, /Move \{plan\.name\}/);
   assert.match(page, /const \[recommendationScenarioId, setRecommendationScenarioId\]/);

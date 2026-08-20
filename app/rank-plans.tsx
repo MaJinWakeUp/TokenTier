@@ -159,6 +159,7 @@ export default function RankPlans({ plans }: { plans: RankablePlan[] }) {
       }}
     >
       <span aria-hidden="true" className="rank-drag-handle">⋮⋮</span>
+      <span className="provider-orb" data-provider={plan.provider} />
       <div><strong>{plan.name}</strong><small>{plan.monthly === null ? plan.provider : `${plan.provider} · $${plan.monthly}/mo`}</small></div>
       <label>
         <span className="visually-hidden">Move {plan.name}</span>
