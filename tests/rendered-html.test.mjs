@@ -91,13 +91,14 @@ test("server-renders the TokenTier product", async () => {
 });
 
 test("removes the disposable starter preview", async () => {
-  const [page, rankPage, layout, styles, packageJson, readme, license, catalogSource, robots, sitemap, ogImage] = await Promise.all([
+  const [page, rankPage, layout, styles, packageJson, readme, workflow, license, catalogSource, robots, sitemap, ogImage] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/rank-plans.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(new URL("../package.json", import.meta.url), "utf8"),
     readFile(new URL("../README.md", import.meta.url), "utf8"),
+    readFile(new URL("../.github/workflows/deploy.yml", import.meta.url), "utf8"),
     readFile(new URL("../LICENSE", import.meta.url), "utf8"),
     readFile(new URL("../data/api-models.json", import.meta.url), "utf8"),
     readFile(new URL("../public/robots.txt", import.meta.url), "utf8"),
@@ -131,6 +132,9 @@ test("removes the disposable starter preview", async () => {
   assert.match(readme, /independent project created and maintained by Jin Ma/);
   assert.match(readme, /The same source supports two hosts/);
   assert.match(readme, /majinwakeup\.github\.io\/TokenTier/);
+  assert.match(workflow, /run: npm ci/);
+  assert.match(workflow, /name: Verify Pages artifact contents/);
+  assert.match(workflow, /path: \.\/out/);
   assert.match(license, /^MIT License\n\nCopyright \(c\) 2026 Jin Ma/);
   assert.equal(JSON.parse(packageJson).license, "MIT");
   assert.match(page, /api-models\.json/);
@@ -241,7 +245,12 @@ test("removes the disposable starter preview", async () => {
   assert.match(page, /tierScore\[a\.tiers\[exploreScenarioId\]\] - tierScore\[b\.tiers\[exploreScenarioId\]\]/);
   assert.doesNotMatch(page, /codex-preview|_sites-preview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
+  assert.doesNotMatch(packageJson, /drizzle/);
   await assert.rejects(access(new URL("app/_sites-preview", projectRoot)));
   await assert.rejects(access(new URL("app/chatgpt-auth.ts", projectRoot)));
   await assert.rejects(access(new URL("public/opengraph-image.svg", projectRoot)));
+  await assert.rejects(access(new URL("db/index.ts", projectRoot)));
+  await assert.rejects(access(new URL("db/schema.ts", projectRoot)));
+  await assert.rejects(access(new URL("drizzle.config.ts", projectRoot)));
+  await assert.rejects(access(new URL("drizzle/meta/_journal.json", projectRoot)));
 });
