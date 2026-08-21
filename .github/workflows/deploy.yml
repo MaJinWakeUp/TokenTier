@@ -29,12 +29,38 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Validate model catalog & export static site
         run: |
           npm run models:validate
           npm run build:pages
+
+      - name: Verify Pages artifact contents
+        shell: bash
+        run: |
+          test -f out/index.html
+          test -f out/404.html
+          test -d out/_next
+          unexpected="$(find out -mindepth 1 -maxdepth 1 \
+            ! -name _next \
+            ! -name 404.html \
+            ! -name index.html \
+            ! -name index.txt \
+            ! -name favicon.svg \
+            ! -name og.png \
+            ! -name robots.txt \
+            ! -name sitemap.xml \
+            -print)"
+          if [[ -n "$unexpected" ]]; then
+            echo "Unexpected Pages files:"
+            echo "$unexpected"
+            exit 1
+          fi
+          if find out -type f \( -name '*.map' -o -name '*.log' -o -name '.env*' -o -name '*.pem' \) -print -quit | grep -q .; then
+            echo "Generated or sensitive files found in Pages artifact"
+            exit 1
+          fi
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
