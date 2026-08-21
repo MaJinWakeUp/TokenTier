@@ -2,6 +2,7 @@
 
 import modelCatalog from "@/data/api-models.json";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import RankPlans from "./rank-plans";
 
 type ScenarioId =
   | "daily"
@@ -16,7 +17,7 @@ type Tier = "S" | "A" | "B" | "—";
 type Confidence = "High" | "Medium" | "Low";
 type Lane = "api" | "plans";
 type Preference = "either" | "api" | "plans";
-type View = "explore" | "recommendation";
+type View = "explore" | "recommendation" | "rank";
 type ApiColumnKey = "input" | "cached" | "output" | "context" | "fit" | "cost";
 type PlanColumnKey = "type" | "price" | "quota" | "apiIncluded" | "equivalent" | "fit" | "evidence";
 
@@ -38,6 +39,50 @@ const planColumnLabels: Record<PlanColumnKey, string> = {
   fit: "Fit",
   evidence: "Evidence",
 };
+
+const viewTitles: Record<View, string> = {
+  explore: "Explore AI prices and tiers — TokenTier",
+  recommendation: "Personal AI recommendation — TokenTier",
+  rank: "Rank AI plans — TokenTier",
+};
+
+const defaultApiColumns: Record<ApiColumnKey, boolean> = {
+  input: true,
+  cached: true,
+  output: true,
+  context: true,
+  fit: true,
+  cost: true,
+};
+
+const defaultPlanColumns: Record<PlanColumnKey, boolean> = {
+  type: true,
+  price: true,
+  quota: true,
+  apiIncluded: true,
+  equivalent: true,
+  fit: true,
+  evidence: true,
+};
+
+function parseColumnPreferences<Key extends string>(
+  raw: string | null,
+  defaults: Record<Key, boolean>,
+): Record<Key, boolean> | null {
+  if (!raw) return null;
+
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
+
+    const entries = Object.keys(defaults).map((key) => [key, (parsed as Record<string, unknown>)[key]] as const);
+    if (entries.some(([, value]) => typeof value !== "boolean")) return null;
+
+    return Object.fromEntries(entries) as Record<Key, boolean>;
+  } catch {
+    return null;
+  }
+}
 
 type UsageSettings = {
   input: number;
@@ -156,6 +201,7 @@ const tierDescriptions: Record<"S" | "A" | "B", string> = {
 };
 
 const models: Model[] = modelCatalog.models as Model[];
+const planCatalogUpdatedAt = "2026-08-19";
 
 const plans: Plan[] = [
   {
@@ -306,19 +352,42 @@ const plans: Plan[] = [
     },
   },
   {
-    id: "gemini-advanced",
+    id: "google-ai-plus",
     provider: "Google",
-    name: "Gemini Advanced",
+    name: "Google AI Plus",
     kind: "Subscription",
-    monthly: 20,
+    monthly: 9.99,
     modelId: "gemini-3-1-pro",
-    source: "https://developers.google.com/profile/help/benefits",
-    note: "Includes Google One storage, Workspace integration, and monthly Google Developer plan credits.",
-    quota: "High-volume web access plus included Developer API credits",
-    evidence: "Official credit",
+    source: "https://one.google.com/about/plans",
+    note: "Consumer Gemini access with 2× Free usage limits. Gemini API usage is billed separately.",
+    quota: "2× Free Gemini limits; compute-based limits refresh every 5 hours",
+    evidence: "Official relative limit",
     confidence: "High",
-    apiIncluded: "Yes",
-    includedApiValue: 20,
+    apiIncluded: "No",
+    cacheRatio: 0.25,
+    tiers: {
+      daily: "A",
+      "code-easy": "B",
+      "code-medium": "B",
+      "code-hard": "—",
+      research: "A",
+      writing: "A",
+      innovation: "A",
+    },
+  },
+  {
+    id: "google-ai-pro",
+    provider: "Google",
+    name: "Google AI Pro",
+    kind: "Subscription",
+    monthly: 19.99,
+    modelId: "gemini-3-1-pro",
+    source: "https://gemini.google/us/subscriptions/",
+    note: "Expanded Gemini, Deep Research, AI Studio, and Antigravity access. It does not include production Gemini API credit.",
+    quota: "4× Free Gemini limits with expanded Pro model and Deep Research access",
+    evidence: "Official relative limit",
+    confidence: "High",
+    apiIncluded: "No",
     cacheRatio: 0.35,
     tiers: {
       daily: "S",
@@ -331,6 +400,54 @@ const plans: Plan[] = [
     },
   },
   {
+    id: "google-ai-ultra-5x",
+    provider: "Google",
+    name: "Google AI Ultra (5x)",
+    kind: "Subscription",
+    monthly: 99.99,
+    modelId: "gemini-3-1-pro",
+    source: "https://gemini.google/us/subscriptions/",
+    note: "Higher Gemini and Antigravity limits plus 10,000 monthly Flow credits. Production Gemini API usage remains separate.",
+    quota: "5× Google AI Pro limits; 10,000 Flow credits / month",
+    evidence: "Official relative limit",
+    confidence: "High",
+    apiIncluded: "No",
+    cacheRatio: 0.4,
+    tiers: {
+      daily: "A",
+      "code-easy": "A",
+      "code-medium": "S",
+      "code-hard": "S",
+      research: "S",
+      writing: "A",
+      innovation: "S",
+    },
+  },
+  {
+    id: "google-ai-ultra-20x",
+    provider: "Google",
+    name: "Google AI Ultra (20x)",
+    kind: "Subscription",
+    monthly: 199.99,
+    modelId: "gemini-3-1-pro",
+    source: "https://gemini.google/us/subscriptions/",
+    note: "Google's highest consumer limits plus 25,000 monthly Flow credits. Production Gemini API usage remains separate.",
+    quota: "20× Google AI Pro limits; 25,000 Flow credits / month",
+    evidence: "Official relative limit",
+    confidence: "High",
+    apiIncluded: "No",
+    cacheRatio: 0.45,
+    tiers: {
+      daily: "B",
+      "code-easy": "B",
+      "code-medium": "A",
+      "code-hard": "S",
+      research: "S",
+      writing: "B",
+      innovation: "S",
+    },
+  },
+  {
     id: "grok-super",
     provider: "xAI",
     name: "SuperGrok",
@@ -338,15 +455,39 @@ const plans: Plan[] = [
     monthly: 30,
     modelId: "grok-4-6",
     source: "https://x.ai/pricing",
-    note: "Includes Grok 4.6 access, image generation, and live social search.",
-    quota: "Published daily quotas with off-peak allowances",
-    evidence: "Official quota",
+    note: "Includes Grok 4.6 access with higher limits, image and video generation, and live web and X search. API usage is separate.",
+    quota: "Shared weekly product usage pool with pay-as-you-go overage",
+    evidence: "Official relative limit",
     confidence: "Medium",
     apiIncluded: "No",
     cacheRatio: 0.2,
     tiers: {
       daily: "S",
       "code-easy": "S",
+      "code-medium": "A",
+      "code-hard": "S",
+      research: "S",
+      writing: "A",
+      innovation: "S",
+    },
+  },
+  {
+    id: "grok-super-heavy",
+    provider: "xAI",
+    name: "SuperGrok Heavy",
+    kind: "Subscription",
+    monthly: 300,
+    modelId: "grok-4-6",
+    source: "https://x.ai/pricing",
+    note: "Highest individual Grok tier with Heavy-model and Build Mode access. The public comparison lists the tier but the $300 price is corroborated from checkout and community sources.",
+    quota: "Highest shared weekly Grok product pool and early feature access",
+    evidence: "Official relative limit",
+    confidence: "Low",
+    apiIncluded: "No",
+    cacheRatio: 0.35,
+    tiers: {
+      daily: "B",
+      "code-easy": "B",
       "code-medium": "A",
       "code-hard": "S",
       research: "S",
@@ -362,9 +503,9 @@ const plans: Plan[] = [
     monthly: 20,
     modelId: "gpt-5-6-terra",
     source: "https://cursor.com/docs/models-and-pricing",
-    note: "500 fast requests/mo across top-tier models, then throttled queue.",
-    quota: "500 fast calls / month plus unlimited slow queue",
-    evidence: "Official quota",
+    note: "Includes a $20 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
+    quota: "$20 Other Models usage plus Cursor Models pool",
+    evidence: "Official credit",
     confidence: "High",
     apiIncluded: "Editor pool",
     includedApiValue: 20,
@@ -372,6 +513,56 @@ const plans: Plan[] = [
     tiers: {
       daily: "—",
       "code-easy": "S",
+      "code-medium": "A",
+      "code-hard": "B",
+      research: "—",
+      writing: "—",
+      innovation: "—",
+    },
+  },
+  {
+    id: "cursor-pro-plus",
+    provider: "Cursor",
+    name: "Cursor Pro Plus",
+    kind: "Subscription",
+    monthly: 60,
+    modelId: "gpt-5-6-terra",
+    source: "https://cursor.com/docs/models-and-pricing",
+    note: "Includes a $70 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
+    quota: "$70 Other Models usage plus Cursor Models pool",
+    evidence: "Official credit",
+    confidence: "High",
+    apiIncluded: "Editor pool",
+    includedApiValue: 70,
+    cacheRatio: 0.4,
+    tiers: {
+      daily: "—",
+      "code-easy": "S",
+      "code-medium": "S",
+      "code-hard": "A",
+      research: "—",
+      writing: "—",
+      innovation: "—",
+    },
+  },
+  {
+    id: "cursor-ultra",
+    provider: "Cursor",
+    name: "Cursor Ultra",
+    kind: "Subscription",
+    monthly: 200,
+    modelId: "gpt-5-6-terra",
+    source: "https://cursor.com/docs/models-and-pricing",
+    note: "Includes a $400 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
+    quota: "$400 Other Models usage plus Cursor Models pool",
+    evidence: "Official credit",
+    confidence: "High",
+    apiIncluded: "Editor pool",
+    includedApiValue: 400,
+    cacheRatio: 0.45,
+    tiers: {
+      daily: "—",
+      "code-easy": "A",
       "code-medium": "S",
       "code-hard": "S",
       research: "—",
@@ -433,21 +624,74 @@ const plans: Plan[] = [
     provider: "Z.ai",
     name: "GLM Coding Lite",
     kind: "Subscription",
-    monthly: 15,
+    monthly: 18,
     modelId: "glm-5-2",
     source: "https://docs.z.ai/devpack/overview",
-    note: "Specialized for developers with GLM-5.2 coding models and SDK tools.",
-    quota: "Fixed monthly allocation of coding tokens",
+    note: "Coding-tool subscription with GLM models and MCP access. The plan key is not a general production API balance.",
+    quota: "10,000 credits / week; about 80 prompts / 5h",
     evidence: "Official credit",
-    confidence: "Medium",
-    apiIncluded: "Yes",
-    includedApiValue: 15,
+    confidence: "High",
+    apiIncluded: "Coding endpoint",
+    weeklyCredits: 10000,
+    creditMultipliers: [1, 0.2, 3],
     cacheRatio: 0.3,
     tiers: {
       daily: "—",
       "code-easy": "S",
       "code-medium": "A",
+      "code-hard": "B",
+      research: "—",
+      writing: "—",
+      innovation: "—",
+    },
+  },
+  {
+    id: "glm-coding-pro",
+    provider: "Z.ai",
+    name: "GLM Coding Pro",
+    kind: "Subscription",
+    monthly: 80,
+    modelId: "glm-5-2",
+    source: "https://z.ai/subscribe",
+    note: "Six times the Lite credit pool with priority generation. The plan key is not a general production API balance.",
+    quota: "60,000 credits / week; about 400 prompts / 5h",
+    evidence: "Official credit",
+    confidence: "High",
+    apiIncluded: "Coding endpoint",
+    weeklyCredits: 60000,
+    creditMultipliers: [1, 0.2, 3],
+    cacheRatio: 0.3,
+    tiers: {
+      daily: "—",
+      "code-easy": "S",
+      "code-medium": "S",
       "code-hard": "A",
+      research: "—",
+      writing: "—",
+      innovation: "—",
+    },
+  },
+  {
+    id: "glm-coding-max",
+    provider: "Z.ai",
+    name: "GLM Coding Max",
+    kind: "Subscription",
+    monthly: 168,
+    modelId: "glm-5-2",
+    source: "https://z.ai/subscribe",
+    note: "Fourteen times the Lite credit pool with dedicated peak resources. The plan key is not a general production API balance.",
+    quota: "140,000 credits / week; about 1,600 prompts / 5h",
+    evidence: "Official credit",
+    confidence: "High",
+    apiIncluded: "Coding endpoint",
+    weeklyCredits: 140000,
+    creditMultipliers: [1, 0.2, 3],
+    cacheRatio: 0.35,
+    tiers: {
+      daily: "—",
+      "code-easy": "A",
+      "code-medium": "S",
+      "code-hard": "S",
       research: "—",
       writing: "—",
       innovation: "—",
@@ -458,23 +702,95 @@ const plans: Plan[] = [
     provider: "Kimi",
     name: "Kimi Moderato",
     kind: "Subscription",
-    monthly: 12,
-    modelId: "kimi-k2-7-code",
+    monthly: 19,
+    modelId: "kimi-k3",
     source: "https://www.kimi.com/help/membership/membership-pricing",
-    note: "Kimi coding model membership with priority execution.",
-    quota: "Priority coding request pool and fast processing",
-    evidence: "Official quota",
-    confidence: "Medium",
+    note: "Shared Kimi membership pool; task counts are vendor estimates based on typical token use and are not API calls.",
+    quota: "60 Agent credits; 1× Kimi Code credits; 2,000 database calls",
+    evidence: "Official relative limit",
+    confidence: "High",
     apiIncluded: "No",
     cacheRatio: 0.25,
     tiers: {
-      daily: "—",
+      daily: "A",
       "code-easy": "A",
-      "code-medium": "A",
+      "code-medium": "B",
       "code-hard": "B",
-      research: "—",
-      writing: "—",
-      innovation: "—",
+      research: "A",
+      writing: "A",
+      innovation: "A",
+    },
+  },
+  {
+    id: "kimi-allegretto",
+    provider: "Kimi",
+    name: "Kimi Allegretto",
+    kind: "Subscription",
+    monthly: 39,
+    modelId: "kimi-k3",
+    source: "https://www.kimi.com/help/membership/membership-pricing",
+    note: "Shared Kimi membership pool with Kimi Claw. Task counts are vendor estimates, not API-call guarantees.",
+    quota: "150 Agent credits; 5× Kimi Code credits; 5,000 database calls",
+    evidence: "Official relative limit",
+    confidence: "High",
+    apiIncluded: "No",
+    cacheRatio: 0.25,
+    tiers: {
+      daily: "S",
+      "code-easy": "S",
+      "code-medium": "A",
+      "code-hard": "A",
+      research: "S",
+      writing: "S",
+      innovation: "A",
+    },
+  },
+  {
+    id: "kimi-allegro",
+    provider: "Kimi",
+    name: "Kimi Allegro",
+    kind: "Subscription",
+    monthly: 99,
+    modelId: "kimi-k3",
+    source: "https://www.kimi.com/help/membership/membership-pricing",
+    note: "Larger shared Kimi membership pool with four concurrent Agent tasks. Task counts are estimates, not API calls.",
+    quota: "360 Agent credits; 15× Kimi Code credits; 12,000 database calls",
+    evidence: "Official relative limit",
+    confidence: "High",
+    apiIncluded: "No",
+    cacheRatio: 0.3,
+    tiers: {
+      daily: "A",
+      "code-easy": "A",
+      "code-medium": "S",
+      "code-hard": "A",
+      research: "S",
+      writing: "A",
+      innovation: "S",
+    },
+  },
+  {
+    id: "kimi-vivace",
+    provider: "Kimi",
+    name: "Kimi Vivace",
+    kind: "Subscription",
+    monthly: 199,
+    modelId: "kimi-k3",
+    source: "https://www.kimi.com/help/membership/membership-pricing",
+    note: "Kimi's highest membership pool and concurrency. Task counts are vendor estimates, not API-call guarantees.",
+    quota: "720 Agent credits; 30× Kimi Code credits; 24,000 database calls",
+    evidence: "Official relative limit",
+    confidence: "High",
+    apiIncluded: "No",
+    cacheRatio: 0.35,
+    tiers: {
+      daily: "B",
+      "code-easy": "B",
+      "code-medium": "A",
+      "code-hard": "S",
+      research: "S",
+      writing: "A",
+      innovation: "S",
     },
   },
 ];
@@ -498,6 +814,10 @@ const planProviderNames = ["All", ...Array.from(new Set(plans.map((p) => p.provi
   if (bIdx !== -1) return 1;
   return a.localeCompare(b);
 })];
+
+const rankablePlans = plans
+  .filter((plan) => plan.kind === "Subscription")
+  .map(({ id, provider, name, monthly }) => ({ id, provider, name, monthly }));
 
 function price(value: number, digits = 2) {
   if (value === 0) return "$0.00";
@@ -851,23 +1171,8 @@ export default function Home() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const columnsSelectorRef = useRef<HTMLDetailsElement>(null);
 
-  const [visibleApiColumns, setVisibleApiColumns] = useState<Record<ApiColumnKey, boolean>>({
-    input: true,
-    cached: true,
-    output: true,
-    context: true,
-    fit: true,
-    cost: true,
-  });
-  const [visiblePlanColumns, setVisiblePlanColumns] = useState<Record<PlanColumnKey, boolean>>({
-    type: true,
-    price: true,
-    quota: true,
-    apiIncluded: true,
-    equivalent: true,
-    fit: true,
-    evidence: true,
-  });
+  const [visibleApiColumns, setVisibleApiColumns] = useState<Record<ApiColumnKey, boolean>>({ ...defaultApiColumns });
+  const [visiblePlanColumns, setVisiblePlanColumns] = useState<Record<PlanColumnKey, boolean>>({ ...defaultPlanColumns });
 
   const switchView = (view: View) => {
     setActiveView(view);
@@ -875,8 +1180,10 @@ export default function Home() {
     setTimeout(() => {
       if (view === "explore") {
         document.getElementById("explore-top-heading")?.focus();
-      } else {
+      } else if (view === "recommendation") {
         document.getElementById("recommendation-top-heading")?.focus();
+      } else {
+        document.getElementById("rank-top-heading")?.focus();
       }
     }, 50);
   };
@@ -900,10 +1207,14 @@ export default function Home() {
   }, [activeTheme]);
 
   useEffect(() => {
+    document.title = viewTitles[activeView];
+  }, [activeView]);
+
+  useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect -- one-time client state hydration from localStorage and URL params */
     try {
       const savedView = localStorage.getItem("tokentier-view");
-      if (savedView === "explore" || savedView === "recommendation") {
+      if (savedView === "explore" || savedView === "recommendation" || savedView === "rank") {
         setActiveView(savedView);
       }
       const savedCalls = localStorage.getItem("tokentier-rec-calls");
@@ -916,10 +1227,10 @@ export default function Home() {
       if (savedOutput) setRecommendationOutputTokens(Math.min(500_000, Math.max(1, Number(savedOutput) || 6_000)));
       const savedPref = localStorage.getItem("tokentier-rec-pref");
       if (savedPref === "either" || savedPref === "api" || savedPref === "plans") setPreference(savedPref);
-      const savedApiCols = localStorage.getItem("tokentier-api-cols");
-      if (savedApiCols) setVisibleApiColumns(JSON.parse(savedApiCols));
-      const savedPlanCols = localStorage.getItem("tokentier-plan-cols");
-      if (savedPlanCols) setVisiblePlanColumns(JSON.parse(savedPlanCols));
+      const savedApiCols = parseColumnPreferences(localStorage.getItem("tokentier-api-cols"), defaultApiColumns);
+      if (savedApiCols) setVisibleApiColumns(savedApiCols);
+      const savedPlanCols = parseColumnPreferences(localStorage.getItem("tokentier-plan-cols"), defaultPlanColumns);
+      if (savedPlanCols) setVisiblePlanColumns(savedPlanCols);
     } catch {
       // ignore
     }
@@ -933,7 +1244,7 @@ export default function Home() {
     const outputParam = params.get("output");
     const prefParam = params.get("preference");
 
-    if (viewParam === "explore" || viewParam === "recommendation") setActiveView(viewParam);
+    if (viewParam === "explore" || viewParam === "recommendation" || viewParam === "rank") setActiveView(viewParam);
     const selectedScenario = scenarios.find((scenario) => scenario.id === scenarioParam);
     if (selectedScenario) {
       setExploreScenarioId(selectedScenario.id);
@@ -965,7 +1276,8 @@ export default function Home() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     params.set("view", activeView);
-    params.set("scenario", activeView === "recommendation" ? recommendationScenarioId : exploreScenarioId);
+    if (activeView === "rank") params.delete("scenario");
+    else params.set("scenario", activeView === "recommendation" ? recommendationScenarioId : exploreScenarioId);
     if (activeView === "recommendation") {
       params.set("calls", monthlyCalls.toString());
       params.set("budget", monthlyBudget.toString());
@@ -1026,6 +1338,9 @@ export default function Home() {
       } else if ((event.metaKey || event.ctrlKey) && event.key === "2") {
         event.preventDefault();
         switchView("recommendation");
+      } else if ((event.metaKey || event.ctrlKey) && event.key === "3") {
+        event.preventDefault();
+        switchView("rank");
       } else if (event.key === "/" && !isInput && activeView === "explore") {
         event.preventDefault();
         searchInputRef.current?.focus();
@@ -1183,9 +1498,11 @@ export default function Home() {
         return { plan, estimate, coverage, withinBudget, score };
       })
       .filter((option): option is NonNullable<typeof option> => option !== null);
-    const withinBudgetOptions = options.filter((option) => option.withinBudget);
-    return (withinBudgetOptions.length > 0 ? withinBudgetOptions : options)
-      .sort((a, b) => b.score - a.score || (a.plan.monthly ?? Infinity) - (b.plan.monthly ?? Infinity));
+    return options.sort((a, b) =>
+      Number(b.withinBudget) - Number(a.withinBudget)
+      || b.score - a.score
+      || (a.plan.monthly ?? Infinity) - (b.plan.monthly ?? Infinity)
+    );
   }, [monthlyBudget, monthlyCalls, recommendationScenarioId, recommendationSettings]);
 
   const recommendedPlanOption = rankedPlanOptions[0];
@@ -1301,28 +1618,29 @@ export default function Home() {
     if (columnsSelectorRef.current) columnsSelectorRef.current.open = false;
   };
 
+  const latestPricingUpdate = modelCatalog.updatedAt > planCatalogUpdatedAt ? modelCatalog.updatedAt : planCatalogUpdatedAt;
   const pricingUpdatedAt = new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
     timeZone: "UTC",
-  }).format(new Date(`${modelCatalog.updatedAt}T00:00:00Z`));
+  }).format(new Date(`${latestPricingUpdate}T00:00:00Z`));
 
   const daysSinceUpdate = useMemo(() => {
     try {
-      const updateDate = new Date(`${modelCatalog.updatedAt}T00:00:00Z`);
+      const updateDate = new Date(`${latestPricingUpdate}T00:00:00Z`);
       const now = new Date();
       return Math.floor((now.getTime() - updateDate.getTime()) / (1000 * 60 * 60 * 24));
     } catch {
       return 0;
     }
-  }, []);
+  }, [latestPricingUpdate]);
 
   const isComparingPlans = compareList.length > 0 && "kind" in compareList[0];
 
   return (
     <main>
-      <a className="skip-link" href={activeView === "explore" ? "#tier-board" : "#recommendation-settings"}>Skip to comparison</a>
+      <a className="skip-link" href={activeView === "explore" ? "#tier-board" : activeView === "recommendation" ? "#recommendation-settings" : "#rank-top"}>Skip to comparison</a>
 
       <div aria-live="polite" className="visually-hidden">{liveAnnouncement}</div>
 
@@ -1353,20 +1671,32 @@ export default function Home() {
             <span aria-hidden="true" className="workspace-tab-short">Explore</span>
           </button>
           <button
-            aria-label="My recommendation"
+            aria-label="Recommendation"
             aria-pressed={activeView === "recommendation"}
             className={activeView === "recommendation" ? "active" : ""}
             id="recommendation-tab"
             onClick={() => switchView("recommendation")}
-            title="My recommendation"
+            title="Recommendation"
             type="button"
           >
-            <span aria-hidden="true" className="workspace-tab-long">My recommendation</span>
+            <span aria-hidden="true" className="workspace-tab-long">Recommendation</span>
             <span aria-hidden="true" className="workspace-tab-short">Recommend</span>
+          </button>
+          <button
+            aria-label="Rank plans"
+            aria-pressed={activeView === "rank"}
+            className={activeView === "rank" ? "active" : ""}
+            id="rank-tab"
+            onClick={() => switchView("rank")}
+            title="Rank plans"
+            type="button"
+          >
+            <span aria-hidden="true" className="workspace-tab-long">Rank plans</span>
+            <span aria-hidden="true" className="workspace-tab-short">Rank</span>
           </button>
         </nav>
         <div className="header-actions">
-          <span className={`freshness ${daysSinceUpdate > 30 ? "stale" : ""}`} title={`Catalog verified ${pricingUpdatedAt}`}>
+          <span className={`freshness ${daysSinceUpdate > 30 ? "stale" : ""}`} title={`Data updated ${pricingUpdatedAt}`}>
             <i /> Updated {pricingUpdatedAt}
           </span>
           <div className="theme-switcher" role="group" aria-label="Theme">
@@ -1531,9 +1861,9 @@ export default function Home() {
                           className="columns-reset-btn"
                           onClick={() => {
                             if (exploreLane === "api") {
-                              setVisibleApiColumns({ input: true, cached: true, output: true, context: true, fit: true, cost: true });
+                              setVisibleApiColumns({ ...defaultApiColumns });
                             } else {
-                              setVisiblePlanColumns({ type: true, price: true, quota: true, apiIncluded: true, equivalent: true, fit: true, evidence: true });
+                              setVisiblePlanColumns({ ...defaultPlanColumns });
                             }
                           }}
                           type="button"
@@ -1597,69 +1927,69 @@ export default function Home() {
                         <th
                           aria-sort={sortBy === "name" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                           className="sortable-header"
-                          onClick={() => handleHeaderSort("name")}
-                          title="Sort by model name"
                         >
-                          <span className="th-content">API model {sortBy === "name" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                          <button onClick={() => handleHeaderSort("name")} title="Sort by model name" type="button">
+                            <span className="th-content">API model {sortBy === "name" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                          </button>
                         </th>
                         {visibleApiColumns.input && (
                           <th
                             aria-sort={sortBy === "input" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("input")}
-                            title="Sort by input token rate"
                           >
-                            <span className="th-content">Input / 1M {sortBy === "input" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("input")} title="Sort by input token rate" type="button">
+                              <span className="th-content">Input / 1M {sortBy === "input" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                         {visibleApiColumns.cached && (
                           <th
                             aria-sort={sortBy === "cached" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("cached")}
-                            title="Sort by cached input rate"
                           >
-                            <span className="th-content">Cached input {sortBy === "cached" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("cached")} title="Sort by cached input rate" type="button">
+                              <span className="th-content">Cached input {sortBy === "cached" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                         {visibleApiColumns.output && (
                           <th
                             aria-sort={sortBy === "output" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("output")}
-                            title="Sort by output token rate"
                           >
-                            <span className="th-content">Output / 1M {sortBy === "output" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("output")} title="Sort by output token rate" type="button">
+                              <span className="th-content">Output / 1M {sortBy === "output" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                         {visibleApiColumns.context && (
                           <th
                             aria-sort={sortBy === "context" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("context")}
-                            title="Sort by context window size"
                           >
-                            <span className="th-content">Context {sortBy === "context" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("context")} title="Sort by context window size" type="button">
+                              <span className="th-content">Context {sortBy === "context" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                         {visibleApiColumns.fit && (
                           <th
                             aria-sort={sortBy === "fit" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("fit")}
-                            title="Sort by scenario fit"
                           >
-                            <span className="th-content">Fit {sortBy === "fit" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("fit")} title="Sort by scenario fit" type="button">
+                              <span className="th-content">Fit {sortBy === "fit" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                         {visibleApiColumns.cost && (
                           <th
                             aria-sort={sortBy === "cost" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("cost")}
-                            title="Sort by estimated per-call cost"
                           >
-                            <span className="th-content">Est. / call {sortBy === "cost" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("cost")} title="Sort by estimated per-call cost" type="button">
+                              <span className="th-content">Est. / call {sortBy === "cost" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                       </tr>
@@ -1705,29 +2035,29 @@ export default function Home() {
                         <th
                           aria-sort={sortBy === "name" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                           className="sortable-header"
-                          onClick={() => handleHeaderSort("name")}
-                          title="Sort by plan name"
                         >
-                          <span className="th-content">Plan or access path {sortBy === "name" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                          <button onClick={() => handleHeaderSort("name")} title="Sort by plan name" type="button">
+                            <span className="th-content">Plan or access path {sortBy === "name" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                          </button>
                         </th>
                         {visiblePlanColumns.type && (
                           <th
                             aria-sort={sortBy === "type" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("type")}
-                            title="Sort by plan type"
                           >
-                            <span className="th-content">Type {sortBy === "type" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("type")} title="Sort by plan type" type="button">
+                              <span className="th-content">Type {sortBy === "type" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                         {visiblePlanColumns.price && (
                           <th
                             aria-sort={sortBy === "price" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("price")}
-                            title="Sort by monthly price"
                           >
-                            <span className="th-content">Price {sortBy === "price" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("price")} title="Sort by monthly price" type="button">
+                              <span className="th-content">Price {sortBy === "price" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                         {visiblePlanColumns.quota && <th>Published quota</th>}
@@ -1737,20 +2067,20 @@ export default function Home() {
                           <th
                             aria-sort={sortBy === "fit" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("fit")}
-                            title="Sort by scenario fit"
                           >
-                            <span className="th-content">Fit {sortBy === "fit" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("fit")} title="Sort by scenario fit" type="button">
+                              <span className="th-content">Fit {sortBy === "fit" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                         {visiblePlanColumns.evidence && (
                           <th
                             aria-sort={sortBy === "confidence" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("confidence")}
-                            title="Sort by quota confidence"
                           >
-                            <span className="th-content">Evidence {sortBy === "confidence" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("confidence")} title="Sort by quota confidence" type="button">
+                              <span className="th-content">Evidence {sortBy === "confidence" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                       </tr>
@@ -2080,6 +2410,10 @@ export default function Home() {
         </section>
       </div>
 
+      <div aria-labelledby="rank-tab" className="view-panel rank-panel" hidden={activeView !== "rank"} id="rank-panel" role="region">
+        <RankPlans plans={rankablePlans} />
+      </div>
+
       <Modal
         isOpen={activeDetailItem !== null}
         maxWidth="640px"
@@ -2343,7 +2677,7 @@ export default function Home() {
 
       <footer className="site-footer">
         <div className="footer-top">
-          <a className="brand" href={activeView === "explore" ? "#explore-top" : "#recommendation-top"} onClick={(e) => { e.preventDefault(); switchView(activeView); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+          <a className="brand" href={activeView === "explore" ? "#explore-top" : activeView === "recommendation" ? "#recommendation-top" : "#rank-top"} onClick={(e) => { e.preventDefault(); switchView(activeView); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
             <span className="brand-mark">T/T</span>
             <span>TokenTier</span>
           </a>
@@ -2363,7 +2697,7 @@ export default function Home() {
         </div>
         <div className="footer-bottom">
           <p className="footer-identity">© 2026 Jin Ma · Open-source code under MIT · Independent project</p>
-          <span className="footer-freshness">Data verified {pricingUpdatedAt}</span>
+          <span className="footer-freshness">Data updated {pricingUpdatedAt}</span>
         </div>
       </footer>
     </main>

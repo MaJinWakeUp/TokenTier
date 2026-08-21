@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://majinwakeup.github.io/TokenTier/sitemap.xml

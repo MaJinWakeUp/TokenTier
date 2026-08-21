@@ -60,3 +60,16 @@ npm run dev
 
 Use `npm run build` for a deployment build and `npm test` for the rendered-page
 checks. The site uses the bundled vinext and Sites hosting structure.
+
+## Deployment targets
+
+The same source supports two hosts:
+
+- GitHub Pages is the public, indexable copy at
+  `https://majinwakeup.github.io/TokenTier/`. The `main` branch workflow runs
+  `npm run build:pages` and applies the `/TokenTier` repository base path.
+- ChatGPT Sites is the private copy. It uses `npm run build`; public canonical,
+  sitemap, and social-preview metadata intentionally point to GitHub Pages.
+
+Run both build commands before merging deployment changes so root-hosted Sites
+assets and repository-path GitHub Pages assets remain compatible.
