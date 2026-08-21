@@ -38,7 +38,7 @@ test("server-renders the TokenTier product", async () => {
     day: "numeric",
     year: "numeric",
     timeZone: "UTC",
-  }).format(new Date(`${[catalog.updatedAt, "2026-08-19"].sort().at(-1)}T00:00:00Z`));
+  }).format(new Date(`${[catalog.updatedAt, "2026-08-21"].sort().at(-1)}T00:00:00Z`));
   assert.match(html, /<title>TokenTier — AI APIs vs subscription plans<\/title>/i);
   assert.match(html, /rel="canonical" href="https:\/\/majinwakeup\.github\.io\/TokenTier\/"/i);
   assert.match(html, /rel="icon" href="https:\/\/majinwakeup\.github\.io\/TokenTier\/favicon\.svg"/i);
@@ -55,6 +55,9 @@ test("server-renders the TokenTier product", async () => {
   assert.match(html, /Unranked plans/);
   assert.match(html, /Copy share link/);
   assert.match(html, /OpenCode Go/);
+  assert.match(html, /ChatGPT Go/);
+  assert.match(html, /SuperGrok Lite/);
+  assert.match(html, /SuperGrok Plus/);
   assert.match(html, /GLM-5\.2/);
   assert.match(html, /Kimi K3/);
   assert.match(html, /Grok 4\.6/);
@@ -124,6 +127,12 @@ test("removes the disposable starter preview", async () => {
   assert.match(page, /Google AI Ultra \(5x\)/);
   assert.match(page, /Google AI Ultra \(20x\)/);
   assert.match(page, /SuperGrok Heavy/);
+  assert.match(page, /id: "chatgpt-go"[\s\S]*?monthly: 8/);
+  assert.match(page, /id: "grok-super-lite"[\s\S]*?monthly: 10/);
+  assert.match(page, /id: "grok-super-plus"[\s\S]*?monthly: 100/);
+  assert.match(page, /https:\/\/grok\.com\/supergrok\?referrer=pricing&target=supergroklite/);
+  assert.match(page, /function planQuota[\s\S]*?if \(plan\.id === "chatgpt-go"\) return plan\.quota;[\s\S]*?const modelClass/);
+  assert.doesNotMatch(page, /"chatgpt-go": \{ Luna:/);
   assert.match(page, /Primary pricing and quota sources/);
   assert.match(page, /modelId: "grok-4-6"/);
   assert.match(page, /Includes Grok 4\.6/);

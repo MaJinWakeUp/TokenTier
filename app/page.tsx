@@ -201,9 +201,33 @@ const tierDescriptions: Record<"S" | "A" | "B", string> = {
 };
 
 const models: Model[] = modelCatalog.models as Model[];
-const planCatalogUpdatedAt = "2026-08-19";
+const planCatalogUpdatedAt = "2026-08-21";
 
 const plans: Plan[] = [
+  {
+    id: "chatgpt-go",
+    provider: "OpenAI",
+    name: "ChatGPT Go",
+    kind: "Subscription",
+    monthly: 8,
+    modelId: "gpt-5-6-luna",
+    source: "https://learn.chatgpt.com/docs/pricing",
+    note: "Entry tier with roughly 10× Free message, upload, and image limits; this plan may include ads. API platform usage is billed separately.",
+    quota: "About 10× Free-tier messages, uploads, and image creation",
+    evidence: "Official relative limit",
+    confidence: "Medium",
+    apiIncluded: "No",
+    cacheRatio: 0.25,
+    tiers: {
+      daily: "A",
+      "code-easy": "A",
+      "code-medium": "B",
+      "code-hard": "B",
+      research: "A",
+      writing: "A",
+      innovation: "B",
+    },
+  },
   {
     id: "chatgpt-plus",
     provider: "OpenAI",
@@ -448,6 +472,30 @@ const plans: Plan[] = [
     },
   },
   {
+    id: "grok-super-lite",
+    provider: "xAI",
+    name: "SuperGrok Lite",
+    kind: "Subscription",
+    monthly: 10,
+    modelId: "grok-4-6",
+    source: "https://grok.com/supergrok?referrer=pricing&target=supergroklite",
+    note: "Entry paid tier with Grok Imagine, longer chats, and a single agent slot. The $10 USD figure is the current web checkout price and may be billed differently by region. API usage is separate.",
+    quota: "Reduced shared weekly product usage pool with pay-as-you-go overage",
+    evidence: "Official relative limit",
+    confidence: "Medium",
+    apiIncluded: "No",
+    cacheRatio: 0.15,
+    tiers: {
+      daily: "A",
+      "code-easy": "A",
+      "code-medium": "B",
+      "code-hard": "B",
+      research: "A",
+      writing: "A",
+      innovation: "B",
+    },
+  },
+  {
     id: "grok-super",
     provider: "xAI",
     name: "SuperGrok",
@@ -465,6 +513,30 @@ const plans: Plan[] = [
       daily: "S",
       "code-easy": "S",
       "code-medium": "A",
+      "code-hard": "S",
+      research: "S",
+      writing: "A",
+      innovation: "S",
+    },
+  },
+  {
+    id: "grok-super-plus",
+    provider: "xAI",
+    name: "SuperGrok Plus",
+    kind: "Subscription",
+    monthly: 100,
+    modelId: "grok-4-6",
+    source: "https://x.ai/pricing",
+    note: "Same Grok model as standard SuperGrok with significantly higher weekly usage, faster replies, priority peak access, and early features. API usage is separate.",
+    quota: "Significantly higher shared weekly product pool plus priority access at peak times",
+    evidence: "Official relative limit",
+    confidence: "Medium",
+    apiIncluded: "No",
+    cacheRatio: 0.3,
+    tiers: {
+      daily: "A",
+      "code-easy": "A",
+      "code-medium": "S",
       "code-hard": "S",
       research: "S",
       writing: "A",
@@ -862,6 +934,7 @@ function planPrice(plan: Plan) {
 }
 
 function planQuota(plan: Plan, scenarioId: ScenarioId) {
+  if (plan.id === "chatgpt-go") return plan.quota;
   if (!plan.id.startsWith("chatgpt-")) return plan.quota;
   const modelClass = ["daily", "code-easy"].includes(scenarioId)
     ? "Luna"
@@ -873,8 +946,8 @@ function planQuota(plan: Plan, scenarioId: ScenarioId) {
     "chatgpt-pro-5x": { Luna: "1,250–10,000", Terra: "125–1,000", Sol: "50–500" },
     "chatgpt-pro-20x": { Luna: "5,000–40,000", Terra: "500–4,000", Sol: "200–2,000" },
   } as const;
-  const range = ranges[plan.id as keyof typeof ranges][modelClass];
-  return `${range} ${modelClass} local messages / 5h`;
+  const range = ranges[plan.id as keyof typeof ranges]?.[modelClass];
+  return range ? `${range} ${modelClass} local messages / 5h` : plan.quota;
 }
 
 function planEstimate(plan: Plan, settings: UsageSettings) {
