@@ -40,6 +40,50 @@ const planColumnLabels: Record<PlanColumnKey, string> = {
   evidence: "Evidence",
 };
 
+const viewTitles: Record<View, string> = {
+  explore: "Explore AI prices and tiers — TokenTier",
+  recommendation: "Personal AI recommendation — TokenTier",
+  rank: "Rank AI plans — TokenTier",
+};
+
+const defaultApiColumns: Record<ApiColumnKey, boolean> = {
+  input: true,
+  cached: true,
+  output: true,
+  context: true,
+  fit: true,
+  cost: true,
+};
+
+const defaultPlanColumns: Record<PlanColumnKey, boolean> = {
+  type: true,
+  price: true,
+  quota: true,
+  apiIncluded: true,
+  equivalent: true,
+  fit: true,
+  evidence: true,
+};
+
+function parseColumnPreferences<Key extends string>(
+  raw: string | null,
+  defaults: Record<Key, boolean>,
+): Record<Key, boolean> | null {
+  if (!raw) return null;
+
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
+
+    const entries = Object.keys(defaults).map((key) => [key, (parsed as Record<string, unknown>)[key]] as const);
+    if (entries.some(([, value]) => typeof value !== "boolean")) return null;
+
+    return Object.fromEntries(entries) as Record<Key, boolean>;
+  } catch {
+    return null;
+  }
+}
+
 type UsageSettings = {
   input: number;
   output: number;
@@ -1127,23 +1171,8 @@ export default function Home() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const columnsSelectorRef = useRef<HTMLDetailsElement>(null);
 
-  const [visibleApiColumns, setVisibleApiColumns] = useState<Record<ApiColumnKey, boolean>>({
-    input: true,
-    cached: true,
-    output: true,
-    context: true,
-    fit: true,
-    cost: true,
-  });
-  const [visiblePlanColumns, setVisiblePlanColumns] = useState<Record<PlanColumnKey, boolean>>({
-    type: true,
-    price: true,
-    quota: true,
-    apiIncluded: true,
-    equivalent: true,
-    fit: true,
-    evidence: true,
-  });
+  const [visibleApiColumns, setVisibleApiColumns] = useState<Record<ApiColumnKey, boolean>>({ ...defaultApiColumns });
+  const [visiblePlanColumns, setVisiblePlanColumns] = useState<Record<PlanColumnKey, boolean>>({ ...defaultPlanColumns });
 
   const switchView = (view: View) => {
     setActiveView(view);
@@ -1178,6 +1207,10 @@ export default function Home() {
   }, [activeTheme]);
 
   useEffect(() => {
+    document.title = viewTitles[activeView];
+  }, [activeView]);
+
+  useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect -- one-time client state hydration from localStorage and URL params */
     try {
       const savedView = localStorage.getItem("tokentier-view");
@@ -1194,10 +1227,10 @@ export default function Home() {
       if (savedOutput) setRecommendationOutputTokens(Math.min(500_000, Math.max(1, Number(savedOutput) || 6_000)));
       const savedPref = localStorage.getItem("tokentier-rec-pref");
       if (savedPref === "either" || savedPref === "api" || savedPref === "plans") setPreference(savedPref);
-      const savedApiCols = localStorage.getItem("tokentier-api-cols");
-      if (savedApiCols) setVisibleApiColumns(JSON.parse(savedApiCols));
-      const savedPlanCols = localStorage.getItem("tokentier-plan-cols");
-      if (savedPlanCols) setVisiblePlanColumns(JSON.parse(savedPlanCols));
+      const savedApiCols = parseColumnPreferences(localStorage.getItem("tokentier-api-cols"), defaultApiColumns);
+      if (savedApiCols) setVisibleApiColumns(savedApiCols);
+      const savedPlanCols = parseColumnPreferences(localStorage.getItem("tokentier-plan-cols"), defaultPlanColumns);
+      if (savedPlanCols) setVisiblePlanColumns(savedPlanCols);
     } catch {
       // ignore
     }
@@ -1828,9 +1861,9 @@ export default function Home() {
                           className="columns-reset-btn"
                           onClick={() => {
                             if (exploreLane === "api") {
-                              setVisibleApiColumns({ input: true, cached: true, output: true, context: true, fit: true, cost: true });
+                              setVisibleApiColumns({ ...defaultApiColumns });
                             } else {
-                              setVisiblePlanColumns({ type: true, price: true, quota: true, apiIncluded: true, equivalent: true, fit: true, evidence: true });
+                              setVisiblePlanColumns({ ...defaultPlanColumns });
                             }
                           }}
                           type="button"
@@ -1894,69 +1927,69 @@ export default function Home() {
                         <th
                           aria-sort={sortBy === "name" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                           className="sortable-header"
-                          onClick={() => handleHeaderSort("name")}
-                          title="Sort by model name"
                         >
-                          <span className="th-content">API model {sortBy === "name" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                          <button onClick={() => handleHeaderSort("name")} title="Sort by model name" type="button">
+                            <span className="th-content">API model {sortBy === "name" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                          </button>
                         </th>
                         {visibleApiColumns.input && (
                           <th
                             aria-sort={sortBy === "input" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("input")}
-                            title="Sort by input token rate"
                           >
-                            <span className="th-content">Input / 1M {sortBy === "input" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("input")} title="Sort by input token rate" type="button">
+                              <span className="th-content">Input / 1M {sortBy === "input" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                         {visibleApiColumns.cached && (
                           <th
                             aria-sort={sortBy === "cached" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("cached")}
-                            title="Sort by cached input rate"
                           >
-                            <span className="th-content">Cached input {sortBy === "cached" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("cached")} title="Sort by cached input rate" type="button">
+                              <span className="th-content">Cached input {sortBy === "cached" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                         {visibleApiColumns.output && (
                           <th
                             aria-sort={sortBy === "output" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("output")}
-                            title="Sort by output token rate"
                           >
-                            <span className="th-content">Output / 1M {sortBy === "output" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("output")} title="Sort by output token rate" type="button">
+                              <span className="th-content">Output / 1M {sortBy === "output" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                         {visibleApiColumns.context && (
                           <th
                             aria-sort={sortBy === "context" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("context")}
-                            title="Sort by context window size"
                           >
-                            <span className="th-content">Context {sortBy === "context" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("context")} title="Sort by context window size" type="button">
+                              <span className="th-content">Context {sortBy === "context" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                         {visibleApiColumns.fit && (
                           <th
                             aria-sort={sortBy === "fit" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("fit")}
-                            title="Sort by scenario fit"
                           >
-                            <span className="th-content">Fit {sortBy === "fit" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("fit")} title="Sort by scenario fit" type="button">
+                              <span className="th-content">Fit {sortBy === "fit" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                         {visibleApiColumns.cost && (
                           <th
                             aria-sort={sortBy === "cost" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("cost")}
-                            title="Sort by estimated per-call cost"
                           >
-                            <span className="th-content">Est. / call {sortBy === "cost" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("cost")} title="Sort by estimated per-call cost" type="button">
+                              <span className="th-content">Est. / call {sortBy === "cost" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                       </tr>
@@ -2002,29 +2035,29 @@ export default function Home() {
                         <th
                           aria-sort={sortBy === "name" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                           className="sortable-header"
-                          onClick={() => handleHeaderSort("name")}
-                          title="Sort by plan name"
                         >
-                          <span className="th-content">Plan or access path {sortBy === "name" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                          <button onClick={() => handleHeaderSort("name")} title="Sort by plan name" type="button">
+                            <span className="th-content">Plan or access path {sortBy === "name" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                          </button>
                         </th>
                         {visiblePlanColumns.type && (
                           <th
                             aria-sort={sortBy === "type" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("type")}
-                            title="Sort by plan type"
                           >
-                            <span className="th-content">Type {sortBy === "type" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("type")} title="Sort by plan type" type="button">
+                              <span className="th-content">Type {sortBy === "type" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                         {visiblePlanColumns.price && (
                           <th
                             aria-sort={sortBy === "price" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("price")}
-                            title="Sort by monthly price"
                           >
-                            <span className="th-content">Price {sortBy === "price" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("price")} title="Sort by monthly price" type="button">
+                              <span className="th-content">Price {sortBy === "price" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                         {visiblePlanColumns.quota && <th>Published quota</th>}
@@ -2034,20 +2067,20 @@ export default function Home() {
                           <th
                             aria-sort={sortBy === "fit" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("fit")}
-                            title="Sort by scenario fit"
                           >
-                            <span className="th-content">Fit {sortBy === "fit" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("fit")} title="Sort by scenario fit" type="button">
+                              <span className="th-content">Fit {sortBy === "fit" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                         {visiblePlanColumns.evidence && (
                           <th
                             aria-sort={sortBy === "confidence" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
                             className="sortable-header"
-                            onClick={() => handleHeaderSort("confidence")}
-                            title="Sort by quota confidence"
                           >
-                            <span className="th-content">Evidence {sortBy === "confidence" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            <button onClick={() => handleHeaderSort("confidence")} title="Sort by quota confidence" type="button">
+                              <span className="th-content">Evidence {sortBy === "confidence" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
                           </th>
                         )}
                       </tr>

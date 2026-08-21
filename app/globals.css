@@ -3119,7 +3119,7 @@ td:first-child {
 
 /* Sortable Table Headers & Sticky Columns */
 .sortable-header {
-  cursor: pointer;
+  padding: 0;
   user-select: none;
   transition: background-color 150ms ease, color 150ms ease;
 }
@@ -3127,6 +3127,33 @@ td:first-child {
 .sortable-header:hover {
   background: var(--bg-elevated);
   color: var(--text-primary);
+}
+
+.sortable-header button {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  min-height: 52px;
+  padding: 17px 18px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: right;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+.sortable-header:first-child button {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.sortable-header button:focus-visible {
+  outline: 3px solid var(--lime);
+  outline-offset: -4px;
+  border-radius: 6px;
 }
 
 .sortable-header span {

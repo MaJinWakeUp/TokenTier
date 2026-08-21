@@ -40,6 +40,10 @@ test("server-renders the TokenTier product", async () => {
     timeZone: "UTC",
   }).format(new Date(`${[catalog.updatedAt, "2026-08-19"].sort().at(-1)}T00:00:00Z`));
   assert.match(html, /<title>TokenTier — AI APIs vs subscription plans<\/title>/i);
+  assert.match(html, /rel="canonical" href="https:\/\/majinwakeup\.github\.io\/TokenTier\/"/i);
+  assert.match(html, /rel="icon" href="https:\/\/majinwakeup\.github\.io\/TokenTier\/favicon\.svg"/i);
+  assert.match(html, /property="og:image" content="https:\/\/majinwakeup\.github\.io\/TokenTier\/og\.png"/i);
+  assert.match(html, /name="twitter:card" content="summary_large_image"/i);
   assert.match(html, /API or plan/);
   assert.match(html, /Tier list/i);
   assert.match(html, /Compare AI APIs and plans/);
@@ -87,7 +91,7 @@ test("server-renders the TokenTier product", async () => {
 });
 
 test("removes the disposable starter preview", async () => {
-  const [page, rankPage, layout, styles, packageJson, readme, license, catalogSource] = await Promise.all([
+  const [page, rankPage, layout, styles, packageJson, readme, license, catalogSource, robots, sitemap, ogImage] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/rank-plans.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
@@ -96,6 +100,9 @@ test("removes the disposable starter preview", async () => {
     readFile(new URL("../README.md", import.meta.url), "utf8"),
     readFile(new URL("../LICENSE", import.meta.url), "utf8"),
     readFile(new URL("../data/api-models.json", import.meta.url), "utf8"),
+    readFile(new URL("../public/robots.txt", import.meta.url), "utf8"),
+    readFile(new URL("../public/sitemap.xml", import.meta.url), "utf8"),
+    readFile(new URL("../public/og.png", import.meta.url)),
   ]);
   const catalog = JSON.parse(catalogSource);
 
@@ -122,10 +129,18 @@ test("removes the disposable starter preview", async () => {
   assert.match(page, /Grok plans ↗/);
   assert.match(readme, /## Ownership and independence/);
   assert.match(readme, /independent project created and maintained by Jin Ma/);
+  assert.match(readme, /The same source supports two hosts/);
+  assert.match(readme, /majinwakeup\.github\.io\/TokenTier/);
   assert.match(license, /^MIT License\n\nCopyright \(c\) 2026 Jin Ma/);
   assert.equal(JSON.parse(packageJson).license, "MIT");
   assert.match(page, /api-models\.json/);
   assert.match(layout, /TokenTier/);
+  assert.match(layout, /metadataBase:/);
+  assert.match(layout, /alternates:\s*\{\s*canonical:/s);
+  assert.match(layout, /summary_large_image/);
+  assert.match(robots, /Sitemap: https:\/\/majinwakeup\.github\.io\/TokenTier\/sitemap\.xml/);
+  assert.match(sitemap, /<loc>https:\/\/majinwakeup\.github\.io\/TokenTier\/<\/loc>/);
+  assert.ok(ogImage.length > 1_000, "exports a non-empty social preview PNG");
   assert.match(layout, /prefers-color-scheme: light/);
   assert.match(styles, /\.explore-workspace\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) 300px;/s);
   assert.match(styles, /\.scenario-dock\s*\{[^}]*position:\s*sticky;[^}]*grid-column:\s*2;/s);
@@ -146,6 +161,11 @@ test("removes the disposable starter preview", async () => {
   assert.match(rankPage, /Move \{plan\.name\}/);
   assert.match(page, /const \[recommendationScenarioId, setRecommendationScenarioId\]/);
   assert.match(page, /const \[exploreLane, setExploreLane\]/);
+  assert.match(page, /document\.title = viewTitles\[activeView\]/);
+  assert.match(page, /function parseColumnPreferences/);
+  assert.doesNotMatch(page, /setVisible(?:Api|Plan)Columns\(JSON\.parse/);
+  assert.match(page, /className="sortable-header"[\s\S]*?<button[\s\S]*?onClick=\{\(\) => handleHeaderSort/s);
+  assert.doesNotMatch(page, /className="sortable-header"\s+onClick=/);
   assert.doesNotMatch(page, /const \[(?:tierLane|priceLane),/);
   assert.equal((page.match(/aria-pressed=\{exploreLane === "api"\}/g) ?? []).length, 2);
   assert.equal((page.match(/aria-pressed=\{exploreLane === "plans"\}/g) ?? []).length, 2);
@@ -222,4 +242,6 @@ test("removes the disposable starter preview", async () => {
   assert.doesNotMatch(page, /codex-preview|_sites-preview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   await assert.rejects(access(new URL("app/_sites-preview", projectRoot)));
+  await assert.rejects(access(new URL("app/chatgpt-auth.ts", projectRoot)));
+  await assert.rejects(access(new URL("public/opengraph-image.svg", projectRoot)));
 });
