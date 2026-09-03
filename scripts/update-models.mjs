@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { existsSync } from "node:fs";
 import { readFile, rename, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -690,11 +691,37 @@ export async function validateAllFiles({
   return { dataset, plans, scenarios };
 }
 
+// The three files are a set, so a model edit has to be checked against the
+// scenario anchors and plan references it can invalidate. Companions default to
+// the catalog's own directory, which is how they are laid out in `data/`.
+async function validateCompanions(merged, resolvedCatalogPath, scenariosPath, plansPath) {
+  const directory = path.dirname(resolvedCatalogPath);
+  const companions = [
+    {
+      label: "scenario definitions",
+      file: path.resolve(scenariosPath ?? path.join(directory, "scenarios.json")),
+      validate: (document) => validateScenarios(document, merged),
+    },
+    {
+      label: "plan catalog",
+      file: path.resolve(plansPath ?? path.join(directory, "plans.json")),
+      validate: (document) => validatePlans(document, merged),
+    },
+  ];
+
+  for (const companion of companions) {
+    if (!existsSync(companion.file)) continue;
+    companion.validate(await readJson(companion.file, companion.label));
+  }
+}
+
 export async function updateCatalog({
   mode,
   inputPath,
   dryRun = false,
   catalogPath = defaultCatalogPath,
+  scenariosPath,
+  plansPath,
 }) {
   if (!inputPath) throw new Error(`The ${mode} command requires an input JSON file.`);
   const resolvedCatalogPath = path.resolve(catalogPath);
@@ -723,6 +750,9 @@ export async function updateCatalog({
       readJson(resolvedInputPath, "model input"),
     ]);
     const merged = mergeModels(dataset, incoming, mode);
+    // Runs before the dry-run returns and before the atomic rename, so a change
+    // that breaks a scenario anchor or a plan reference is never written.
+    await validateCompanions(merged, resolvedCatalogPath, scenariosPath, plansPath);
     const incomingModels = Array.isArray(incoming) ? incoming : [incoming];
 
     if (dryRun) {

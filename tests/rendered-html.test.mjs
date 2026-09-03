@@ -103,6 +103,17 @@ test("server-renders the TokenTier product", async () => {
   const defaultProfile = scenarios.scenarios.find((entry) => entry.id === "code-medium");
   assert.ok(html.includes(defaultProfile.input.toLocaleString("en-US")), "renders the profile input tokens");
   assert.ok(html.includes(defaultProfile.calls.toLocaleString("en-US")), "renders the profile call count");
+  // The work-type selector and the numbers under it must agree on first visit,
+  // before any saved or URL state exists.
+  assert.match(html, /<option value="code-medium" selected="">/);
+  for (const field of [defaultProfile.input, defaultProfile.output, defaultProfile.calls]) {
+    assert.ok(html.includes(`value="${field}"`), `initialises a recommendation field to ${field}`);
+  }
+  const otherProfile = scenarios.scenarios.find((entry) => entry.id !== "code-medium" && entry.calls !== defaultProfile.calls);
+  assert.ok(
+    !html.includes(`value="${otherProfile.calls}"`),
+    `does not initialise the call count from ${otherProfile.id}`,
+  );
   assert.match(html, /Input from cache/);
   assert.match(html, /Typical month/);
   // The frontier replaces the single "best API" pick.
@@ -124,7 +135,7 @@ test("server-renders the TokenTier product", async () => {
 });
 
 test("removes the disposable starter preview", async () => {
-  const [page, rankPage, layout, styles, packageJson, readme, workflow, license, catalogSource, robots, sitemap, ogImage, planSource, scenarioSource, viteConfig, gitignore] = await Promise.all([
+  const [page, rankPage, layout, styles, packageJson, readme, workflow, license, catalogSource, robots, sitemap, ogImage, planSource, scenarioSource, viteConfig, gitignore, updater] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/rank-board.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
@@ -141,6 +152,7 @@ test("removes the disposable starter preview", async () => {
     readFile(new URL("../data/scenarios.json", import.meta.url), "utf8"),
     readFile(new URL("../vite.config.ts", import.meta.url), "utf8"),
     readFile(new URL("../.gitignore", import.meta.url), "utf8"),
+    readFile(new URL("../scripts/update-models.mjs", import.meta.url), "utf8"),
   ]);
   const catalog = JSON.parse(catalogSource);
   const scenarios = JSON.parse(scenarioSource);
@@ -301,6 +313,9 @@ test("removes the disposable starter preview", async () => {
   assert.doesNotMatch(page, /aria-haspopup="listbox"|className="columns-menu" role="menu"/);
   assert.match(page, /function monthlyPrice\(value: number\)/);
   assert.match(page, /setRecommendationInputTokens\(selectedScenario\.input\)/);
+  // The updater must check the whole data set before it writes.
+  assert.match(updater, /async function validateCompanions/);
+  assert.match(updater, /await validateCompanions\(merged, resolvedCatalogPath, scenariosPath, plansPath\);/);
   assert.match(page, /setRecommendationOutputTokens\(selectedScenario\.output\)/);
   assert.match(page, /activeView === "recommendation" \? recommendationScenarioId : exploreScenarioId/);
   assert.ok(
@@ -359,6 +374,10 @@ test("removes the disposable starter preview", async () => {
   }
   assert.match(page, /function planPlacements/);
   assert.match(page, /function planWorkingModel/);
+  // One source for every opening value, so the selector cannot drift from them.
+  assert.match(page, /const defaultScenario = scenarioFor\("code-medium"\)/);
+  assert.doesNotMatch(page, /useState\(scenarios\[0\]\./);
+  assert.doesNotMatch(page, /useState<ScenarioId>\("code-medium"\)/);
   assert.match(page, /const workingModel = planWorkingModel\(plan, scenario, recommendationSettings\)/);
   assert.match(page, /via \{workingModel\.name\}/);
   assert.match(page, /const placementsByScenario/);

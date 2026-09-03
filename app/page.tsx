@@ -556,6 +556,12 @@ function settingsFor(scenarioId: ScenarioId): UsageSettings {
   return { input: scenario.input, output: scenario.output, cacheRatio: scenario.cacheRatio };
 }
 
+// The profile the app opens on. Every initial value is read from this one
+// scenario, so the work-type selector can never disagree with the token counts,
+// call volume and cache share shown underneath it.
+const defaultScenario = scenarioFor("code-medium");
+const defaultScenarioId = defaultScenario.id;
+
 function modelPlacement(id: string, scenarioId: ScenarioId): Placement {
   return placementsByScenario.get(scenarioId)?.models.get(id) ?? unscored;
 }
@@ -845,15 +851,15 @@ function subscribeTheme(callback: () => void) {
 
 export default function Home() {
   const [activeView, setActiveView] = useState<View>("explore");
-  const [exploreScenarioId, setExploreScenarioId] = useState<ScenarioId>("code-medium");
-  const [recommendationScenarioId, setRecommendationScenarioId] = useState<ScenarioId>("code-medium");
-  const [recommendationInputTokens, setRecommendationInputTokens] = useState(scenarios[0].input);
-  const [recommendationOutputTokens, setRecommendationOutputTokens] = useState(scenarios[0].output);
-  const [recommendationCacheRatio, setRecommendationCacheRatio] = useState(scenarios[0].cacheRatio);
+  const [exploreScenarioId, setExploreScenarioId] = useState<ScenarioId>(defaultScenarioId);
+  const [recommendationScenarioId, setRecommendationScenarioId] = useState<ScenarioId>(defaultScenarioId);
+  const [recommendationInputTokens, setRecommendationInputTokens] = useState(defaultScenario.input);
+  const [recommendationOutputTokens, setRecommendationOutputTokens] = useState(defaultScenario.output);
+  const [recommendationCacheRatio, setRecommendationCacheRatio] = useState(defaultScenario.cacheRatio);
   const [apiPriority, setApiPriority] = useState<ApiPriority>("budget");
   const [exploreLane, setExploreLane] = useState<Lane>("api");
   const [recComparisonTab, setRecComparisonTab] = useState<Lane>("api");
-  const [monthlyCalls, setMonthlyCalls] = useState(scenarios[0].calls);
+  const [monthlyCalls, setMonthlyCalls] = useState(defaultScenario.calls);
   const [monthlyBudget, setMonthlyBudget] = useState(30);
   const [preference, setPreference] = useState<Preference>("either");
   const [showAllPlans, setShowAllPlans] = useState(false);
@@ -922,9 +928,9 @@ export default function Home() {
       const savedBudget = localStorage.getItem("tokentier-rec-budget");
       if (savedBudget) setMonthlyBudget(Math.min(10_000, Math.max(1, Number(savedBudget) || 30)));
       const savedInput = localStorage.getItem("tokentier-rec-input");
-      if (savedInput) setRecommendationInputTokens(Math.min(1_000_000, Math.max(1, Number(savedInput) || scenarios[0].input)));
+      if (savedInput) setRecommendationInputTokens(Math.min(1_000_000, Math.max(1, Number(savedInput) || defaultScenario.input)));
       const savedOutput = localStorage.getItem("tokentier-rec-output");
-      if (savedOutput) setRecommendationOutputTokens(Math.min(500_000, Math.max(1, Number(savedOutput) || scenarios[0].output)));
+      if (savedOutput) setRecommendationOutputTokens(Math.min(500_000, Math.max(1, Number(savedOutput) || defaultScenario.output)));
       const savedCache = localStorage.getItem("tokentier-rec-cache");
       if (savedCache !== null && savedCache !== "") {
         const parsed = Number(savedCache);

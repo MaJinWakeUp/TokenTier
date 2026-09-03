@@ -151,14 +151,19 @@ function gatedDataset(minIndexClearing = 3) {
   return dataset(models);
 }
 
-async function temporaryFiles(catalog, input) {
+async function temporaryFiles(catalog, input, companions = {}) {
   const directory = await mkdtemp(path.join(os.tmpdir(), "tokentier-models-"));
   const catalogPath = path.join(directory, "api-models.json");
   const inputPath = path.join(directory, "input.json");
-  await Promise.all([
+  const writes = [
     writeFile(catalogPath, `${JSON.stringify(catalog, null, 2)}\n`),
     writeFile(inputPath, `${JSON.stringify(input, null, 2)}\n`),
-  ]);
+  ];
+  // The updater looks for these beside the catalog, as they sit in `data/`.
+  for (const [name, document] of Object.entries(companions)) {
+    writes.push(writeFile(path.join(directory, `${name}.json`), `${JSON.stringify(document, null, 2)}\n`));
+  }
+  await Promise.all(writes);
   return { catalogPath, directory, inputPath };
 }
 
@@ -551,4 +556,79 @@ test("no plan claims implausible leverage over its own price", async () => {
       );
     }
   }
+});
+
+// A model edit can invalidate a scenario anchor or a plan reference, so the
+// updater has to check the whole set before it writes anything. Otherwise a bad
+// record lands on disk and only the next prebuild notices.
+test("refuses a model update that breaks a scenario anchor", async (t) => {
+  const catalog = gatedDataset();
+  const demoted = model({ capability: capability({ metrics: { intelligence: 40 } }) });
+  const files = await temporaryFiles(catalog, demoted, {
+    scenarios: scenarioDocument(),
+    plans: planDocument(),
+  });
+  t.after(() => rm(files.directory, { recursive: true, force: true }));
+  const before = await readFile(files.catalogPath, "utf8");
+
+  // A dry run must fail for the same reason a real write would.
+  await assert.rejects(
+    updateCatalog({
+      mode: "update",
+      inputPath: files.inputPath,
+      catalogPath: files.catalogPath,
+      dryRun: true,
+    }),
+    /anchor example-model scores 40, below its own threshold of 50/,
+  );
+
+  await assert.rejects(
+    updateCatalog({
+      mode: "update",
+      inputPath: files.inputPath,
+      catalogPath: files.catalogPath,
+    }),
+    /anchor example-model scores 40, below its own threshold of 50/,
+  );
+
+  assert.equal(await readFile(files.catalogPath, "utf8"), before, "leaves the catalog untouched");
+  await assert.rejects(access(`${files.catalogPath}.lock`), { code: "ENOENT" });
+});
+
+// mergeModels only adds or replaces by id, so it cannot strand a plan reference
+// on its own. It can still be asked to write on top of a data directory that is
+// already inconsistent, and it should refuse rather than compound the problem.
+test("refuses to write over an already broken plan catalog", async (t) => {
+  const catalog = gatedDataset();
+  const added = model({ id: "brand-new-model", name: "Brand New Model" });
+  const files = await temporaryFiles(catalog, added, {
+    scenarios: scenarioDocument(),
+    plans: planDocument([plan({ modelIds: ["ghost-model"] })]),
+  });
+  t.after(() => rm(files.directory, { recursive: true, force: true }));
+  const before = await readFile(files.catalogPath, "utf8");
+
+  await assert.rejects(
+    updateCatalog({
+      mode: "add",
+      inputPath: files.inputPath,
+      catalogPath: files.catalogPath,
+    }),
+    /modelIds contains "ghost-model", which is not in the model catalog/,
+  );
+
+  assert.equal(await readFile(files.catalogPath, "utf8"), before, "leaves the catalog untouched");
+  await assert.rejects(access(`${files.catalogPath}.lock`), { code: "ENOENT" });
+});
+
+test("still updates when the companion files are absent", async (t) => {
+  const files = await temporaryFiles(dataset(), model({ id: "new-model", name: "New Model" }));
+  t.after(() => rm(files.directory, { recursive: true, force: true }));
+
+  const result = await updateCatalog({
+    mode: "add",
+    inputPath: files.inputPath,
+    catalogPath: files.catalogPath,
+  });
+  assert.deepEqual(result.dataset.models.map((item) => item.id), ["example-model", "new-model"]);
 });
