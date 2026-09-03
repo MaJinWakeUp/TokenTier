@@ -1,24 +1,22 @@
 "use client";
 
 import modelCatalog from "@/data/api-models.json";
+import planCatalog from "@/data/plans.json";
+import scenarioCatalog from "@/data/scenarios.json";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import RankPlans from "./rank-plans";
+import RankBoard from "./rank-board";
 
-type ScenarioId =
-  | "daily"
-  | "code-easy"
-  | "code-medium"
-  | "code-hard"
-  | "research"
-  | "writing"
-  | "innovation";
-
-type Tier = "S" | "A" | "B" | "—";
+type ScenarioId = string;
+type MetricKey = "intelligence" | "codingAgent" | "agentic" | "longContext";
+type Tier = "S" | "A" | "B" | "C";
 type Confidence = "High" | "Medium" | "Low";
 type Lane = "api" | "plans";
 type Preference = "either" | "api" | "plans";
 type View = "explore" | "recommendation" | "rank";
-type ApiColumnKey = "input" | "cached" | "output" | "context" | "fit" | "cost";
+// Where on the value frontier the API recommendation should sit. Cost-minimising
+// alone always returns the floor, which never varies by workload.
+type ApiPriority = "cost" | "budget" | "capability";
+type ApiColumnKey = "input" | "cached" | "output" | "context" | "index" | "fit" | "cost";
 type PlanColumnKey = "type" | "price" | "quota" | "apiIncluded" | "equivalent" | "fit" | "evidence";
 
 const apiColumnLabels: Record<ApiColumnKey, string> = {
@@ -26,6 +24,7 @@ const apiColumnLabels: Record<ApiColumnKey, string> = {
   cached: "Cached input",
   output: "Output / 1M",
   context: "Context",
+  index: "Index",
   fit: "Fit",
   cost: "Est. / call",
 };
@@ -43,7 +42,7 @@ const planColumnLabels: Record<PlanColumnKey, string> = {
 const viewTitles: Record<View, string> = {
   explore: "Explore AI prices and tiers — TokenTier",
   recommendation: "Personal AI recommendation — TokenTier",
-  rank: "Rank AI plans — TokenTier",
+  rank: "Rank AI models and plans — TokenTier",
 };
 
 const defaultApiColumns: Record<ApiColumnKey, boolean> = {
@@ -51,6 +50,7 @@ const defaultApiColumns: Record<ApiColumnKey, boolean> = {
   cached: true,
   output: true,
   context: true,
+  index: true,
   fit: true,
   cost: true,
 };
@@ -87,6 +87,20 @@ function parseColumnPreferences<Key extends string>(
 type UsageSettings = {
   input: number;
   output: number;
+  // Share of input billed at the cached rate. A profile that resends a stable
+  // prefix pays the cached rate for most of its input, which changes the
+  // ranking, not just the totals.
+  cacheRatio: number;
+};
+
+// Published capability scores. `null` is a deliberate third state: the model is
+// listed and priced, but no independent score exists, so it never gets a tier.
+type Capability = {
+  metrics: Partial<Record<MetricKey, number>>;
+  indexVersion: string;
+  variant?: string;
+  source: string;
+  verifiedAt: string;
 };
 
 type Model = {
@@ -100,7 +114,7 @@ type Model = {
   source: string;
   verifiedAt: string;
   note?: string;
-  tiers: Record<ScenarioId, Tier>;
+  capability: Capability | null;
 };
 
 type Plan = {
@@ -109,84 +123,73 @@ type Plan = {
   name: string;
   kind: "Subscription" | "BYOK client" | "Pay as you go";
   monthly: number | null;
-  modelId: string;
+  // Every model the plan gives access to. Which one a scenario uses is chosen
+  // per workload, because a $60 allowance goes much further on a small model.
+  modelIds: string[];
   source: string;
   note: string;
   quota: string;
   evidence: "Official quota" | "Official credit" | "Official relative limit" | "Price break-even";
   confidence: Confidence;
   apiIncluded: string;
+  verifiedAt: string;
   includedApiValue?: number;
   weeklyCredits?: number;
-  creditMultipliers?: [number, number, number];
+  // Keyed by model id: providers publish credit multipliers per model.
+  creditMultipliers?: Record<string, [number, number, number]>;
   cacheRatio?: number;
-  tiers: Record<ScenarioId, Tier>;
 };
 
-const scenarios: Array<{
+// The capability bar a scenario demands, plus the anchor model that makes the
+// number re-derivable when the index is rebased.
+type Gate = {
+  metric: MetricKey;
+  minIndex: number;
+  anchor: string;
+  rationale: string;
+  preferredMetric?: MetricKey;
+};
+
+type Scenario = {
   id: ScenarioId;
   label: string;
   input: number;
   output: number;
+  calls: number;
+  cacheRatio: number;
   description: string;
-}> = [
-  {
-    id: "daily",
-    label: "Daily use",
-    input: 1200,
-    output: 600,
-    description: "Questions, summaries, planning, and everyday writing.",
-  },
-  {
-    id: "code-easy",
-    label: "Easy coding",
-    input: 4000,
-    output: 1500,
-    description: "Small functions, explanations, tests, and local fixes.",
-  },
-  {
-    id: "code-medium",
-    label: "Medium coding",
-    input: 18000,
-    output: 6000,
-    description: "Feature development, refactoring, and multi-file review.",
-  },
-  {
-    id: "code-hard",
-    label: "Hard coding",
-    input: 70000,
-    output: 18000,
-    description: "Large repos, architectural work, and complex debugging.",
-  },
-  {
-    id: "research",
-    label: "Research",
-    input: 45000,
-    output: 5000,
-    description: "Long documents, literature review, and source analysis.",
-  },
-  {
-    id: "writing",
-    label: "Writing",
-    input: 3000,
-    output: 2500,
-    description: "Drafting, editing, tone adjustment, and long-form copy.",
-  },
-  {
-    id: "innovation",
-    label: "Innovation",
-    input: 24000,
-    output: 8000,
-    description: "Brainstorming, strategy, product concepts, and novel ideas.",
-  },
-];
-
-const tierScore: Record<Tier, number> = {
-  S: 90,
-  A: 80,
-  B: 65,
-  "—": 0,
+  rationale: string;
+  gate: Gate;
 };
+
+const capabilityIndex = modelCatalog.capabilityIndex;
+const models = modelCatalog.models as Model[];
+const modelById = new Map(models.map((model) => [model.id, model]));
+const plans = planCatalog.plans as Plan[];
+const planCatalogUpdatedAt = planCatalog.updatedAt;
+const scenarios = scenarioCatalog.scenarios as Scenario[];
+const tierCuts = scenarioCatalog.tierCuts as [number, number, number];
+const rankingWeights = scenarioCatalog.ranking;
+
+const metricLabels: Record<MetricKey, string> = {
+  intelligence: "Intelligence Index",
+  codingAgent: "Coding Agent Index",
+  agentic: "Agentic Index",
+  longContext: "Long-context Index",
+};
+
+const tierOrder: Tier[] = ["S", "A", "B", "C"];
+
+// Tiers rank value among the models that already cleared the capability bar,
+// so the letters describe price-for-capability, not raw capability.
+const tierDescriptions: Record<Tier, string> = {
+  S: "Best value above the bar",
+  A: "Strong value",
+  B: "Fair value",
+  C: "Weakest value above the bar",
+};
+
+const tierRank: Record<Tier, number> = { S: 4, A: 3, B: 2, C: 1 };
 
 const confidenceScore: Record<Confidence, number> = {
   High: 30,
@@ -194,702 +197,23 @@ const confidenceScore: Record<Confidence, number> = {
   Low: 10,
 };
 
-const tierDescriptions: Record<"S" | "A" | "B", string> = {
-  S: "Top tier · Best overall",
-  A: "Solid alternative",
-  B: "Acceptable for light tasks",
-};
+const providerPriority = ["OpenAI", "Anthropic", "xAI", "Google"];
 
-const models: Model[] = modelCatalog.models as Model[];
-const planCatalogUpdatedAt = "2026-08-21";
-
-const plans: Plan[] = [
-  {
-    id: "chatgpt-go",
-    provider: "OpenAI",
-    name: "ChatGPT Go",
-    kind: "Subscription",
-    monthly: 8,
-    modelId: "gpt-5-6-luna",
-    source: "https://learn.chatgpt.com/docs/pricing",
-    note: "Entry tier with roughly 10× Free message, upload, and image limits; this plan may include ads. API platform usage is billed separately.",
-    quota: "About 10× Free-tier messages, uploads, and image creation",
-    evidence: "Official relative limit",
-    confidence: "Medium",
-    apiIncluded: "No",
-    cacheRatio: 0.25,
-    tiers: {
-      daily: "A",
-      "code-easy": "A",
-      "code-medium": "B",
-      "code-hard": "B",
-      research: "A",
-      writing: "A",
-      innovation: "B",
-    },
-  },
-  {
-    id: "chatgpt-plus",
-    provider: "OpenAI",
-    name: "ChatGPT Plus",
-    kind: "Subscription",
-    monthly: 20,
-    modelId: "gpt-5-6-terra",
-    source: "https://learn.chatgpt.com/docs/pricing",
-    note: "Covers standard ChatGPT interface access; API platform usage is billed separately.",
-    quota: "Rolling 5-hour limit across GPT-5.6 Terra and Luna",
-    evidence: "Official relative limit",
-    confidence: "Medium",
-    apiIncluded: "No",
-    cacheRatio: 0.25,
-    tiers: {
-      daily: "S",
-      "code-easy": "S",
-      "code-medium": "A",
-      "code-hard": "A",
-      research: "S",
-      writing: "S",
-      innovation: "A",
-    },
-  },
-  {
-    id: "chatgpt-pro-5x",
-    provider: "OpenAI",
-    name: "ChatGPT Pro (5x)",
-    kind: "Subscription",
-    monthly: 100,
-    modelId: "gpt-5-6-sol",
-    source: "https://learn.chatgpt.com/docs/pricing",
-    note: "Higher allowances and prioritised access during peak times.",
-    quota: "5x standard rolling allowances plus GPT-5.6 Sol access",
-    evidence: "Official relative limit",
-    confidence: "Medium",
-    apiIncluded: "No",
-    cacheRatio: 0.35,
-    tiers: {
-      daily: "A",
-      "code-easy": "A",
-      "code-medium": "S",
-      "code-hard": "S",
-      research: "S",
-      writing: "S",
-      innovation: "S",
-    },
-  },
-  {
-    id: "chatgpt-pro-20x",
-    provider: "OpenAI",
-    name: "ChatGPT Pro (20x)",
-    kind: "Subscription",
-    monthly: 200,
-    modelId: "gpt-5-6-sol",
-    source: "https://learn.chatgpt.com/docs/pricing",
-    note: "Maximum rolling allowances and prioritised throughput for heavy users.",
-    quota: "20x standard rolling allowances and continuous Sol access",
-    evidence: "Official relative limit",
-    confidence: "Medium",
-    apiIncluded: "No",
-    cacheRatio: 0.4,
-    tiers: {
-      daily: "B",
-      "code-easy": "B",
-      "code-medium": "A",
-      "code-hard": "S",
-      research: "S",
-      writing: "A",
-      innovation: "S",
-    },
-  },
-  {
-    id: "claude-pro",
-    provider: "Anthropic",
-    name: "Claude Pro",
-    kind: "Subscription",
-    monthly: 20,
-    modelId: "claude-sonnet-5",
-    source: "https://claude.com/pricing",
-    note: "App-level rate limit applies. Agent SDK usage can be charged against plan credits with an extra fee.",
-    quota: "5x Free plan allowances, dynamic by context size and demand",
-    evidence: "Official credit",
-    confidence: "Medium",
-    apiIncluded: "Optional",
-    includedApiValue: 20,
-    cacheRatio: 0.3,
-    tiers: {
-      daily: "S",
-      "code-easy": "S",
-      "code-medium": "A",
-      "code-hard": "A",
-      research: "S",
-      writing: "S",
-      innovation: "A",
-    },
-  },
-  {
-    id: "claude-max-5x",
-    provider: "Anthropic",
-    name: "Claude Max (5x)",
-    kind: "Subscription",
-    monthly: 100,
-    modelId: "claude-opus-5",
-    source: "https://claude.com/pricing",
-    note: "Designed for intensive research and long-context analysis.",
-    quota: "5x Pro allowance across Opus and Sonnet models",
-    evidence: "Official relative limit",
-    confidence: "Medium",
-    apiIncluded: "Optional",
-    includedApiValue: 100,
-    cacheRatio: 0.4,
-    tiers: {
-      daily: "B",
-      "code-easy": "B",
-      "code-medium": "A",
-      "code-hard": "S",
-      research: "S",
-      writing: "S",
-      innovation: "S",
-    },
-  },
-  {
-    id: "claude-max-20x",
-    provider: "Anthropic",
-    name: "Claude Max (20x)",
-    kind: "Subscription",
-    monthly: 200,
-    modelId: "claude-opus-5",
-    source: "https://claude.com/pricing",
-    note: "Highest personal tier with maximum capacity and priority queues.",
-    quota: "20x Pro allowance and full context limits",
-    evidence: "Official relative limit",
-    confidence: "Medium",
-    apiIncluded: "Optional",
-    includedApiValue: 200,
-    cacheRatio: 0.45,
-    tiers: {
-      daily: "B",
-      "code-easy": "B",
-      "code-medium": "A",
-      "code-hard": "S",
-      research: "S",
-      writing: "A",
-      innovation: "S",
-    },
-  },
-  {
-    id: "google-ai-plus",
-    provider: "Google",
-    name: "Google AI Plus",
-    kind: "Subscription",
-    monthly: 9.99,
-    modelId: "gemini-3-1-pro",
-    source: "https://one.google.com/about/plans",
-    note: "Consumer Gemini access with 2× Free usage limits. Gemini API usage is billed separately.",
-    quota: "2× Free Gemini limits; compute-based limits refresh every 5 hours",
-    evidence: "Official relative limit",
-    confidence: "High",
-    apiIncluded: "No",
-    cacheRatio: 0.25,
-    tiers: {
-      daily: "A",
-      "code-easy": "B",
-      "code-medium": "B",
-      "code-hard": "—",
-      research: "A",
-      writing: "A",
-      innovation: "A",
-    },
-  },
-  {
-    id: "google-ai-pro",
-    provider: "Google",
-    name: "Google AI Pro",
-    kind: "Subscription",
-    monthly: 19.99,
-    modelId: "gemini-3-1-pro",
-    source: "https://gemini.google/us/subscriptions/",
-    note: "Expanded Gemini, Deep Research, AI Studio, and Antigravity access. It does not include production Gemini API credit.",
-    quota: "4× Free Gemini limits with expanded Pro model and Deep Research access",
-    evidence: "Official relative limit",
-    confidence: "High",
-    apiIncluded: "No",
-    cacheRatio: 0.35,
-    tiers: {
-      daily: "S",
-      "code-easy": "S",
-      "code-medium": "A",
-      "code-hard": "A",
-      research: "S",
-      writing: "S",
-      innovation: "A",
-    },
-  },
-  {
-    id: "google-ai-ultra-5x",
-    provider: "Google",
-    name: "Google AI Ultra (5x)",
-    kind: "Subscription",
-    monthly: 99.99,
-    modelId: "gemini-3-1-pro",
-    source: "https://gemini.google/us/subscriptions/",
-    note: "Higher Gemini and Antigravity limits plus 10,000 monthly Flow credits. Production Gemini API usage remains separate.",
-    quota: "5× Google AI Pro limits; 10,000 Flow credits / month",
-    evidence: "Official relative limit",
-    confidence: "High",
-    apiIncluded: "No",
-    cacheRatio: 0.4,
-    tiers: {
-      daily: "A",
-      "code-easy": "A",
-      "code-medium": "S",
-      "code-hard": "S",
-      research: "S",
-      writing: "A",
-      innovation: "S",
-    },
-  },
-  {
-    id: "google-ai-ultra-20x",
-    provider: "Google",
-    name: "Google AI Ultra (20x)",
-    kind: "Subscription",
-    monthly: 199.99,
-    modelId: "gemini-3-1-pro",
-    source: "https://gemini.google/us/subscriptions/",
-    note: "Google's highest consumer limits plus 25,000 monthly Flow credits. Production Gemini API usage remains separate.",
-    quota: "20× Google AI Pro limits; 25,000 Flow credits / month",
-    evidence: "Official relative limit",
-    confidence: "High",
-    apiIncluded: "No",
-    cacheRatio: 0.45,
-    tiers: {
-      daily: "B",
-      "code-easy": "B",
-      "code-medium": "A",
-      "code-hard": "S",
-      research: "S",
-      writing: "B",
-      innovation: "S",
-    },
-  },
-  {
-    id: "grok-super-lite",
-    provider: "xAI",
-    name: "SuperGrok Lite",
-    kind: "Subscription",
-    monthly: 10,
-    modelId: "grok-4-6",
-    source: "https://grok.com/supergrok?referrer=pricing&target=supergroklite",
-    note: "Entry paid tier with Grok Imagine, longer chats, and a single agent slot. The $10 USD figure is the current web checkout price and may be billed differently by region. API usage is separate.",
-    quota: "Reduced shared weekly product usage pool with pay-as-you-go overage",
-    evidence: "Official relative limit",
-    confidence: "Medium",
-    apiIncluded: "No",
-    cacheRatio: 0.15,
-    tiers: {
-      daily: "A",
-      "code-easy": "A",
-      "code-medium": "B",
-      "code-hard": "B",
-      research: "A",
-      writing: "A",
-      innovation: "B",
-    },
-  },
-  {
-    id: "grok-super",
-    provider: "xAI",
-    name: "SuperGrok",
-    kind: "Subscription",
-    monthly: 30,
-    modelId: "grok-4-6",
-    source: "https://x.ai/pricing",
-    note: "Includes Grok 4.6 access with higher limits, image and video generation, and live web and X search. API usage is separate.",
-    quota: "Shared weekly product usage pool with pay-as-you-go overage",
-    evidence: "Official relative limit",
-    confidence: "Medium",
-    apiIncluded: "No",
-    cacheRatio: 0.2,
-    tiers: {
-      daily: "S",
-      "code-easy": "S",
-      "code-medium": "A",
-      "code-hard": "S",
-      research: "S",
-      writing: "A",
-      innovation: "S",
-    },
-  },
-  {
-    id: "grok-super-plus",
-    provider: "xAI",
-    name: "SuperGrok Plus",
-    kind: "Subscription",
-    monthly: 100,
-    modelId: "grok-4-6",
-    source: "https://x.ai/pricing",
-    note: "Same Grok model as standard SuperGrok with significantly higher weekly usage, faster replies, priority peak access, and early features. API usage is separate.",
-    quota: "Significantly higher shared weekly product pool plus priority access at peak times",
-    evidence: "Official relative limit",
-    confidence: "Medium",
-    apiIncluded: "No",
-    cacheRatio: 0.3,
-    tiers: {
-      daily: "A",
-      "code-easy": "A",
-      "code-medium": "S",
-      "code-hard": "S",
-      research: "S",
-      writing: "A",
-      innovation: "S",
-    },
-  },
-  {
-    id: "grok-super-heavy",
-    provider: "xAI",
-    name: "SuperGrok Heavy",
-    kind: "Subscription",
-    monthly: 300,
-    modelId: "grok-4-6",
-    source: "https://x.ai/pricing",
-    note: "Highest individual Grok tier with Heavy-model and Build Mode access. The public comparison lists the tier but the $300 price is corroborated from checkout and community sources.",
-    quota: "Highest shared weekly Grok product pool and early feature access",
-    evidence: "Official relative limit",
-    confidence: "Low",
-    apiIncluded: "No",
-    cacheRatio: 0.35,
-    tiers: {
-      daily: "B",
-      "code-easy": "B",
-      "code-medium": "A",
-      "code-hard": "S",
-      research: "S",
-      writing: "A",
-      innovation: "S",
-    },
-  },
-  {
-    id: "cursor-pro",
-    provider: "Cursor",
-    name: "Cursor Pro",
-    kind: "Subscription",
-    monthly: 20,
-    modelId: "gpt-5-6-terra",
-    source: "https://cursor.com/docs/models-and-pricing",
-    note: "Includes a $20 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
-    quota: "$20 Other Models usage plus Cursor Models pool",
-    evidence: "Official credit",
-    confidence: "High",
-    apiIncluded: "Editor pool",
-    includedApiValue: 20,
-    cacheRatio: 0.4,
-    tiers: {
-      daily: "—",
-      "code-easy": "S",
-      "code-medium": "A",
-      "code-hard": "B",
-      research: "—",
-      writing: "—",
-      innovation: "—",
-    },
-  },
-  {
-    id: "cursor-pro-plus",
-    provider: "Cursor",
-    name: "Cursor Pro Plus",
-    kind: "Subscription",
-    monthly: 60,
-    modelId: "gpt-5-6-terra",
-    source: "https://cursor.com/docs/models-and-pricing",
-    note: "Includes a $70 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
-    quota: "$70 Other Models usage plus Cursor Models pool",
-    evidence: "Official credit",
-    confidence: "High",
-    apiIncluded: "Editor pool",
-    includedApiValue: 70,
-    cacheRatio: 0.4,
-    tiers: {
-      daily: "—",
-      "code-easy": "S",
-      "code-medium": "S",
-      "code-hard": "A",
-      research: "—",
-      writing: "—",
-      innovation: "—",
-    },
-  },
-  {
-    id: "cursor-ultra",
-    provider: "Cursor",
-    name: "Cursor Ultra",
-    kind: "Subscription",
-    monthly: 200,
-    modelId: "gpt-5-6-terra",
-    source: "https://cursor.com/docs/models-and-pricing",
-    note: "Includes a $400 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
-    quota: "$400 Other Models usage plus Cursor Models pool",
-    evidence: "Official credit",
-    confidence: "High",
-    apiIncluded: "Editor pool",
-    includedApiValue: 400,
-    cacheRatio: 0.45,
-    tiers: {
-      daily: "—",
-      "code-easy": "A",
-      "code-medium": "S",
-      "code-hard": "S",
-      research: "—",
-      writing: "—",
-      innovation: "—",
-    },
-  },
-  {
-    id: "opencode-go",
-    provider: "OpenCode",
-    name: "OpenCode Go",
-    kind: "Subscription",
-    monthly: 10,
-    modelId: "glm-5-2",
-    source: "https://opencode.ai/docs/go/",
-    note: "Weekly credit allotment with peak and off-peak rate multipliers.",
-    quota: "20,000 credits / week (peak / off-peak multipliers apply)",
-    evidence: "Official credit",
-    confidence: "High",
-    apiIncluded: "Yes",
-    weeklyCredits: 20000,
-    creditMultipliers: [1, 0.2, 3],
-    cacheRatio: 0.2,
-    tiers: {
-      daily: "A",
-      "code-easy": "S",
-      "code-medium": "A",
-      "code-hard": "A",
-      research: "A",
-      writing: "A",
-      innovation: "A",
-    },
-  },
-  {
-    id: "opencode-zen",
-    provider: "OpenCode",
-    name: "OpenCode Zen",
-    kind: "Pay as you go",
-    monthly: null,
-    modelId: "kimi-k3",
-    source: "https://opencode.ai/docs/zen/",
-    note: "Pay-as-you-go proxy routing to multiple foundation models with unified billing.",
-    quota: "Direct token pass-through with no monthly fee",
-    evidence: "Price break-even",
-    confidence: "Low",
-    apiIncluded: "Yes",
-    tiers: {
-      daily: "A",
-      "code-easy": "A",
-      "code-medium": "A",
-      "code-hard": "A",
-      research: "A",
-      writing: "A",
-      innovation: "A",
-    },
-  },
-  {
-    id: "glm-coding-lite",
-    provider: "Z.ai",
-    name: "GLM Coding Lite",
-    kind: "Subscription",
-    monthly: 18,
-    modelId: "glm-5-2",
-    source: "https://docs.z.ai/devpack/overview",
-    note: "Coding-tool subscription with GLM models and MCP access. The plan key is not a general production API balance.",
-    quota: "10,000 credits / week; about 80 prompts / 5h",
-    evidence: "Official credit",
-    confidence: "High",
-    apiIncluded: "Coding endpoint",
-    weeklyCredits: 10000,
-    creditMultipliers: [1, 0.2, 3],
-    cacheRatio: 0.3,
-    tiers: {
-      daily: "—",
-      "code-easy": "S",
-      "code-medium": "A",
-      "code-hard": "B",
-      research: "—",
-      writing: "—",
-      innovation: "—",
-    },
-  },
-  {
-    id: "glm-coding-pro",
-    provider: "Z.ai",
-    name: "GLM Coding Pro",
-    kind: "Subscription",
-    monthly: 80,
-    modelId: "glm-5-2",
-    source: "https://z.ai/subscribe",
-    note: "Six times the Lite credit pool with priority generation. The plan key is not a general production API balance.",
-    quota: "60,000 credits / week; about 400 prompts / 5h",
-    evidence: "Official credit",
-    confidence: "High",
-    apiIncluded: "Coding endpoint",
-    weeklyCredits: 60000,
-    creditMultipliers: [1, 0.2, 3],
-    cacheRatio: 0.3,
-    tiers: {
-      daily: "—",
-      "code-easy": "S",
-      "code-medium": "S",
-      "code-hard": "A",
-      research: "—",
-      writing: "—",
-      innovation: "—",
-    },
-  },
-  {
-    id: "glm-coding-max",
-    provider: "Z.ai",
-    name: "GLM Coding Max",
-    kind: "Subscription",
-    monthly: 168,
-    modelId: "glm-5-2",
-    source: "https://z.ai/subscribe",
-    note: "Fourteen times the Lite credit pool with dedicated peak resources. The plan key is not a general production API balance.",
-    quota: "140,000 credits / week; about 1,600 prompts / 5h",
-    evidence: "Official credit",
-    confidence: "High",
-    apiIncluded: "Coding endpoint",
-    weeklyCredits: 140000,
-    creditMultipliers: [1, 0.2, 3],
-    cacheRatio: 0.35,
-    tiers: {
-      daily: "—",
-      "code-easy": "A",
-      "code-medium": "S",
-      "code-hard": "S",
-      research: "—",
-      writing: "—",
-      innovation: "—",
-    },
-  },
-  {
-    id: "kimi-moderato",
-    provider: "Kimi",
-    name: "Kimi Moderato",
-    kind: "Subscription",
-    monthly: 19,
-    modelId: "kimi-k3",
-    source: "https://www.kimi.com/help/membership/membership-pricing",
-    note: "Shared Kimi membership pool; task counts are vendor estimates based on typical token use and are not API calls.",
-    quota: "60 Agent credits; 1× Kimi Code credits; 2,000 database calls",
-    evidence: "Official relative limit",
-    confidence: "High",
-    apiIncluded: "No",
-    cacheRatio: 0.25,
-    tiers: {
-      daily: "A",
-      "code-easy": "A",
-      "code-medium": "B",
-      "code-hard": "B",
-      research: "A",
-      writing: "A",
-      innovation: "A",
-    },
-  },
-  {
-    id: "kimi-allegretto",
-    provider: "Kimi",
-    name: "Kimi Allegretto",
-    kind: "Subscription",
-    monthly: 39,
-    modelId: "kimi-k3",
-    source: "https://www.kimi.com/help/membership/membership-pricing",
-    note: "Shared Kimi membership pool with Kimi Claw. Task counts are vendor estimates, not API-call guarantees.",
-    quota: "150 Agent credits; 5× Kimi Code credits; 5,000 database calls",
-    evidence: "Official relative limit",
-    confidence: "High",
-    apiIncluded: "No",
-    cacheRatio: 0.25,
-    tiers: {
-      daily: "S",
-      "code-easy": "S",
-      "code-medium": "A",
-      "code-hard": "A",
-      research: "S",
-      writing: "S",
-      innovation: "A",
-    },
-  },
-  {
-    id: "kimi-allegro",
-    provider: "Kimi",
-    name: "Kimi Allegro",
-    kind: "Subscription",
-    monthly: 99,
-    modelId: "kimi-k3",
-    source: "https://www.kimi.com/help/membership/membership-pricing",
-    note: "Larger shared Kimi membership pool with four concurrent Agent tasks. Task counts are estimates, not API calls.",
-    quota: "360 Agent credits; 15× Kimi Code credits; 12,000 database calls",
-    evidence: "Official relative limit",
-    confidence: "High",
-    apiIncluded: "No",
-    cacheRatio: 0.3,
-    tiers: {
-      daily: "A",
-      "code-easy": "A",
-      "code-medium": "S",
-      "code-hard": "A",
-      research: "S",
-      writing: "A",
-      innovation: "S",
-    },
-  },
-  {
-    id: "kimi-vivace",
-    provider: "Kimi",
-    name: "Kimi Vivace",
-    kind: "Subscription",
-    monthly: 199,
-    modelId: "kimi-k3",
-    source: "https://www.kimi.com/help/membership/membership-pricing",
-    note: "Kimi's highest membership pool and concurrency. Task counts are vendor estimates, not API-call guarantees.",
-    quota: "720 Agent credits; 30× Kimi Code credits; 24,000 database calls",
-    evidence: "Official relative limit",
-    confidence: "High",
-    apiIncluded: "No",
-    cacheRatio: 0.35,
-    tiers: {
-      daily: "B",
-      "code-easy": "B",
-      "code-medium": "A",
-      "code-hard": "S",
-      research: "S",
-      writing: "A",
-      innovation: "S",
-    },
-  },
-];
-
-const providerNames = ["All", ...Array.from(new Set(models.map((m) => m.provider))).sort((a, b) => {
-  const priority = ["OpenAI", "Anthropic", "xAI", "Google"];
-  const aIdx = priority.indexOf(a);
-  const bIdx = priority.indexOf(b);
+function byProviderPriority(a: string, b: string) {
+  const aIdx = providerPriority.indexOf(a);
+  const bIdx = providerPriority.indexOf(b);
   if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
   if (aIdx !== -1) return -1;
   if (bIdx !== -1) return 1;
   return a.localeCompare(b);
-})];
+}
 
-const planProviderNames = ["All", ...Array.from(new Set(plans.map((p) => p.provider))).sort((a, b) => {
-  const priority = ["OpenAI", "Anthropic", "xAI", "Google"];
-  const aIdx = priority.indexOf(a);
-  const bIdx = priority.indexOf(b);
-  if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
-  if (aIdx !== -1) return -1;
-  if (bIdx !== -1) return 1;
-  return a.localeCompare(b);
-})];
+function providerFilterNames(providers: string[]) {
+  return ["All", ...Array.from(new Set(providers)).sort(byProviderPriority)];
+}
 
-const rankablePlans = plans
-  .filter((plan) => plan.kind === "Subscription")
-  .map(({ id, provider, name, monthly }) => ({ id, provider, name, monthly }));
+const providerNames = providerFilterNames(models.map((model) => model.provider));
+const planProviderNames = providerFilterNames(plans.map((plan) => plan.provider));
 
 function price(value: number, digits = 2) {
   if (value === 0) return "$0.00";
@@ -921,7 +245,10 @@ function compactNumber(value: number) {
   }).format(Math.round(value));
 }
 
-function callCost(model: Model, settings: UsageSettings, cacheRatio = 0) {
+function callCost(model: Model, settings: UsageSettings, cacheRatioOverride?: number) {
+  // A plan's own cache behaviour wins when it publishes one; otherwise the
+  // workload's reuse share applies.
+  const cacheRatio = cacheRatioOverride ?? settings.cacheRatio;
   const cachedRate = model.cached ?? model.input;
   const inputCost = (settings.input * (1 - cacheRatio) * model.input + settings.input * cacheRatio * cachedRate) / 1_000_000;
   const outputCost = (settings.output * model.output) / 1_000_000;
@@ -950,14 +277,15 @@ function planQuota(plan: Plan, scenarioId: ScenarioId) {
   return range ? `${range} ${modelClass} local messages / 5h` : plan.quota;
 }
 
-function planEstimate(plan: Plan, settings: UsageSettings) {
-  const model = models.find((item) => item.id === plan.modelId);
+function planEstimate(plan: Plan, settings: UsageSettings, workingModel?: Model | null) {
+  const model = workingModel ?? modelById.get(plan.modelIds[0]);
   if (!model) return null;
-  const referenceCost = callCost(model, settings, plan.cacheRatio ?? 0);
+  const referenceCost = callCost(model, settings, plan.cacheRatio);
+  const multipliers = plan.creditMultipliers?.[model.id];
 
-  if (plan.weeklyCredits && plan.creditMultipliers) {
-    const [inputMultiplier, cachedMultiplier, outputMultiplier] = plan.creditMultipliers;
-    const cacheRatio = plan.cacheRatio ?? 0;
+  if (plan.weeklyCredits && multipliers) {
+    const [inputMultiplier, cachedMultiplier, outputMultiplier] = multipliers;
+    const cacheRatio = plan.cacheRatio ?? settings.cacheRatio;
     const creditsPerCall = (
       settings.input * (1 - cacheRatio) * inputMultiplier
       + settings.input * cacheRatio * cachedMultiplier
@@ -1009,8 +337,8 @@ function formatMoneyRange(low: number, high: number) {
   return `${price(low, 0)}–${price(high, 0)}`;
 }
 
-function planCoverageScore(plan: Plan, settings: UsageSettings, calls: number) {
-  const estimate = planEstimate(plan, settings);
+function planCoverageScore(plan: Plan, settings: UsageSettings, calls: number, workingModel?: Model | null) {
+  const estimate = planEstimate(plan, settings, workingModel);
   if (estimate && (plan.weeklyCredits || plan.includedApiValue !== undefined)) {
     if (estimate.callsLow >= calls) return 100;
     if (estimate.callsHigh >= calls) return 70;
@@ -1018,6 +346,309 @@ function planCoverageScore(plan: Plan, settings: UsageSettings, calls: number) {
   }
   return null;
 }
+
+/* --- Capability gate and derived tiers ------------------------------------
+   Eligibility is absolute: a published capability score must clear the bar the
+   scenario declares, and the context window must hold the work. Placement among
+   the models that cleared it is relative, cut at fixed percentiles, so the board
+   keeps a readable spread however the catalog grows. Nothing here is hand-graded.
+   -------------------------------------------------------------------------- */
+
+type Placement =
+  | { state: "tier"; tier: Tier; index: number; minIndex: number; headroom: number }
+  | { state: "below"; index: number; minIndex: number }
+  | { state: "context"; index: number; minIndex: number }
+  | { state: "unpriced" }
+  | { state: "unscored" };
+
+const unscored: Placement = { state: "unscored" };
+
+function metricValue(capability: Capability | null, metric: MetricKey): number | null {
+  const value = capability?.metrics?.[metric];
+  return typeof value === "number" ? value : null;
+}
+
+function standardScore(values: number[]) {
+  if (values.length === 0) return () => 0;
+  const mean = values.reduce((total, value) => total + value, 0) / values.length;
+  const variance = values.reduce((total, value) => total + (value - mean) ** 2, 0) / values.length;
+  const deviation = Math.sqrt(variance);
+  if (!Number.isFinite(deviation) || deviation === 0) return () => 0;
+  return (value: number) => (value - mean) / deviation;
+}
+
+function tierAtRank(rank: number, total: number): Tier {
+  const position = total <= 1 ? 0 : rank / total;
+  if (position < tierCuts[0]) return "S";
+  if (position < tierCuts[1]) return "A";
+  if (position < tierCuts[2]) return "B";
+  return "C";
+}
+
+function scenarioTokens(scenario: Scenario) {
+  return scenario.input + scenario.output;
+}
+
+// Cheaper is better, on a log scale: a model half the price of another is a
+// fixed step better whether the prices are cents or dollars.
+function costStrength(cost: number) {
+  return -Math.log(Math.max(cost, 1e-9));
+}
+
+function gateModel(model: Model, scenario: Scenario, requiredTokens: number): Placement | null {
+  const { metric, minIndex } = scenario.gate;
+  const index = metricValue(model.capability, metric);
+  if (index === null) return unscored;
+  if (index < minIndex) return { state: "below", index, minIndex };
+  if (contextSize(model.context) < requiredTokens) return { state: "context", index, minIndex };
+  return null;
+}
+
+function modelPlacements(scenario: Scenario): Map<string, Placement> {
+  const placed = new Map<string, Placement>();
+  const requiredTokens = scenarioTokens(scenario);
+  const settings: UsageSettings = {
+    input: scenario.input,
+    output: scenario.output,
+    cacheRatio: scenario.cacheRatio,
+  };
+  const eligible: Array<{ id: string; index: number; cost: number }> = [];
+
+  for (const model of models) {
+    const rejection = gateModel(model, scenario, requiredTokens);
+    if (rejection) {
+      placed.set(model.id, rejection);
+      continue;
+    }
+    eligible.push({
+      id: model.id,
+      index: metricValue(model.capability, scenario.gate.metric) as number,
+      cost: callCost(model, settings),
+    });
+  }
+
+  const minIndex = scenario.gate.minIndex;
+  const cost = standardScore(eligible.map((item) => costStrength(item.cost)));
+  const headroom = standardScore(eligible.map((item) => item.index - minIndex));
+  const weights = rankingWeights.models;
+
+  eligible
+    .map((item) => ({
+      ...item,
+      score: weights.cost * cost(costStrength(item.cost)) + weights.headroom * headroom(item.index - minIndex),
+    }))
+    .sort((a, b) => b.score - a.score || a.cost - b.cost)
+    .forEach((item, rank, ranked) => {
+      placed.set(item.id, {
+        state: "tier",
+        tier: tierAtRank(rank, ranked.length),
+        index: item.index,
+        minIndex,
+        headroom: item.index - minIndex,
+      });
+    });
+
+  return placed;
+}
+
+// A plan inherits the capability of the model it routes to, then ranks on what
+// a plan actually competes on: price, headroom, and how solid its quota evidence is.
+// A plan is judged on the model a sensible user would reach for: the cheapest
+// one it offers that clears the scenario's bar and holds the work. Judging every
+// plan by one fixed model misstates both its capability and its capacity.
+function planWorkingModel(plan: Plan, scenario: Scenario, settings: UsageSettings) {
+  const requiredTokens = settings.input + settings.output;
+  const eligible = plan.modelIds
+    .map((id) => modelById.get(id))
+    .filter((model): model is Model => Boolean(model))
+    .filter((model) => gateModel(model, scenario, requiredTokens) === null)
+    // A credit-metered plan can only be costed on models it publishes multipliers for.
+    .filter((model) => !plan.weeklyCredits || Boolean(plan.creditMultipliers?.[model.id]));
+  if (eligible.length === 0) return null;
+  return [...eligible].sort(
+    (a, b) => callCost(a, settings, plan.cacheRatio) - callCost(b, settings, plan.cacheRatio),
+  )[0];
+}
+
+// Why a plan is off the board, when none of its models qualifies.
+function planRejection(plan: Plan, scenario: Scenario, settings: UsageSettings): Placement {
+  const requiredTokens = settings.input + settings.output;
+  const offered = plan.modelIds
+    .map((id) => modelById.get(id))
+    .filter((model): model is Model => Boolean(model));
+  if (offered.length === 0) return unscored;
+  // Report the closest miss, so the reason names the plan's best model.
+  return offered
+    .map((model) => gateModel(model, scenario, requiredTokens) ?? unscored)
+    .sort((a, b) => placementSort(b, a))[0];
+}
+
+function planPlacements(scenario: Scenario): Map<string, Placement> {
+  const placed = new Map<string, Placement>();
+  const settings: UsageSettings = {
+    input: scenario.input,
+    output: scenario.output,
+    cacheRatio: scenario.cacheRatio,
+  };
+  const eligible: Array<{ id: string; index: number; monthly: number; confidence: Confidence }> = [];
+
+  for (const plan of plans) {
+    const model = planWorkingModel(plan, scenario, settings);
+    if (!model) {
+      placed.set(plan.id, planRejection(plan, scenario, settings));
+      continue;
+    }
+    if (plan.monthly === null || plan.monthly <= 0) {
+      placed.set(plan.id, { state: "unpriced" });
+      continue;
+    }
+    eligible.push({
+      id: plan.id,
+      index: metricValue(model.capability, scenario.gate.metric) as number,
+      monthly: plan.monthly,
+      confidence: plan.confidence,
+    });
+  }
+
+  const minIndex = scenario.gate.minIndex;
+  const price = standardScore(eligible.map((item) => costStrength(item.monthly)));
+  const headroom = standardScore(eligible.map((item) => item.index - minIndex));
+  const confidence = standardScore(eligible.map((item) => confidenceScore[item.confidence]));
+  const weights = rankingWeights.plans;
+
+  eligible
+    .map((item) => ({
+      ...item,
+      score: weights.price * price(costStrength(item.monthly))
+        + weights.headroom * headroom(item.index - minIndex)
+        + weights.confidence * confidence(confidenceScore[item.confidence]),
+    }))
+    .sort((a, b) => b.score - a.score || a.monthly - b.monthly)
+    .forEach((item, rank, ranked) => {
+      placed.set(item.id, {
+        state: "tier",
+        tier: tierAtRank(rank, ranked.length),
+        index: item.index,
+        minIndex,
+        headroom: item.index - minIndex,
+      });
+    });
+
+  return placed;
+}
+
+// Every input is static data, so the whole board is derived once at module load.
+const placementsByScenario = new Map(
+  scenarios.map((scenario) => [
+    scenario.id,
+    { models: modelPlacements(scenario), plans: planPlacements(scenario) },
+  ]),
+);
+
+const scenarioById = new Map(scenarios.map((scenario) => [scenario.id, scenario]));
+
+function scenarioFor(scenarioId: ScenarioId): Scenario {
+  return scenarioById.get(scenarioId) ?? scenarios[0];
+}
+
+function settingsFor(scenarioId: ScenarioId): UsageSettings {
+  const scenario = scenarioFor(scenarioId);
+  return { input: scenario.input, output: scenario.output, cacheRatio: scenario.cacheRatio };
+}
+
+// The profile the app opens on. Every initial value is read from this one
+// scenario, so the work-type selector can never disagree with the token counts,
+// call volume and cache share shown underneath it.
+const defaultScenario = scenarioFor("code-medium");
+const defaultScenarioId = defaultScenario.id;
+
+function modelPlacement(id: string, scenarioId: ScenarioId): Placement {
+  return placementsByScenario.get(scenarioId)?.models.get(id) ?? unscored;
+}
+
+function planPlacement(id: string, scenarioId: ScenarioId): Placement {
+  return placementsByScenario.get(scenarioId)?.plans.get(id) ?? unscored;
+}
+
+function itemPlacement(item: Model | Plan, scenarioId: ScenarioId): Placement {
+  return "kind" in item ? planPlacement(item.id, scenarioId) : modelPlacement(item.id, scenarioId);
+}
+
+function placementLabel(placement: Placement) {
+  return placement.state === "tier" ? placement.tier : "—";
+}
+
+function placementClass(placement: Placement) {
+  return placement.state === "tier" ? `tier-${placement.tier.toLowerCase()}` : "tier-na";
+}
+
+function placementReason(placement: Placement, scenario: Scenario, metric: MetricKey) {
+  const label = metricLabels[metric];
+  switch (placement.state) {
+    case "tier":
+      return `${label} ${placement.index} clears the ${placement.minIndex} bar for ${scenario.label} with ${placement.headroom} to spare. Tier ${placement.tier}: ${tierDescriptions[placement.tier].toLowerCase()}.`;
+    case "below":
+      return `${label} ${placement.index} is below the ${placement.minIndex} bar for ${scenario.label}.`;
+    case "context":
+      return `Context window is smaller than the ${scenarioTokens(scenario).toLocaleString()} tokens this profile needs.`;
+    case "unpriced":
+      return "No fixed monthly price to rank against.";
+    default:
+      return `Not scored on the ${label}, so no tier is assigned.`;
+  }
+}
+
+function placementSort(a: Placement, b: Placement) {
+  const rank = (placement: Placement) => (placement.state === "tier" ? tierRank[placement.tier] : 0);
+  const index = (placement: Placement) => ("index" in placement ? placement.index : -Infinity);
+  return rank(a) - rank(b) || index(a) - index(b);
+}
+
+function gateSummary(scenario: Scenario) {
+  const placed = placementsByScenario.get(scenario.id);
+  const values = [...(placed?.models.values() ?? [])];
+  return {
+    qualifying: values.filter((placement) => placement.state === "tier").length,
+    below: values.filter((placement) => placement.state === "below").length,
+    context: values.filter((placement) => placement.state === "context").length,
+    unscored: values.filter((placement) => placement.state === "unscored").length,
+    total: models.length,
+  };
+}
+
+// Eligibility for the recommendation view, where the token profile is the user's
+// own rather than the scenario preset.
+function eligibleModelsFor(scenario: Scenario, settings: UsageSettings) {
+  const requiredTokens = settings.input + settings.output;
+  return models.filter((model) => gateModel(model, scenario, requiredTokens) === null);
+}
+
+function eligiblePlansFor(scenario: Scenario, settings: UsageSettings) {
+  return plans.filter((plan) => planWorkingModel(plan, scenario, settings) !== null);
+}
+
+function capabilityOf(model: Model | undefined, metric: MetricKey) {
+  return model ? metricValue(model.capability, metric) : null;
+}
+
+const rankablePlans = plans
+  .filter((plan) => plan.kind === "Subscription")
+  .map((plan) => ({
+    id: plan.id,
+    provider: plan.provider,
+    name: plan.name,
+    detail: plan.monthly === null ? "pay as you go" : `$${plan.monthly}/mo`,
+  }));
+
+const rankableModels = models.map((model) => {
+  const index = metricValue(model.capability, "intelligence");
+  return {
+    id: model.id,
+    provider: model.provider,
+    name: model.name,
+    detail: index === null ? "not scored" : `index ${index}`,
+  };
+});
 
 type IconName =
   | "warning"
@@ -1220,13 +851,15 @@ function subscribeTheme(callback: () => void) {
 
 export default function Home() {
   const [activeView, setActiveView] = useState<View>("explore");
-  const [exploreScenarioId, setExploreScenarioId] = useState<ScenarioId>("code-medium");
-  const [recommendationScenarioId, setRecommendationScenarioId] = useState<ScenarioId>("code-medium");
-  const [recommendationInputTokens, setRecommendationInputTokens] = useState(18_000);
-  const [recommendationOutputTokens, setRecommendationOutputTokens] = useState(6_000);
+  const [exploreScenarioId, setExploreScenarioId] = useState<ScenarioId>(defaultScenarioId);
+  const [recommendationScenarioId, setRecommendationScenarioId] = useState<ScenarioId>(defaultScenarioId);
+  const [recommendationInputTokens, setRecommendationInputTokens] = useState(defaultScenario.input);
+  const [recommendationOutputTokens, setRecommendationOutputTokens] = useState(defaultScenario.output);
+  const [recommendationCacheRatio, setRecommendationCacheRatio] = useState(defaultScenario.cacheRatio);
+  const [apiPriority, setApiPriority] = useState<ApiPriority>("budget");
   const [exploreLane, setExploreLane] = useState<Lane>("api");
   const [recComparisonTab, setRecComparisonTab] = useState<Lane>("api");
-  const [monthlyCalls, setMonthlyCalls] = useState(500);
+  const [monthlyCalls, setMonthlyCalls] = useState(defaultScenario.calls);
   const [monthlyBudget, setMonthlyBudget] = useState(30);
   const [preference, setPreference] = useState<Preference>("either");
   const [showAllPlans, setShowAllPlans] = useState(false);
@@ -1295,9 +928,18 @@ export default function Home() {
       const savedBudget = localStorage.getItem("tokentier-rec-budget");
       if (savedBudget) setMonthlyBudget(Math.min(10_000, Math.max(1, Number(savedBudget) || 30)));
       const savedInput = localStorage.getItem("tokentier-rec-input");
-      if (savedInput) setRecommendationInputTokens(Math.min(1_000_000, Math.max(1, Number(savedInput) || 18_000)));
+      if (savedInput) setRecommendationInputTokens(Math.min(1_000_000, Math.max(1, Number(savedInput) || defaultScenario.input)));
       const savedOutput = localStorage.getItem("tokentier-rec-output");
-      if (savedOutput) setRecommendationOutputTokens(Math.min(500_000, Math.max(1, Number(savedOutput) || 6_000)));
+      if (savedOutput) setRecommendationOutputTokens(Math.min(500_000, Math.max(1, Number(savedOutput) || defaultScenario.output)));
+      const savedCache = localStorage.getItem("tokentier-rec-cache");
+      if (savedCache !== null && savedCache !== "") {
+        const parsed = Number(savedCache);
+        if (!Number.isNaN(parsed)) setRecommendationCacheRatio(Math.min(0.95, Math.max(0, parsed)));
+      }
+      const savedPriority = localStorage.getItem("tokentier-rec-priority");
+      if (savedPriority === "cost" || savedPriority === "budget" || savedPriority === "capability") {
+        setApiPriority(savedPriority);
+      }
       const savedPref = localStorage.getItem("tokentier-rec-pref");
       if (savedPref === "either" || savedPref === "api" || savedPref === "plans") setPreference(savedPref);
       const savedApiCols = parseColumnPreferences(localStorage.getItem("tokentier-api-cols"), defaultApiColumns);
@@ -1324,6 +966,8 @@ export default function Home() {
       setRecommendationScenarioId(selectedScenario.id);
       setRecommendationInputTokens(selectedScenario.input);
       setRecommendationOutputTokens(selectedScenario.output);
+      setRecommendationCacheRatio(selectedScenario.cacheRatio);
+      setMonthlyCalls(selectedScenario.calls);
     }
     if (callsParam) {
       const c = Number(callsParam);
@@ -1344,6 +988,15 @@ export default function Home() {
     if (prefParam === "either" || prefParam === "api" || prefParam === "plans") {
       setPreference(prefParam);
     }
+    const cacheParam = params.get("cache");
+    if (cacheParam) {
+      const parsed = Number(cacheParam);
+      if (!Number.isNaN(parsed) && parsed >= 0 && parsed <= 0.95) setRecommendationCacheRatio(parsed);
+    }
+    const priorityParam = params.get("priority");
+    if (priorityParam === "cost" || priorityParam === "budget" || priorityParam === "capability") {
+      setApiPriority(priorityParam);
+    }
   }, []);
 
   useEffect(() => {
@@ -1356,13 +1009,13 @@ export default function Home() {
       params.set("budget", monthlyBudget.toString());
       params.set("input", recommendationInputTokens.toString());
       params.set("output", recommendationOutputTokens.toString());
+      params.set("cache", recommendationCacheRatio.toString());
       params.set("preference", preference);
+      params.set("priority", apiPriority);
     } else {
-      params.delete("calls");
-      params.delete("budget");
-      params.delete("input");
-      params.delete("output");
-      params.delete("preference");
+      for (const key of ["calls", "budget", "input", "output", "cache", "preference", "priority"]) {
+        params.delete(key);
+      }
     }
     const newUrl = `${window.location.pathname}?${params.toString()}`;
     window.history.replaceState(null, "", newUrl);
@@ -1373,6 +1026,8 @@ export default function Home() {
       localStorage.setItem("tokentier-rec-budget", monthlyBudget.toString());
       localStorage.setItem("tokentier-rec-input", recommendationInputTokens.toString());
       localStorage.setItem("tokentier-rec-output", recommendationOutputTokens.toString());
+      localStorage.setItem("tokentier-rec-cache", recommendationCacheRatio.toString());
+      localStorage.setItem("tokentier-rec-priority", apiPriority);
       localStorage.setItem("tokentier-rec-pref", preference);
       localStorage.setItem("tokentier-api-cols", JSON.stringify(visibleApiColumns));
       localStorage.setItem("tokentier-plan-cols", JSON.stringify(visiblePlanColumns));
@@ -1381,12 +1036,14 @@ export default function Home() {
     }
   }, [
     activeView,
+    apiPriority,
     exploreScenarioId,
     recommendationScenarioId,
     monthlyCalls,
     monthlyBudget,
     recommendationInputTokens,
     recommendationOutputTokens,
+    recommendationCacheRatio,
     preference,
     visibleApiColumns,
     visiblePlanColumns,
@@ -1512,65 +1169,120 @@ export default function Home() {
     }
   };
 
-  const exploreScenario = scenarios.find((item) => item.id === exploreScenarioId)!;
-  const exploreSettings = useMemo<UsageSettings>(() => ({
-    input: exploreScenario.input,
-    output: exploreScenario.output,
-  }), [exploreScenario]);
+  const exploreScenario = scenarioFor(exploreScenarioId);
+  const exploreMetric = exploreScenario.gate.metric;
+  const exploreGate = gateSummary(exploreScenario);
+  const exploreSettings = useMemo<UsageSettings>(() => settingsFor(exploreScenarioId), [exploreScenarioId]);
   const recommendationSettings = useMemo<UsageSettings>(() => ({
     input: recommendationInputTokens,
     output: recommendationOutputTokens,
-  }), [recommendationInputTokens, recommendationOutputTokens]);
+    cacheRatio: recommendationCacheRatio,
+  }), [recommendationCacheRatio, recommendationInputTokens, recommendationOutputTokens]);
 
-  const apiRecommendation = useMemo(() => {
-    const requiredTokens = recommendationSettings.input + recommendationSettings.output;
-    const candidates = models.filter(
-      (model) => model.tiers[recommendationScenarioId] !== "—" && contextSize(model.context) >= requiredTokens,
-    );
-    const validCandidates = candidates.length > 0
-      ? candidates
-      : models.filter((model) => model.tiers[recommendationScenarioId] !== "—");
-    const withinBudget = validCandidates.filter(
-      (model) => callCost(model, recommendationSettings) * monthlyCalls <= monthlyBudget,
-    );
-    const eligible = withinBudget.length > 0 ? withinBudget : validCandidates;
-    return [...eligible].sort((a, b) => {
-      const aSpend = callCost(a, recommendationSettings) * monthlyCalls;
-      const bSpend = callCost(b, recommendationSettings) * monthlyCalls;
-      const aScore = tierScore[a.tiers[recommendationScenarioId]];
-      const bScore = tierScore[b.tiers[recommendationScenarioId]];
-      return bScore - aScore || aSpend - bSpend;
-    })[0];
+  const recommendationScenario = scenarioFor(recommendationScenarioId);
+  const recommendationMetric = recommendationScenario.gate.metric;
+
+  // Cost-minimising under a binary gate always returns the floor, so a single
+  // "best" never varies by workload. Report the frontier instead and let the
+  // reader choose where on it to sit.
+  const apiFrontier = useMemo(() => {
+    const scenario = scenarioFor(recommendationScenarioId);
+    const metric = scenario.gate.metric;
+    const eligible = eligibleModelsFor(scenario, recommendationSettings);
+    const spend = (model: Model) => callCost(model, recommendationSettings);
+    const index = (model: Model) => capabilityOf(model, metric) ?? 0;
+
+    if (eligible.length === 0) {
+      const scored = models.filter((model) => metricValue(model.capability, metric) !== null);
+      const fallback = [...(scored.length > 0 ? scored : models)].sort(
+        (a, b) => index(b) - index(a) || spend(a) - spend(b),
+      )[0];
+      return { meetsBar: false, budgetFits: false, cost: fallback, budget: fallback, capability: fallback };
+    }
+
+    const cheapest = [...eligible].sort((a, b) => spend(a) - spend(b) || index(b) - index(a))[0];
+    const strongest = [...eligible].sort((a, b) => index(b) - index(a) || spend(a) - spend(b))[0];
+
+    // The middle axis answers "what is the best I can get for my budget?".
+    // A cost-and-headroom blend would not: one model is such a price outlier
+    // that it wins any weighted score, making the axis a duplicate of cheapest.
+    const affordable = eligible.filter((model) => spend(model) * monthlyCalls <= monthlyBudget);
+    const bestAffordable = affordable.length > 0
+      ? [...affordable].sort((a, b) => index(b) - index(a) || spend(a) - spend(b))[0]
+      : cheapest;
+
+    return {
+      meetsBar: true,
+      budgetFits: affordable.length > 0,
+      cost: cheapest,
+      budget: bestAffordable,
+      capability: strongest,
+    };
   }, [monthlyBudget, monthlyCalls, recommendationScenarioId, recommendationSettings]);
 
-  const rankedPlanOptions = useMemo(() => {
-    const requiredTokens = recommendationSettings.input + recommendationSettings.output;
-    const candidates = plans.filter((plan) => {
-      if (plan.kind !== "Subscription" || plan.tiers[recommendationScenarioId] === "—") return false;
-      const underlyingModel = models.find((m) => m.id === plan.modelId);
-      if (underlyingModel && contextSize(underlyingModel.context) < requiredTokens) {
-        return false;
-      }
-      return true;
+  const apiRecommendationModel = apiFrontier[apiPriority];
+  const apiRecommendationIndex = capabilityOf(apiRecommendationModel, recommendationMetric);
+  const frontierPicks = useMemo(() => {
+    const labels: Array<{ id: ApiPriority; label: string; hint: string }> = [
+      { id: "cost", label: "Lowest cost", hint: "Cheapest model that clears the bar" },
+      {
+        id: "budget",
+        label: "Best in budget",
+        hint: apiFrontier.budgetFits
+          ? "Highest scored model whose monthly spend fits the budget"
+          : "Nothing clears the bar inside the budget, so this falls back to the cheapest",
+      },
+      { id: "capability", label: "Most capable", hint: "Highest scored model that clears the bar, budget aside" },
+    ];
+    return labels.map((entry) => {
+      const model = apiFrontier[entry.id];
+      const spend = callCost(model, recommendationSettings) * monthlyCalls;
+      const sameAs = labels
+        .filter((other) => other.id !== entry.id && apiFrontier[other.id].id === model.id)
+        .map((other) => other.label);
+      return { ...entry, model, spend, sameAs };
     });
-    const validCandidates = candidates.length > 0
-      ? candidates
-      : plans.filter(
-          (plan) => plan.kind === "Subscription" && plan.tiers[recommendationScenarioId] !== "—",
-        );
-    const options = validCandidates
+  }, [apiFrontier, monthlyCalls, recommendationSettings]);
+
+  const rankedPlanOptions = useMemo(() => {
+    const scenario = scenarioFor(recommendationScenarioId);
+    const gated = eligiblePlansFor(scenario, recommendationSettings)
+      .filter((plan) => plan.kind === "Subscription");
+    const subscriptions = plans.filter((plan) => plan.kind === "Subscription");
+    // Keep a non-empty list even when nothing clears the bar; each option says
+    // whether it did, so the view never renders an empty recommendation.
+    const meetsBar = gated.length > 0;
+    const candidates = meetsBar ? gated : subscriptions;
+
+    const options = candidates
       .map((plan) => {
-        const estimate = planEstimate(plan, recommendationSettings);
+        // Everything about a plan is read through the model this workload uses.
+        const workingModel = planWorkingModel(plan, scenario, recommendationSettings)
+          ?? modelById.get(plan.modelIds[0])
+          ?? null;
+        const estimate = planEstimate(plan, recommendationSettings, workingModel);
         if (!estimate) return null;
-        const coverage = planCoverageScore(plan, recommendationSettings, monthlyCalls);
+        const index = capabilityOf(workingModel ?? undefined, scenario.gate.metric);
+        const coverage = planCoverageScore(plan, recommendationSettings, monthlyCalls, workingModel);
         const withinBudget = (plan.monthly ?? Infinity) <= monthlyBudget;
-        const score = tierScore[plan.tiers[recommendationScenarioId]] * 0.48
-          + (withinBudget ? 100 : 0) * 0.22
-          + (coverage ?? 25) * 0.2
-          + confidenceScore[plan.confidence] * 0.1;
-        return { plan, estimate, coverage, withinBudget, score };
+
+        // A plan whose quota cannot be converted is not a worse plan, it is an
+        // unmeasured one. Renormalise the known weights instead of substituting
+        // a penalty, which would reward whoever published a formula we can read.
+        const weights = rankingWeights.recommendation;
+        const terms: Array<[number, number]> = [
+          [weights.capability, index ?? 0],
+          [weights.budget, withinBudget ? 100 : 0],
+          [weights.confidence, (confidenceScore[plan.confidence] / 30) * 100],
+        ];
+        if (coverage !== null) terms.push([weights.coverage, coverage]);
+        const totalWeight = terms.reduce((total, [weight]) => total + weight, 0);
+        const score = terms.reduce((total, [weight, value]) => total + weight * value, 0) / totalWeight;
+
+        return { plan, estimate, coverage, withinBudget, score, index, meetsBar, workingModel };
       })
       .filter((option): option is NonNullable<typeof option> => option !== null);
+
     return options.sort((a, b) =>
       Number(b.withinBudget) - Number(a.withinBudget)
       || b.score - a.score
@@ -1578,41 +1290,49 @@ export default function Home() {
     );
   }, [monthlyBudget, monthlyCalls, recommendationScenarioId, recommendationSettings]);
 
-  const recommendedPlanOption = rankedPlanOptions[0];
-  const planRecommendation = recommendedPlanOption.plan;
-  const recommendedPlanEstimate = recommendedPlanOption.estimate;
-  const recommendedPlanCoverage = recommendedPlanOption.coverage;
-  const recommendedApiSpend = callCost(apiRecommendation, recommendationSettings) * monthlyCalls;
+  const recommendedPlanOption = rankedPlanOptions.at(0) ?? null;
+  const planRecommendation = recommendedPlanOption?.plan ?? null;
+  const recommendedPlanEstimate = recommendedPlanOption?.estimate ?? null;
+  const recommendedPlanCoverage = recommendedPlanOption?.coverage ?? null;
+  const recommendedApiSpend = callCost(apiRecommendationModel, recommendationSettings) * monthlyCalls;
   const planCoversVolume = recommendedPlanCoverage === 100;
-  const planWithinBudget = recommendedPlanOption.withinBudget;
+  const planWithinBudget = recommendedPlanOption?.withinBudget ?? false;
   const apiWithinBudget = recommendedApiSpend <= monthlyBudget;
 
-  const preferredPath: Lane = preference === "api"
-    ? apiWithinBudget || !planWithinBudget || !planCoversVolume ? "api" : "plans"
-    : preference === "plans"
-      ? planWithinBudget && planCoversVolume ? "plans" : "api"
-      : recommendedApiSpend <= (planRecommendation.monthly ?? Infinity) * 0.65
-        ? "api"
-        : recommendedApiSpend >= (planRecommendation.monthly ?? Infinity) * 1.25 && planWithinBudget && planCoversVolume
-          ? "plans"
-          : planWithinBudget && planCoversVolume && !apiWithinBudget
-            ? "plans"
-            : "api";
+  const planMonthly = planRecommendation?.monthly ?? null;
 
-  const recommendedPlanPrice = planRecommendation.monthly ?? 0;
-  const recommendedPlanCalls = formatEstimateRange(recommendedPlanEstimate.callsLow, recommendedPlanEstimate.callsHigh);
+  const preferredPath: Lane = planRecommendation === null
+    ? "api"
+    : preference === "api"
+      ? apiWithinBudget || !planWithinBudget || !planCoversVolume ? "api" : "plans"
+      : preference === "plans"
+        ? planWithinBudget && planCoversVolume ? "plans" : "api"
+        : recommendedApiSpend <= (planMonthly ?? Infinity) * 0.65
+          ? "api"
+          : recommendedApiSpend >= (planMonthly ?? Infinity) * 1.25 && planWithinBudget && planCoversVolume
+            ? "plans"
+            : planWithinBudget && planCoversVolume && !apiWithinBudget
+              ? "plans"
+              : "api";
+
+  const recommendedPlanPrice = planMonthly ?? 0;
+  const recommendedPlanCalls = recommendedPlanEstimate
+    ? formatEstimateRange(recommendedPlanEstimate.callsLow, recommendedPlanEstimate.callsHigh)
+    : "—";
   const apiPlanDifference = recommendedApiSpend - recommendedPlanPrice;
   const sameMonthlyPrice = Math.abs(apiPlanDifference) < 0.005;
 
-  const diffFactCaption = sameMonthlyPrice
-    ? "Both options cost the same monthly for this workload."
-    : apiPlanDifference < 0
-      ? preferredPath === "api"
-        ? `API saves ${monthlyPrice(Math.abs(apiPlanDifference))}/mo compared to ${planRecommendation.name}`
-        : `${apiRecommendation.name} API is ${monthlyPrice(Math.abs(apiPlanDifference))}/mo cheaper than ${planRecommendation.name}`
-      : preferredPath === "plans"
-        ? `${planRecommendation.name} saves ${monthlyPrice(Math.abs(apiPlanDifference))}/mo compared to API spend (~${recommendedPlanCalls} calls)`
-        : `API costs ${monthlyPrice(Math.abs(apiPlanDifference))}/mo more than ${planRecommendation.name} (~${recommendedPlanCalls} calls)`;
+  const diffFactCaption = planRecommendation === null
+    ? `No subscription plan can be compared for this workload. ${apiRecommendationModel.name} API is estimated at ${monthlyPrice(recommendedApiSpend)}/mo.`
+    : sameMonthlyPrice
+      ? "Both options cost the same monthly for this workload."
+      : apiPlanDifference < 0
+        ? preferredPath === "api"
+          ? `API saves ${monthlyPrice(Math.abs(apiPlanDifference))}/mo compared to ${planRecommendation.name}`
+          : `${apiRecommendationModel.name} API is ${monthlyPrice(Math.abs(apiPlanDifference))}/mo cheaper than ${planRecommendation.name}`
+        : preferredPath === "plans"
+          ? `${planRecommendation.name} saves ${monthlyPrice(Math.abs(apiPlanDifference))}/mo compared to API spend (~${recommendedPlanCalls} calls)`
+          : `API costs ${monthlyPrice(Math.abs(apiPlanDifference))}/mo more than ${planRecommendation.name} (~${recommendedPlanCalls} calls)`;
 
   const rankedModelCosts = useMemo(() => {
     const requiredTokens = recommendationSettings.input + recommendationSettings.output;
@@ -1646,7 +1366,8 @@ export default function Home() {
       else if (sortBy === "cached") comparison = (a.cached ?? a.input) - (b.cached ?? b.input);
       else if (sortBy === "output") comparison = a.output - b.output;
       else if (sortBy === "context") comparison = contextSize(a.context) - contextSize(b.context);
-      else if (sortBy === "fit") comparison = tierScore[a.tiers[exploreScenarioId]] - tierScore[b.tiers[exploreScenarioId]];
+      else if (sortBy === "index") comparison = (metricValue(a.capability, scenarioFor(exploreScenarioId).gate.metric) ?? -Infinity) - (metricValue(b.capability, scenarioFor(exploreScenarioId).gate.metric) ?? -Infinity);
+      else if (sortBy === "fit") comparison = placementSort(modelPlacement(a.id, exploreScenarioId), modelPlacement(b.id, exploreScenarioId));
       else comparison = callCost(a, exploreSettings) - callCost(b, exploreSettings);
       return sortDirection === "asc" ? comparison : -comparison;
     });
@@ -1666,17 +1387,19 @@ export default function Home() {
       if (sortBy === "name") comparison = a.name.localeCompare(b.name);
       else if (sortBy === "type") comparison = a.kind.localeCompare(b.kind);
       else if (sortBy === "confidence") comparison = confidenceScore[a.confidence] - confidenceScore[b.confidence];
-      else if (sortBy === "fit") comparison = tierScore[a.tiers[exploreScenarioId]] - tierScore[b.tiers[exploreScenarioId]];
+      else if (sortBy === "fit") comparison = placementSort(planPlacement(a.id, exploreScenarioId), planPlacement(b.id, exploreScenarioId));
       else comparison = (a.monthly ?? Infinity) - (b.monthly ?? Infinity);
       return sortDirection === "asc" ? comparison : -comparison;
     });
   }, [exploreScenarioId, selectedProviders, query, sortBy, sortDirection]);
 
   const updateRecommendationProfile = (id: ScenarioId) => {
-    const selected = scenarios.find((item) => item.id === id)!;
+    const selected = scenarioFor(id);
     setRecommendationScenarioId(id);
     setRecommendationInputTokens(selected.input);
     setRecommendationOutputTokens(selected.output);
+    setRecommendationCacheRatio(selected.cacheRatio);
+    setMonthlyCalls(selected.calls);
   };
 
   const useExploreProfile = () => {
@@ -1797,6 +1520,8 @@ export default function Home() {
               <span><strong>{plans.filter((p) => p.kind === "Subscription").length}</strong> subscriptions</span>
               <span className="dot-sep">·</span>
               <span><strong>{scenarios.length}</strong> workload presets</span>
+              <span className="dot-sep">·</span>
+              <span>tiers derived from <strong>{capabilityIndex.name}</strong> v{capabilityIndex.version}</span>
             </div>
           </div>
           <button className="button button-ghost hero-cta" onClick={useExploreProfile} type="button">
@@ -1817,10 +1542,15 @@ export default function Home() {
               </select>
             </label>
             <p className="scenario-dock-description">{exploreScenario.description}</p>
-            <div className="preset-call" aria-label={`${exploreScenario.input.toLocaleString()} input and ${exploreScenario.output.toLocaleString()} output tokens per estimated call`}>
-              <span>Preset per API call</span>
-              <strong>{exploreScenario.input.toLocaleString()} input + {exploreScenario.output.toLocaleString()} output</strong>
+            <div className="preset-call" aria-label={`${exploreScenario.input.toLocaleString()} input and ${exploreScenario.output.toLocaleString()} output tokens per call, ${exploreScenario.calls.toLocaleString()} calls a month, ${Math.round(exploreScenario.cacheRatio * 100)} percent of input from cache`}>
+              <span>Typical month</span>
+              <strong>{exploreScenario.input.toLocaleString()} in + {exploreScenario.output.toLocaleString()} out</strong>
+              <dl className="preset-call-facts">
+                <div><dt>Calls</dt><dd>{exploreScenario.calls.toLocaleString()} / mo</dd></div>
+                <div><dt>From cache</dt><dd>{Math.round(exploreScenario.cacheRatio * 100)}% of input</dd></div>
+              </dl>
             </div>
+            <p className="scenario-dock-rationale">{exploreScenario.rationale}</p>
             <p className="scenario-dock-note">Used for the tier list and price estimates. Excludes tools, search, images, storage, taxes, and retries.</p>
             <button className="scenario-dock-action" onClick={() => { updateRecommendationProfile(exploreScenarioId); switchView("recommendation"); }} type="button">
               Customize in Recommend <span>→</span>
@@ -1841,15 +1571,32 @@ export default function Home() {
                 </div>
               </div>
 
+              <div className="gate-banner">
+                <div className="gate-banner-rule">
+                  <strong>{metricLabels[exploreMetric]} &ge; {exploreScenario.gate.minIndex}</strong>
+                  <span>
+                    {exploreGate.qualifying} of {exploreGate.total} models qualify for {exploreScenario.label}
+                  </span>
+                </div>
+                <p>
+                  {exploreScenario.gate.rationale}{" "}
+                  Anchored to {models.find((model) => model.id === exploreScenario.gate.anchor)?.name ?? exploreScenario.gate.anchor}
+                  {" "}on {capabilityIndex.name} v{capabilityIndex.version}.
+                </p>
+              </div>
+
               <div className="tier-board">
-                {(["S", "A", "B"] as const).map((tier) => (
+                {tierOrder.map((tier) => (
                   <div className={`tier-row tier-${tier.toLowerCase()}`} key={tier}>
                     <div className="tier-label"><strong>{tier}</strong><span>{tierDescriptions[tier]}</span></div>
                     <div className="tier-models" role="group" aria-label={`${tier} tier items`}>
                       {(() => {
                         if (exploreLane === "api") {
                           const items = models
-                            .filter((model) => model.tiers[exploreScenarioId] === tier)
+                            .filter((model) => {
+                              const placement = modelPlacement(model.id, exploreScenarioId);
+                              return placement.state === "tier" && placement.tier === tier;
+                            })
                             .sort((a, b) => callCost(a, exploreSettings) - callCost(b, exploreSettings));
                           if (items.length === 0) {
                             return <p className="tier-empty">No models ranked in this tier for this scenario.</p>;
@@ -1869,7 +1616,11 @@ export default function Home() {
                           ));
                         }
                         const items = plans
-                          .filter((plan) => plan.kind === "Subscription" && plan.tiers[exploreScenarioId] === tier)
+                          .filter((plan) => {
+                            if (plan.kind !== "Subscription") return false;
+                            const placement = planPlacement(plan.id, exploreScenarioId);
+                            return placement.state === "tier" && placement.tier === tier;
+                          })
                           .sort((a, b) => (a.monthly ?? Infinity) - (b.monthly ?? Infinity));
                         if (items.length === 0) {
                           return <p className="tier-empty">No plans ranked in this tier for this scenario.</p>;
@@ -1883,7 +1634,10 @@ export default function Home() {
                             type="button"
                           >
                             <span className="provider-orb" data-provider={item.provider} />
-                            <span><strong title={item.name}>{item.name}</strong><small>{item.confidence} quota confidence</small></span>
+                            <span>
+                              <strong title={item.name}>{item.name}</strong>
+                              <small>via {planWorkingModel(item, exploreScenario, exploreSettings)?.name ?? item.provider}</small>
+                            </span>
                             <b>${item.monthly}<small>/ month</small></b>
                           </button>
                         ));
@@ -1892,7 +1646,39 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-              <p className="tier-note">API tiers combine task fit and cost. Plan tiers combine task fit, price, and quota confidence. Select a card to view specs or compare.</p>
+              <p className="tier-note">
+                Everything on the board already clears the {exploreScenario.label.toLowerCase()} capability bar, so the
+                letters rank value: models by per-call cost, plans by price and quota evidence. Select a card to view specs or compare.
+              </p>
+
+              {exploreLane === "api" && exploreGate.qualifying < exploreGate.total && (
+                <details className="gate-excluded">
+                  <summary>
+                    Not on the board ({exploreGate.total - exploreGate.qualifying})
+                  </summary>
+                  <ul>
+                    {models
+                      .map((model) => ({ model, placement: modelPlacement(model.id, exploreScenarioId) }))
+                      .filter(({ placement }) => placement.state !== "tier")
+                      .sort((a, b) => placementSort(b.placement, a.placement))
+                      .map(({ model, placement }) => (
+                        <li key={model.id}>
+                          <span className="provider-orb" data-provider={model.provider} />
+                          <button className="table-item-name-btn" onClick={() => setActiveDetailItem(model)} type="button">
+                            <strong>{model.name}</strong>
+                          </button>
+                          <span className="gate-excluded-reason">
+                            {placement.state === "below"
+                              ? `${metricLabels[exploreMetric]} ${placement.index} · below the ${placement.minIndex} bar`
+                              : placement.state === "context"
+                                ? `Context window too small for ${scenarioTokens(exploreScenario).toLocaleString()} tokens`
+                                : "Not independently scored"}
+                          </span>
+                        </li>
+                      ))}
+                  </ul>
+                </details>
+              )}
             </section>
 
             <section className="section prices-section" id="prices">
@@ -2045,6 +1831,16 @@ export default function Home() {
                             </button>
                           </th>
                         )}
+                        {visibleApiColumns.index && (
+                          <th
+                            aria-sort={sortBy === "index" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
+                            className="sortable-header"
+                          >
+                            <button onClick={() => handleHeaderSort("index")} title={`Sort by ${metricLabels[exploreMetric]}`} type="button">
+                              <span className="th-content">Index {sortBy === "index" && <Icon name={sortDirection === "asc" ? "arrow-up" : "arrow-down"} size={12} />}</span>
+                            </button>
+                          </th>
+                        )}
                         {visibleApiColumns.fit && (
                           <th
                             aria-sort={sortBy === "fit" ? (sortDirection === "asc" ? "ascending" : "descending") : "none"}
@@ -2070,6 +1866,8 @@ export default function Home() {
                     <tbody>
                       {visibleModels.map((model) => {
                         const callCostValue = callCost(model, exploreSettings);
+                        const placement = modelPlacement(model.id, exploreScenarioId);
+                        const modelIndex = metricValue(model.capability, exploreMetric);
                         return (
                           <tr key={model.id}>
                             <td className="sticky-col">
@@ -2093,7 +1891,20 @@ export default function Home() {
                             {visibleApiColumns.cached && <td>{model.cached === null ? "—" : price(model.cached, 4)}</td>}
                             {visibleApiColumns.output && <td>{price(model.output)}</td>}
                             {visibleApiColumns.context && <td>{model.context}</td>}
-                            {visibleApiColumns.fit && <td><span className={`mini-tier ${model.tiers[exploreScenarioId] === "—" ? "tier-na" : `tier-${model.tiers[exploreScenarioId].toLowerCase()}`}`}>{model.tiers[exploreScenarioId]}</span></td>}
+                            {visibleApiColumns.index && (
+                              <td>
+                                {modelIndex === null
+                                  ? <span className="muted-dash" title={`Not scored on the ${metricLabels[exploreMetric]}`}>—</span>
+                                  : <a className="index-value" href={model.capability?.source} rel="noreferrer" target="_blank" title={`${metricLabels[exploreMetric]} ${modelIndex} (v${model.capability?.indexVersion}${model.capability?.variant ? `, ${model.capability.variant}` : ""}) · verified ${model.capability?.verifiedAt}`}>{modelIndex}</a>}
+                              </td>
+                            )}
+                            {visibleApiColumns.fit && (
+                              <td>
+                                <span className={`mini-tier ${placementClass(placement)}`} title={placementReason(placement, exploreScenario, exploreMetric)}>
+                                  {placementLabel(placement)}
+                                </span>
+                              </td>
+                            )}
                             {visibleApiColumns.cost && <td><strong>{price(callCostValue, 3)}</strong></td>}
                           </tr>
                         );
@@ -2160,7 +1971,9 @@ export default function Home() {
                     </thead>
                     <tbody>
                       {visiblePlans.map((plan) => {
-                        const estimate = planEstimate(plan, exploreSettings);
+                        const workingModel = planWorkingModel(plan, exploreScenario, exploreSettings);
+                        const estimate = planEstimate(plan, exploreSettings, workingModel);
+                        const placement = planPlacement(plan.id, exploreScenarioId);
                         return (
                           <tr key={plan.id}>
                             <td className="sticky-col">
@@ -2184,8 +1997,30 @@ export default function Home() {
                             {visiblePlanColumns.price && <td><strong>{planPrice(plan)}</strong>{plan.kind === "Subscription" && <small className="per-month"> / mo</small>}</td>}
                             {visiblePlanColumns.quota && <td className="wrap-cell">{planQuota(plan, exploreScenarioId)}</td>}
                             {visiblePlanColumns.apiIncluded && <td>{plan.apiIncluded}</td>}
-                            {visiblePlanColumns.equivalent && <td>{estimate ? <><strong>{formatEstimateRange(estimate.callsLow, estimate.callsHigh)} calls</strong><small className="estimate-detail">{formatMoneyRange(estimate.valueLow, estimate.valueHigh)} · {estimate.basis}</small></> : <span className="muted-dash">Your API bill</span>}</td>}
-                            {visiblePlanColumns.fit && <td><span className={`mini-tier ${plan.tiers[exploreScenarioId] === "—" ? "tier-na" : `tier-${plan.tiers[exploreScenarioId].toLowerCase()}`}`}>{plan.tiers[exploreScenarioId]}</span></td>}
+                            {visiblePlanColumns.equivalent && (
+                              <td>
+                                {estimate ? (
+                                  <>
+                                    <strong>{formatEstimateRange(estimate.callsLow, estimate.callsHigh)} calls</strong>
+                                    <small className="estimate-detail">
+                                      {formatMoneyRange(estimate.valueLow, estimate.valueHigh)} · {estimate.basis}
+                                    </small>
+                                    {workingModel && (
+                                      <small className="estimate-detail" title={`Cheapest model on this plan that clears the ${exploreScenario.label} bar`}>
+                                        via {workingModel.name}
+                                      </small>
+                                    )}
+                                  </>
+                                ) : <span className="muted-dash">Your API bill</span>}
+                              </td>
+                            )}
+                            {visiblePlanColumns.fit && (
+                              <td>
+                                <span className={`mini-tier ${placementClass(placement)}`} title={placementReason(placement, exploreScenario, exploreMetric)}>
+                                  {placementLabel(placement)}
+                                </span>
+                              </td>
+                            )}
                             {visiblePlanColumns.evidence && <td><span className={`evidence-badge evidence-${plan.confidence.toLowerCase()}`}>{plan.confidence}</span><small className="estimate-detail">{plan.evidence}</small></td>}
                           </tr>
                         );
@@ -2206,19 +2041,44 @@ export default function Home() {
                 <summary>How estimates and equivalents work</summary>
                 <div className="methodology-grid">
                   <div className="methodology-card">
-                    <strong>1. Token Cost Math</strong>
+                    <strong>1. Capability Gate</strong>
+                    <p>
+                      Each scenario declares a minimum {capabilityIndex.name} score (v{capabilityIndex.version}, {capabilityIndex.scale}),
+                      anchored to a named model so the number can be re-derived when the index is rebased. Scores are published by
+                      Artificial Analysis, not by us. A model with no published score is listed and priced but never given a tier.
+                    </p>
+                  </div>
+                  <div className="methodology-card">
+                    <strong>2. Derived Tiers</strong>
+                    <p>
+                      Tiers are computed, never hand-graded. Among the models that clear the bar and whose context window holds the
+                      work, S/A/B/C are cut at fixed percentiles ({Math.round(tierCuts[0] * 100)}%, {Math.round(tierCuts[1] * 100)}%,{" "}
+                      {Math.round(tierCuts[2] * 100)}%) of a score that weights per-call cost {Math.round(rankingWeights.models.cost * 100)}%
+                      and capability headroom {Math.round(rankingWeights.models.headroom * 100)}%.
+                    </p>
+                  </div>
+                  <div className="methodology-card">
+                    <strong>3. Token Cost Math</strong>
                     <p>Per-call costs calculate exact published input, cached input, and output token rates divided by 1,000,000.</p>
                   </div>
                   <div className="methodology-card">
-                    <strong>2. Prompt Cache Ratios</strong>
-                    <p>Plans that utilize prompt caching (e.g. Cursor, Claude, GPT) apply calibrated cache-hit discounts to repeated context.</p>
+                    <strong>4. Cache Share</strong>
+                    <p>
+                      Every workload profile carries the share of input billed at the cached rate, and it applies to
+                      API costs as well as plan estimates. A plan that publishes its own cache behaviour overrides the
+                      profile. Ignoring this overstates the cost of agent work, where most of a large prompt is a cache read.
+                    </p>
                   </div>
                   <div className="methodology-card">
-                    <strong>3. Quota Conversions</strong>
-                    <p>Weekly credits and 5-hour rolling quotas are normalized to 30-day monthly equivalents based on active hours.</p>
+                    <strong>5. Quota Conversions</strong>
+                    <p>
+                      Credit formulas use each provider&rsquo;s published multipliers and divisor; dollar-denominated caps convert
+                      at the same list rates the catalog stores. Weekly allowances are normalised to 4.33 weeks, and the range
+                      spans peak to off-peak rates. Where no quota converts, capacity is left unscored rather than guessed.
+                    </p>
                   </div>
                   <div className="methodology-card">
-                    <strong>4. Price Break-Even Caveat</strong>
+                    <strong>6. Price Break-Even Caveat</strong>
                     <p>Where hard limits are not published, break-even indicates where API spend matches subscription price, not guaranteed throughput.</p>
                   </div>
                 </div>
@@ -2227,6 +2087,7 @@ export default function Home() {
               <details className="sources price-sources" id="price-sources">
                 <summary>Primary pricing and quota sources</summary>
                 <div>
+                  <a href={capabilityIndex.source} target="_blank" rel="noreferrer">Artificial Analysis capability index ↗</a>
                   <a href="https://developers.openai.com/api/docs/models/compare" target="_blank" rel="noreferrer">OpenAI API ↗</a>
                   <a href="https://learn.chatgpt.com/docs/pricing" target="_blank" rel="noreferrer">ChatGPT plans ↗</a>
                   <a href="https://claude.com/pricing" target="_blank" rel="noreferrer">Claude API ↗</a>
@@ -2269,7 +2130,7 @@ export default function Home() {
                 {!apiWithinBudget && (
                   <div className="decision-fallback-note">
                     <Icon name="warning" size={13} />
-                    <span>No model fits within ${monthlyBudget.toLocaleString()}/mo. Showing cheapest option ({apiRecommendation.name}).</span>
+                    <span>No model fits within ${monthlyBudget.toLocaleString()}/mo. Showing cheapest option ({apiRecommendationModel.name}).</span>
                   </div>
                 )}
               </div>
@@ -2288,17 +2149,17 @@ export default function Home() {
               <div className="decision-fact">
                 <small>Monthly API Spend</small>
                 <strong>{monthlyPrice(recommendedApiSpend)}</strong>
-                <span>{apiRecommendation.name}</span>
+                <span>{apiRecommendationModel.name}</span>
               </div>
               <div className="decision-fact">
                 <small>Plan Cost &amp; Quota</small>
-                <strong>${recommendedPlanPrice}/mo</strong>
-                <span>{planRecommendation.name} (~{recommendedPlanCalls} calls)</span>
+                <strong>{planRecommendation === null ? "None" : `$${recommendedPlanPrice}/mo`}</strong>
+                <span>{planRecommendation === null ? "No comparable plan" : `${planRecommendation.name} (~${recommendedPlanCalls} calls)`}</span>
               </div>
               <div className="decision-fact">
                 <small>Difference</small>
-                <strong>{sameMonthlyPrice ? "Same price" : `${monthlyPrice(Math.abs(apiPlanDifference))}/mo`}</strong>
-                <span>{sameMonthlyPrice ? "Same monthly cost" : apiPlanDifference < 0 ? "API is more cost-effective" : "Plan is more cost-effective"}</span>
+                <strong>{planRecommendation === null ? "—" : sameMonthlyPrice ? "Same price" : `${monthlyPrice(Math.abs(apiPlanDifference))}/mo`}</strong>
+                <span>{planRecommendation === null ? "API only" : sameMonthlyPrice ? "Same monthly cost" : apiPlanDifference < 0 ? "API is more cost-effective" : "Plan is more cost-effective"}</span>
               </div>
             </div>
             <p className="decision-verdict-caption">{diffFactCaption}</p>
@@ -2339,6 +2200,24 @@ export default function Home() {
                         ))}
                       </div>
                     </label>
+                    <label>
+                      <span>Input from cache</span>
+                      <input
+                        inputMode="numeric"
+                        max="95"
+                        min="0"
+                        onChange={(event) => setRecommendationCacheRatio(Math.min(0.95, Math.max(0, (Number(event.target.value) || 0) / 100)))}
+                        type="number"
+                        value={Math.round(recommendationCacheRatio * 100)}
+                      />
+                      <div className="preset-chips" role="group" aria-label="Cache share presets">
+                        {[0, 25, 60, 90].map((val) => (
+                          <button key={val} type="button" className={`preset-chip ${Math.round(recommendationCacheRatio * 100) === val ? "active" : ""}`} onClick={() => setRecommendationCacheRatio(val / 100)}>
+                            {val}%
+                          </button>
+                        ))}
+                      </div>
+                    </label>
                   </div>
                 </fieldset>
                 <fieldset>
@@ -2363,9 +2242,9 @@ export default function Home() {
                   </div>
                 </fieldset>
                 <p className="settings-note">
-                  <span><strong>Work type</strong> controls task-fit and quota class.</span>
+                  <span><strong>Work type</strong> sets the capability bar and replaces all four numbers below with that profile&rsquo;s typical month.</span>
                   <br />
-                  <span><strong>Token fields</strong> control API cost and plan-equivalent estimates.</span>
+                  <span><strong>Input from cache</strong> is the share of input billed at the cached rate. Agent sessions that resend a stable prefix sit high; one-off document analysis sits low.</span>
                 </p>
               </div>
             </section>
@@ -2374,34 +2253,99 @@ export default function Home() {
               <div className="settings-heading"><h2 id="recommendation-title">Best path</h2></div>
               <div className="recommendation-grid">
                 <article className={preferredPath === "api" ? "path-card primary" : "path-card"}>
-                  <div className="path-card-label"><span>BEST API</span><span className={`mini-tier tier-${apiRecommendation.tiers[recommendationScenarioId].toLowerCase()}`}>{apiRecommendation.tiers[recommendationScenarioId]}</span></div>
+                  <div className="path-card-label">
+                    <span>BEST API</span>
+                    <span className={`gate-pill ${apiFrontier.meetsBar ? "gate-pass" : "gate-fail"}`}>
+                      {apiRecommendationIndex === null ? "Not scored" : `Index ${apiRecommendationIndex}`}
+                    </span>
+                  </div>
                   <div className="path-title">
-                    <span className="provider-orb" data-provider={apiRecommendation.provider} />
-                    <div><strong>{apiRecommendation.name}</strong><small>{apiRecommendation.provider} · direct API</small></div>
+                    <span className="provider-orb" data-provider={apiRecommendationModel.provider} />
+                    <div><strong>{apiRecommendationModel.name}</strong><small>{apiRecommendationModel.provider} · direct API</small></div>
                     {preferredPath === "api" && <span className="recommendation-badge">Best</span>}
                   </div>
                   <p className="path-price" title={`${price(recommendedApiSpend)} per month`}>{monthlyPrice(recommendedApiSpend)}<span>/ month</span></p>
-                  <dl><div><dt>Per call</dt><dd>{price(callCost(apiRecommendation, recommendationSettings), 3)}</dd></div><div><dt>Budget</dt><dd>{apiWithinBudget ? "Fits" : `Over by ${monthlyPrice(recommendedApiSpend - monthlyBudget)}`}</dd></div><div><dt>Basis</dt><dd>Published token rates</dd></div></dl>
-                  <div className="path-card-verdict"><p>{apiRecommendation.name} is estimated at {monthlyPrice(recommendedApiSpend)}/mo for {monthlyCalls.toLocaleString()} calls.</p></div>
-                </article>
-
-                <article className={preferredPath === "plans" ? "path-card primary" : "path-card"}>
-                  <div className="path-card-label"><span>BEST PLAN</span><span className={`mini-tier tier-${planRecommendation.tiers[recommendationScenarioId].toLowerCase()}`}>{planRecommendation.tiers[recommendationScenarioId]}</span></div>
-                  <div className="path-title">
-                    <span className="provider-orb" data-provider={planRecommendation.provider} />
-                    <div><strong>{planRecommendation.name}</strong><small>{planRecommendation.provider} · subscription</small></div>
-                    {preferredPath === "plans" && <span className="recommendation-badge">Best</span>}
+                  <dl><div><dt>Per call</dt><dd>{price(callCost(apiRecommendationModel, recommendationSettings), 3)}</dd></div><div><dt>Budget</dt><dd>{apiWithinBudget ? "Fits" : `Over by ${monthlyPrice(recommendedApiSpend - monthlyBudget)}`}</dd></div><div><dt>Capability bar</dt><dd>{metricLabels[recommendationMetric]} &ge; {recommendationScenario.gate.minIndex}</dd></div></dl>
+                  <div className="path-card-verdict">
+                    <p>
+                      {apiFrontier.meetsBar
+                        ? `${frontierPicks.find((pick) => pick.id === apiPriority)?.hint}, at ${monthlyPrice(recommendedApiSpend)}/mo for ${monthlyCalls.toLocaleString()} calls.`
+                        : `No model clears the ${recommendationScenario.label.toLowerCase()} bar at this context size. Showing the highest scored model.`}
+                    </p>
                   </div>
-                  <p className="path-price">${planRecommendation.monthly}<span>/ month</span></p>
-                  <dl><div><dt>{recommendedPlanEstimate.basis === "Price break-even only" ? "API-cost parity" : "Est. capacity"}</dt><dd>{formatEstimateRange(recommendedPlanEstimate.callsLow, recommendedPlanEstimate.callsHigh)} calls</dd></div><div><dt>Published quota</dt><dd>{planQuota(planRecommendation, recommendationScenarioId)}</dd></div><div><dt>Confidence</dt><dd>{planRecommendation.confidence} · {recommendedPlanEstimate.basis}</dd></div></dl>
-                  {(planRecommendation.confidence === "Low" || recommendedPlanEstimate.basis === "Price break-even only") && (
-                    <div className="confidence-caveat-badge">
-                      <Icon name="warning" size={13} />
-                      <span>Low confidence quota</span>
+
+                  {apiFrontier.meetsBar && (
+                    <div className="frontier" role="group" aria-label="API priority">
+                      <p className="frontier-caption">
+                        {frontierPicks.every((pick) => pick.model.id === frontierPicks[0].model.id)
+                          ? "One model leads on every axis for this workload and budget."
+                          : "These are three different answers. Pick which one to compare against the plan."}
+                      </p>
+                      {frontierPicks.map((pick) => (
+                        <button
+                          aria-pressed={apiPriority === pick.id}
+                          className={`frontier-option ${apiPriority === pick.id ? "active" : ""}`}
+                          key={pick.id}
+                          onClick={() => setApiPriority(pick.id)}
+                          title={pick.hint}
+                          type="button"
+                        >
+                          <span className="frontier-option-label">{pick.label}</span>
+                          <span className="frontier-option-model">
+                            <span className="provider-orb" data-provider={pick.model.provider} />
+                            <strong>{pick.model.name}</strong>
+                          </span>
+                          <span className="frontier-option-cost">
+                            {monthlyPrice(pick.spend)}<small>/ mo</small>
+                          </span>
+                        </button>
+                      ))}
                     </div>
                   )}
-                  <div className="path-card-verdict"><p>{planRecommendation.name}: ${planRecommendation.monthly}/month · {recommendedPlanCoverage === null ? "published quota cannot be converted to this profile" : `estimated ${recommendedPlanCalls} calls for this profile`}.</p></div>
                 </article>
+
+                {planRecommendation === null || recommendedPlanEstimate === null ? (
+                  <article className="path-card path-card-empty">
+                    <div className="path-card-label"><span>BEST PLAN</span></div>
+                    <p>No subscription plan can be converted to this workload, so this comparison is API-only.</p>
+                  </article>
+                ) : (
+                  <article className={preferredPath === "plans" ? "path-card primary" : "path-card"}>
+                    <div className="path-card-label">
+                      <span>BEST PLAN</span>
+                      <span className={`gate-pill ${recommendedPlanOption?.meetsBar ? "gate-pass" : "gate-fail"}`}>
+                        {recommendedPlanOption?.index === null || recommendedPlanOption?.index === undefined
+                          ? "Not scored"
+                          : `Index ${recommendedPlanOption.index}`}
+                      </span>
+                    </div>
+                    <div className="path-title">
+                      <span className="provider-orb" data-provider={planRecommendation.provider} />
+                      <div><strong>{planRecommendation.name}</strong><small>{planRecommendation.provider} · subscription</small></div>
+                      {preferredPath === "plans" && <span className="recommendation-badge">Best</span>}
+                    </div>
+                    <p className="path-price">${planRecommendation.monthly}<span>/ month</span></p>
+                    <dl>
+                      <div>
+                        <dt>{recommendedPlanEstimate.basis === "Price break-even only" ? "API-cost parity" : "Est. capacity"}</dt>
+                        <dd>{formatEstimateRange(recommendedPlanEstimate.callsLow, recommendedPlanEstimate.callsHigh)} calls</dd>
+                      </div>
+                      <div>
+                        <dt>Model used</dt>
+                        <dd>{recommendedPlanOption?.workingModel?.name ?? "None that clears the bar"}</dd>
+                      </div>
+                      <div><dt>Published quota</dt><dd>{planQuota(planRecommendation, recommendationScenarioId)}</dd></div>
+                      <div><dt>Confidence</dt><dd>{planRecommendation.confidence} · {recommendedPlanEstimate.basis}</dd></div>
+                    </dl>
+                    {(planRecommendation.confidence === "Low" || recommendedPlanEstimate.basis === "Price break-even only") && (
+                      <div className="confidence-caveat-badge">
+                        <Icon name="warning" size={13} />
+                        <span>Low confidence quota</span>
+                      </div>
+                    )}
+                    <div className="path-card-verdict"><p>{planRecommendation.name}: ${planRecommendation.monthly}/month · {recommendedPlanCoverage === null ? "published quota cannot be converted to this profile" : `estimated ${recommendedPlanCalls} calls for this profile`}.</p></div>
+                  </article>
+                )}
               </div>
             </section>
           </div>
@@ -2426,8 +2370,9 @@ export default function Home() {
             {recComparisonTab === "api" ? (
               <div className="model-cost-columns">
                 {rankedModelCosts.map(({ model, perCall, monthly }) => {
-                  const recommended = model.id === apiRecommendation.id;
-                  const tier = model.tiers[recommendationScenarioId];
+                  const recommended = model.id === apiRecommendationModel.id;
+                  const modelIndex = capabilityOf(model, recommendationMetric);
+                  const clearsBar = modelIndex !== null && modelIndex >= recommendationScenario.gate.minIndex;
                   const ratio = Math.min(1, monthly / maxRankedMonthly);
                   return (
                     <article className={`model-cost-row ${recommended ? "recommended" : ""}`} key={model.id}>
@@ -2436,7 +2381,13 @@ export default function Home() {
                         <span className="provider-orb" data-provider={model.provider} />
                         <div>
                           <button className="table-item-name-btn" onClick={() => setActiveDetailItem(model)} type="button"><strong>{model.name}</strong></button>
-                          <small>{model.provider} · {tier === "—" ? "Not ranked" : `${tier} tier`}</small>
+                          <small>
+                            {model.provider} · {modelIndex === null
+                              ? "not scored"
+                              : clearsBar
+                                ? `index ${modelIndex}, clears the bar`
+                                : `index ${modelIndex}, below the ${recommendationScenario.gate.minIndex} bar`}
+                          </small>
                         </div>
                         {recommended && <span className="recommendation-badge">Best API</span>}
                       </div>
@@ -2451,13 +2402,13 @@ export default function Home() {
             ) : (
               <>
                 <div className="plan-match-grid">
-                  {rankedPlanOptions.slice(0, showAllPlans ? rankedPlanOptions.length : 6).map(({ plan, estimate, coverage, withinBudget }, index) => (
+                  {rankedPlanOptions.slice(0, showAllPlans ? rankedPlanOptions.length : 6).map(({ plan, estimate, coverage, withinBudget, workingModel }, index) => (
                     <article className={`plan-match-card ${index === 0 ? "recommended" : ""}`} key={plan.id}>
                       <div className="plan-match-title">
                         <span className="provider-orb" data-provider={plan.provider} />
                         <div>
                           <button className="table-item-name-btn" onClick={() => setActiveDetailItem(plan)} type="button"><strong>{plan.name}</strong></button>
-                          <small>{plan.provider}</small>
+                          <small>{plan.provider} · via {workingModel?.name ?? "no qualifying model"}</small>
                         </div>
                         {index === 0 && <span className="recommendation-badge">Best plan</span>}
                       </div>
@@ -2465,7 +2416,14 @@ export default function Home() {
                       <dl>
                         <div><dt>Budget</dt><dd>{withinBudget ? "Fits" : "Over budget"}</dd></div>
                         <div><dt>{estimate.basis === "Price break-even only" ? "API-cost parity" : "Est. capacity"}</dt><dd>{formatEstimateRange(estimate.callsLow, estimate.callsHigh)} calls</dd></div>
-                        <div><dt>Your {monthlyCalls.toLocaleString()}-call target</dt><dd>{coverage === null ? "Cannot verify" : coverage === 100 ? "Estimated to cover" : coverage >= 70 ? "May cover at upper estimate" : "Below target"}</dd></div>
+                        <div>
+                          <dt>Your {monthlyCalls.toLocaleString()}-call target</dt>
+                          <dd>
+                            {coverage === null
+                              ? <span title="No convertible quota was published, so capacity is left out of this plan's score rather than counted against it.">Not measurable</span>
+                              : coverage === 100 ? "Estimated to cover" : coverage >= 70 ? "May cover at upper estimate" : "Below target"}
+                          </dd>
+                        </div>
                         <div><dt>Evidence</dt><dd>{plan.confidence} · {plan.evidence}</dd></div>
                       </dl>
                     </article>
@@ -2484,7 +2442,7 @@ export default function Home() {
       </div>
 
       <div aria-labelledby="rank-tab" className="view-panel rank-panel" hidden={activeView !== "rank"} id="rank-panel" role="region">
-        <RankPlans plans={rankablePlans} />
+        <RankBoard models={rankableModels} plans={rankablePlans} />
       </div>
 
       <Modal
@@ -2520,7 +2478,21 @@ export default function Home() {
                 <div className="detail-specs-grid">
                   <div className="spec-box"><small>Monthly Price</small><strong>{planPrice(activeDetailItem)}</strong></div>
                   <div className="spec-box"><small>Quota Evidence</small><strong>{activeDetailItem.confidence} ({activeDetailItem.evidence})</strong></div>
-                  <div className="spec-box"><small>Underlying Model</small><strong>{models.find((m) => m.id === activeDetailItem.modelId)?.name ?? activeDetailItem.modelId}</strong></div>
+                  <div className="spec-box">
+                    <small>Model used for {exploreScenario.label}</small>
+                    <strong>
+                      {planWorkingModel(activeDetailItem, exploreScenario, exploreSettings)?.name
+                        ?? "None that clears the bar"}
+                    </strong>
+                  </div>
+                  <div className="spec-box full-span">
+                    <small>Models on this plan ({activeDetailItem.modelIds.length})</small>
+                    <strong>
+                      {activeDetailItem.modelIds
+                        .map((id) => modelById.get(id)?.name ?? id)
+                        .join(", ")}
+                    </strong>
+                  </div>
                   <div className="spec-box"><small>API Included?</small><strong>{activeDetailItem.apiIncluded}</strong></div>
                   <div className="spec-box full-span"><small>Published Quota / Rule</small><strong>{planQuota(activeDetailItem, exploreScenarioId)}</strong></div>
                 </div>
@@ -2534,15 +2506,24 @@ export default function Home() {
               )}
 
               <div className="modal-scenario-fits">
-                <strong>Scenario Fit Ratings:</strong>
+                <strong>Derived tier by scenario:</strong>
                 <div className="scenario-fits-list">
-                  {scenarios.map((sc) => (
-                    <div className="scenario-fit-item" key={sc.id}>
-                      <span>{sc.label}</span>
-                      <span className={`mini-tier tier-${activeDetailItem.tiers[sc.id].toLowerCase()}`}>{activeDetailItem.tiers[sc.id]}</span>
-                    </div>
-                  ))}
+                  {scenarios.map((sc) => {
+                    const placement = itemPlacement(activeDetailItem, sc.id);
+                    return (
+                      <div className="scenario-fit-item" key={sc.id}>
+                        <span>{sc.label}</span>
+                        <span className={`mini-tier ${placementClass(placement)}`} title={placementReason(placement, sc, sc.gate.metric)}>
+                          {placementLabel(placement)}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
+                <p className="modal-scenario-fits-note">
+                  Tiers are derived from {capabilityIndex.name} v{capabilityIndex.version} scores against each scenario&rsquo;s
+                  capability bar, then ranked on cost. Hover a letter for the reason.
+                </p>
               </div>
             </div>
             <footer className="detail-modal-footer">
@@ -2656,12 +2637,17 @@ export default function Home() {
                     ))}
                   </tr>
                   <tr>
-                    <td>Scenario Fit ({exploreScenario.label})</td>
-                    {compareList.map((item) => (
-                      <td key={item.id}>
-                        <span className={`mini-tier tier-${item.tiers[exploreScenarioId].toLowerCase()}`}>{item.tiers[exploreScenarioId]}</span>
-                      </td>
-                    ))}
+                    <td>Derived tier ({exploreScenario.label})</td>
+                    {compareList.map((item) => {
+                      const placement = itemPlacement(item, exploreScenarioId);
+                      return (
+                        <td key={item.id}>
+                          <span className={`mini-tier ${placementClass(placement)}`} title={placementReason(placement, exploreScenario, exploreMetric)}>
+                            {placementLabel(placement)}
+                          </span>
+                        </td>
+                      );
+                    })}
                   </tr>
                 </>
               ) : (
@@ -2694,7 +2680,7 @@ export default function Home() {
                     <td>Equivalent Calls ({exploreScenario.label})</td>
                     {compareList.map((item) => {
                       if (!("kind" in item)) return <td key={item.id}>—</td>;
-                      const est = planEstimate(item as Plan, exploreSettings);
+                      const est = planEstimate(item as Plan, exploreSettings, planWorkingModel(item as Plan, exploreScenario, exploreSettings));
                       return (
                         <td key={item.id}>
                           {est ? <strong>{formatEstimateRange(est.callsLow, est.callsHigh)} calls</strong> : "—"}
@@ -2711,12 +2697,17 @@ export default function Home() {
                     ))}
                   </tr>
                   <tr>
-                    <td>Scenario Fit ({exploreScenario.label})</td>
-                    {compareList.map((item) => (
-                      <td key={item.id}>
-                        <span className={`mini-tier tier-${item.tiers[exploreScenarioId].toLowerCase()}`}>{item.tiers[exploreScenarioId]}</span>
-                      </td>
-                    ))}
+                    <td>Derived tier ({exploreScenario.label})</td>
+                    {compareList.map((item) => {
+                      const placement = itemPlacement(item, exploreScenarioId);
+                      return (
+                        <td key={item.id}>
+                          <span className={`mini-tier ${placementClass(placement)}`} title={placementReason(placement, exploreScenario, exploreMetric)}>
+                            {placementLabel(placement)}
+                          </span>
+                        </td>
+                      );
+                    })}
                   </tr>
                 </>
               )}
@@ -2769,7 +2760,10 @@ export default function Home() {
           </nav>
         </div>
         <div className="footer-bottom">
-          <p className="footer-identity">© 2026 Jin Ma · Open-source code under MIT · Independent project</p>
+          <p className="footer-identity">
+            © 2026 Jin Ma · Open-source code under MIT · Independent project · Capability scores by{" "}
+            <a href={capabilityIndex.source} rel="noreferrer" target="_blank">Artificial Analysis</a>
+          </p>
           <span className="footer-freshness">Data updated {pricingUpdatedAt}</span>
         </div>
       </footer>

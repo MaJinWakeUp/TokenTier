@@ -37,6 +37,12 @@ yarn-error.log*
 
 /dist/
 /.wrangler/
+data/*.lock
+
+# ChatGPT Sites is a local-only deployment target; GitHub Pages is the
+# published host. Keep these on disk, out of the repository.
+/.openai/
+/build/sites-vite-plugin.ts
 /outputs/
 /work/
 
