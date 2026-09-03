@@ -124,7 +124,7 @@ test("server-renders the TokenTier product", async () => {
 });
 
 test("removes the disposable starter preview", async () => {
-  const [page, rankPage, layout, styles, packageJson, readme, workflow, license, catalogSource, robots, sitemap, ogImage, planSource, scenarioSource] = await Promise.all([
+  const [page, rankPage, layout, styles, packageJson, readme, workflow, license, catalogSource, robots, sitemap, ogImage, planSource, scenarioSource, viteConfig, gitignore] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/rank-board.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
@@ -139,6 +139,8 @@ test("removes the disposable starter preview", async () => {
     readFile(new URL("../public/og.png", import.meta.url)),
     readFile(new URL("../data/plans.json", import.meta.url), "utf8"),
     readFile(new URL("../data/scenarios.json", import.meta.url), "utf8"),
+    readFile(new URL("../vite.config.ts", import.meta.url), "utf8"),
+    readFile(new URL("../.gitignore", import.meta.url), "utf8"),
   ]);
   const catalog = JSON.parse(catalogSource);
   const scenarios = JSON.parse(scenarioSource);
@@ -197,7 +199,15 @@ test("removes the disposable starter preview", async () => {
   assert.match(page, /Artificial Analysis capability index ↗/);
   assert.match(readme, /## Ownership and independence/);
   assert.match(readme, /independent project created and maintained by Jin Ma/);
-  assert.match(readme, /The same source supports two hosts/);
+  assert.match(readme, /GitHub Pages is the published host/);
+  // The Sites packaging plugin is local-only, so the build must not require it:
+  // the path is probed at runtime and the import is hidden from the bundler.
+  assert.match(viteConfig, /existsSync\(sitesPluginPath\)/);
+  assert.match(viteConfig, /import\(\/\* @vite-ignore \*\/ pathToFileURL\(sitesPluginPath\)\.href\)/);
+  assert.doesNotMatch(viteConfig, /^import \{ sites \}/m);
+  // Neither Sites file may be tracked; both are ignored so a clone has no trace.
+  assert.match(gitignore, /\/\.openai\//);
+  assert.match(gitignore, /\/build\/sites-vite-plugin\.ts/);
   assert.match(readme, /majinwakeup\.github\.io\/TokenTier/);
   assert.match(workflow, /run: npm ci/);
   assert.match(workflow, /name: Verify Pages artifact contents/);

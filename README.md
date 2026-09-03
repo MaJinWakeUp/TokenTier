@@ -243,13 +243,16 @@ checks. The site uses the bundled vinext and Sites hosting structure.
 
 ## Deployment targets
 
-The same source supports two hosts:
+GitHub Pages is the published host, at
+`https://majinwakeup.github.io/TokenTier/`. The `main` branch workflow runs
+`npm run build:pages` and applies the `/TokenTier` repository base path. It is
+the only deployment this repository configures.
 
-- GitHub Pages is the public, indexable copy at
-  `https://majinwakeup.github.io/TokenTier/`. The `main` branch workflow runs
-  `npm run build:pages` and applies the `/TokenTier` repository base path.
-- ChatGPT Sites is the private copy. It uses `npm run build`; public canonical,
-  sitemap, and social-preview metadata intentionally point to GitHub Pages.
-
-Run both build commands before merging deployment changes so root-hosted Sites
-assets and repository-path GitHub Pages assets remain compatible.
+A private ChatGPT Sites copy can also be built locally with `npm run build`.
+Its packaging plugin (`build/sites-vite-plugin.ts`) and hosting config
+(`.openai/hosting.json`) are deliberately kept out of the repository and are
+ignored by Git, so a clone has no trace of them. `vite.config.ts` loads the
+plugin only if it is present and builds without it otherwise, which means
+`npm run build`, `npm run dev` and `npm test` all work from a fresh clone.
+Canonical, sitemap, and social-preview metadata point at GitHub Pages either
+way.
