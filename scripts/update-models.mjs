@@ -4,19 +4,14 @@ import { readFile, rename, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-const scenarioIds = [
-  "daily",
-  "code-easy",
-  "code-medium",
-  "code-hard",
-  "research",
-  "writing",
-  "innovation",
-];
-const tierValues = new Set(["S", "A", "B", "—"]);
-const catalogKeys = ["currency", "models", "schemaVersion", "unit", "updatedAt"];
+// Capability metrics a model record may carry. Only `intelligence` is published
+// per model today; the others are reserved for Artificial Analysis sub-indices.
+const metricKeys = ["intelligence", "codingAgent", "agentic", "longContext"];
+const catalogKeys = ["capabilityIndex", "currency", "models", "schemaVersion", "unit", "updatedAt"];
+const capabilityIndexKeys = ["attribution", "name", "scale", "source", "version"];
 const requiredModelKeys = [
   "cached",
+  "capability",
   "context",
   "id",
   "input",
@@ -24,12 +19,51 @@ const requiredModelKeys = [
   "output",
   "provider",
   "source",
-  "tiers",
   "verifiedAt",
 ];
 const allowedModelKeys = new Set([...requiredModelKeys, "note"]);
+const requiredCapabilityKeys = ["indexVersion", "metrics", "source", "verifiedAt"];
+const allowedCapabilityKeys = new Set([...requiredCapabilityKeys, "variant"]);
+const planKinds = new Set(["Subscription", "BYOK client", "Pay as you go"]);
+const evidenceValues = new Set([
+  "Official quota",
+  "Official credit",
+  "Official relative limit",
+  "Price break-even",
+]);
+const confidenceValues = new Set(["High", "Medium", "Low"]);
+const requiredPlanKeys = [
+  "apiIncluded",
+  "confidence",
+  "evidence",
+  "id",
+  "kind",
+  "modelIds",
+  "monthly",
+  "name",
+  "note",
+  "provider",
+  "quota",
+  "source",
+  "verifiedAt",
+];
+const allowedPlanKeys = new Set([
+  ...requiredPlanKeys,
+  "cacheRatio",
+  "creditMultipliers",
+  "includedApiValue",
+  "weeklyCredits",
+]);
+// A gate that admits almost nothing is a data error, not a strict standard.
+const minEligibleModelsPerScenario = 3;
 const defaultCatalogPath = fileURLToPath(
   new URL("../data/api-models.json", import.meta.url),
+);
+const defaultScenariosPath = fileURLToPath(
+  new URL("../data/scenarios.json", import.meta.url),
+);
+const defaultPlansPath = fileURLToPath(
+  new URL("../data/plans.json", import.meta.url),
 );
 
 function isRecord(value) {
@@ -113,13 +147,57 @@ function collectModelErrors(model, indexLabel) {
     errors.push(`${location}.note must be a nonempty trimmed string when provided.`);
   }
 
-  addExactKeyErrors(model.tiers, scenarioIds, `${location}.tiers`, errors);
-  if (isRecord(model.tiers)) {
-    for (const scenarioId of scenarioIds) {
-      if (scenarioId in model.tiers && !tierValues.has(model.tiers[scenarioId])) {
-        errors.push(`${location}.tiers.${scenarioId} must be S, A, B, or —.`);
+  errors.push(...collectCapabilityErrors(model.capability, location));
+  return errors;
+}
+
+// `capability: null` is a deliberate third state: the model is listed and priced,
+// but no independent score exists yet, so it never receives a derived tier.
+function collectCapabilityErrors(capability, location) {
+  if (capability === null) return [];
+  const errors = [];
+  const at = `${location}.capability`;
+  if (!isRecord(capability)) {
+    return [`${at} must be null or an object.`];
+  }
+
+  for (const key of requiredCapabilityKeys) {
+    if (!(key in capability)) errors.push(`${at} is missing: ${key}.`);
+  }
+  const extra = Object.keys(capability).filter((key) => !allowedCapabilityKeys.has(key));
+  if (extra.length > 0) errors.push(`${at} has unknown keys: ${extra.join(", ")}.`);
+
+  if (!isRecord(capability.metrics) || Object.keys(capability.metrics).length === 0) {
+    errors.push(`${at}.metrics must be a nonempty object.`);
+  } else {
+    for (const [metric, value] of Object.entries(capability.metrics)) {
+      if (!metricKeys.includes(metric)) {
+        errors.push(`${at}.metrics has unknown metric: ${metric}.`);
+      }
+      if (!Number.isFinite(value) || value < -100 || value > 100) {
+        errors.push(`${at}.metrics.${metric} must be a finite number between -100 and 100.`);
       }
     }
+  }
+
+  // A composite index that gains evaluations cannot be compared across versions,
+  // so every score records the version it was read under.
+  if (typeof capability.indexVersion !== "string" || !/^\d+(?:\.\d+)*$/.test(capability.indexVersion)) {
+    errors.push(`${at}.indexVersion must look like 4 or 4.1.1.`);
+  }
+  if ("variant" in capability && (typeof capability.variant !== "string" || capability.variant.trim() !== capability.variant || capability.variant.length === 0)) {
+    errors.push(`${at}.variant must be a nonempty trimmed string when provided.`);
+  }
+  try {
+    const source = new URL(capability.source);
+    if (source.protocol !== "https:") throw new Error("not HTTPS");
+  } catch {
+    errors.push(`${at}.source must be a valid HTTPS URL.`);
+  }
+  if (!isIsoDate(capability.verifiedAt)) {
+    errors.push(`${at}.verifiedAt must be an ISO date (YYYY-MM-DD).`);
+  } else if (capability.verifiedAt > localIsoDate()) {
+    errors.push(`${at}.verifiedAt cannot be later than the current local date.`);
   }
   return errors;
 }
@@ -139,7 +217,7 @@ export function validateDataset(dataset) {
     throw new Error(`Model catalog validation failed:\n- ${errors.join("\n- ")}`);
   }
 
-  if (dataset.schemaVersion !== 1) errors.push("catalog.schemaVersion must be 1.");
+  if (dataset.schemaVersion !== 2) errors.push("catalog.schemaVersion must be 2.");
   if (dataset.currency !== "USD") errors.push("catalog.currency must be USD.");
   if (dataset.unit !== "per-million-tokens") {
     errors.push("catalog.unit must be per-million-tokens.");
@@ -173,17 +251,43 @@ export function validateDataset(dataset) {
       }
     }
 
-    for (const scenarioId of scenarioIds) {
-      if (!dataset.models.some((model) => model?.tiers?.[scenarioId] === "S")) {
-        errors.push(`At least one S-tier model is required for ${scenarioId}.`);
+    // Scores read under different index versions are not comparable, and the
+    // gate thresholds are anchored to one version at a time.
+    const declaredVersion = dataset.capabilityIndex?.version;
+    for (const model of dataset.models) {
+      const version = model?.capability?.indexVersion;
+      if (version !== undefined && version !== declaredVersion) {
+        errors.push(
+          `model ${model.id} was scored under index version ${version}, `
+          + `but catalog.capabilityIndex.version is ${declaredVersion}. `
+          + "Re-read the score and re-anchor the scenario thresholds.",
+        );
       }
     }
 
     const verifiedDates = dataset.models
-      .map((model) => model?.verifiedAt)
+      .flatMap((model) => [model?.verifiedAt, model?.capability?.verifiedAt])
       .filter(isIsoDate);
     if (isIsoDate(dataset.updatedAt) && verifiedDates.some((date) => date > dataset.updatedAt)) {
-      errors.push("catalog.updatedAt cannot be earlier than a model's verifiedAt date.");
+      errors.push("catalog.updatedAt cannot be earlier than a model or capability verifiedAt date.");
+    }
+  }
+
+  addExactKeyErrors(dataset.capabilityIndex, capabilityIndexKeys, "catalog.capabilityIndex", errors);
+  if (isRecord(dataset.capabilityIndex)) {
+    for (const key of ["name", "scale", "attribution"]) {
+      if (typeof dataset.capabilityIndex[key] !== "string" || dataset.capabilityIndex[key].length === 0) {
+        errors.push(`catalog.capabilityIndex.${key} must be a nonempty string.`);
+      }
+    }
+    if (typeof dataset.capabilityIndex.version !== "string" || !/^\d+(?:\.\d+)*$/.test(dataset.capabilityIndex.version)) {
+      errors.push("catalog.capabilityIndex.version must look like 4 or 4.1.1.");
+    }
+    try {
+      const source = new URL(dataset.capabilityIndex.source);
+      if (source.protocol !== "https:") throw new Error("not HTTPS");
+    } catch {
+      errors.push("catalog.capabilityIndex.source must be a valid HTTPS URL.");
     }
   }
 
@@ -191,6 +295,316 @@ export function validateDataset(dataset) {
     throw new Error(`Model catalog validation failed:\n- ${errors.join("\n- ")}`);
   }
   return dataset;
+}
+
+function metricValue(model, metric) {
+  const value = model?.capability?.metrics?.[metric];
+  return Number.isFinite(value) ? value : null;
+}
+
+export function eligibleModels(dataset, scenario) {
+  return dataset.models.filter((model) => {
+    const value = metricValue(model, scenario.gate.metric);
+    return value !== null && value >= scenario.gate.minIndex;
+  });
+}
+
+export function validateScenarios(scenarios, dataset) {
+  const errors = [];
+  addExactKeyErrors(
+    scenarios,
+    ["metric", "metricNote", "profileNote", "ranking", "scenarios", "schemaVersion", "tierCuts"],
+    "scenarios",
+    errors,
+  );
+  if (!isRecord(scenarios)) {
+    throw new Error(`Scenario validation failed:\n- ${errors.join("\n- ")}`);
+  }
+
+  if (scenarios.schemaVersion !== 2) errors.push("scenarios.schemaVersion must be 2.");
+  if (!metricKeys.includes(scenarios.metric)) {
+    errors.push(`scenarios.metric must be one of: ${metricKeys.join(", ")}.`);
+  }
+  for (const key of ["metricNote", "profileNote"]) {
+    if (typeof scenarios[key] !== "string" || scenarios[key].length === 0) {
+      errors.push(`scenarios.${key} must be a nonempty string.`);
+    }
+  }
+
+  // Tier cuts are the percentile boundaries that keep the board balanced as the
+  // catalog grows, so they must be strictly increasing fractions.
+  const cuts = scenarios.tierCuts;
+  if (!Array.isArray(cuts) || cuts.length !== 3) {
+    errors.push("scenarios.tierCuts must be an array of three percentile boundaries.");
+  } else if (
+    cuts.some((cut) => !Number.isFinite(cut) || cut <= 0 || cut >= 1)
+    || cuts[0] >= cuts[1]
+    || cuts[1] >= cuts[2]
+  ) {
+    errors.push("scenarios.tierCuts must be strictly increasing fractions between 0 and 1.");
+  }
+
+  for (const [group, keys] of [
+    ["models", ["cost", "headroom"]],
+    ["plans", ["price", "headroom", "confidence"]],
+    ["recommendation", ["capability", "budget", "coverage", "confidence"]],
+  ]) {
+    const weights = scenarios.ranking?.[group];
+    addExactKeyErrors(weights, keys, `scenarios.ranking.${group}`, errors);
+    if (isRecord(weights)) {
+      const total = keys.reduce((sum, key) => sum + (Number.isFinite(weights[key]) ? weights[key] : NaN), 0);
+      if (!Number.isFinite(total) || Math.abs(total - 1) > 1e-9) {
+        errors.push(`scenarios.ranking.${group} weights must be finite and sum to 1.`);
+      }
+    }
+  }
+
+  if (!Array.isArray(scenarios.scenarios) || scenarios.scenarios.length === 0) {
+    errors.push("scenarios.scenarios must be a nonempty array.");
+    throw new Error(`Scenario validation failed:\n- ${errors.join("\n- ")}`);
+  }
+
+  const ids = new Set();
+  const modelIds = new Set(dataset.models.map((model) => model.id));
+  for (const scenario of scenarios.scenarios) {
+    const location = `scenario ${scenario?.id ?? "?"}`;
+    addExactKeyErrors(
+      scenario,
+      ["cacheRatio", "calls", "description", "gate", "id", "input", "label", "output", "rationale"],
+      location,
+      errors,
+    );
+    if (!isRecord(scenario)) continue;
+
+    if (typeof scenario.id !== "string" || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(scenario.id)) {
+      errors.push(`${location}.id must be a lowercase slug.`);
+    } else if (ids.has(scenario.id)) {
+      errors.push(`Duplicate scenario id: ${scenario.id}.`);
+    } else {
+      ids.add(scenario.id);
+    }
+    for (const key of ["label", "description", "rationale"]) {
+      if (typeof scenario[key] !== "string" || scenario[key].trim() !== scenario[key] || scenario[key].length === 0) {
+        errors.push(`${location}.${key} must be a nonempty trimmed string.`);
+      }
+    }
+    for (const key of ["input", "output"]) {
+      if (!Number.isInteger(scenario[key]) || scenario[key] <= 0) {
+        errors.push(`${location}.${key} must be a positive integer token count.`);
+      }
+    }
+    // The recommendation view's defaults come straight from the profile, so the
+    // call count and cache share have to be usable as form values.
+    if (!Number.isInteger(scenario.calls) || scenario.calls <= 0 || scenario.calls > 100_000) {
+      errors.push(`${location}.calls must be a positive integer no greater than 100,000.`);
+    }
+    if (!Number.isFinite(scenario.cacheRatio) || scenario.cacheRatio < 0 || scenario.cacheRatio > 0.95) {
+      errors.push(`${location}.cacheRatio must be a fraction between 0 and 0.95.`);
+    }
+
+    const gate = scenario.gate;
+    const gateKeys = ["anchor", "metric", "minIndex", "rationale"];
+    addExactKeyErrors(
+      gate,
+      isRecord(gate) && "preferredMetric" in gate ? [...gateKeys, "preferredMetric"] : gateKeys,
+      `${location}.gate`,
+      errors,
+    );
+    if (!isRecord(gate)) continue;
+
+    if (!metricKeys.includes(gate.metric)) {
+      errors.push(`${location}.gate.metric must be one of: ${metricKeys.join(", ")}.`);
+    }
+    if ("preferredMetric" in gate && !metricKeys.includes(gate.preferredMetric)) {
+      errors.push(`${location}.gate.preferredMetric must be one of: ${metricKeys.join(", ")}.`);
+    }
+    if (!Number.isFinite(gate.minIndex) || gate.minIndex < -100 || gate.minIndex > 100) {
+      errors.push(`${location}.gate.minIndex must be a finite number between -100 and 100.`);
+    }
+    if (typeof gate.rationale !== "string" || gate.rationale.length === 0) {
+      errors.push(`${location}.gate.rationale must explain why this threshold is where it is.`);
+    }
+
+    // The anchor is what makes a threshold re-derivable when the index is rebased:
+    // it must be a real catalog model that actually clears its own bar.
+    if (typeof gate.anchor !== "string" || !modelIds.has(gate.anchor)) {
+      errors.push(`${location}.gate.anchor must be a model id present in the catalog.`);
+    } else {
+      const anchor = dataset.models.find((model) => model.id === gate.anchor);
+      const anchorValue = metricValue(anchor, gate.metric);
+      if (anchorValue === null) {
+        errors.push(`${location}.gate.anchor ${gate.anchor} has no ${gate.metric} score to anchor against.`);
+      } else if (anchorValue < gate.minIndex) {
+        errors.push(
+          `${location}.gate.anchor ${gate.anchor} scores ${anchorValue}, `
+          + `below its own threshold of ${gate.minIndex}.`,
+        );
+      }
+    }
+
+    if (Number.isFinite(gate.minIndex)) {
+      const eligible = eligibleModels(dataset, scenario);
+      if (eligible.length < minEligibleModelsPerScenario) {
+        errors.push(
+          `${location} admits only ${eligible.length} model(s) at index >= ${gate.minIndex}; `
+          + `at least ${minEligibleModelsPerScenario} are required.`,
+        );
+      }
+    }
+  }
+
+  // Harder work cannot demand less capability than easier work.
+  const ladder = ["code-easy", "code-medium", "code-hard"]
+    .map((id) => scenarios.scenarios.find((scenario) => scenario.id === id))
+    .filter((scenario) => isRecord(scenario) && Number.isFinite(scenario.gate?.minIndex));
+  for (let index = 1; index < ladder.length; index += 1) {
+    if (ladder[index].gate.minIndex < ladder[index - 1].gate.minIndex) {
+      errors.push(
+        `scenario ${ladder[index].id} sets a lower bar (${ladder[index].gate.minIndex}) `
+        + `than ${ladder[index - 1].id} (${ladder[index - 1].gate.minIndex}).`,
+      );
+    }
+  }
+
+  if (errors.length > 0) {
+    throw new Error(`Scenario validation failed:\n- ${errors.join("\n- ")}`);
+  }
+  return scenarios;
+}
+
+export function validatePlans(document, dataset) {
+  const errors = [];
+  addExactKeyErrors(document, ["currency", "plans", "schemaVersion", "updatedAt"], "plans", errors);
+  if (!isRecord(document)) {
+    throw new Error(`Plan validation failed:\n- ${errors.join("\n- ")}`);
+  }
+
+  if (document.schemaVersion !== 1) errors.push("plans.schemaVersion must be 1.");
+  if (document.currency !== "USD") errors.push("plans.currency must be USD.");
+  if (!isIsoDate(document.updatedAt)) {
+    errors.push("plans.updatedAt must be an ISO date (YYYY-MM-DD).");
+  } else if (document.updatedAt > localIsoDate()) {
+    errors.push("plans.updatedAt cannot be later than the current local date.");
+  }
+
+  if (!Array.isArray(document.plans) || document.plans.length === 0) {
+    errors.push("plans.plans must be a nonempty array.");
+    throw new Error(`Plan validation failed:\n- ${errors.join("\n- ")}`);
+  }
+
+  const modelIds = new Set(dataset.models.map((model) => model.id));
+  const ids = new Set();
+  for (const plan of document.plans) {
+    const location = `plan ${plan?.id ?? "?"}`;
+    if (!isRecord(plan)) {
+      errors.push(`${location} must be an object.`);
+      continue;
+    }
+    for (const key of requiredPlanKeys) {
+      if (!(key in plan)) errors.push(`${location} is missing: ${key}.`);
+    }
+    const extra = Object.keys(plan).filter((key) => !allowedPlanKeys.has(key));
+    if (extra.length > 0) errors.push(`${location} has unknown keys: ${extra.join(", ")}.`);
+
+    if (typeof plan.id !== "string" || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(plan.id)) {
+      errors.push(`${location}.id must be a lowercase slug.`);
+    } else if (ids.has(plan.id)) {
+      errors.push(`Duplicate plan id: ${plan.id}.`);
+    } else {
+      ids.add(plan.id);
+    }
+    for (const key of ["provider", "name", "note", "quota", "apiIncluded"]) {
+      if (typeof plan[key] !== "string" || plan[key].trim() !== plan[key] || plan[key].length === 0) {
+        errors.push(`${location}.${key} must be a nonempty trimmed string.`);
+      }
+    }
+    if (!planKinds.has(plan.kind)) {
+      errors.push(`${location}.kind must be one of: ${[...planKinds].join(", ")}.`);
+    }
+    if (plan.monthly !== null && (!Number.isFinite(plan.monthly) || plan.monthly < 0)) {
+      errors.push(`${location}.monthly must be null or a nonnegative finite number.`);
+    }
+    if (!evidenceValues.has(plan.evidence)) {
+      errors.push(`${location}.evidence must be one of: ${[...evidenceValues].join(", ")}.`);
+    }
+    if (!confidenceValues.has(plan.confidence)) {
+      errors.push(`${location}.confidence must be one of: ${[...confidenceValues].join(", ")}.`);
+    }
+
+    // Referential integrity: a plan's numbers are derived from whichever of its
+    // models suits the scenario, so a dangling id silently breaks the estimates.
+    if (!Array.isArray(plan.modelIds) || plan.modelIds.length === 0) {
+      errors.push(`${location}.modelIds must be a nonempty array of catalog model ids.`);
+    } else {
+      for (const id of plan.modelIds) {
+        if (typeof id !== "string" || !modelIds.has(id)) {
+          errors.push(
+            `${location}.modelIds contains "${id}", which is not in the model catalog. `
+            + "Repoint the plan at listed models before removing one.",
+          );
+        }
+      }
+      if (new Set(plan.modelIds).size !== plan.modelIds.length) {
+        errors.push(`${location}.modelIds contains duplicates.`);
+      }
+    }
+
+    try {
+      const source = new URL(plan.source);
+      if (source.protocol !== "https:") throw new Error("not HTTPS");
+    } catch {
+      errors.push(`${location}.source must be a valid HTTPS URL.`);
+    }
+    if (!isIsoDate(plan.verifiedAt)) {
+      errors.push(`${location}.verifiedAt must be an ISO date (YYYY-MM-DD).`);
+    } else if (plan.verifiedAt > localIsoDate()) {
+      errors.push(`${location}.verifiedAt cannot be later than the current local date.`);
+    }
+
+    if ("cacheRatio" in plan && (!Number.isFinite(plan.cacheRatio) || plan.cacheRatio < 0 || plan.cacheRatio > 1)) {
+      errors.push(`${location}.cacheRatio must be a fraction between 0 and 1.`);
+    }
+    if ("includedApiValue" in plan && (!Number.isFinite(plan.includedApiValue) || plan.includedApiValue <= 0)) {
+      errors.push(`${location}.includedApiValue must be a positive finite number.`);
+    }
+    if ("weeklyCredits" in plan && (!Number.isFinite(plan.weeklyCredits) || plan.weeklyCredits <= 0)) {
+      errors.push(`${location}.weeklyCredits must be a positive finite number.`);
+    }
+    if ("creditMultipliers" in plan) {
+      // Providers publish credit multipliers per model, so a plan that meters in
+      // credits needs a set for every model it offers or its capacity for that
+      // model cannot be computed at all.
+      const multipliers = plan.creditMultipliers;
+      if (!isRecord(multipliers)) {
+        errors.push(`${location}.creditMultipliers must be an object keyed by model id.`);
+      } else {
+        for (const [id, triple] of Object.entries(multipliers)) {
+          if (Array.isArray(plan.modelIds) && !plan.modelIds.includes(id)) {
+            errors.push(`${location}.creditMultipliers has "${id}", which the plan does not offer.`);
+          }
+          if (!Array.isArray(triple) || triple.length !== 3 || triple.some((value) => !Number.isFinite(value) || value < 0)) {
+            errors.push(`${location}.creditMultipliers.${id} must be three nonnegative numbers [input, cached, output].`);
+          }
+        }
+        for (const id of Array.isArray(plan.modelIds) ? plan.modelIds : []) {
+          if (!(id in multipliers)) {
+            errors.push(`${location}.creditMultipliers is missing multipliers for ${id}.`);
+          }
+        }
+      }
+      if (!("weeklyCredits" in plan)) {
+        errors.push(`${location}.creditMultipliers requires weeklyCredits.`);
+      }
+    }
+    if ("weeklyCredits" in plan && !("creditMultipliers" in plan)) {
+      errors.push(`${location}.weeklyCredits requires creditMultipliers.`);
+    }
+  }
+
+  if (errors.length > 0) {
+    throw new Error(`Plan validation failed:\n- ${errors.join("\n- ")}`);
+  }
+  return document;
 }
 
 function normalizeIncoming(value) {
@@ -226,7 +640,11 @@ export function mergeModels(dataset, incomingValue, mode) {
   const models = mode === "add"
     ? [...dataset.models, ...incoming]
     : dataset.models.map((model) => replacements.get(model.id) ?? model);
-  const updatedAt = [dataset.updatedAt, ...incoming.map((model) => model.verifiedAt)]
+  const updatedAt = [
+    dataset.updatedAt,
+    ...incoming.flatMap((model) => [model.verifiedAt, model.capability?.verifiedAt]),
+  ]
+    .filter(isIsoDate)
     .sort()
     .at(-1);
   const merged = { ...dataset, updatedAt, models };
@@ -253,6 +671,23 @@ export async function validateCatalogFile(catalogPath = defaultCatalogPath) {
   const dataset = await readJson(resolvedCatalogPath, "model catalog");
   validateDataset(dataset);
   return dataset;
+}
+
+// The three files only make sense together: thresholds are anchored to catalog
+// models, and every plan derives its numbers from one.
+export async function validateAllFiles({
+  catalogPath = defaultCatalogPath,
+  scenariosPath = defaultScenariosPath,
+  plansPath = defaultPlansPath,
+} = {}) {
+  const dataset = await validateCatalogFile(catalogPath);
+  const [scenarios, plans] = await Promise.all([
+    readJson(path.resolve(scenariosPath), "scenario definitions"),
+    readJson(path.resolve(plansPath), "plan catalog"),
+  ]);
+  validateScenarios(scenarios, dataset);
+  validatePlans(plans, dataset);
+  return { dataset, plans, scenarios };
 }
 
 export async function updateCatalog({
@@ -338,8 +773,24 @@ export async function main(args = process.argv.slice(2)) {
 
   if (command === "validate") {
     if (inputPath || flags.length > 0) throw new Error(usage());
-    const dataset = await validateCatalogFile();
-    console.log(`Validated ${dataset.models.length} models in data/api-models.json.`);
+    const { dataset, plans, scenarios } = await validateAllFiles();
+    const scored = dataset.models.filter((model) => model.capability !== null).length;
+    console.log(
+      `Validated ${dataset.models.length} models (${scored} with a capability score) `
+      + `in data/api-models.json.`,
+    );
+    console.log(`Validated ${plans.plans.length} plans in data/plans.json.`);
+    console.log(
+      `Validated ${scenarios.scenarios.length} scenarios in data/scenarios.json `
+      + `against ${dataset.capabilityIndex.name} v${dataset.capabilityIndex.version}.`,
+    );
+    for (const scenario of scenarios.scenarios) {
+      const eligible = eligibleModels(dataset, scenario).length;
+      console.log(
+        `  ${scenario.id.padEnd(12)} ${scenario.gate.metric} >= ${String(scenario.gate.minIndex).padStart(3)}`
+        + ` · ${eligible}/${dataset.models.length} models qualify`,
+      );
+    }
     return;
   }
 

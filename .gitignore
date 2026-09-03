@@ -37,6 +37,7 @@ yarn-error.log*
 
 /dist/
 /.wrangler/
+data/*.lock
 /outputs/
 /work/
 

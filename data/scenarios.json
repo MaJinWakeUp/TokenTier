@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 2,
+  "metric": "intelligence",
+  "metricNote": "Artificial Analysis publishes a headline Intelligence Index per model, plus Coding Agent and Agentic indices as separate leaderboards. Per-model sub-index values are not published on the model pages, so every scenario currently gates on the headline index. When a sub-index becomes available per model, switch that scenario's gate.metric and re-anchor its minIndex.",
+  "profileNote": "Each profile is a typical month of one kind of work: the tokens one request sends and returns, how many requests a month, and how much of the input is a cache read rather than fresh context. The cache share matters as much as the token counts — an agent that resends a stable repo prefix pays the cached rate for most of its input. Every number is an editable starting point, not a measurement; the Recommend view lets you replace all four.",
+  "tierCuts": [
+    0.15,
+    0.5,
+    0.85
+  ],
+  "ranking": {
+    "models": {
+      "cost": 0.65,
+      "headroom": 0.35
+    },
+    "plans": {
+      "price": 0.5,
+      "headroom": 0.3,
+      "confidence": 0.2
+    },
+    "recommendation": {
+      "capability": 0.48,
+      "budget": 0.22,
+      "coverage": 0.2,
+      "confidence": 0.1
+    }
+  },
+  "scenarios": [
+    {
+      "id": "daily",
+      "label": "Daily use",
+      "input": 1500,
+      "output": 700,
+      "calls": 400,
+      "cacheRatio": 0.2,
+      "description": "Questions, summaries, planning, and everyday writing.",
+      "rationale": "About thirteen short exchanges a day. A system prompt and a little recent history are reused; the question itself is new each time.",
+      "gate": {
+        "metric": "intelligence",
+        "minIndex": 45,
+        "anchor": "gemini-3-1-pro",
+        "rationale": "Everyday questions still need a model that will not confidently invent an answer, which rules out the small-model tier."
+      }
+    },
+    {
+      "id": "code-easy",
+      "label": "Easy coding",
+      "input": 6000,
+      "output": 1200,
+      "calls": 500,
+      "cacheRatio": 0.45,
+      "description": "Small functions, explanations, tests, and local fixes.",
+      "rationale": "Around seventeen requests a day against one file plus instructions, which get resent across a short back-and-forth, so roughly half the input is a cache read.",
+      "gate": {
+        "metric": "intelligence",
+        "minIndex": 45,
+        "anchor": "gemini-3-1-pro",
+        "rationale": "Even a self-contained function has to compile and pass its own test, so the bar sits above the small-model tier.",
+        "preferredMetric": "codingAgent"
+      }
+    },
+    {
+      "id": "code-medium",
+      "label": "Medium coding",
+      "input": 25000,
+      "output": 3500,
+      "calls": 900,
+      "cacheRatio": 0.6,
+      "description": "Feature development, refactoring, and multi-file review.",
+      "rationale": "A feature spanning several files at about thirty agent turns a day. The repo context is stable within a session, so most input is a cache read and the output is a tool call rather than an essay.",
+      "gate": {
+        "metric": "intelligence",
+        "minIndex": 55,
+        "anchor": "claude-sonnet-5",
+        "rationale": "Shipping a multi-file feature means holding several files in mind at once; below this bar the edits stop being coherent with each other.",
+        "preferredMetric": "codingAgent"
+      }
+    },
+    {
+      "id": "code-hard",
+      "label": "Hard coding",
+      "input": 90000,
+      "output": 6000,
+      "calls": 1500,
+      "cacheRatio": 0.75,
+      "description": "Large repos, architectural work, and complex debugging.",
+      "rationale": "Long agent sessions on an unfamiliar large repository, about fifty turns a day. The prefix barely changes between turns, so three quarters of a very large input is billed at the cached rate.",
+      "gate": {
+        "metric": "intelligence",
+        "minIndex": 60,
+        "anchor": "glm-5-3",
+        "rationale": "An unfamiliar large repository punishes weak reasoning quietly, so hard coding admits only the frontier tier.",
+        "preferredMetric": "codingAgent"
+      }
+    },
+    {
+      "id": "research",
+      "label": "Research",
+      "input": 60000,
+      "output": 4000,
+      "calls": 200,
+      "cacheRatio": 0.25,
+      "description": "Long documents, literature review, and source analysis.",
+      "rationale": "Roughly seven whole documents a day. Each source is new, so little is cached and the input dominates the bill.",
+      "gate": {
+        "metric": "intelligence",
+        "minIndex": 60,
+        "anchor": "glm-5-3",
+        "rationale": "Holding a long document together and citing it accurately fails quietly rather than loudly, so research sits at the frontier bar.",
+        "preferredMetric": "longContext"
+      }
+    },
+    {
+      "id": "writing",
+      "label": "Writing",
+      "input": 4000,
+      "output": 3000,
+      "calls": 300,
+      "cacheRatio": 0.25,
+      "description": "Drafting, editing, tone adjustment, and long-form copy.",
+      "rationale": "About ten drafting and revision passes a day on one piece. This is the one profile where output rivals input, so output rates decide the bill.",
+      "gate": {
+        "metric": "intelligence",
+        "minIndex": 50,
+        "anchor": "gpt-5-6-luna",
+        "rationale": "Copy that ships without a rewrite needs more than fluent text, but it does not need frontier reasoning."
+      }
+    },
+    {
+      "id": "innovation",
+      "label": "Innovation",
+      "input": 12000,
+      "output": 5000,
+      "calls": 150,
+      "cacheRatio": 0.3,
+      "description": "Brainstorming, strategy, product concepts, and novel ideas.",
+      "rationale": "Around five deliberate thinking sessions a day. A brief and some background are reused, the ideas are not, and answers run long.",
+      "gate": {
+        "metric": "intelligence",
+        "minIndex": 60,
+        "anchor": "glm-5-3",
+        "rationale": "Novel ideation is where frontier capability separates from competence, so innovation admits only the frontier tier.",
+        "preferredMetric": "agentic"
+      }
+    }
+  ]
+}

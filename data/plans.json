@@ -1,0 +1,595 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-03",
+  "currency": "USD",
+  "plans": [
+    {
+      "id": "chatgpt-go",
+      "provider": "OpenAI",
+      "name": "ChatGPT Go",
+      "kind": "Subscription",
+      "monthly": 8,
+      "source": "https://learn.chatgpt.com/docs/pricing",
+      "note": "Entry tier with roughly 10× Free message, upload, and image limits; this plan may include ads. API platform usage is billed separately.",
+      "quota": "About 10× Free-tier messages, uploads, and image creation",
+      "evidence": "Official relative limit",
+      "confidence": "Medium",
+      "apiIncluded": "No",
+      "cacheRatio": 0.25,
+      "verifiedAt": "2026-08-21",
+      "modelIds": [
+        "gpt-5-6-luna"
+      ]
+    },
+    {
+      "id": "chatgpt-plus",
+      "provider": "OpenAI",
+      "name": "ChatGPT Plus",
+      "kind": "Subscription",
+      "monthly": 20,
+      "source": "https://learn.chatgpt.com/docs/pricing",
+      "note": "Covers standard ChatGPT interface access; API platform usage is billed separately.",
+      "quota": "Rolling 5-hour limit across GPT-5.6 Terra and Luna",
+      "evidence": "Official relative limit",
+      "confidence": "Medium",
+      "apiIncluded": "No",
+      "cacheRatio": 0.25,
+      "verifiedAt": "2026-09-03",
+      "modelIds": [
+        "gpt-5-6-luna",
+        "gpt-5-6-terra",
+        "gpt-5-6-sol"
+      ]
+    },
+    {
+      "id": "chatgpt-pro-5x",
+      "provider": "OpenAI",
+      "name": "ChatGPT Pro (5x)",
+      "kind": "Subscription",
+      "monthly": 100,
+      "source": "https://learn.chatgpt.com/docs/pricing",
+      "note": "Higher allowances and prioritised access during peak times.",
+      "quota": "5x standard rolling allowances plus GPT-5.6 Sol access",
+      "evidence": "Official relative limit",
+      "confidence": "Medium",
+      "apiIncluded": "No",
+      "cacheRatio": 0.35,
+      "verifiedAt": "2026-09-03",
+      "modelIds": [
+        "gpt-5-6-luna",
+        "gpt-5-6-terra",
+        "gpt-5-6-sol"
+      ]
+    },
+    {
+      "id": "chatgpt-pro-20x",
+      "provider": "OpenAI",
+      "name": "ChatGPT Pro (20x)",
+      "kind": "Subscription",
+      "monthly": 200,
+      "source": "https://learn.chatgpt.com/docs/pricing",
+      "note": "Maximum rolling allowances and prioritised throughput for heavy users.",
+      "quota": "20x standard rolling allowances and continuous Sol access",
+      "evidence": "Official relative limit",
+      "confidence": "Medium",
+      "apiIncluded": "No",
+      "cacheRatio": 0.4,
+      "verifiedAt": "2026-09-03",
+      "modelIds": [
+        "gpt-5-6-luna",
+        "gpt-5-6-terra",
+        "gpt-5-6-sol"
+      ]
+    },
+    {
+      "id": "claude-pro",
+      "provider": "Anthropic",
+      "name": "Claude Pro",
+      "kind": "Subscription",
+      "monthly": 20,
+      "source": "https://claude.com/pricing",
+      "note": "App-level rate limit applies. Agent SDK usage can be charged against plan credits with an extra fee.",
+      "quota": "5x Free plan allowances, dynamic by context size and demand",
+      "evidence": "Official credit",
+      "confidence": "Medium",
+      "apiIncluded": "Optional",
+      "includedApiValue": 20,
+      "cacheRatio": 0.3,
+      "verifiedAt": "2026-08-21",
+      "modelIds": [
+        "claude-sonnet-5"
+      ]
+    },
+    {
+      "id": "claude-max-5x",
+      "provider": "Anthropic",
+      "name": "Claude Max (5x)",
+      "kind": "Subscription",
+      "monthly": 100,
+      "source": "https://claude.com/pricing",
+      "note": "Designed for intensive research and long-context analysis.",
+      "quota": "5x Pro allowance across Opus and Sonnet models",
+      "evidence": "Official relative limit",
+      "confidence": "Medium",
+      "apiIncluded": "Optional",
+      "includedApiValue": 100,
+      "cacheRatio": 0.4,
+      "verifiedAt": "2026-08-21",
+      "modelIds": [
+        "claude-opus-5"
+      ]
+    },
+    {
+      "id": "claude-max-20x",
+      "provider": "Anthropic",
+      "name": "Claude Max (20x)",
+      "kind": "Subscription",
+      "monthly": 200,
+      "source": "https://claude.com/pricing",
+      "note": "Highest personal tier with maximum capacity and priority queues.",
+      "quota": "20x Pro allowance and full context limits",
+      "evidence": "Official relative limit",
+      "confidence": "Medium",
+      "apiIncluded": "Optional",
+      "includedApiValue": 200,
+      "cacheRatio": 0.45,
+      "verifiedAt": "2026-08-21",
+      "modelIds": [
+        "claude-opus-5"
+      ]
+    },
+    {
+      "id": "google-ai-plus",
+      "provider": "Google",
+      "name": "Google AI Plus",
+      "kind": "Subscription",
+      "monthly": 9.99,
+      "source": "https://one.google.com/about/plans",
+      "note": "Consumer Gemini access with 2× Free usage limits. Gemini API usage is billed separately.",
+      "quota": "2× Free Gemini limits; compute-based limits refresh every 5 hours",
+      "evidence": "Official relative limit",
+      "confidence": "High",
+      "apiIncluded": "No",
+      "cacheRatio": 0.25,
+      "verifiedAt": "2026-09-03",
+      "modelIds": [
+        "gemini-3-1-pro",
+        "gemini-3-8-flash"
+      ]
+    },
+    {
+      "id": "google-ai-pro",
+      "provider": "Google",
+      "name": "Google AI Pro",
+      "kind": "Subscription",
+      "monthly": 19.99,
+      "source": "https://gemini.google/us/subscriptions/",
+      "note": "Expanded Gemini, Deep Research, AI Studio, and Antigravity access. It does not include production Gemini API credit.",
+      "quota": "4× Free Gemini limits with expanded Pro model and Deep Research access",
+      "evidence": "Official relative limit",
+      "confidence": "High",
+      "apiIncluded": "No",
+      "cacheRatio": 0.35,
+      "verifiedAt": "2026-09-03",
+      "modelIds": [
+        "gemini-3-1-pro",
+        "gemini-3-8-flash"
+      ]
+    },
+    {
+      "id": "google-ai-ultra-5x",
+      "provider": "Google",
+      "name": "Google AI Ultra (5x)",
+      "kind": "Subscription",
+      "monthly": 99.99,
+      "source": "https://gemini.google/us/subscriptions/",
+      "note": "Higher Gemini and Antigravity limits plus 10,000 monthly Flow credits. Production Gemini API usage remains separate.",
+      "quota": "5× Google AI Pro limits; 10,000 Flow credits / month",
+      "evidence": "Official relative limit",
+      "confidence": "High",
+      "apiIncluded": "No",
+      "cacheRatio": 0.4,
+      "verifiedAt": "2026-09-03",
+      "modelIds": [
+        "gemini-3-1-pro",
+        "gemini-3-8-flash"
+      ]
+    },
+    {
+      "id": "google-ai-ultra-20x",
+      "provider": "Google",
+      "name": "Google AI Ultra (20x)",
+      "kind": "Subscription",
+      "monthly": 199.99,
+      "source": "https://gemini.google/us/subscriptions/",
+      "note": "Google's highest consumer limits plus 25,000 monthly Flow credits. Production Gemini API usage remains separate.",
+      "quota": "20× Google AI Pro limits; 25,000 Flow credits / month",
+      "evidence": "Official relative limit",
+      "confidence": "High",
+      "apiIncluded": "No",
+      "cacheRatio": 0.45,
+      "verifiedAt": "2026-09-03",
+      "modelIds": [
+        "gemini-3-1-pro",
+        "gemini-3-8-flash"
+      ]
+    },
+    {
+      "id": "grok-super-lite",
+      "provider": "xAI",
+      "name": "SuperGrok Lite",
+      "kind": "Subscription",
+      "monthly": 10,
+      "source": "https://grok.com/supergrok?referrer=pricing&target=supergroklite",
+      "note": "Entry paid tier with Grok Imagine, longer chats, and a single agent slot. The $10 USD figure is the current web checkout price and may be billed differently by region. API usage is separate.",
+      "quota": "Reduced shared weekly product usage pool with pay-as-you-go overage",
+      "evidence": "Official relative limit",
+      "confidence": "Medium",
+      "apiIncluded": "No",
+      "cacheRatio": 0.15,
+      "verifiedAt": "2026-08-21",
+      "modelIds": [
+        "grok-4-6"
+      ]
+    },
+    {
+      "id": "grok-super",
+      "provider": "xAI",
+      "name": "SuperGrok",
+      "kind": "Subscription",
+      "monthly": 30,
+      "source": "https://x.ai/pricing",
+      "note": "Includes Grok 4.6 access with higher limits, image and video generation, and live web and X search. API usage is separate.",
+      "quota": "Shared weekly product usage pool with pay-as-you-go overage",
+      "evidence": "Official relative limit",
+      "confidence": "Medium",
+      "apiIncluded": "No",
+      "cacheRatio": 0.2,
+      "verifiedAt": "2026-08-21",
+      "modelIds": [
+        "grok-4-6"
+      ]
+    },
+    {
+      "id": "grok-super-plus",
+      "provider": "xAI",
+      "name": "SuperGrok Plus",
+      "kind": "Subscription",
+      "monthly": 100,
+      "source": "https://x.ai/pricing",
+      "note": "Same Grok model as standard SuperGrok with significantly higher weekly usage, faster replies, priority peak access, and early features. API usage is separate.",
+      "quota": "Significantly higher shared weekly product pool plus priority access at peak times",
+      "evidence": "Official relative limit",
+      "confidence": "Medium",
+      "apiIncluded": "No",
+      "cacheRatio": 0.3,
+      "verifiedAt": "2026-08-21",
+      "modelIds": [
+        "grok-4-6"
+      ]
+    },
+    {
+      "id": "grok-super-heavy",
+      "provider": "xAI",
+      "name": "SuperGrok Heavy",
+      "kind": "Subscription",
+      "monthly": 300,
+      "source": "https://x.ai/pricing",
+      "note": "Highest individual Grok tier with Heavy-model and Build Mode access. The public comparison lists the tier but the $300 price is corroborated from checkout and community sources.",
+      "quota": "Highest shared weekly Grok product pool and early feature access",
+      "evidence": "Official relative limit",
+      "confidence": "Low",
+      "apiIncluded": "No",
+      "cacheRatio": 0.35,
+      "verifiedAt": "2026-08-21",
+      "modelIds": [
+        "grok-4-6"
+      ]
+    },
+    {
+      "id": "cursor-pro",
+      "provider": "Cursor",
+      "name": "Cursor Pro",
+      "kind": "Subscription",
+      "monthly": 20,
+      "source": "https://cursor.com/docs/models-and-pricing",
+      "note": "Includes a $20 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
+      "quota": "$20 Other Models usage plus Cursor Models pool",
+      "evidence": "Official credit",
+      "confidence": "High",
+      "apiIncluded": "Editor pool",
+      "includedApiValue": 20,
+      "cacheRatio": 0.4,
+      "verifiedAt": "2026-09-03",
+      "modelIds": [
+        "grok-4-6",
+        "grok-4-5",
+        "claude-fable-5-1",
+        "claude-opus-5",
+        "claude-sonnet-5",
+        "claude-haiku-4-5",
+        "gemini-3-1-pro",
+        "gemini-3-8-flash",
+        "kimi-k3",
+        "kimi-k2-7-code",
+        "gpt-5-6-luna",
+        "gpt-5-6-terra",
+        "gpt-5-6-sol"
+      ]
+    },
+    {
+      "id": "cursor-pro-plus",
+      "provider": "Cursor",
+      "name": "Cursor Pro Plus",
+      "kind": "Subscription",
+      "monthly": 60,
+      "source": "https://cursor.com/docs/models-and-pricing",
+      "note": "Includes a $70 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
+      "quota": "$70 Other Models usage plus Cursor Models pool",
+      "evidence": "Official credit",
+      "confidence": "High",
+      "apiIncluded": "Editor pool",
+      "includedApiValue": 70,
+      "cacheRatio": 0.4,
+      "verifiedAt": "2026-09-03",
+      "modelIds": [
+        "grok-4-6",
+        "grok-4-5",
+        "claude-fable-5-1",
+        "claude-opus-5",
+        "claude-sonnet-5",
+        "claude-haiku-4-5",
+        "gemini-3-1-pro",
+        "gemini-3-8-flash",
+        "kimi-k3",
+        "kimi-k2-7-code",
+        "gpt-5-6-luna",
+        "gpt-5-6-terra",
+        "gpt-5-6-sol"
+      ]
+    },
+    {
+      "id": "cursor-ultra",
+      "provider": "Cursor",
+      "name": "Cursor Ultra",
+      "kind": "Subscription",
+      "monthly": 200,
+      "source": "https://cursor.com/docs/models-and-pricing",
+      "note": "Includes a $400 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
+      "quota": "$400 Other Models usage plus Cursor Models pool",
+      "evidence": "Official credit",
+      "confidence": "High",
+      "apiIncluded": "Editor pool",
+      "includedApiValue": 400,
+      "cacheRatio": 0.45,
+      "verifiedAt": "2026-09-03",
+      "modelIds": [
+        "grok-4-6",
+        "grok-4-5",
+        "claude-fable-5-1",
+        "claude-opus-5",
+        "claude-sonnet-5",
+        "claude-haiku-4-5",
+        "gemini-3-1-pro",
+        "gemini-3-8-flash",
+        "kimi-k3",
+        "kimi-k2-7-code",
+        "gpt-5-6-luna",
+        "gpt-5-6-terra",
+        "gpt-5-6-sol"
+      ]
+    },
+    {
+      "id": "opencode-go",
+      "provider": "OpenCode",
+      "name": "OpenCode Go",
+      "kind": "Subscription",
+      "monthly": 10,
+      "source": "https://opencode.ai/docs/go/",
+      "note": "Usage is capped in dollars, not credits, and metered at the same per-token rates published for each model, so the monthly $60 ceiling converts directly. The monthly cap binds before the weekly one. API usage beyond the cap is not included.",
+      "quota": "$12 of usage per 5 hours, $30 per week, $60 per month",
+      "evidence": "Official quota",
+      "confidence": "High",
+      "apiIncluded": "Yes",
+      "cacheRatio": 0.2,
+      "verifiedAt": "2026-09-03",
+      "includedApiValue": 60,
+      "modelIds": [
+        "grok-4-6",
+        "gpt-5-6-luna",
+        "glm-5-3-flash",
+        "glm-5-3",
+        "kimi-k3",
+        "kimi-k2-7-code",
+        "qwen-3-8-max",
+        "deepseek-v4-pro",
+        "deepseek-v4-flash"
+      ]
+    },
+    {
+      "id": "opencode-zen",
+      "provider": "OpenCode",
+      "name": "OpenCode Zen",
+      "kind": "Pay as you go",
+      "monthly": null,
+      "source": "https://opencode.ai/docs/zen/",
+      "note": "Pay-as-you-go proxy routing to multiple foundation models with unified billing.",
+      "quota": "Direct token pass-through with no monthly fee",
+      "evidence": "Price break-even",
+      "confidence": "Low",
+      "apiIncluded": "Yes",
+      "verifiedAt": "2026-08-21",
+      "modelIds": [
+        "kimi-k3"
+      ]
+    },
+    {
+      "id": "glm-coding-lite",
+      "provider": "Z.ai",
+      "name": "GLM Coding Lite",
+      "kind": "Subscription",
+      "monthly": 18,
+      "source": "https://docs.z.ai/devpack/overview",
+      "note": "Credits are charged as (input x 6.9 + cached input x 1.7 + output x 24) / 10,000 for GLM-5.3; GLM-5.3-Flash bills at roughly a third of that. Off-peak hours cost half, which is the upper end of the range shown. The weekly cap binds before the 5-hour one. Reference model moved from GLM-5.2 to GLM-5.3 when GLM-5.2 left the catalog.",
+      "quota": "2,000 credits per 5 hours and 10,000 per week",
+      "evidence": "Official credit",
+      "confidence": "High",
+      "apiIncluded": "Coding endpoint",
+      "weeklyCredits": 10000,
+      "cacheRatio": 0.3,
+      "verifiedAt": "2026-09-03",
+      "modelIds": [
+        "glm-5-3",
+        "glm-5-3-flash"
+      ],
+      "creditMultipliers": {
+        "glm-5-3": [
+          6.9,
+          1.7,
+          24
+        ],
+        "glm-5-3-flash": [
+          2.3,
+          0.56,
+          8
+        ]
+      }
+    },
+    {
+      "id": "glm-coding-pro",
+      "provider": "Z.ai",
+      "name": "GLM Coding Pro",
+      "kind": "Subscription",
+      "monthly": 80,
+      "source": "https://z.ai/subscribe",
+      "note": "Credits are charged as (input x 6.9 + cached input x 1.7 + output x 24) / 10,000 for GLM-5.3. Off-peak hours cost half, which is the upper end of the range shown. Reference model moved from GLM-5.2 to GLM-5.3 when GLM-5.2 left the catalog.",
+      "quota": "12,000 credits per 5 hours and 60,000 per week",
+      "evidence": "Official credit",
+      "confidence": "High",
+      "apiIncluded": "Coding endpoint",
+      "weeklyCredits": 60000,
+      "cacheRatio": 0.3,
+      "verifiedAt": "2026-09-03",
+      "modelIds": [
+        "glm-5-3",
+        "glm-5-3-flash"
+      ],
+      "creditMultipliers": {
+        "glm-5-3": [
+          6.9,
+          1.7,
+          24
+        ],
+        "glm-5-3-flash": [
+          2.3,
+          0.56,
+          8
+        ]
+      }
+    },
+    {
+      "id": "glm-coding-max",
+      "provider": "Z.ai",
+      "name": "GLM Coding Max",
+      "kind": "Subscription",
+      "monthly": 168,
+      "source": "https://z.ai/subscribe",
+      "note": "Credits are charged as (input x 6.9 + cached input x 1.7 + output x 24) / 10,000 for GLM-5.3. Off-peak hours cost half, which is the upper end of the range shown. Reference model moved from GLM-5.2 to GLM-5.3 when GLM-5.2 left the catalog.",
+      "quota": "28,000 credits per 5 hours and 140,000 per week",
+      "evidence": "Official credit",
+      "confidence": "High",
+      "apiIncluded": "Coding endpoint",
+      "weeklyCredits": 140000,
+      "cacheRatio": 0.35,
+      "verifiedAt": "2026-09-03",
+      "modelIds": [
+        "glm-5-3",
+        "glm-5-3-flash"
+      ],
+      "creditMultipliers": {
+        "glm-5-3": [
+          6.9,
+          1.7,
+          24
+        ],
+        "glm-5-3-flash": [
+          2.3,
+          0.56,
+          8
+        ]
+      }
+    },
+    {
+      "id": "kimi-moderato",
+      "provider": "Kimi",
+      "name": "Kimi Moderato",
+      "kind": "Subscription",
+      "monthly": 19,
+      "source": "https://www.kimi.com/help/membership/membership-pricing",
+      "note": "Shared Kimi membership pool; task counts are vendor estimates based on typical token use and are not API calls.",
+      "quota": "60 Agent credits; 1× Kimi Code credits; 2,000 database calls",
+      "evidence": "Official relative limit",
+      "confidence": "High",
+      "apiIncluded": "No",
+      "cacheRatio": 0.25,
+      "verifiedAt": "2026-08-21",
+      "modelIds": [
+        "kimi-k3"
+      ]
+    },
+    {
+      "id": "kimi-allegretto",
+      "provider": "Kimi",
+      "name": "Kimi Allegretto",
+      "kind": "Subscription",
+      "monthly": 39,
+      "source": "https://www.kimi.com/help/membership/membership-pricing",
+      "note": "Shared Kimi membership pool with Kimi Claw. Task counts are vendor estimates, not API-call guarantees.",
+      "quota": "150 Agent credits; 5× Kimi Code credits; 5,000 database calls",
+      "evidence": "Official relative limit",
+      "confidence": "High",
+      "apiIncluded": "No",
+      "cacheRatio": 0.25,
+      "verifiedAt": "2026-08-21",
+      "modelIds": [
+        "kimi-k3"
+      ]
+    },
+    {
+      "id": "kimi-allegro",
+      "provider": "Kimi",
+      "name": "Kimi Allegro",
+      "kind": "Subscription",
+      "monthly": 99,
+      "source": "https://www.kimi.com/help/membership/membership-pricing",
+      "note": "Larger shared Kimi membership pool with four concurrent Agent tasks. Task counts are estimates, not API calls.",
+      "quota": "360 Agent credits; 15× Kimi Code credits; 12,000 database calls",
+      "evidence": "Official relative limit",
+      "confidence": "High",
+      "apiIncluded": "No",
+      "cacheRatio": 0.3,
+      "verifiedAt": "2026-08-21",
+      "modelIds": [
+        "kimi-k3"
+      ]
+    },
+    {
+      "id": "kimi-vivace",
+      "provider": "Kimi",
+      "name": "Kimi Vivace",
+      "kind": "Subscription",
+      "monthly": 199,
+      "source": "https://www.kimi.com/help/membership/membership-pricing",
+      "note": "Kimi's highest membership pool and concurrency. Task counts are vendor estimates, not API-call guarantees.",
+      "quota": "720 Agent credits; 30× Kimi Code credits; 24,000 database calls",
+      "evidence": "Official relative limit",
+      "confidence": "High",
+      "apiIncluded": "No",
+      "cacheRatio": 0.35,
+      "verifiedAt": "2026-08-21",
+      "modelIds": [
+        "kimi-k3"
+      ]
+    }
+  ]
+}
