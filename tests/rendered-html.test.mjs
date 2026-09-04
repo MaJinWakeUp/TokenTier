@@ -399,6 +399,13 @@ test("removes the disposable starter preview", async () => {
   assert.doesNotMatch(page, /No model fits within/);
   assert.match(page, /apiFrontier\.budgetFits \? \([\s\S]*?over your/);
   assert.match(page, /No model clears the \{recommendationScenario\.label\.toLowerCase\(\)\} bar within/);
+  // Both branches name the axis being viewed. The no-fit branch used to call it
+  // "the cheapest" while reporting whichever axis was selected, so with the
+  // capability axis it labelled the most expensive model as the cheapest.
+  assert.doesNotMatch(page, /Showing the cheapest at/);
+  assert.match(page, /const costPick = frontierPicks\.find\(\(pick\) => pick\.id === "cost"\)/);
+  assert.match(page, /costPick\.model\.id !== activePick\.model\.id/);
+  assert.equal((page.match(/\{activePick\.label\.toLowerCase\(\)\}/g) ?? []).length, 2);
   assert.match(page, /onClick=\{\(\) => setApiPriority\("budget"\)\}/);
   // Options the budget cannot cover say so before they are selected.
   assert.match(page, /overBudget: spend > monthlyBudget/);

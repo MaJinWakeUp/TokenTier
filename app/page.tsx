@@ -1254,6 +1254,7 @@ export default function Home() {
 
   const activePick = frontierPicks.find((pick) => pick.id === apiPriority) ?? frontierPicks[0];
   const budgetPick = frontierPicks.find((pick) => pick.id === "budget") ?? frontierPicks[0];
+  const costPick = frontierPicks.find((pick) => pick.id === "cost") ?? frontierPicks[0];
 
   const rankedPlanOptions = useMemo(() => {
     const scenario = scenarioFor(recommendationScenarioId);
@@ -2291,7 +2292,11 @@ export default function Home() {
                     ) : (
                       <span>
                         No model clears the {recommendationScenario.label.toLowerCase()} bar within{" "}
-                        ${monthlyBudget.toLocaleString()}/mo. Showing the cheapest at {monthlyPrice(recommendedApiSpend)}/mo.
+                        ${monthlyBudget.toLocaleString()}/mo. You are viewing{" "}
+                        <strong>{activePick.label.toLowerCase()}</strong> at {monthlyPrice(recommendedApiSpend)}/mo
+                        {costPick.model.id !== activePick.model.id && (
+                          <>, and the cheapest is {costPick.model.name} at {monthlyPrice(costPick.spend)}/mo</>
+                        )}.
                       </span>
                     )}
                   </div>
