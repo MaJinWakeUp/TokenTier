@@ -1248,9 +1248,12 @@ export default function Home() {
       const sameAs = labels
         .filter((other) => other.id !== entry.id && apiFrontier[other.id].id === model.id)
         .map((other) => other.label);
-      return { ...entry, model, spend, sameAs };
+      return { ...entry, model, spend, sameAs, overBudget: spend > monthlyBudget };
     });
-  }, [apiFrontier, monthlyCalls, recommendationSettings]);
+  }, [apiFrontier, monthlyBudget, monthlyCalls, recommendationSettings]);
+
+  const activePick = frontierPicks.find((pick) => pick.id === apiPriority) ?? frontierPicks[0];
+  const budgetPick = frontierPicks.find((pick) => pick.id === "budget") ?? frontierPicks[0];
 
   const rankedPlanOptions = useMemo(() => {
     const scenario = scenarioFor(recommendationScenarioId);
@@ -2276,7 +2279,21 @@ export default function Home() {
                 {!apiWithinBudget && (
                   <div className="decision-fallback-note">
                     <Icon name="warning" size={13} />
-                    <span>No model fits within ${monthlyBudget.toLocaleString()}/mo. Showing cheapest option ({apiRecommendationModel.name}).</span>
+                    {apiFrontier.budgetFits ? (
+                      <span>
+                        You are viewing <strong>{activePick.label.toLowerCase()}</strong>, which is{" "}
+                        {monthlyPrice(recommendedApiSpend)}/mo and over your ${monthlyBudget.toLocaleString()}/mo budget.{" "}
+                        <button className="inline-link" onClick={() => setApiPriority("budget")} type="button">
+                          Best in budget
+                        </button>{" "}
+                        is {budgetPick.model.name} at {monthlyPrice(budgetPick.spend)}/mo.
+                      </span>
+                    ) : (
+                      <span>
+                        No model clears the {recommendationScenario.label.toLowerCase()} bar within{" "}
+                        ${monthlyBudget.toLocaleString()}/mo. Showing the cheapest at {monthlyPrice(recommendedApiSpend)}/mo.
+                      </span>
+                    )}
                   </div>
                 )}
               </div>
@@ -2447,6 +2464,7 @@ export default function Home() {
                           </span>
                           <span className="frontier-option-cost">
                             {monthlyPrice(pick.spend)}<small>/ mo</small>
+                            {pick.overBudget && <small className="frontier-over">over budget</small>}
                           </span>
                         </button>
                       ))}

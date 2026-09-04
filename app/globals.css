@@ -4520,3 +4520,23 @@ footer.site-footer {
   font-size: 13px;
   line-height: 1.5;
 }
+
+/* --- Budget state -------------------------------------------------------- */
+
+.inline-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent-readable);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.frontier-over {
+  display: block;
+  color: var(--coral);
+  font-family: var(--font-geist-sans), sans-serif;
+  font-size: 13px;
+}

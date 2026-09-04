@@ -393,6 +393,16 @@ test("removes the disposable starter preview", async () => {
   assert.match(styles, /@media \(max-width: 680px\)[\s\S]*?\.source-link\s*\{[^}]*width:\s*40px;/s);
   // The cache field is a percentage and has to say so.
   assert.match(page, /<span id="cache-unit">% of input<\/span>/);
+  // Over budget has two causes since the frontier landed: nothing affordable
+  // clears the bar, or the reader is looking at an axis that ignores budget.
+  // The old copy asserted the first whenever the shown model was over.
+  assert.doesNotMatch(page, /No model fits within/);
+  assert.match(page, /apiFrontier\.budgetFits \? \([\s\S]*?over your/);
+  assert.match(page, /No model clears the \{recommendationScenario\.label\.toLowerCase\(\)\} bar within/);
+  assert.match(page, /onClick=\{\(\) => setApiPriority\("budget"\)\}/);
+  // Options the budget cannot cover say so before they are selected.
+  assert.match(page, /overBudget: spend > monthlyBudget/);
+  assert.match(page, /className="frontier-over">over budget/);
   // One source for every opening value, so the selector cannot drift from them.
   assert.match(page, /const defaultScenario = scenarioFor\("code-medium"\)/);
   assert.doesNotMatch(page, /useState\(scenarios\[0\]\./);
