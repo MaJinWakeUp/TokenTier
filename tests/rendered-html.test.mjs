@@ -406,6 +406,27 @@ test("removes the disposable starter preview", async () => {
   assert.match(page, /const costPick = frontierPicks\.find\(\(pick\) => pick\.id === "cost"\)/);
   assert.match(page, /costPick\.model\.id !== activePick\.model\.id/);
   assert.equal((page.match(/\{activePick\.label\.toLowerCase\(\)\}/g) ?? []).length, 2);
+  // Whole-dollar rounding put figures on the wrong side of the budget they were
+  // judged against: $3.33 rendered as "$3" beside an "over budget" tag on a $3
+  // budget. Every amount shown against the budget keeps cents when it must.
+  assert.match(page, /function monthlyPriceAgainst\(value: number, reference: number\)/);
+  assert.match(page, /const contradicts = \(value > reference && rounded <= reference\)/);
+  assert.match(page, /\|\| \(value < reference && rounded > reference\)/);
+  assert.match(page, /monthlyPriceAgainst\(pick\.spend, monthlyBudget\)/);
+  assert.match(page, /monthlyPriceAgainst\(recommendedApiSpend, monthlyBudget\)/);
+  assert.match(page, /monthlyPriceAgainst\(costPick\.spend, monthlyBudget\)/);
+  assert.match(page, /monthlyPriceAgainst\(budgetPick\.spend, monthlyBudget\)/);
+  for (const unguarded of [
+    /monthlyPrice\(pick\.spend\)/,
+    /monthlyPrice\(costPick\.spend\)/,
+    /monthlyPrice\(budgetPick\.spend\)/,
+  ]) {
+    assert.doesNotMatch(page, unguarded);
+  }
+  // The one remaining plain use is the plan-comparison caption, which states no
+  // budget verdict, so rounding there cannot contradict anything.
+  assert.equal((page.match(/monthlyPrice\(recommendedApiSpend\)/g) ?? []).length, 1);
+  assert.match(page, /No subscription plan can be compared[\s\S]*?monthlyPrice\(recommendedApiSpend\)/);
   assert.match(page, /onClick=\{\(\) => setApiPriority\("budget"\)\}/);
   // Options the budget cannot cover say so before they are selected.
   assert.match(page, /overBudget: spend > monthlyBudget/);

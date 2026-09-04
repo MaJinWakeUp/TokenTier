@@ -235,6 +235,16 @@ function monthlyPrice(value: number) {
   return `$${Math.round(value).toLocaleString()}`;
 }
 
+// Whole-dollar rounding can land a figure on the wrong side of the budget it is
+// being judged against: $3.33 renders as "$3" beside an "over budget" tag on a
+// $3 budget. Keep cents whenever the rounded value would contradict the verdict.
+function monthlyPriceAgainst(value: number, reference: number) {
+  const rounded = Math.round(value);
+  const contradicts = (value > reference && rounded <= reference)
+    || (value < reference && rounded > reference);
+  return contradicts ? `$${value.toFixed(2)}` : monthlyPrice(value);
+}
+
 function contextSize(context: string): number {
   const normalized = context.trim().toUpperCase();
   if (normalized.endsWith("M")) {
@@ -2283,19 +2293,22 @@ export default function Home() {
                     {apiFrontier.budgetFits ? (
                       <span>
                         You are viewing <strong>{activePick.label.toLowerCase()}</strong>, which is{" "}
-                        {monthlyPrice(recommendedApiSpend)}/mo and over your ${monthlyBudget.toLocaleString()}/mo budget.{" "}
+                        {monthlyPriceAgainst(recommendedApiSpend, monthlyBudget)}/mo and over your{" "}
+                        ${monthlyBudget.toLocaleString()}/mo budget.{" "}
                         <button className="inline-link" onClick={() => setApiPriority("budget")} type="button">
                           Best in budget
                         </button>{" "}
-                        is {budgetPick.model.name} at {monthlyPrice(budgetPick.spend)}/mo.
+                        is {budgetPick.model.name} at {monthlyPriceAgainst(budgetPick.spend, monthlyBudget)}/mo.
                       </span>
                     ) : (
                       <span>
                         No model clears the {recommendationScenario.label.toLowerCase()} bar within{" "}
                         ${monthlyBudget.toLocaleString()}/mo. You are viewing{" "}
-                        <strong>{activePick.label.toLowerCase()}</strong> at {monthlyPrice(recommendedApiSpend)}/mo
+                        <strong>{activePick.label.toLowerCase()}</strong> at{" "}
+                        {monthlyPriceAgainst(recommendedApiSpend, monthlyBudget)}/mo
                         {costPick.model.id !== activePick.model.id && (
-                          <>, and the cheapest is {costPick.model.name} at {monthlyPrice(costPick.spend)}/mo</>
+                          <>, and the cheapest is {costPick.model.name} at{" "}
+                            {monthlyPriceAgainst(costPick.spend, monthlyBudget)}/mo</>
                         )}.
                       </span>
                     )}
@@ -2316,7 +2329,7 @@ export default function Home() {
             <div className="decision-facts-strip">
               <div className="decision-fact">
                 <small>Monthly API Spend</small>
-                <strong>{monthlyPrice(recommendedApiSpend)}</strong>
+                <strong>{monthlyPriceAgainst(recommendedApiSpend, monthlyBudget)}</strong>
                 <span>{apiRecommendationModel.name}</span>
               </div>
               <div className="decision-fact">
@@ -2436,12 +2449,12 @@ export default function Home() {
                     <div><strong>{apiRecommendationModel.name}</strong><small>{apiRecommendationModel.provider} · direct API</small></div>
                     {preferredPath === "api" && <span className="recommendation-badge">Best</span>}
                   </div>
-                  <p className="path-price" title={`${price(recommendedApiSpend)} per month`}>{monthlyPrice(recommendedApiSpend)}<span>/ month</span></p>
+                  <p className="path-price" title={`${price(recommendedApiSpend)} per month`}>{monthlyPriceAgainst(recommendedApiSpend, monthlyBudget)}<span>/ month</span></p>
                   <dl><div><dt>Per call</dt><dd>{price(callCost(apiRecommendationModel, recommendationSettings), 3)}</dd></div><div><dt>Budget</dt><dd>{apiWithinBudget ? "Fits" : `Over by ${monthlyPrice(recommendedApiSpend - monthlyBudget)}`}</dd></div><div><dt>Capability bar</dt><dd>{metricLabels[recommendationMetric]} &ge; {recommendationScenario.gate.minIndex}</dd></div></dl>
                   <div className="path-card-verdict">
                     <p>
                       {apiFrontier.meetsBar
-                        ? `${frontierPicks.find((pick) => pick.id === apiPriority)?.hint}, at ${monthlyPrice(recommendedApiSpend)}/mo for ${monthlyCalls.toLocaleString()} calls.`
+                        ? `${activePick.hint}, at ${monthlyPriceAgainst(recommendedApiSpend, monthlyBudget)}/mo for ${monthlyCalls.toLocaleString()} calls.`
                         : `No model clears the ${recommendationScenario.label.toLowerCase()} bar at this context size. Showing the highest scored model.`}
                     </p>
                   </div>
@@ -2468,7 +2481,7 @@ export default function Home() {
                             <strong>{pick.model.name}</strong>
                           </span>
                           <span className="frontier-option-cost">
-                            {monthlyPrice(pick.spend)}<small>/ mo</small>
+                            {monthlyPriceAgainst(pick.spend, monthlyBudget)}<small>/ mo</small>
                             {pick.overBudget && <small className="frontier-over">over budget</small>}
                           </span>
                         </button>
