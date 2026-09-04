@@ -59,7 +59,7 @@ html[data-theme="light"] {
   --ink: #0f172a;
   --paper: #ffffff;
   --brand-accent: #16a34a;
-  --accent-readable: #15803d;
+  --accent-readable: #12712f;
   --brand-accent-text: #07110b;
   --brand-accent-soft: rgba(22, 163, 74, 0.1);
   --brand-accent-glow: rgba(22, 163, 74, 0.2);
@@ -83,7 +83,7 @@ html[data-theme="light"] {
   --text-primary: #0f172a;
   --text-secondary: #334155;
   --text-tertiary: #475569;
-  --text-muted: #64748b;
+  --text-muted: #5b687c;
   --border-subtle: rgba(15, 23, 42, 0.12);
   --border-strong: #cbd5e1;
   --header-bg: rgba(246, 248, 250, 0.88);
@@ -2771,14 +2771,6 @@ td:first-child {
 }
 
 @media (max-width: 420px) {
-  .workspace-tab-long {
-    display: none;
-  }
-
-  .workspace-tab-short {
-    display: inline;
-  }
-
   .tier-models {
     grid-auto-rows: 94px;
   }
@@ -4098,7 +4090,7 @@ footer.site-footer {
 .gate-banner-rule strong {
   font-family: var(--font-geist-mono), monospace;
   font-size: 14px;
-  color: var(--ink);
+  color: var(--text-primary);
 }
 
 .gate-banner-rule span {
@@ -4165,8 +4157,9 @@ footer.site-footer {
 }
 
 .index-value {
+  position: relative;
   font-family: var(--font-geist-mono), monospace;
-  color: var(--ink);
+  color: var(--text-primary);
   text-decoration: none;
   border-bottom: 1px dotted var(--border-strong);
 }
@@ -4386,4 +4379,144 @@ footer.site-footer {
   .scenario-dock-rationale {
     display: none;
   }
+}
+
+/* --- Header tabs ---------------------------------------------------------
+   The full labels stop fitting their buttons at about 560px, not 420px: at
+   430px "Recommendation" needs 109px inside a 70px button. The tabs share a
+   row with the brand and the theme switcher, so the short labels have to fit
+   roughly 45px each rather than the row being widened.
+   ------------------------------------------------------------------------ */
+
+@media (max-width: 560px) {
+  .workspace-tab-long {
+    display: none;
+  }
+
+  .workspace-tab-short {
+    display: inline;
+  }
+
+  .workspace-tabs button {
+    padding: 0 8px;
+    font-size: 13px;
+  }
+}
+
+/* --- Touch targets ------------------------------------------------------
+   Table controls sit in dense rows, so their hit areas are grown with an
+   overlay rather than with padding, which would push the row heights out.
+   ------------------------------------------------------------------------ */
+
+/* Padding grows the real hit box; the matching negative margin keeps the row
+   heights exactly where they were. An absolutely positioned ::after overlay
+   does not work here because these controls are inline, so the overlay has no
+   box to position against. */
+.index-value {
+  display: inline-block;
+  padding: 12px 10px;
+  margin: -12px -10px;
+}
+
+/* A fixed grid box, so the box itself grows rather than an overlay. 26px met
+   the 24px AA minimum but was uncomfortable; touch widths get more. */
+.source-link {
+  width: 32px;
+  height: 32px;
+}
+
+@media (max-width: 680px) {
+  .source-link {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.table-item-name-btn {
+  display: inline-block;
+  padding: 12px 6px;
+  margin: -12px -6px;
+}
+
+.columns-reset-btn {
+  min-height: 24px;
+  padding: 12px 10px;
+  margin: -8px -10px;
+}
+
+.preset-chip,
+.copy-link-btn {
+  min-height: 36px;
+}
+
+@media (max-width: 680px) {
+  .preset-chip,
+  .copy-link-btn {
+    min-height: 44px;
+  }
+}
+
+/* --- Numeric field affix ------------------------------------------------- */
+
+.input-affix {
+  position: relative;
+  display: block;
+}
+
+.input-affix input {
+  width: 100%;
+  padding-right: 34px;
+}
+
+.input-affix > span {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 14px;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+/* --- Spec box detail ----------------------------------------------------- */
+
+.spec-box-qualifier {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.spec-box small.spec-box-note {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.spec-box-note a {
+  color: var(--accent-readable);
+}
+
+/* --- Compare table ------------------------------------------------------- */
+
+.compare-table td.compare-best {
+  background: var(--accent-soft);
+}
+
+.compare-best-mark {
+  /* SVGs are block by default in this sheet, which would drop the tick onto
+     its own line under the value. */
+  display: inline;
+  margin-left: 6px;
+  color: var(--accent-readable);
+  vertical-align: -1px;
+}
+
+.compare-note {
+  margin: 14px 0 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.5;
 }

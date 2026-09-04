@@ -150,6 +150,14 @@ type Gate = {
   preferredMetric?: MetricKey;
 };
 
+type CompareRow = {
+  label: string;
+  render: (item: Model | Plan) => React.ReactNode;
+  // Present only on rows where one value is objectively better.
+  score?: (item: Model | Plan) => number | null;
+  better?: "higher" | "lower";
+};
+
 type Scenario = {
   id: ScenarioId;
   label: string;
@@ -1434,6 +1442,144 @@ export default function Home() {
 
   const isComparingPlans = compareList.length > 0 && "kind" in compareList[0];
 
+  // One descriptor per row, so every row knows how to render itself and which
+  // direction counts as better. Without that a comparison table makes the
+  // reader do the comparing.
+  const compareRows = useMemo<CompareRow[]>(() => {
+    const tierBadge = (placement: Placement) => (
+      <span className={`mini-tier ${placementClass(placement)}`} title={placementReason(placement, exploreScenario, exploreMetric)}>
+        {placementLabel(placement)}
+      </span>
+    );
+    const sourceRow: CompareRow = {
+      label: "Official source",
+      render: (item) => (
+        <a className="button button-ghost" href={item.source} rel="noreferrer" target="_blank">
+          <span>Source</span>
+          <Icon name="external" size={13} />
+        </a>
+      ),
+    };
+
+    if (isComparingPlans) {
+      const working = (item: Model | Plan) => planWorkingModel(item as Plan, exploreScenario, exploreSettings);
+      return [
+        { label: "Plan type", render: (item) => <span className="kind-pill">{(item as Plan).kind}</span> },
+        {
+          label: "Monthly price",
+          render: (item) => <strong>{planPrice(item as Plan)}</strong>,
+          score: (item) => (item as Plan).monthly,
+          better: "lower",
+        },
+        {
+          label: capabilityIndex.name,
+          render: (item) => {
+            const index = metricValue(working(item)?.capability ?? null, exploreMetric);
+            return index === null ? <span className="muted-dash">Not scored</span> : <strong>{index}</strong>;
+          },
+          score: (item) => metricValue(working(item)?.capability ?? null, exploreMetric),
+          better: "higher",
+        },
+        {
+          label: `Model used (${exploreScenario.label.toLowerCase()})`,
+          render: (item) => working(item)?.name ?? <span className="muted-dash">None clears the bar</span>,
+        },
+        { label: "Published quota", render: (item) => planQuota(item as Plan, exploreScenarioId) },
+        { label: "API included?", render: (item) => (item as Plan).apiIncluded },
+        {
+          label: `Equivalent calls (${exploreScenario.label.toLowerCase()})`,
+          render: (item) => {
+            const estimate = planEstimate(item as Plan, exploreSettings, working(item));
+            return estimate
+              ? <strong>{formatEstimateRange(estimate.callsLow, estimate.callsHigh)} calls</strong>
+              : <span className="muted-dash">—</span>;
+          },
+          score: (item) => planEstimate(item as Plan, exploreSettings, working(item))?.callsLow ?? null,
+          better: "higher",
+        },
+        {
+          label: "Quota evidence",
+          render: (item) => (
+            <>
+              <span className={`evidence-badge evidence-${(item as Plan).confidence.toLowerCase()}`}>{(item as Plan).confidence}</span>
+              <small className="estimate-detail">{(item as Plan).evidence}</small>
+            </>
+          ),
+          score: (item) => confidenceScore[(item as Plan).confidence],
+          better: "higher",
+        },
+        {
+          label: `Derived tier (${exploreScenario.label.toLowerCase()})`,
+          render: (item) => tierBadge(itemPlacement(item, exploreScenarioId)),
+          score: (item) => {
+            const placement = itemPlacement(item, exploreScenarioId);
+            return placement.state === "tier" ? tierRank[placement.tier] : 0;
+          },
+          better: "higher",
+        },
+        sourceRow,
+      ];
+    }
+
+    return [
+      {
+        label: capabilityIndex.name,
+        render: (item) => {
+          const index = metricValue((item as Model).capability, exploreMetric);
+          return index === null ? <span className="muted-dash">Not scored</span> : <strong>{index}</strong>;
+        },
+        score: (item) => metricValue((item as Model).capability, exploreMetric),
+        better: "higher",
+      },
+      {
+        label: "Input / 1M",
+        render: (item) => <strong>{price((item as Model).input)}</strong>,
+        score: (item) => (item as Model).input,
+        better: "lower",
+      },
+      {
+        label: "Cached input / 1M",
+        render: (item) => ((item as Model).cached === null ? "—" : price((item as Model).cached as number, 4)),
+        score: (item) => (item as Model).cached ?? (item as Model).input,
+        better: "lower",
+      },
+      {
+        label: "Output / 1M",
+        render: (item) => <strong>{price((item as Model).output)}</strong>,
+        score: (item) => (item as Model).output,
+        better: "lower",
+      },
+      {
+        label: "Context window",
+        render: (item) => (item as Model).context,
+        score: (item) => contextSize((item as Model).context),
+        better: "higher",
+      },
+      {
+        label: `Est. cost / call (${exploreScenario.label.toLowerCase()})`,
+        render: (item) => <strong>{price(callCost(item as Model, exploreSettings), 4)}</strong>,
+        score: (item) => callCost(item as Model, exploreSettings),
+        better: "lower",
+      },
+      {
+        label: `${monthlyCalls.toLocaleString()} calls / month`,
+        render: (item) => <strong>{monthlyPrice(callCost(item as Model, exploreSettings) * monthlyCalls)}</strong>,
+        score: (item) => callCost(item as Model, exploreSettings),
+        better: "lower",
+      },
+      {
+        label: `Derived tier (${exploreScenario.label.toLowerCase()})`,
+        render: (item) => tierBadge(itemPlacement(item, exploreScenarioId)),
+        score: (item) => {
+          const placement = itemPlacement(item, exploreScenarioId);
+          return placement.state === "tier" ? tierRank[placement.tier] : 0;
+        },
+        better: "higher",
+      },
+      sourceRow,
+    ];
+  }, [exploreMetric, exploreScenario, exploreScenarioId, exploreSettings, isComparingPlans, monthlyCalls]);
+
   return (
     <main>
       <a className="skip-link" href={activeView === "explore" ? "#tier-board" : activeView === "recommendation" ? "#recommendation-settings" : "#rank-top"}>Skip to comparison</a>
@@ -1476,7 +1622,7 @@ export default function Home() {
             type="button"
           >
             <span aria-hidden="true" className="workspace-tab-long">Recommendation</span>
-            <span aria-hidden="true" className="workspace-tab-short">Recommend</span>
+            <span aria-hidden="true" className="workspace-tab-short">Advice</span>
           </button>
           <button
             aria-label="Rank plans"
@@ -2202,14 +2348,18 @@ export default function Home() {
                     </label>
                     <label>
                       <span>Input from cache</span>
-                      <input
-                        inputMode="numeric"
-                        max="95"
-                        min="0"
-                        onChange={(event) => setRecommendationCacheRatio(Math.min(0.95, Math.max(0, (Number(event.target.value) || 0) / 100)))}
-                        type="number"
-                        value={Math.round(recommendationCacheRatio * 100)}
-                      />
+                      <span className="input-affix">
+                        <input
+                          aria-describedby="cache-unit"
+                          inputMode="numeric"
+                          max="95"
+                          min="0"
+                          onChange={(event) => setRecommendationCacheRatio(Math.min(0.95, Math.max(0, (Number(event.target.value) || 0) / 100)))}
+                          type="number"
+                          value={Math.round(recommendationCacheRatio * 100)}
+                        />
+                        <span id="cache-unit">% of input</span>
+                      </span>
                       <div className="preset-chips" role="group" aria-label="Cache share presets">
                         {[0, 25, 60, 90].map((val) => (
                           <button key={val} type="button" className={`preset-chip ${Math.round(recommendationCacheRatio * 100) === val ? "active" : ""}`} onClick={() => setRecommendationCacheRatio(val / 100)}>
@@ -2473,6 +2623,27 @@ export default function Home() {
                   <div className="spec-box"><small>Context Window</small><strong>{activeDetailItem.context}</strong></div>
                   <div className="spec-box"><small>Est. Call Cost ({exploreScenario.label})</small><strong>{price(callCost(activeDetailItem, exploreSettings), 4)}</strong></div>
                   <div className="spec-box"><small>{monthlyCalls.toLocaleString()} Calls / Month</small><strong>{monthlyPrice(callCost(activeDetailItem, exploreSettings) * monthlyCalls)}</strong></div>
+                  <div className="spec-box full-span">
+                    <small>{capabilityIndex.name}</small>
+                    {activeDetailItem.capability === null ? (
+                      <strong>Not independently scored</strong>
+                    ) : (
+                      <>
+                        <strong>
+                          {metricValue(activeDetailItem.capability, exploreMetric) ?? "—"}
+                          <span className="spec-box-qualifier">
+                            {" "}/ 100 · bar for {exploreScenario.label.toLowerCase()} is {exploreScenario.gate.minIndex}
+                          </span>
+                        </strong>
+                        <small className="spec-box-note">
+                          v{activeDetailItem.capability.indexVersion}
+                          {activeDetailItem.capability.variant ? ` · ${activeDetailItem.capability.variant} effort` : ""}
+                          {" · verified "}{activeDetailItem.capability.verifiedAt}{" · "}
+                          <a href={activeDetailItem.capability.source} rel="noreferrer" target="_blank">source</a>
+                        </small>
+                      </>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <div className="detail-specs-grid">
@@ -2480,10 +2651,19 @@ export default function Home() {
                   <div className="spec-box"><small>Quota Evidence</small><strong>{activeDetailItem.confidence} ({activeDetailItem.evidence})</strong></div>
                   <div className="spec-box">
                     <small>Model used for {exploreScenario.label}</small>
-                    <strong>
-                      {planWorkingModel(activeDetailItem, exploreScenario, exploreSettings)?.name
-                        ?? "None that clears the bar"}
-                    </strong>
+                    {(() => {
+                      const working = planWorkingModel(activeDetailItem, exploreScenario, exploreSettings);
+                      if (!working) return <strong>None that clears the bar</strong>;
+                      const index = metricValue(working.capability, exploreMetric);
+                      return (
+                        <strong>
+                          {working.name}
+                          {index !== null && (
+                            <span className="spec-box-qualifier"> · index {index}</span>
+                          )}
+                        </strong>
+                      );
+                    })()}
                   </div>
                   <div className="spec-box full-span">
                     <small>Models on this plan ({activeDetailItem.modelIds.length})</small>
@@ -2598,132 +2778,38 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {!isComparingPlans ? (
-                <>
-                  <tr>
-                    <td>Input / 1M</td>
-                    {compareList.map((item) => (
-                      <td key={item.id}>{"input" in item ? <strong>{price(item.input)}</strong> : null}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td>Cached Input / 1M</td>
-                    {compareList.map((item) => (
-                      <td key={item.id}>{"cached" in item ? (item.cached !== null ? price(item.cached, 4) : "—") : null}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td>Output / 1M</td>
-                    {compareList.map((item) => (
-                      <td key={item.id}>{"output" in item ? <strong>{price(item.output)}</strong> : null}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td>Context Window</td>
-                    {compareList.map((item) => (
-                      <td key={item.id}>{"context" in item ? item.context : null}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td>Est. Cost / Call ({exploreScenario.label})</td>
-                    {compareList.map((item) => (
-                      <td key={item.id}>{"input" in item ? <strong>{price(callCost(item, exploreSettings), 4)}</strong> : null}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td>{monthlyCalls.toLocaleString()} Calls / Month</td>
-                    {compareList.map((item) => (
-                      <td key={item.id}>{"input" in item ? <strong>{monthlyPrice(callCost(item, exploreSettings) * monthlyCalls)}</strong> : null}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td>Derived tier ({exploreScenario.label})</td>
-                    {compareList.map((item) => {
-                      const placement = itemPlacement(item, exploreScenarioId);
+              {compareRows.map((row) => {
+                // Mark the best cell so a comparison reads as a comparison. Ties
+                // mark every tied cell; a single item is never a "winner".
+                const scores = row.score ? compareList.map(row.score) : [];
+                const usable = scores.filter((value): value is number => value !== null);
+                const best = row.score && compareList.length > 1 && usable.length > 1
+                  ? (row.better === "higher" ? Math.max(...usable) : Math.min(...usable))
+                  : null;
+                const allEqual = best !== null && usable.every((value) => value === best);
+                return (
+                  <tr key={row.label}>
+                    <td>{row.label}</td>
+                    {compareList.map((item, index) => {
+                      const isBest = best !== null && !allEqual && scores[index] === best;
                       return (
-                        <td key={item.id}>
-                          <span className={`mini-tier ${placementClass(placement)}`} title={placementReason(placement, exploreScenario, exploreMetric)}>
-                            {placementLabel(placement)}
-                          </span>
+                        <td className={isBest ? "compare-best" : undefined} key={item.id}>
+                          {isBest && <span className="visually-hidden">Best: </span>}
+                          {row.render(item)}
+                          {isBest && <Icon className="compare-best-mark" name="check" size={13} />}
                         </td>
                       );
                     })}
                   </tr>
-                </>
-              ) : (
-                <>
-                  <tr>
-                    <td>Plan Type</td>
-                    {compareList.map((item) => (
-                      <td key={item.id}>{"kind" in item ? <span className="kind-pill">{item.kind}</span> : null}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td>Monthly Price</td>
-                    {compareList.map((item) => (
-                      <td key={item.id}>{"monthly" in item ? <strong>{planPrice(item as Plan)}</strong> : null}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td>Published Quota</td>
-                    {compareList.map((item) => (
-                      <td key={item.id}>{"quota" in item ? planQuota(item as Plan, exploreScenarioId) : null}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td>API Included?</td>
-                    {compareList.map((item) => (
-                      <td key={item.id}>{"apiIncluded" in item ? item.apiIncluded : null}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td>Equivalent Calls ({exploreScenario.label})</td>
-                    {compareList.map((item) => {
-                      if (!("kind" in item)) return <td key={item.id}>—</td>;
-                      const est = planEstimate(item as Plan, exploreSettings, planWorkingModel(item as Plan, exploreScenario, exploreSettings));
-                      return (
-                        <td key={item.id}>
-                          {est ? <strong>{formatEstimateRange(est.callsLow, est.callsHigh)} calls</strong> : "—"}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                  <tr>
-                    <td>Quota Evidence</td>
-                    {compareList.map((item) => (
-                      <td key={item.id}>
-                        {"confidence" in item ? <span className={`evidence-badge evidence-${item.confidence.toLowerCase()}`}>{item.confidence}</span> : null}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td>Derived tier ({exploreScenario.label})</td>
-                    {compareList.map((item) => {
-                      const placement = itemPlacement(item, exploreScenarioId);
-                      return (
-                        <td key={item.id}>
-                          <span className={`mini-tier ${placementClass(placement)}`} title={placementReason(placement, exploreScenario, exploreMetric)}>
-                            {placementLabel(placement)}
-                          </span>
-                        </td>
-                      );
-                    })}
-                  </tr>
-                </>
-              )}
-              <tr>
-                <td>Official Source</td>
-                {compareList.map((item) => (
-                  <td key={item.id}>
-                    <a className="button button-ghost" href={item.source} rel="noreferrer" target="_blank">
-                      <span>Source</span>
-                      <Icon name="external" size={13} />
-                    </a>
-                  </td>
-                ))}
-              </tr>
+                );
+              })}
             </tbody>
           </table>
+          <p className="compare-note">
+            A tick marks the better value in a row. {isComparingPlans
+              ? "Plan capacity and capability come from the cheapest model each plan offers that clears the bar."
+              : `Costs use the ${exploreScenario.label.toLowerCase()} profile.`}
+          </p>
         </div>
       </Modal>
 

@@ -308,7 +308,11 @@ test("removes the disposable starter preview", async () => {
   assert.match(styles, /\.plan-match-grid\s*\{/);
   assert.match(styles, /@media \(max-width: 680px\)[\s\S]*?\.scenario-dock\s*\{[^}]*grid-template-columns:\s*minmax\(0, 0\.8fr\) minmax\(0, 1\.2fr\);/s);
   assert.match(styles, /@media \(max-width: 680px\)[\s\S]*?\.table-tools-top\s*\{[^}]*display:\s*flex;[^}]*flex-direction:\s*column;/s);
-  assert.match(styles, /@media \(max-width: 420px\)[\s\S]*?\.workspace-tab-long\s*\{[^}]*display:\s*none;/s);
+  // The full labels stop fitting around 560px, not 420px: at 430px
+  // "Recommendation" needs 109px inside a 70px button.
+  assert.match(styles, /@media \(max-width: 560px\)[\s\S]*?\.workspace-tab-long\s*\{[^}]*display:\s*none;/s);
+  // Even "Recommend" overflows the button at 360px.
+  assert.match(page, /className="workspace-tab-short">Advice</);
   assert.match(styles, /\.columns-reset-btn\s*\{[^}]*color:\s*var\(--accent-readable\);/s);
   assert.doesNotMatch(page, /aria-haspopup="listbox"|className="columns-menu" role="menu"/);
   assert.match(page, /function monthlyPrice\(value: number\)/);
@@ -374,6 +378,21 @@ test("removes the disposable starter preview", async () => {
   }
   assert.match(page, /function planPlacements/);
   assert.match(page, /function planWorkingModel/);
+  // The index decides every tier, so it appears where a reader looks it up.
+  assert.match(page, /<small>\{capabilityIndex\.name\}<\/small>/);
+  assert.match(page, /label: capabilityIndex\.name,/);
+  // A comparison table has to say which value is better.
+  assert.match(page, /const compareRows = useMemo<CompareRow\[\]>/);
+  assert.match(page, /className=\{isBest \? "compare-best" : undefined\}/);
+  assert.match(page, /A tick marks the better value in a row\./);
+  assert.match(styles, /\.compare-best-mark\s*\{[^}]*display:\s*inline;/s);
+  // Dense table controls grow their hit box with padding and cancel the layout
+  // shift with a matching negative margin.
+  assert.match(styles, /\.table-item-name-btn\s*\{[^}]*padding:\s*12px 6px;[^}]*margin:\s*-12px -6px;/s);
+  assert.match(styles, /\.index-value\s*\{[^}]*padding:\s*12px 10px;[^}]*margin:\s*-12px -10px;/s);
+  assert.match(styles, /@media \(max-width: 680px\)[\s\S]*?\.source-link\s*\{[^}]*width:\s*40px;/s);
+  // The cache field is a percentage and has to say so.
+  assert.match(page, /<span id="cache-unit">% of input<\/span>/);
   // One source for every opening value, so the selector cannot drift from them.
   assert.match(page, /const defaultScenario = scenarioFor\("code-medium"\)/);
   assert.doesNotMatch(page, /useState\(scenarios\[0\]\./);
@@ -410,4 +429,66 @@ test("removes the disposable starter preview", async () => {
   await assert.rejects(access(new URL("db/schema.ts", projectRoot)));
   await assert.rejects(access(new URL("drizzle.config.ts", projectRoot)));
   await assert.rejects(access(new URL("drizzle/meta/_journal.json", projectRoot)));
+});
+
+// --ink is the ink for coloured fills. On a dark inset panel it is invisible,
+// which is how the capability bar and the index column came to render as blank
+// gaps in dark mode while looking fine in light mode.
+test("never puts fill-ink on a plain surface", async () => {
+  const styles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  const darkTokens = styles.slice(0, styles.indexOf('html[data-theme="light"]'));
+  const value = (name) => darkTokens.match(new RegExp(`--${name}:\\s*([^;]+);`))?.[1]?.trim();
+  assert.equal(value("ink"), "#0b0d13", "dark --ink stays the ink for coloured fills");
+
+  // Every rule that paints with --ink must sit on a coloured fill.
+  const onColouredFill = [
+    "::selection", ".skip-link", ".brand-mark", ".workspace-tabs button.active",
+    ".theme-switcher button.active", ".button-primary",
+    ".tier-s .tier-label", ".tier-a .tier-label", ".tier-b .tier-label", ".tier-c .tier-label",
+    ".mini-tier", ".rank-tier-label input", ".rank-tier-label button",
+  ];
+  const inkRules = [...styles.matchAll(/([^{}]+)\{([^}]*var\(--ink\)[^}]*)\}/g)]
+    .map((match) => match[1].trim().split("\n").pop().trim());
+  for (const selector of inkRules) {
+    assert.ok(
+      onColouredFill.includes(selector),
+      `${selector} paints with --ink but is not a known coloured fill; use --text-primary`,
+    );
+  }
+
+  // The two that regressed, pinned explicitly.
+  assert.match(styles, /\.gate-banner-rule strong\s*\{[^}]*color:\s*var\(--text-primary\);/s);
+  assert.match(styles, /\.index-value\s*\{[^}]*color:\s*var\(--text-primary\);/s);
+});
+
+test("keeps muted text and the readable accent above AA contrast", async () => {
+  const styles = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  const lightTokens = styles.slice(styles.indexOf('html[data-theme="light"]'));
+  const value = (name) => lightTokens.match(new RegExp(`--${name}:\\s*(#[0-9a-f]{6});`))?.[1];
+
+  const channels = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  const luminance = (hex) => {
+    const [r, g, b] = channels(hex).map((v) => {
+      const c = v / 255;
+      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const ratio = (a, b) => {
+    const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+    return (hi + 0.05) / (lo + 0.05);
+  };
+
+  // The inset panels are the tightest background these two sit on.
+  const inset = "#e2e8f0";
+  for (const token of ["text-muted", "accent-readable"]) {
+    const hex = value(token);
+    assert.ok(hex, `light --${token} is a hex value`);
+    const contrast = ratio(hex, inset);
+    assert.ok(
+      contrast >= 4.5,
+      `light --${token} (${hex}) is ${contrast.toFixed(2)}:1 on ${inset}, below the 4.5 minimum`,
+    );
+  }
 });
