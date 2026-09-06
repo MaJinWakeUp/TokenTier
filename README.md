@@ -82,10 +82,20 @@ is compared against the plans:
 - **Best in budget** — highest scored model whose monthly spend fits the budget.
 - **Most capable** — highest scored model that clears the bar, budget aside.
 
-Plan scores weight capability, budget fit, quota coverage and evidence strength.
-When a plan publishes no convertible quota, the coverage weight is renormalised
-away rather than replaced with a low default, so a plan is never penalised for
-publishing less than a competitor whose formula we happen to be able to read.
+Plans are not scored against models on a blended number. A plan is only ever
+recommended when three things are true at once: a model it offers clears the
+capability bar, its published allowance can be shown to cover the requested
+volume for a whole month, and its price fits the budget. A plan that fails any
+of the three is listed under **Conditional or unmeasurable plans** with the
+reason, rather than promoted with a discount or hidden.
+
+The access requirement — any surface, direct API, chat app, or coding client —
+is a hard filter, not a preference. Asking for a coding client never returns a
+chat-only plan, and asking for a direct API never returns a subscription that
+does not expose one.
+
+When nothing qualifies, the page says so and names the constraint to relax. It
+never falls back to the nearest option that does not fit.
 
 ## How tiers are decided
 
@@ -94,13 +104,16 @@ Tiers are derived, never hand-graded. Two independent judgements are kept apart:
 1. **Can it do the work?** Every scenario in `data/scenarios.json` declares a
    minimum score on an external capability index — currently the
    [Artificial Analysis Intelligence Index](https://artificialanalysis.ai/),
-   a 0–100 composite of nine published evaluations. A model must clear that bar
+   a 0–100 composite of ten published evaluations. A model must clear that bar
    and hold the scenario's tokens in its context window to appear on the board.
    The bar is absolute, because "can it do this task" has a fixed answer.
 2. **Is it worth the money?** Among the models that cleared the bar, S/A/B/C are
-   cut at fixed percentiles of a score weighting per-call cost against capability
-   headroom. Placement is relative, so the board keeps a readable spread as the
-   catalog grows instead of collecting everything into one letter.
+   assigned by cost ratio against the cheapest qualifying option, using the bands
+   in `data/scenarios.json` (`costRatioBands`, currently 1.25x / 2x / 4x). A
+   letter therefore means the same thing in every scenario and at any catalog
+   size, and two options that cost the same always share a tier. A percentile cut
+   could not promise either: it would move an unchanged model between letters
+   whenever a different model was added.
 
 Consequences worth knowing:
 
@@ -172,6 +185,45 @@ date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
 
+## Catalog changes, September 6 2026
+
+Artificial Analysis published **Intelligence Index v4.2** on September 4 2026. It
+adds AA-Briefcase and Surge's GDP.pdf, upgrades AA-LCR to v1.1, removes the
+saturated GPQA Diamond, and raises private held-out evaluations to 40% of the
+composite. Scores are not comparable across index versions, so all 21 scored
+models were re-read together and `capabilityIndex.version` moved to `4.2`.
+
+Every score fell, by 2 to 12 points. Each scenario bar was therefore re-derived
+from its anchor, preserving the gap between the anchor's score and its own bar —
+which is what the anchor field exists for:
+
+| Scenario | Anchor | Anchor 4.1.1 → 4.2 | Bar 4.1.1 → 4.2 |
+| --- | --- | --- | --- |
+| Daily use | Gemini 3.1 Pro | 48 → 37 | 45 → 34 |
+| Easy coding | Gemini 3.1 Pro | 48 → 37 | 45 → 34 |
+| Medium coding | Claude Sonnet 5 | 55 → 45 | 55 → 45 |
+| Hard coding | GLM-5.3 | 60 → 49 | 60 → 49 |
+| Research | GLM-5.3 | 60 → 49 | 60 → 49 |
+| Paper writing | GPT-5.6 Luna | 52 → 43 | 50 → 41 |
+| Innovation | GLM-5.3 | 60 → 49 | 60 → 49 |
+
+Effect on the board: **no scenario's cheapest qualified option changed.** Kimi
+K2.7 Code newly clears the daily and easy-coding bars; nothing else moved tier.
+Re-deriving from the anchors rather than keeping the old numbers is what kept
+the board stable — holding the bars at their v4.1.1 values would have emptied
+the frontier scenarios.
+
+**Added: GPT-6 Astra** (OpenAI, released September 3 2026) at $10 input / $1
+cached / $50 output per 1M, 1.05M context, 128K max output, Intelligence Index
+55 at max effort. Several third-party write-ups report a surcharge above 272,000
+input tokens (whole request billed at 2× input and 1.5× output). That claim is
+not in OpenAI's published model documentation, so the catalog records the flat
+published rates and no rate band. If the surcharge is confirmed from an official
+page, add it as `rateBands` — very large prompts are under-priced until then.
+
+Not added: K2 Horizon 375B A23B, which Artificial Analysis listed the same week.
+Its token rates were not confirmed from a provider source.
+
 ## Catalog changes, September 3 2026
 
 Added, with prices and capability scores read from the sources recorded in each
@@ -229,6 +281,56 @@ Gemini 3.8 Flash follows the existing Flash convention: the standard rate is the
 headline and the introductory rate through December 31 2026 sits in the note, so
 a temporary discount never moves a model up the board.
 
+## Routes and code layout
+
+The site is three routes, each owning its own state. Visiting one never reads or
+writes another's saved data.
+
+| Route | Question it answers |
+| --- | --- |
+| `/` | **Rankings** — what costs least for a preset kind of work, and how everything is tiered against it |
+| `/recommend/` | **Recommend** — what to use for a specific workload, budget, and access requirement |
+| `/tier-list/` | **My tier list** — how *you* would rank the models or plans, kept separate from the calculated rankings |
+
+Links from the previous single-page build (`/?view=explore`, `?view=recommendation`,
+`?view=rank`) still work: the root recognises them and hands the whole query to
+the route that owns it.
+
+| Directory | Holds |
+| --- | --- |
+| `lib/catalog/` | Catalog types, validation, and the assembled catalog |
+| `lib/domain/` | The decision engine: eligibility, pricing, placement, recommendation, the derived decision, and the workload/link contracts |
+| `lib/boards/` | The personal-board payload codec and editor operations |
+| `lib/browser/` | Versioned storage, URL, and theme adapters — the only modules that touch `window` |
+| `components/` | The shared shell, modal, item details, and comparison dialog |
+| `features/` | One directory per route: its view, its own state, and its own controls |
+| `app/` | Route composition and metadata only |
+
+`lib/` is pure: no React, no DOM, no filesystem. That is what lets the
+maintenance CLI (`scripts/update-models.mjs`) and the site share one definition
+of eligibility, and lets the engine be tested without rendering anything.
+
+## Personal tier lists
+
+The board on `/tier-list/` is opinion, not calculation, and it is treated as the
+reader's own work:
+
+- The payload is versioned and records ordered tiers **and** ordered cards inside
+  each tier. Boards saved by the previous build are read and migrated once, in a
+  deterministic order, and the original keys are left in place.
+- Opening a shared link shows a **preview**. Nothing saved is replaced until
+  "Use this board" is pressed, and the board it replaces stays recoverable for
+  one step.
+- Cards the catalog no longer contains stay visible as retired cards until they
+  are explicitly removed, rather than disappearing.
+- Every move is available without dragging, as WCAG 2.2 requires: each card has a
+  destination menu and up/down controls.
+- New links put the payload in the URL fragment, which is not sent to the server.
+  That is not privacy — a shared board is shared — it just keeps the payload out
+  of request logs. Boards too large for a dependable link are exported as JSON.
+- "Saved in this browser" appears only after a write actually succeeded. When
+  storage is denied, editing continues in memory and export is offered.
+
 ## Local development
 
 Requires Node.js `>=22.13.0`.
@@ -238,8 +340,18 @@ npm install
 npm run dev
 ```
 
-Use `npm run build` for a deployment build and `npm test` for the rendered-page
-checks. The site uses the bundled vinext and Sites hosting structure.
+`tsconfig.json` excludes `.next` on purpose. Both build targets generate route
+types into `.next/types/`, with incompatible shapes, so whichever ran last leaves
+the other's file stale and `tsc --noEmit` then fails on generated code. `next
+build` re-adds `.next/types/**/*.ts` to `include` every time it runs; `exclude`
+wins over `include`, so leaving both in place is stable. Do not remove the
+`.next` exclude to "resolve" the contradiction.
+
+Use `npm run build` for a deployment build, `npm run build:pages` for the static
+export that GitHub Pages publishes, and `npm test` for the full suite: the engine
+and board tests, the workload/link contract, and the server-rendered HTML of
+every route. `npm run lint` and `npx tsc --noEmit` run in CI alongside it. The
+site uses the bundled vinext and Sites hosting structure.
 
 ## Deployment targets
 

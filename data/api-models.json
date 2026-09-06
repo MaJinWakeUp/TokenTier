@@ -1,16 +1,38 @@
 {
-  "schemaVersion": 2,
-  "updatedAt": "2026-09-03",
+  "schemaVersion": 3,
+  "updatedAt": "2026-09-06",
   "currency": "USD",
   "unit": "per-million-tokens",
   "capabilityIndex": {
     "name": "Artificial Analysis Intelligence Index",
-    "version": "4.1.1",
-    "scale": "0-100 composite of nine published evaluations",
+    "version": "4.2",
+    "scale": "0-100 composite of ten published evaluations",
     "source": "https://artificialanalysis.ai/",
     "attribution": "Capability scores are published by Artificial Analysis and reproduced with attribution."
   },
   "models": [
+    {
+      "id": "gpt-6-astra",
+      "provider": "OpenAI",
+      "name": "GPT-6 Astra",
+      "input": 10,
+      "cached": 1,
+      "output": 50,
+      "context": "1.05M",
+      "source": "https://developers.openai.com/api/docs/models/compare",
+      "verifiedAt": "2026-09-06",
+      "note": "OpenAI's frontier model, released 3 September 2026. Published rates apply across the full context window; maximum output is 128K tokens.",
+      "capability": {
+        "metrics": {
+          "intelligence": 55
+        },
+        "indexVersion": "4.2",
+        "variant": "max",
+        "source": "https://artificialanalysis.ai/models/gpt-6-astra",
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 1050000
+    },
     {
       "id": "gpt-5-6-sol",
       "provider": "OpenAI",
@@ -24,13 +46,14 @@
       "note": "Standard rate reduced to $4 input / $0.40 cached / $20 output; the catalog previously carried $5 / $0.50 / $30.",
       "capability": {
         "metrics": {
-          "intelligence": 61
+          "intelligence": 51
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/gpt-5-6-sol",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 1050000
     },
     {
       "id": "gpt-5-6-terra",
@@ -45,13 +68,14 @@
       "note": "Live comparison-page rate; some search snippets remain stale.",
       "capability": {
         "metrics": {
-          "intelligence": 57
+          "intelligence": 47
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/gpt-5-6-terra",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 1050000
     },
     {
       "id": "gpt-5-6-luna",
@@ -66,13 +90,14 @@
       "note": "Live comparison-page rate; some model-detail snippets remain stale.",
       "capability": {
         "metrics": {
-          "intelligence": 52
+          "intelligence": 43
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/gpt-5-6-luna",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 1050000
     },
     {
       "id": "claude-opus-5",
@@ -87,13 +112,14 @@
       "note": "Frontier reasoning and agentic model; succeeds Opus 4.8.",
       "capability": {
         "metrics": {
-          "intelligence": 63
+          "intelligence": 54
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/claude-opus-5",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 1000000
     },
     {
       "id": "claude-fable-5-1",
@@ -108,13 +134,14 @@
       "note": "Cache hits and refreshes are priced at 0.025x base input ($0.25 / 1M) instead of the usual 0.1x. Supersedes Claude Fable 5.",
       "capability": {
         "metrics": {
-          "intelligence": 66
+          "intelligence": 57
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/claude-fable-5-1",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 1000000
     },
     {
       "id": "claude-sonnet-5",
@@ -129,12 +156,14 @@
       "note": "Permanent standard rate ($2 input / $10 output / $0.20 cached).",
       "capability": {
         "metrics": {
-          "intelligence": 55
+          "intelligence": 45
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
+        "variant": "max",
         "source": "https://artificialanalysis.ai/models/claude-sonnet-5",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 1000000
     },
     {
       "id": "claude-haiku-4-5",
@@ -149,13 +178,14 @@
       "note": "High-speed, low-latency Claude model with 1M context.",
       "capability": {
         "metrics": {
-          "intelligence": 24
+          "intelligence": 22
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
         "variant": "non-reasoning",
         "source": "https://artificialanalysis.ai/models/claude-4-5-haiku",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 1000000
     },
     {
       "id": "gemini-3-1-pro",
@@ -167,15 +197,17 @@
       "context": "1M",
       "source": "https://ai.google.dev/gemini-api/docs/pricing",
       "verifiedAt": "2026-08-16",
-      "note": "Standard price shown for prompts up to 200K tokens.",
+      "note": "Standard price shown for prompts up to 200K tokens (inclusive). Rates above 200K are not published.",
       "capability": {
         "metrics": {
-          "intelligence": 48
+          "intelligence": 37
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
         "source": "https://artificialanalysis.ai/models/gemini-3-1-pro-preview",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 1000000,
+      "unsupportedBeyond": 200001
     },
     {
       "id": "gemini-3-8-flash",
@@ -190,13 +222,14 @@
       "note": "Standard rate shown. An introductory rate of $0.75 input / $0.075 cached / $3.75 output runs through December 31, 2026. 1M input limit with 64K max output.",
       "capability": {
         "metrics": {
-          "intelligence": 59
+          "intelligence": 47
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
         "variant": "high",
         "source": "https://artificialanalysis.ai/models/gemini-3-8-flash",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 1000000
     },
     {
       "id": "grok-4-6",
@@ -211,13 +244,22 @@
       "note": "Prompts at or above 200K use $4 input, $1 cached input, and $12 output per million tokens.",
       "capability": {
         "metrics": {
-          "intelligence": 61
+          "intelligence": 51
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
         "variant": "high",
         "source": "https://artificialanalysis.ai/models/grok-4-6",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 500000,
+      "rateBands": [
+        {
+          "input": 4,
+          "cached": 1,
+          "output": 12,
+          "threshold": 200000
+        }
+      ]
     },
     {
       "id": "grok-4-5",
@@ -229,16 +271,18 @@
       "context": "500K",
       "source": "https://docs.x.ai/developers/pricing",
       "verifiedAt": "2026-08-16",
-      "note": "Prompts at or above 200K use higher long-context rates.",
+      "note": "Listed rates verified only below 200K input; rates at or above 200K are not published.",
       "capability": {
         "metrics": {
-          "intelligence": 56
+          "intelligence": 45
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
         "variant": "high",
         "source": "https://artificialanalysis.ai/models/grok-4-5",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 500000,
+      "unsupportedBeyond": 200000
     },
     {
       "id": "grok-4-3",
@@ -253,13 +297,22 @@
       "note": "Prompts at or above 200K use $2.50 input, $0.40 cached input, and $5 output.",
       "capability": {
         "metrics": {
-          "intelligence": 38
+          "intelligence": 29
         },
-        "indexVersion": "4.1.1",
-        "variant": "high",
+        "indexVersion": "4.2",
+        "variant": "medium",
         "source": "https://artificialanalysis.ai/models/grok-4-3",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 1000000,
+      "rateBands": [
+        {
+          "input": 2.5,
+          "cached": 0.4,
+          "output": 5,
+          "threshold": 200000
+        }
+      ]
     },
     {
       "id": "grok-build-0-1",
@@ -272,7 +325,8 @@
       "source": "https://docs.x.ai/developers/models/grok-build-0.1",
       "verifiedAt": "2026-08-16",
       "note": "Agentic coding and tool-calling model.",
-      "capability": null
+      "capability": null,
+      "contextTokens": 256000
     },
     {
       "id": "deepseek-v4-pro",
@@ -287,12 +341,14 @@
       "note": "Standard peak pricing shown ($1.32 in / $3.96 out); off-peak discount (01:00–04:00 & 06:00–10:00 UTC) offers 50% lower rates ($0.66 in / $1.98 out).",
       "capability": {
         "metrics": {
-          "intelligence": 53
+          "intelligence": 42
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
+        "variant": "max",
         "source": "https://artificialanalysis.ai/models/deepseek-v4-pro",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 1000000
     },
     {
       "id": "deepseek-v4-flash",
@@ -307,12 +363,14 @@
       "note": "Standard peak pricing shown ($0.44 in / $1.32 out); off-peak discount (01:00–04:00 & 06:00–10:00 UTC) offers 50% lower rates ($0.22 in / $0.66 out).",
       "capability": {
         "metrics": {
-          "intelligence": 52
+          "intelligence": 41
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
+        "variant": "max",
         "source": "https://artificialanalysis.ai/models/deepseek-v4-flash",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 1000000
     },
     {
       "id": "mistral-large-3",
@@ -326,12 +384,13 @@
       "verifiedAt": "2026-08-16",
       "capability": {
         "metrics": {
-          "intelligence": 16
+          "intelligence": 11
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
         "source": "https://artificialanalysis.ai/models/mistral-large-3",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 256000
     },
     {
       "id": "codestral",
@@ -344,7 +403,8 @@
       "source": "https://mistral.ai/pricing/api/",
       "verifiedAt": "2026-08-16",
       "note": "Specialized model for code generation and Fill-in-the-Middle (FIM) workflows.",
-      "capability": null
+      "capability": null,
+      "contextTokens": 256000
     },
     {
       "id": "glm-5-3",
@@ -359,13 +419,14 @@
       "note": "Flagship 1M context model; available through GLM Coding Plan and OpenCode Zen.",
       "capability": {
         "metrics": {
-          "intelligence": 60
+          "intelligence": 49
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/glm-5-3",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 1000000
     },
     {
       "id": "glm-5-3-flash",
@@ -380,12 +441,13 @@
       "note": "Standard rate shown. A 50% promotional rate ($0.075 input / $0.015 cached / $0.25 output) runs through September 9, 2026.",
       "capability": {
         "metrics": {
-          "intelligence": 57
+          "intelligence": 46
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
         "source": "https://artificialanalysis.ai/models/glm-5-3-flash",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 1000000
     },
     {
       "id": "kimi-k3",
@@ -400,13 +462,14 @@
       "note": "Also available through OpenCode Zen; web search is billed separately.",
       "capability": {
         "metrics": {
-          "intelligence": 60
+          "intelligence": 50
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/kimi-k3",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 1000000
     },
     {
       "id": "kimi-k2-7-code",
@@ -421,12 +484,13 @@
       "note": "Coding-specialized API; not ranked for general writing or research.",
       "capability": {
         "metrics": {
-          "intelligence": 43
+          "intelligence": 34
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
         "source": "https://artificialanalysis.ai/models/kimi-k2-7-code",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 256000
     },
     {
       "id": "meta-muse-spark-1-3",
@@ -441,13 +505,14 @@
       "note": "Standard tier, not used to improve Meta products. A contributor tier (muse-spark-1.3-contributor) costs $0.10 input / $0.002 cached / $0.20 output in exchange for allowing Meta to train on prompts and outputs.",
       "capability": {
         "metrics": {
-          "intelligence": 62
+          "intelligence": 53
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/muse-spark-1-3",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 1000000
     },
     {
       "id": "qwen-3-8-max",
@@ -462,12 +527,13 @@
       "note": "International (Singapore) endpoint rate. The Beijing, US, Germany, Japan, and Hong Kong endpoints bill lower at $1.65 input / $0.206 cached / $4.951 output. Max input is 991,808 tokens of the 1M window.",
       "capability": {
         "metrics": {
-          "intelligence": 58
+          "intelligence": 47
         },
-        "indexVersion": "4.1.1",
+        "indexVersion": "4.2",
         "source": "https://artificialanalysis.ai/models/qwen3-8-max",
-        "verifiedAt": "2026-09-03"
-      }
+        "verifiedAt": "2026-09-06"
+      },
+      "contextTokens": 1000000
     }
   ]
 }

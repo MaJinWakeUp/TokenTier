@@ -47,6 +47,7 @@ function model(overrides = {}) {
     cached: 0.1,
     output: 5,
     context: "128K",
+    contextTokens: 128_000,
     source: "https://example.com/pricing",
     verifiedAt: today,
     note: "Official list price.",
@@ -57,7 +58,7 @@ function model(overrides = {}) {
 
 function dataset(models = [model()], overrides = {}) {
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     updatedAt: today,
     currency: "USD",
     unit: "per-million-tokens",
@@ -100,6 +101,7 @@ function scenarioDocument(scenarios = [scenario()], overrides = {}) {
     metricNote: "Sub-index values are not published per model yet.",
     profileNote: "Each profile is a typical month of one kind of work.",
     tierCuts: [0.15, 0.5, 0.85],
+    costRatioBands: [1.25, 2, 4],
     ranking: {
       models: { cost: 0.65, headroom: 0.35 },
       plans: { price: 0.5, headroom: 0.3, confidence: 0.2 },
@@ -131,7 +133,7 @@ function plan(overrides = {}) {
 
 function planDocument(plans = [plan()], overrides = {}) {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     updatedAt: today,
     currency: "USD",
     plans,

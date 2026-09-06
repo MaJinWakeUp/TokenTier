@@ -261,9 +261,14 @@ main {
   background: var(--bg-inset);
 }
 
-.workspace-tabs button {
+.workspace-tabs button,
+.workspace-tabs a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 44px;
   padding: 0 15px;
+  text-decoration: none;
   border: 0;
   border-radius: 8px;
   background: transparent;
@@ -274,11 +279,13 @@ main {
   transition: color 160ms ease, background 160ms ease;
 }
 
-.workspace-tabs button:hover {
+.workspace-tabs button:hover,
+.workspace-tabs a:hover {
   color: var(--text-primary);
 }
 
-.workspace-tabs button.active {
+.workspace-tabs button.active,
+.workspace-tabs a.active {
   background: var(--lime);
   color: var(--ink);
 }
@@ -1069,30 +1076,6 @@ main {
   background: var(--bg-elevated);
 }
 
-.sort-field {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-  white-space: nowrap;
-  color: var(--text-tertiary);
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 13px;
-  text-transform: uppercase;
-}
-
-.sort-field select {
-  height: 44px;
-  padding: 0 31px 0 11px;
-  border: 1px solid var(--border-strong);
-  border-radius: 9px;
-  background: var(--bg-inset);
-  color: var(--text-primary);
-  font-family: var(--font-geist-sans), sans-serif;
-  font-size: 14px;
-  text-transform: none;
-}
-
 .columns-menu {
   position: absolute;
   right: 0;
@@ -1430,19 +1413,6 @@ td:first-child {
   text-align: center;
 }
 
-.plans-section {
-  border-top: 1px solid var(--border-subtle);
-  background: var(--bg-canvas);
-  color: var(--text-primary);
-  transition: background-color 200ms ease, color 200ms ease;
-}
-
-.plan-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
 .plan-card {
   display: flex;
   min-height: 330px;
@@ -1460,58 +1430,6 @@ td:first-child {
   border-color: var(--brand-accent);
   box-shadow: var(--card-shadow);
   transform: translateY(-3px);
-}
-
-.plan-heading {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 11px;
-}
-
-.plan-heading .provider-orb {
-  width: 28px;
-  height: 28px;
-  border-radius: 9px;
-}
-
-.plan-heading small {
-  color: var(--text-tertiary);
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.plan-heading h3 {
-  margin: 2px 0 0;
-  font-size: 15px;
-  letter-spacing: -0.025em;
-  color: var(--text-primary);
-}
-
-.plan-heading a {
-  color: var(--text-muted);
-  font-size: 13px;
-}
-
-.plan-price {
-  display: flex;
-  align-items: baseline;
-  gap: 7px;
-  margin: 33px 0 24px;
-}
-
-.plan-price strong {
-  font-size: 40px;
-  font-weight: 710;
-  letter-spacing: -0.06em;
-  color: var(--text-primary);
-}
-
-.plan-price span {
-  color: var(--text-muted);
-  font-size: 13px;
 }
 
 .equivalent {
@@ -1542,20 +1460,6 @@ td:first-child {
   color: var(--text-muted);
   font-size: 13px;
   line-height: 1.4;
-}
-
-.plan-note {
-  margin: auto 0 0;
-  padding-top: 18px;
-  color: var(--text-muted);
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.proxy-note {
-  margin: 19px 0 0;
-  color: var(--text-muted);
-  font-size: 13px;
 }
 
 .sources {
@@ -2383,9 +2287,7 @@ td:first-child {
     grid-template-columns: repeat(2, minmax(230px, 1fr));
   }
 
-  .plan-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  
 
   .recommendation-workspace {
     grid-template-columns: 1fr;
@@ -2417,15 +2319,13 @@ td:first-child {
     text-align: left;
   }
 
-  .settings-heading,
-  .plan-matches-heading {
+  .settings-heading {
     align-items: flex-start;
     flex-direction: column;
     gap: 10px;
   }
 
-  .settings-heading p,
-  .plan-matches-heading p {
+  .settings-heading p {
     max-width: 620px;
     text-align: left;
   }
@@ -2442,9 +2342,7 @@ td:first-child {
     font-size: 50px;
   }
 
-  .model-cost-list {
-    grid-template-columns: 1fr;
-  }
+  
 
   .decision-banner {
     grid-template-columns: auto 1fr;
@@ -2486,7 +2384,8 @@ td:first-child {
     width: 100%;
   }
 
-  .workspace-tabs button {
+  .workspace-tabs button,
+  .workspace-tabs a {
     min-height: 44px;
     padding: 0 8px;
     font-size: 13px;
@@ -2550,6 +2449,15 @@ td:first-child {
 
   .preset-call strong {
     margin-top: 4px;
+  }
+
+  /* The dock's narrow layout is a two-column header; everything below it is a
+     full-width row, or the leader names and the Recommend link truncate to a
+     single letter in a 0.8fr column. */
+  .preset-leaders,
+  .scenario-dock-rationale,
+  .scenario-dock-action {
+    grid-column: 1 / -1;
   }
 
   .recommendation-view {
@@ -2664,15 +2572,9 @@ td:first-child {
     grid-template-columns: 1fr;
   }
 
-  .cost-list-heading {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 10px;
-  }
+  
 
-  .cost-list-heading p {
-    text-align: left;
-  }
+  
 
   .model-cost-row {
     gap: 12px;
@@ -2731,24 +2633,16 @@ td:first-child {
     width: 100%;
   }
 
-  .sort-field {
-    justify-self: stretch;
-  }
+  
 
-  .sort-field select {
-    min-width: 0;
-    flex: 1;
-  }
+  
 
-  .plan-grid {
-    grid-template-columns: 1fr;
-  }
+  
 
   .plan-card {
     min-height: 310px;
   }
 
-  .tab-shortcut-kbd,
   .search-shortcut-kbd {
     display: none;
   }
@@ -3179,29 +3073,6 @@ tbody tr:hover .sticky-col {
   background: var(--bg-elevated);
 }
 
-.cost-cell {
-  position: relative;
-}
-
-.cost-bar-track {
-  position: absolute;
-  top: 6px;
-  bottom: 6px;
-  right: 8px;
-  left: 30px;
-  pointer-events: none;
-  background: transparent;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.cost-bar-fill {
-  height: 100%;
-  background: var(--brand-accent-soft);
-  border-radius: 4px;
-  border: 1px solid var(--brand-accent-glow);
-}
-
 .cost-row-bar {
   position: absolute;
   left: 0;
@@ -3211,24 +3082,6 @@ tbody tr:hover .sticky-col {
   border-radius: 11px;
   pointer-events: none;
   z-index: 0;
-}
-
-.recommended-row {
-  background: rgba(56, 239, 125, 0.04);
-}
-
-.recommended-chip {
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: var(--brand-accent-soft);
-  border: 1px solid var(--brand-accent);
-  color: var(--accent-readable);
-  margin-left: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
 .model-cell-header {
@@ -3272,29 +3125,6 @@ tbody tr:hover .sticky-col {
   background: var(--brand-accent);
   color: var(--brand-accent-text);
   border-color: var(--brand-accent);
-}
-
-.budget-fallback-banner {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  padding: 14px 18px;
-  border-radius: 14px;
-  background: rgba(251, 191, 36, 0.12);
-  border: 1px solid rgba(251, 191, 36, 0.3);
-  color: #d97706;
-  margin-bottom: 16px;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-[data-theme="dark"] .budget-fallback-banner {
-  color: #fbbf24;
-}
-
-.fallback-icon {
-  font-size: 20px;
-  flex-shrink: 0;
 }
 
 .confidence-caveat-badge {
@@ -3507,21 +3337,6 @@ tbody tr:hover .sticky-col {
   line-height: 1.5;
 }
 
-.info-tooltip {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--bg-inset);
-  color: var(--text-muted);
-  font-size: 13px;
-  text-decoration: none;
-  cursor: help;
-  margin-left: 4px;
-}
-
 .hero-stats-strip {
   display: flex;
   gap: 8px;
@@ -3565,7 +3380,6 @@ tbody tr:hover .sticky-col {
   border-color: var(--brand-accent);
 }
 
-.tab-shortcut-kbd,
 .search-shortcut-kbd {
   font-family: var(--font-geist-mono), monospace;
   font-size: 13px;
@@ -4019,16 +3833,15 @@ footer.site-footer {
 
 @media print {
   .site-header,
-  .scenario-dock-action,
-  .theme-switcher,
-  .back-to-top-btn,
-  .workspace-tabs,
-  .search-field,
-  .columns-selector,
-  .sort-field,
-  .provider-filters,
-  .table-scroll-hint,
-  .compare-floating-tray {
+.scenario-dock-action,
+.theme-switcher,
+.back-to-top-btn,
+.workspace-tabs,
+.search-field,
+.columns-selector,
+.provider-filters,
+.table-scroll-hint,
+.compare-floating-tray {
     display: none !important;
   }
   main {
@@ -4397,7 +4210,8 @@ footer.site-footer {
     display: inline;
   }
 
-  .workspace-tabs button {
+  .workspace-tabs button,
+  .workspace-tabs a {
     padding: 0 8px;
     font-size: 13px;
   }
@@ -4539,4 +4353,301 @@ footer.site-footer {
   color: var(--coral);
   font-family: var(--font-geist-sans), sans-serif;
   font-size: 13px;
+}
+
+/* --- Rankings: cheapest qualified leaders --------------------------------
+   The first viewport has to answer "what costs least for this kind of work"
+   before the board is scrolled, so the two leaders sit in the profile dock
+   beside the preset they were derived from.
+   ------------------------------------------------------------------------ */
+
+.preset-leaders {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  background: var(--bg-inset);
+}
+
+.preset-leaders > span {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.preset-leader {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  min-height: 52px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--bg-card-alt);
+  color: var(--text-primary);
+  text-align: left;
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+
+.preset-leader:hover {
+  border-color: var(--brand-accent);
+  transform: translateY(-1px);
+}
+
+.preset-leader > span {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.preset-leader strong,
+.preset-leader small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preset-leader strong {
+  font-size: 14px;
+}
+
+.preset-leader small {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.preset-leader b {
+  font-size: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.preset-leader b small {
+  margin-left: 3px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.preset-leader-empty {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* --- Recommend: advanced workload controls and result states ------------- */
+
+.advanced-settings {
+  margin-top: 4px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  background: var(--bg-inset);
+}
+
+.advanced-settings > summary {
+  padding: 14px 16px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.advanced-settings > summary::marker,
+.advanced-settings > summary::-webkit-details-marker {
+  color: var(--text-muted);
+}
+
+.advanced-settings > fieldset,
+.advanced-settings > .settings-note {
+  margin: 0;
+  padding: 0 16px 16px;
+}
+
+.advanced-settings > fieldset {
+  border: 0;
+}
+
+.decision-advice {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.frontier-same {
+  display: block;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.storage-warning,
+.share-manual-note {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 14px;
+  padding: 10px 13px;
+  border: 1px solid var(--note-accent);
+  border-radius: 10px;
+  background: var(--note-soft);
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.share-card .rank-share-field {
+  margin-top: 12px;
+}
+
+/* --- Tier list: preview, recovery, board metadata, card ordering --------- */
+
+.rank-preview-banner,
+.rank-recovery-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--note-accent);
+  border-radius: 14px;
+  background: var(--note-soft);
+}
+
+.rank-preview-banner p,
+.rank-recovery-banner p {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin: 0;
+  max-width: 72ch;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.rank-meta-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.rank-meta-fields label {
+  display: grid;
+  gap: 6px;
+}
+
+.rank-meta-fields span {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.rank-meta-fields input {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+/* Three controls beside a 205px name field left the name about 95px wide, so
+   the controls take their own row under it. The tier row is tall enough that
+   this costs no height. */
+.rank-tier-label {
+  flex-wrap: wrap;
+  align-content: center;
+}
+
+.rank-tier-label label {
+  flex: 1 0 100%;
+}
+
+.rank-tier-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.rank-tier-controls button {
+  width: 36px;
+  height: 36px;
+}
+
+.rank-card-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.rank-card-order {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.rank-card-order button {
+  display: grid;
+  width: 28px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+}
+
+.rank-card-order button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.rank-plan-card.retired {
+  border-style: dashed;
+  border-color: var(--coral);
+  background: var(--coral-soft);
+  cursor: default;
+}
+
+.rank-pool-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px 12px;
+}
+
+.rank-pool-filters select {
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+@media (max-width: 640px) {
+  .rank-pool-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rank-preview-banner,
+  .rank-recovery-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* An "API only" answer is a short one; the card says so without stretching to
+   match the card beside it. */
+.path-card-empty {
+  align-self: start;
 }
