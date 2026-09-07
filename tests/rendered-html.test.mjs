@@ -486,6 +486,34 @@ test("keeps its layout, density and touch-target contracts", async () => {
   assert.doesNotMatch(styles, /\.view-panel\[hidden\]/, "routes replaced the hidden view panels");
 });
 
+// A `var(--name)` that is never defined makes the whole declaration invalid at
+// computed-value time, so the browser drops it silently and the rule simply does
+// not apply. That is how the frontier options lost their borders and active
+// background, three :focus-visible outlines stopped rendering, and the "best"
+// cell in the comparison table lost its highlight — all with no error anywhere.
+test("every custom property the stylesheet uses is defined", async () => {
+  const styles = await read("app/globals.css");
+
+  const defined = new Set([...styles.matchAll(/(--[\w-]+)\s*:/g)].map((match) => match[1]));
+  const used = new Set([...styles.matchAll(/var\((--[\w-]+)\s*[,)]/g)].map((match) => match[1]));
+
+  // next/font sets these two on the body element, so they are supplied from
+  // outside the stylesheet by design.
+  const external = new Set(["--font-geist-sans", "--font-geist-mono"]);
+  const undeclared = [...used].filter((token) => !defined.has(token) && !external.has(token));
+
+  assert.deepEqual(undeclared, [], `undefined custom properties: ${undeclared.join(", ")}`);
+
+  // Both themes have to define the same set, or a token resolves in one theme
+  // and silently drops the rule in the other.
+  const lightStart = styles.indexOf('html[data-theme="light"]');
+  const darkTokens = new Set([...styles.slice(0, lightStart).matchAll(/^\s{2}(--[\w-]+)\s*:/gm)].map((m) => m[1]));
+  const lightBlock = styles.slice(lightStart, styles.indexOf("}", styles.indexOf("{", lightStart)));
+  const lightTokens = new Set([...lightBlock.matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]));
+  const missingInLight = [...lightTokens].filter((token) => !darkTokens.has(token));
+  assert.deepEqual(missingInLight, [], "the light theme overrides only tokens the base theme defines");
+});
+
 // --ink is the ink for coloured fills. On a dark inset panel it is invisible,
 // which is how the capability bar and the index column came to render as blank
 // gaps in dark mode while looking fine in light mode.
