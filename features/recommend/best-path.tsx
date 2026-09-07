@@ -54,6 +54,16 @@ export function BestPath({
   return (
     <>
       <div className={`decision-banner recommendation-summary decision-${decision.preferredPath}`}>
+        {/* The verdict states the question it answered, so it is still readable
+            once the settings above it have scrolled out of view. */}
+        <p className="decision-workload">
+          <strong>{scenario.label}</strong>
+          <span>{workload.calls.toLocaleString()} calls / mo</span>
+          <span>{workload.input.toLocaleString()} in + {workload.output.toLocaleString()} out</span>
+          <span>{Math.round(workload.cacheRatio * 100)}% cached</span>
+          <span>${workload.budget.toLocaleString()} budget</span>
+          <span>{workload.access === "any" ? "any surface" : workload.access}</span>
+        </p>
         <div className="decision-banner-header">
           <div className="decision-banner-badge-group">
             {!(decision.apiNoMatch && decision.planNoMatch) && <span className="best-path-badge">BEST PATH</span>}

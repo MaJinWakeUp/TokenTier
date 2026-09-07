@@ -7,17 +7,35 @@
 // stylesheet token).
 
 import assert from "node:assert/strict";
-import { access, readFile } from "node:fs/promises";
+import { access, readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 
 const projectRoot = new URL("../", import.meta.url);
+
+// The deploy mounts the site under the repository name on GitHub Pages and at
+// the root everywhere else, so the routes these tests request depend on how the
+// bundle was built. Rather than recompute next.config's rule here — where it
+// would silently drift — read it off the artifact: the build emits its assets
+// under the base path, so whichever directory holds `_next` names it.
+async function discoverBasePath() {
+  const serverDir = new URL("../dist/server/", import.meta.url);
+  const entries = await readdir(serverDir, { withFileTypes: true });
+  if (entries.some((entry) => entry.isDirectory() && entry.name === "_next")) return "";
+  for (const entry of entries.filter((e) => e.isDirectory() && e.name !== "ssr")) {
+    const nested = await readdir(new URL(`${entry.name}/`, serverDir)).catch(() => []);
+    if (nested.includes("_next")) return `/${entry.name}`;
+  }
+  throw new Error("could not find the built assets, so the base path is unknown");
+}
+
+const basePath = await discoverBasePath();
 
 async function render(path = "/") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   const { default: worker } = await import(workerUrl.href);
 
   return worker.fetch(
-    new Request(`http://localhost${path}`, { headers: { accept: "text/html" } }),
+    new Request(`http://localhost${basePath}${path}`, { headers: { accept: "text/html" } }),
     { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } },
     { waitUntil() {}, passThroughOnException() {} },
   );
@@ -25,7 +43,7 @@ async function render(path = "/") {
 
 async function html(path = "/") {
   const response = await render(path);
-  assert.equal(response.status, 200, `${path} responds 200`);
+  assert.equal(response.status, 200, `${basePath}${path} responds 200`);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i, `${path} is HTML`);
   return response.text();
 }
@@ -48,8 +66,8 @@ test("every section is its own route with its own title and canonical", async ()
     const title = markup.match(/<title>([^<]*)<\/title>/)?.[1];
     assert.ok(title && title.includes("TokenTier"), `${route.path} has a TokenTier title`);
     // The shell is shared, so every route carries the nav to the other two.
-    assert.match(markup, /href="\/recommend\/"/, `${route.path} links to Recommend`);
-    assert.match(markup, /href="\/tier-list\/"/, `${route.path} links to the tier list`);
+    assert.ok(markup.includes(`href="${basePath}/recommend/"`), `${route.path} links to Recommend`);
+    assert.ok(markup.includes(`href="${basePath}/tier-list/"`), `${route.path} links to the tier list`);
     assert.match(markup, /© 2026 Jin Ma · Open-source code under MIT · Independent project/, `${route.path} footer identity`);
   }
 
@@ -146,10 +164,22 @@ test("Recommend puts the decision before the explanation", async () => {
   for (const surface of ["Any surface", "Direct API", "Chat app", "Coding client"]) {
     assert.ok(markup.includes(surface), `offers the ${surface} requirement`);
   }
-  // The verdict is above the settings that produced it.
+  // The settings come before the verdict. A reader who lands on a shared link
+  // has to be able to see what is being priced before being told what it costs;
+  // the previous order put the answer above the question.
   assert.ok(
-    markup.indexOf("decision-banner") < markup.indexOf("recommendation-workspace"),
-    "shows the verdict before the settings workspace",
+    markup.indexOf('id="recommendation-settings"') < markup.indexOf("decision-banner"),
+    "shows the settings before the verdict they produced",
+  );
+  // And the verdict repeats the workload, so it still says what it answered once
+  // the settings have scrolled away.
+  assert.match(markup, /class="decision-workload"/);
+  assert.match(markup, /calls \/ mo/);
+  assert.match(markup, /budget<\/span>/);
+  // Sharing is an end-of-task action, so it follows the answer.
+  assert.ok(
+    markup.indexOf("decision-banner") < markup.indexOf("share-card"),
+    "the share card follows the recommendation",
   );
   // A share link is offered with a selectable fallback, not clipboard only.
   assert.match(markup, /Copy link/);
@@ -425,7 +455,8 @@ test("keeps its layout, density and touch-target contracts", async () => {
   // The move menu must be able to show its own option text.
   assert.match(styles, /\.rank-plan-card select\s*\{[^}]*min-width:\s*108px;/s);
   assert.match(styles, /\.rank-company-grid\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit, minmax\(300px, 1fr\)\);/s);
-  assert.match(styles, /\.recommendation-workspace\s*\{/);
+  assert.match(styles, /\.custom-settings-grid\s*\{[^}]*repeat\(4, minmax\(0, 1fr\)\);/s);
+  assert.match(styles, /@media \(max-width: 1120px\)[\s\S]*?\.custom-settings-grid\s*\{[^}]*repeat\(2,/s);
   assert.match(styles, /\.plan-match-grid\s*\{/);
   assert.match(styles, /\.frontier-option\s*\{/);
   assert.match(styles, /\.mini-tier\.tier-c \{ background: var\(--tier-c-bg\); \}/);
@@ -466,6 +497,34 @@ test("keeps its layout, density and touch-target contracts", async () => {
   assert.doesNotMatch(styles, /\.hero-card|\.scenario-tabs|\.price-scenario-tabs|\.call-profile/);
   assert.doesNotMatch(styles, /\.recommendation-intro/);
   assert.doesNotMatch(styles, /\.view-panel\[hidden\]/, "routes replaced the hidden view panels");
+});
+
+// A `var(--name)` that is never defined makes the whole declaration invalid at
+// computed-value time, so the browser drops it silently and the rule simply does
+// not apply. That is how the frontier options lost their borders and active
+// background, three :focus-visible outlines stopped rendering, and the "best"
+// cell in the comparison table lost its highlight — all with no error anywhere.
+test("every custom property the stylesheet uses is defined", async () => {
+  const styles = await read("app/globals.css");
+
+  const defined = new Set([...styles.matchAll(/(--[\w-]+)\s*:/g)].map((match) => match[1]));
+  const used = new Set([...styles.matchAll(/var\((--[\w-]+)\s*[,)]/g)].map((match) => match[1]));
+
+  // next/font sets these two on the body element, so they are supplied from
+  // outside the stylesheet by design.
+  const external = new Set(["--font-geist-sans", "--font-geist-mono"]);
+  const undeclared = [...used].filter((token) => !defined.has(token) && !external.has(token));
+
+  assert.deepEqual(undeclared, [], `undefined custom properties: ${undeclared.join(", ")}`);
+
+  // Both themes have to define the same set, or a token resolves in one theme
+  // and silently drops the rule in the other.
+  const lightStart = styles.indexOf('html[data-theme="light"]');
+  const darkTokens = new Set([...styles.slice(0, lightStart).matchAll(/^\s{2}(--[\w-]+)\s*:/gm)].map((m) => m[1]));
+  const lightBlock = styles.slice(lightStart, styles.indexOf("}", styles.indexOf("{", lightStart)));
+  const lightTokens = new Set([...lightBlock.matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]));
+  const missingInLight = [...lightTokens].filter((token) => !darkTokens.has(token));
+  assert.deepEqual(missingInLight, [], "the light theme overrides only tokens the base theme defines");
 });
 
 // --ink is the ink for coloured fills. On a dark inset panel it is invisible,
