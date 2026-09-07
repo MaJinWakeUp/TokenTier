@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import SiteFooter from "@/components/site-footer";
+import SiteHeader from "@/components/site-header";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -17,11 +19,14 @@ const socialImageUrl = new URL("og.png", publicSiteUrl);
 
 export const metadata: Metadata = {
   metadataBase: publicSiteUrl,
-  title: "TokenTier — AI APIs vs subscription plans",
+  title: {
+    default: "TokenTier — AI APIs vs subscription plans",
+    template: "%s",
+  },
   description:
     "Compare AI API prices with subscription quotas, credits, scenario tier lists, and a transparent API-versus-plan recommender.",
   alternates: {
-    canonical: "https://majinwakeup.github.io/TokenTier/",
+    canonical: "./",
   },
   icons: {
     icon: [{ url: new URL("favicon.svg", publicSiteUrl), type: "image/svg+xml" }],
@@ -77,7 +82,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <SiteHeader />
         {children}
+        <SiteFooter />
       </body>
     </html>
   );

@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["esnext"],
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "strict": true,
+    "noEmit": false,
+    "outDir": "build/lib",
+    "rootDir": "lib",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "declaration": false,
+    "sourceMap": false,
+    "incremental": false
+  },
+  "include": ["lib/**/*.ts"],
+  "exclude": ["lib/catalog/index.ts", "lib/browser"]
+}

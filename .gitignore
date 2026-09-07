@@ -43,6 +43,7 @@ data/*.lock
 # published host. Keep these on disk, out of the repository.
 /.openai/
 /build/sites-vite-plugin.ts
+/build/lib/
 /outputs/
 /work/
 
