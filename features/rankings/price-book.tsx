@@ -17,8 +17,7 @@ import { contextSize, metricValue } from "@/lib/domain/eligibility";
 import { confidenceScore, placementSort, planWorkingModel } from "@/lib/domain/placement";
 import { callCost, planEstimate } from "@/lib/domain/pricing";
 import {
-  formatEstimateRange,
-  formatMoneyRange,
+  estimatePresentation,
   metricLabels,
   placementClass,
   placementLabel,
@@ -395,9 +394,9 @@ export function PriceBook({
                       <td>
                         {estimate ? (
                           <>
-                            <strong>{formatEstimateRange(estimate.callsLow, estimate.callsHigh)} calls</strong>
+                            <strong>{estimatePresentation(estimate).calls}</strong>
                             <small className="estimate-detail">
-                              {formatMoneyRange(estimate.valueLow, estimate.valueHigh)} · {estimate.basis.label}
+                              {estimatePresentation(estimate).value} · {estimate.basis.label}
                             </small>
                             {workingModel && (
                               <small className="estimate-detail" title={`Cheapest model on this plan that clears the ${scenario.label} bar`}>

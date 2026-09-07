@@ -36,6 +36,7 @@ import {
   clearRecovery,
   emptyBoards,
   readBoards,
+  replaceUnreadableBoards,
   readRecovery,
   saveRecovery,
   writeBoards,
@@ -75,6 +76,7 @@ export function TierListView() {
   const [preview, setPreview] = useState<Preview | null>(null);
   const [recovery, setRecovery] = useState<Recovery | null>(null);
   const [status, setStatus] = useState("");
+  const [storageBlocked, setStorageBlocked] = useState(false);
   const [saved, setSaved] = useState(false);
   const [shareUrl, setShareUrl] = useState("");
   const [shareState, setShareState] = useState<"idle" | "copied" | "manual" | "too-large">("idle");
@@ -92,6 +94,7 @@ export function TierListView() {
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect -- one-time hydration from storage and an explicit share link */
     const stored = readBoards(itemsBySubject);
+    setStorageBlocked(stored.blocked);
     const restored = { ...emptyBoards(), ...stored.boards };
     setBoards(restored);
 
@@ -140,13 +143,13 @@ export function TierListView() {
   // Persist after hydration so an empty first render never overwrites saved
   // work, and never while a preview is open — a preview is someone else's.
   useEffect(() => {
-    if (!hydrated || preview) return;
+    if (!hydrated || preview || storageBlocked) return;
     // Persisting is the external system this effect exists to update, and
     // whether the write landed is that system answering back. The editor has to
     // know, because "Saved in this browser" must not be claimed on a failure.
     // eslint-disable-next-line react-hooks/set-state-in-effect -- storage feedback, not derived state
     setSaved(writeBoards(subject, boards));
-  }, [boards, hydrated, preview, subject]);
+  }, [boards, hydrated, preview, subject, storageBlocked]);
 
   const update = (change: (current: Board) => Board) => {
     if (!editing) return;
@@ -369,6 +372,13 @@ export function TierListView() {
 
   return (
     <main className="view-panel">
+      {storageBlocked && <div role="alert" className="decision-advice">
+        <p>Saved boards could not be read. Autosave is paused to preserve them. You can edit and export this session.</p>
+        {!preview && <button className="button button-ghost" type="button" onClick={() => {
+          if (replaceUnreadableBoards(subject, boards)) { setStorageBlocked(false); setSaved(true); setStatus("Original saved data backed up; this session is now saved."); }
+          else setStatus("Could not preserve a backup and save. Original data is unchanged; export this session instead.");
+        }}>Back up original data and replace saved boards</button>}
+      </div>}
       <a className="skip-link" href="#rank-top">Skip to your board</a>
       <section className="rank-view" id="rank-top" aria-labelledby="rank-top-heading">
         <header className="rank-header">

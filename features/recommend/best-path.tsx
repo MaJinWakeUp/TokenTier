@@ -6,7 +6,7 @@ import { capabilityOf } from "@/lib/domain/eligibility";
 import type { Decision } from "@/lib/domain/decision";
 import type { Objective, Workload } from "@/lib/domain/workload";
 import {
-  formatEstimateRange,
+  estimatePresentation,
   metricLabels,
   monthlyPrice,
   monthlyPriceAgainst,
@@ -14,20 +14,6 @@ import {
   price,
 } from "@/lib/format";
 import { Icon } from "@/components/icon";
-
-// What to do about it, in the reader's own terms. A constraint is never
-// quietly relaxed, so the way out has to be said out loud.
-function noMatchAdvice(decision: Decision, workload: Workload): string | null {
-  if (decision.apiNoMatch && decision.planNoMatch) {
-    return `Nothing qualifies at ${workload.calls.toLocaleString()} calls a month within $${workload.budget.toLocaleString()}. Raise the budget, lower the call volume, or pick a work type with a lower capability bar.`;
-  }
-  if (decision.apiNoMatch) {
-    return "No API model clears this bar within the budget. Raising the budget or lowering the call volume is the direct fix; changing the access requirement widens the field.";
-  }
-  // A plan-only shortfall is already stated on the plan card itself, so
-  // repeating it here would say the same thing twice.
-  return null;
-}
 
 export function BestPath({
   decision,
@@ -47,8 +33,7 @@ export function BestPath({
   const planBest = decision.result.plans.best;
   const estimate = planBest?.estimate ?? null;
   const apiIndex = decision.apiModel ? capabilityOf(decision.apiModel, metric) : null;
-  const advice = noMatchAdvice(decision, workload);
-  const planCalls = estimate ? formatEstimateRange(estimate.callsLow, estimate.callsHigh) : "—";
+  const planCalls = estimatePresentation(estimate).calls;
   const oneAnswer = decision.frontier.every((pick) => pick.model?.id === decision.frontier[0]?.model?.id);
 
   return (
@@ -103,7 +88,7 @@ export function BestPath({
           <div className="decision-fact">
             <small>Plan Cost &amp; Quota</small>
             <strong>{decision.plan === null ? "None" : `$${decision.planMonthly}/mo`}</strong>
-            <span>{decision.plan === null ? "No comparable plan" : `${decision.plan.name} (~${planCalls} calls)`}</span>
+            <span>{decision.plan === null ? "No comparable plan" : `${decision.plan.name} (~${planCalls})`}</span>
           </div>
           <div className="decision-fact">
             <small>Difference</small>
@@ -112,7 +97,6 @@ export function BestPath({
           </div>
         </div>
         <p className="decision-verdict-caption">{decision.caption}</p>
-        {advice && <p className="decision-advice">{advice}</p>}
       </div>
 
       <section className="recommendation-card recommendation-output" aria-labelledby="recommendation-title">
@@ -127,7 +111,7 @@ export function BestPath({
             </div>
             {decision.apiModel === null ? (
               <div className="path-title">
-                <div><strong>No qualified model</strong><small>No model clears the bar within these constraints</small></div>
+                <div><strong>No qualified model</strong><small>{decision.apiReason}</small></div>
               </div>
             ) : (
               <div className="path-title">
@@ -154,14 +138,14 @@ export function BestPath({
               <p>
                 {decision.apiModel
                   ? `${decision.active.hint}, at ${monthlyPriceAgainst(decision.apiSpend, workload.budget)}/mo for ${workload.calls.toLocaleString()} calls.`
-                  : `No model clears the ${scenario.label.toLowerCase()} bar at this context size and budget.`}
+                  : decision.apiReason}
               </p>
             </div>
 
-            {decision.apiModel && (
+            {decision.result.api.evaluations.length > 0 && (
               <div className="frontier" role="group" aria-label="API priority">
                 <p className="frontier-caption">
-                  {oneAnswer
+                  {oneAnswer && decision.apiModel
                     ? "One model leads on every axis for this workload and budget."
                     : "These are three different answers. Pick which one to compare against the plan."}
                 </p>
@@ -202,8 +186,7 @@ export function BestPath({
             <article className="path-card path-card-empty">
               <div className="path-card-label"><span>BEST PLAN</span></div>
               <p>
-                No subscription plan has a published allowance that provably covers this workload within budget,
-                so this comparison is API-only. Conditional and unmeasurable plans are listed below.
+                {decision.planReason}
               </p>
             </article>
           ) : (
@@ -231,7 +214,7 @@ export function BestPath({
               <dl>
                 <div>
                   <dt>{estimate.basis.kind === "break-even" ? "API-cost parity" : "Est. capacity"}</dt>
-                  <dd>{planCalls} calls</dd>
+                  <dd>{planCalls}</dd>
                 </div>
                 <div><dt>Model used</dt><dd>{planBest?.workingModel?.name ?? "None that clears the bar"}</dd></div>
                 <div><dt>Published quota</dt><dd>{planQuota(decision.plan, workload.scenarioId)}</dd></div>
@@ -248,13 +231,30 @@ export function BestPath({
                   {decision.plan.name}: ${decision.plan.monthly}/month ·{" "}
                   {planBest?.coverage === null
                     ? "published quota cannot be converted to this profile"
-                    : `estimated ${planCalls} calls for this profile`}.
+                    : `estimated ${planCalls} for this profile`}.
                 </p>
               </div>
             </article>
           )}
         </div>
       </section>
+      {decision.planNoMatch && workload.calls > 0 && decision.conditionalPlans.length > 0 && (
+        <section className="recommendation-card" aria-labelledby="conditional-title">
+          <h2 id="conditional-title">Conditional plans to investigate</h2>
+          <p>These fit your budget and model requirements. Coverage is unverified; they are not guaranteed matches.</p>
+          <div className="recommendation-grid">
+            {decision.conditionalPlans.map((entry) => <article className="path-card" key={entry.plan.id}>
+              <span className="gate-pill">Conditional</span>
+              <h3><button className="table-item-name-btn" type="button" onClick={() => onInspect(entry.plan)}>{entry.plan.name}</button></h3>
+              <p>{monthlyPrice(entry.plan.monthly ?? 0)}/mo · {entry.workingModel?.name}</p>
+              <p>{estimatePresentation(entry.estimate).calls}. {entry.plan.quota}</p>
+              <p>{entry.plan.evidence}. {entry.plan.conditionalLimits?.map((limit) => limit.description).join("; ")}</p>
+              <p>Confirm model-specific capacity and reset limits for your {workload.calls.toLocaleString()} monthly calls.</p>
+              <a href={entry.plan.source} target="_blank" rel="noreferrer">Provider source</a>
+            </article>)}
+          </div>
+        </section>
+      )}
     </>
   );
 }

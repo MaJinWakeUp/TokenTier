@@ -6,7 +6,7 @@ import type { Model, Plan } from "@/lib/catalog/types";
 import type { Decision } from "@/lib/domain/decision";
 import type { PlanEvaluation } from "@/lib/domain/recommend";
 import type { Workload } from "@/lib/domain/workload";
-import { formatEstimateRange, monthlyPrice, price } from "@/lib/format";
+import { estimatePresentation, monthlyPrice, price } from "@/lib/format";
 
 type Lane = "api" | "plans";
 
@@ -115,7 +115,9 @@ export function DetailedComparison({
                           ? "not scored"
                           : row.eligible
                             ? `index ${row.index}, clears the bar`
-                            : `index ${row.index}, below the ${scenario.gate.minIndex} bar`}
+                            : row.rejection?.state === "pricing" ? "unsupported pricing at this input size"
+                              : row.rejection?.state === "context" ? "context window too small"
+                                : `index ${row.index}, below the ${scenario.gate.minIndex} bar`}
                       </small>
                     </div>
                     {recommended && <span className="recommendation-badge">Best API</span>}
@@ -164,7 +166,7 @@ export function DetailedComparison({
                         <div><dt>Budget</dt><dd>{evaluation.withinBudget ? "Fits" : "Over budget"}</dd></div>
                         <div>
                           <dt>{evaluation.estimate.basis.kind === "break-even" ? "API-cost parity" : "Est. capacity"}</dt>
-                          <dd>{formatEstimateRange(evaluation.estimate.callsLow, evaluation.estimate.callsHigh)} calls</dd>
+                          <dd>{estimatePresentation(evaluation.estimate).calls}</dd>
                         </div>
                         <div>
                           <dt>Your {workload.calls.toLocaleString()}-call target</dt>
