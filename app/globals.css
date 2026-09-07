@@ -562,12 +562,31 @@ main {
   text-align: right;
 }
 
-.recommendation-workspace {
-  display: grid;
-  grid-template-columns: minmax(430px, 0.95fr) minmax(540px, 1.05fr);
-  align-items: stretch;
-  gap: 22px;
+/* The settings run the full width and come first: the reader has to see what is
+   being priced before being told what it costs. */
+.settings-card {
   margin-top: 28px;
+}
+
+.decision-workload {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 0 0 14px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.decision-workload strong {
+  color: var(--text-primary);
+}
+
+.decision-workload span:not(:last-child)::after,
+.decision-workload strong::after {
+  margin-left: 10px;
+  color: var(--text-muted);
+  content: "·";
 }
 
 .settings-card,
@@ -639,9 +658,11 @@ main {
   text-transform: uppercase;
 }
 
+/* Four controls per fieldset, so four columns: the whole configuration reads as
+   one row on a wide screen instead of wrapping a lone field onto its own line. */
 .custom-settings-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -2254,6 +2275,10 @@ td:first-child {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .custom-settings-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .scenario-dock {
     position: static;
     display: grid;
@@ -2297,12 +2322,6 @@ td:first-child {
 
   .tier-models {
     grid-template-columns: repeat(2, minmax(230px, 1fr));
-  }
-
-  
-
-  .recommendation-workspace {
-    grid-template-columns: 1fr;
   }
 
   .plan-match-grid {
@@ -2482,10 +2501,6 @@ td:first-child {
 
   .recommendation-header p {
     font-size: 15px;
-  }
-
-  .recommendation-workspace {
-    margin-top: 14px;
   }
 
   .settings-card,

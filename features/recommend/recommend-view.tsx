@@ -78,6 +78,8 @@ export function RecommendView() {
           </p>
         )}
 
+        <WorkloadForm controller={controller} />
+
         {!controller.scenarioChosen ? (
           <div className="decision-banner decision-api">
             <p className="decision-verdict-caption">
@@ -100,36 +102,32 @@ export function RecommendView() {
           />
         )}
 
-        <div className="recommendation-workspace">
-          <WorkloadForm controller={controller} />
-
-          <section className="settings-card share-card" aria-labelledby="share-title">
-            <div className="settings-heading"><h2 id="share-title">Share this comparison</h2></div>
-            <div className="settings-body">
-              <p className="settings-note">
-                The link carries the whole workload — work type, token sizes, call volume, cache share,
-                budget, access requirement, and which objective you are viewing.
-              </p>
-              <button className="copy-link-btn" onClick={share} title="Copy a link to this recommendation" type="button">
-                <Icon name={shareState === "copied" ? "check" : "copy"} size={14} />
-                <span>{shareState === "copied" ? "Link copied" : "Copy link"}</span>
-              </button>
-              {shareState === "manual" && (
-                <p className="share-manual-note">This browser blocked the clipboard. Select and copy the link below.</p>
-              )}
-              {shareUrl && (
-                <label className="rank-share-field">
-                  <span>Shareable link</span>
-                  <input onFocus={(event) => event.currentTarget.select()} readOnly value={shareUrl} />
-                </label>
-              )}
-            </div>
-          </section>
-        </div>
-
         {controller.scenarioChosen && (
           <DetailedComparison decision={decision} onInspect={inspect} workload={controller.workload} />
         )}
+
+        <section className="settings-card share-card" aria-labelledby="share-title">
+          <div className="settings-heading"><h2 id="share-title">Share this comparison</h2></div>
+          <div className="settings-body">
+            <p className="settings-note">
+              The link carries the whole workload — work type, token sizes, call volume, cache share,
+              budget, access requirement, and which objective you are viewing.
+            </p>
+            <button className="copy-link-btn" onClick={share} title="Copy a link to this recommendation" type="button">
+              <Icon name={shareState === "copied" ? "check" : "copy"} size={14} />
+              <span>{shareState === "copied" ? "Link copied" : "Copy link"}</span>
+            </button>
+            {shareState === "manual" && (
+              <p className="share-manual-note">This browser blocked the clipboard. Select and copy the link below.</p>
+            )}
+            {shareUrl && (
+              <label className="rank-share-field">
+                <span>Shareable link</span>
+                <input onFocus={(event) => event.currentTarget.select()} readOnly value={shareUrl} />
+              </label>
+            )}
+          </div>
+        </section>
       </section>
 
       <CatalogInspectorViews

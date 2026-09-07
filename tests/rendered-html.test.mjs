@@ -164,10 +164,22 @@ test("Recommend puts the decision before the explanation", async () => {
   for (const surface of ["Any surface", "Direct API", "Chat app", "Coding client"]) {
     assert.ok(markup.includes(surface), `offers the ${surface} requirement`);
   }
-  // The verdict is above the settings that produced it.
+  // The settings come before the verdict. A reader who lands on a shared link
+  // has to be able to see what is being priced before being told what it costs;
+  // the previous order put the answer above the question.
   assert.ok(
-    markup.indexOf("decision-banner") < markup.indexOf("recommendation-workspace"),
-    "shows the verdict before the settings workspace",
+    markup.indexOf('id="recommendation-settings"') < markup.indexOf("decision-banner"),
+    "shows the settings before the verdict they produced",
+  );
+  // And the verdict repeats the workload, so it still says what it answered once
+  // the settings have scrolled away.
+  assert.match(markup, /class="decision-workload"/);
+  assert.match(markup, /calls \/ mo/);
+  assert.match(markup, /budget<\/span>/);
+  // Sharing is an end-of-task action, so it follows the answer.
+  assert.ok(
+    markup.indexOf("decision-banner") < markup.indexOf("share-card"),
+    "the share card follows the recommendation",
   );
   // A share link is offered with a selectable fallback, not clipboard only.
   assert.match(markup, /Copy link/);
@@ -443,7 +455,8 @@ test("keeps its layout, density and touch-target contracts", async () => {
   // The move menu must be able to show its own option text.
   assert.match(styles, /\.rank-plan-card select\s*\{[^}]*min-width:\s*108px;/s);
   assert.match(styles, /\.rank-company-grid\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit, minmax\(300px, 1fr\)\);/s);
-  assert.match(styles, /\.recommendation-workspace\s*\{/);
+  assert.match(styles, /\.custom-settings-grid\s*\{[^}]*repeat\(4, minmax\(0, 1fr\)\);/s);
+  assert.match(styles, /@media \(max-width: 1120px\)[\s\S]*?\.custom-settings-grid\s*\{[^}]*repeat\(2,/s);
   assert.match(styles, /\.plan-match-grid\s*\{/);
   assert.match(styles, /\.frontier-option\s*\{/);
   assert.match(styles, /\.mini-tier\.tier-c \{ background: var\(--tier-c-bg\); \}/);
