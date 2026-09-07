@@ -7,17 +7,35 @@
 // stylesheet token).
 
 import assert from "node:assert/strict";
-import { access, readFile } from "node:fs/promises";
+import { access, readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 
 const projectRoot = new URL("../", import.meta.url);
+
+// The deploy mounts the site under the repository name on GitHub Pages and at
+// the root everywhere else, so the routes these tests request depend on how the
+// bundle was built. Rather than recompute next.config's rule here — where it
+// would silently drift — read it off the artifact: the build emits its assets
+// under the base path, so whichever directory holds `_next` names it.
+async function discoverBasePath() {
+  const serverDir = new URL("../dist/server/", import.meta.url);
+  const entries = await readdir(serverDir, { withFileTypes: true });
+  if (entries.some((entry) => entry.isDirectory() && entry.name === "_next")) return "";
+  for (const entry of entries.filter((e) => e.isDirectory() && e.name !== "ssr")) {
+    const nested = await readdir(new URL(`${entry.name}/`, serverDir)).catch(() => []);
+    if (nested.includes("_next")) return `/${entry.name}`;
+  }
+  throw new Error("could not find the built assets, so the base path is unknown");
+}
+
+const basePath = await discoverBasePath();
 
 async function render(path = "/") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   const { default: worker } = await import(workerUrl.href);
 
   return worker.fetch(
-    new Request(`http://localhost${path}`, { headers: { accept: "text/html" } }),
+    new Request(`http://localhost${basePath}${path}`, { headers: { accept: "text/html" } }),
     { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } },
     { waitUntil() {}, passThroughOnException() {} },
   );
@@ -25,7 +43,7 @@ async function render(path = "/") {
 
 async function html(path = "/") {
   const response = await render(path);
-  assert.equal(response.status, 200, `${path} responds 200`);
+  assert.equal(response.status, 200, `${basePath}${path} responds 200`);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i, `${path} is HTML`);
   return response.text();
 }
@@ -48,8 +66,8 @@ test("every section is its own route with its own title and canonical", async ()
     const title = markup.match(/<title>([^<]*)<\/title>/)?.[1];
     assert.ok(title && title.includes("TokenTier"), `${route.path} has a TokenTier title`);
     // The shell is shared, so every route carries the nav to the other two.
-    assert.match(markup, /href="\/recommend\/"/, `${route.path} links to Recommend`);
-    assert.match(markup, /href="\/tier-list\/"/, `${route.path} links to the tier list`);
+    assert.ok(markup.includes(`href="${basePath}/recommend/"`), `${route.path} links to Recommend`);
+    assert.ok(markup.includes(`href="${basePath}/tier-list/"`), `${route.path} links to the tier list`);
     assert.match(markup, /© 2026 Jin Ma · Open-source code under MIT · Independent project/, `${route.path} footer identity`);
   }
 
