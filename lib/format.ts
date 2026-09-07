@@ -11,7 +11,7 @@ export const metricLabels: Record<MetricKey, string> = {
   longContext: "Long-context Index",
 };
 
-export const tierOrder: Tier[] = ["S", "A", "B", "C"];
+export const tierOrder: Tier[] = ["S", "A", "B", "C", "D"];
 
 // Tiers rank value among the models that already cleared the capability bar,
 // so the letters describe price-for-capability, not raw capability.
@@ -19,7 +19,8 @@ export const tierDescriptions: Record<Tier, string> = {
   S: "Best value above the bar",
   A: "Strong value",
   B: "Fair value",
-  C: "Weakest value above the bar",
+  C: "Costly for what it adds",
+  D: "Weakest value above the bar",
 };
 
 const providerPriority = ["OpenAI", "Anthropic", "xAI", "Google"];

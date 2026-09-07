@@ -1,8 +1,15 @@
 // Derived tier placements. Tiers rank value among the models that already
 // cleared the capability bar, so the letters describe price-for-capability,
-// not raw capability. Placement among the qualified is relative, cut at fixed
-// percentiles, so the board keeps a readable spread however the catalog grows.
-// Nothing here is hand-graded.
+// not raw capability. Nothing here is hand-graded.
+//
+// Placement is curved: the qualified population is ordered by cost and cut at
+// the published proportions, so the board reads as a spread from S to D rather
+// than collapsing into one letter. Fixed cost-ratio bands used to do this, and
+// they had a real advantage — a letter meant the same multiple of the cheapest
+// price in every scenario. But one unusually cheap model is enough to push
+// every other option past the last band, which is how a board ended up with a
+// populated S, an empty A and B, and everything else in C. A curve trades the
+// absolute reading for a board that always distinguishes.
 
 import type { Confidence, Model, Plan, Scenario, Tier, UsageSettings } from "../catalog/types.js";
 import { gateModel, metricValue, scenarioTokens, unscored, type Rejection } from "./eligibility.js";
@@ -17,26 +24,56 @@ export type Placement =
 
 export const noPlacement: Placement = unscored as Placement;
 
-export const tierRank: Record<Tier, number> = { S: 4, A: 3, B: 2, C: 1 };
+export const tierRank: Record<Tier, number> = { S: 5, A: 4, B: 3, C: 2, D: 1 };
 
-// Cost ratio bands for tier assignment: a plan costing <=1.25x the cheapest
-// is S, <=2x is A, <=4x is B, else C. Shared by model and plan placements so
-// the tier letters describe price-for-capability consistently.
-export const DEFAULT_RATIO_BANDS: [number, number, number] = [1.25, 2, 4];
+export const tierLetters: Tier[] = ["S", "A", "B", "C", "D"];
 
-// Assign a tier by cost ratio against the cheapest in the population.
-export function tierByCostRatio(
-  cost: number,
-  cheapest: number,
-  bands: [number, number, number] = DEFAULT_RATIO_BANDS,
-): Tier {
-  if (cost <= 0) return "S";
-  if (cheapest <= 0) return "C";
-  const ratio = cost / cheapest;
-  if (ratio <= bands[0]) return "S";
-  if (ratio <= bands[1]) return "A";
-  if (ratio <= bands[2]) return "B";
-  return "C";
+// The proportions the curve cuts at, used when the catalog is big enough to
+// fill every letter. Overridden by scenarios.tierCuts.
+export const DEFAULT_TIER_CUTS: [number, number, number, number] = [0.2, 0.4, 0.6, 0.8];
+
+export type Priced = { id: string; cost: number };
+
+// Curve a priced population onto the tier letters.
+//
+// Equal costs are grouped first and placed together, so two options that cost
+// the same can never be separated by a letter — the group, not the item, is
+// what gets a position. Ordering is by cost then id, so the result is
+// deterministic and independent of the order the caller passed items in.
+//
+// When there are fewer distinct prices than letters, the letters are used from
+// S downward, one per group. That keeps the board contiguous instead of
+// printing empty rows at the bottom.
+export function curveTiers(
+  items: Priced[],
+  cuts: [number, number, number, number] = DEFAULT_TIER_CUTS,
+): Map<string, Tier> {
+  const placed = new Map<string, Tier>();
+  if (items.length === 0) return placed;
+
+  const sorted = [...items].sort((a, b) => a.cost - b.cost || a.id.localeCompare(b.id));
+  const groups: Array<{ cost: number; ids: string[] }> = [];
+  for (const item of sorted) {
+    const last = groups.at(-1);
+    if (last && last.cost === item.cost) last.ids.push(item.id);
+    else groups.push({ cost: item.cost, ids: [item.id] });
+  }
+
+  // Not enough distinct prices to fill the board: one letter per price.
+  if (groups.length < tierLetters.length) {
+    groups.forEach((group, index) => {
+      for (const id of group.ids) placed.set(id, tierLetters[index]);
+    });
+    return placed;
+  }
+
+  groups.forEach((group, index) => {
+    const position = index / groups.length;
+    const cut = cuts.findIndex((boundary) => position < boundary);
+    const tier = tierLetters[cut === -1 ? tierLetters.length - 1 : cut];
+    for (const id of group.ids) placed.set(id, tier);
+  });
+  return placed;
 }
 
 export const confidenceScore: Record<Confidence, number> = {
@@ -54,14 +91,6 @@ export function standardScore(values: number[]) {
   return (value: number) => (value - mean) / deviation;
 }
 
-export function tierAtRank(rank: number, total: number, tierCuts: [number, number, number]): Tier {
-  const position = total <= 1 ? 0 : rank / total;
-  if (position < tierCuts[0]) return "S";
-  if (position < tierCuts[1]) return "A";
-  if (position < tierCuts[2]) return "B";
-  return "C";
-}
-
 // Cheaper is better, on a log scale: a model half the price of another is a
 // fixed step better whether the prices are cents or dollars.
 export function costStrength(cost: number) {
@@ -71,8 +100,7 @@ export function costStrength(cost: number) {
 export function modelPlacements(
   models: Model[],
   scenario: Scenario,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  tierCuts: [number, number, number],
+  tierCuts: [number, number, number, number],
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   rankingWeights: { cost: number; headroom: number },
 ): Map<string, Placement> {
@@ -106,16 +134,14 @@ export function modelPlacements(
   }
 
   const minIndex = scenario.gate.minIndex;
-  // Sort by cost then id so ties are deterministic.
-  const sorted = [...eligible].sort(
-    (a, b) => a.cost - b.cost || a.id.localeCompare(b.id),
-  );
-  const cheapest = sorted.length > 0 ? sorted[0].cost : 0;
+  // The curve is taken over every eligible model, not the filtered view, so a
+  // provider filter or a search never changes the letters on the board.
+  const curved = curveTiers(eligible, tierCuts);
 
-  for (const item of sorted) {
+  for (const item of eligible) {
     placed.set(item.id, {
       state: "tier",
-      tier: tierByCostRatio(item.cost, cheapest),
+      tier: curved.get(item.id) as Tier,
       index: item.index,
       minIndex,
       headroom: item.index - minIndex,
@@ -191,8 +217,7 @@ export function planPlacements(
   plans: Plan[],
   scenario: Scenario,
   modelById: Map<string, Model>,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  tierCuts: [number, number, number],
+  tierCuts: [number, number, number, number],
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   rankingWeights: { price: number; headroom: number; confidence: number },
 ): Map<string, Placement> {
@@ -249,16 +274,15 @@ export function planPlacements(
   }
 
   const minIndex = scenario.gate.minIndex;
-  // Sort by monthly price then id so ties are deterministic.
-  const sorted = [...eligible].sort(
-    (a, b) => a.monthly - b.monthly || a.id.localeCompare(b.id),
+  const curved = curveTiers(
+    eligible.map((item) => ({ id: item.id, cost: item.monthly })),
+    tierCuts,
   );
-  const cheapest = sorted.length > 0 ? sorted[0].monthly : 0;
 
-  for (const item of sorted) {
+  for (const item of eligible) {
     placed.set(item.id, {
       state: "tier",
-      tier: tierByCostRatio(item.monthly, cheapest),
+      tier: curved.get(item.id) as Tier,
       index: item.index,
       minIndex,
       headroom: item.index - minIndex,

@@ -100,8 +100,7 @@ function scenarioDocument(scenarios = [scenario()], overrides = {}) {
     metric: "intelligence",
     metricNote: "Sub-index values are not published per model yet.",
     profileNote: "Each profile is a typical month of one kind of work.",
-    tierCuts: [0.15, 0.5, 0.85],
-    costRatioBands: [1.25, 2, 4],
+    tierCuts: [0.2, 0.4, 0.6, 0.8],
     ranking: {
       models: { cost: 0.65, headroom: 0.35 },
       plans: { price: 0.5, headroom: 0.3, confidence: 0.2 },
@@ -392,7 +391,7 @@ test("rejects an unusable call count or cache share", () => {
 test("rejects malformed tier cuts and ranking weights", () => {
   const catalog = gatedDataset();
   assert.throws(
-    () => validateScenarios(scenarioDocument(undefined, { tierCuts: [0.5, 0.2, 0.9] }), catalog),
+    () => validateScenarios(scenarioDocument(undefined, { tierCuts: [0.5, 0.2, 0.9, 0.95] }), catalog),
     /tierCuts must be strictly increasing fractions/,
   );
   assert.throws(

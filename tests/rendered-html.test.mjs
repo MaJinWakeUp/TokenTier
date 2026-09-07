@@ -85,6 +85,15 @@ test("Rankings answers the cheapest-qualified question above the board", async (
   assert.match(markup, /Artificial Analysis Intelligence Index/);
   // Nothing unscored is silently dropped.
   assert.match(markup, /Not on the board/);
+
+  // The board is curved, so every letter it prints has something in it and the
+  // letters run contiguously from S. A row reading "No models ranked in this
+  // tier" in the middle of the board is the bug this replaced.
+  const letters = [...markup.matchAll(/class="tier-row tier-([sabcd])"/g)].map((m) => m[1].toUpperCase());
+  assert.ok(letters.length > 0, "the board renders tier rows");
+  assert.deepEqual(letters, ["S", "A", "B", "C", "D"].slice(0, letters.length), "letters are contiguous from S");
+  assert.doesNotMatch(markup, /No models ranked in this tier/, "no letter is printed empty");
+  assert.doesNotMatch(markup, /No plans ranked in this tier/, "no letter is printed empty");
   assert.match(markup, /Primary pricing and quota sources/);
   assert.match(markup, /Artificial Analysis capability index ↗/);
   assert.match(markup, /Typical month/);
@@ -296,7 +305,7 @@ test("the engine stays pure and the views stay presentational", async () => {
   assert.match(placementLib, /function modelPlacements/);
   assert.match(placementLib, /function planPlacements/);
   assert.match(placementLib, /function planWorkingModel/);
-  assert.match(placementLib, /function tierAtRank/);
+  assert.match(placementLib, /function curveTiers/);
   assert.match(pricingLib, /const cacheRatio = cacheRatioOverride \?\? settings\.cacheRatio/);
   assert.match(pricingLib, /function planCoverageScore[\s\S]*?return null;[\s\S]*?\n}/);
   assert.match(formatLib, /function monthlyPriceAgainst\(value: number, reference: number\)/);
@@ -420,6 +429,7 @@ test("keeps its layout, density and touch-target contracts", async () => {
   assert.match(styles, /\.plan-match-grid\s*\{/);
   assert.match(styles, /\.frontier-option\s*\{/);
   assert.match(styles, /\.mini-tier\.tier-c \{ background: var\(--tier-c-bg\); \}/);
+  assert.match(styles, /\.mini-tier\.tier-d \{ background: var\(--tier-d-bg\); \}/);
   assert.match(styles, /\.compare-best-mark\s*\{[^}]*display:\s*inline;/s);
   assert.match(styles, /\.columns-reset-btn\s*\{[^}]*color:\s*var\(--accent-readable\);/s);
   assert.match(styles, /\.row-note summary\s*\{[^}]*background:\s*var\(--note-soft\);/s);
@@ -473,6 +483,7 @@ test("never puts fill-ink on a plain surface", async () => {
     "::selection", ".skip-link", ".brand-mark", ".workspace-tabs a.active",
     ".theme-switcher button.active", ".button-primary",
     ".tier-s .tier-label", ".tier-a .tier-label", ".tier-b .tier-label", ".tier-c .tier-label",
+    ".tier-d .tier-label",
     ".mini-tier", ".rank-tier-label input", ".rank-tier-label button",
   ];
   const inkRules = [...styles.matchAll(/([^{}]+)\{([^}]*var\(--ink\)[^}]*)\}/g)]

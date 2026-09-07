@@ -1,6 +1,6 @@
 "use client";
 
-import { capabilityIndex, costRatioBands, models, plans } from "@/lib/catalog";
+import { capabilityIndex, models, plans, tierCuts } from "@/lib/catalog";
 
 // Source links are generated from the catalog the page is actually showing, so
 // a link cannot outlive the row it documents or point somewhere the numbers no
@@ -35,9 +35,17 @@ export function Methodology() {
         <div className="methodology-card">
           <strong>2. Derived Tiers</strong>
           <p>
-            Tiers are computed, never hand-graded. Among the models that clear the bar and whose context window holds the
-            work, S/A/B/C are assigned by cost ratio: a model within {costRatioBands[0]}x of the cheapest is S,
-            within {costRatioBands[1]}x is A, within {costRatioBands[2]}x is B, else C. Equal costs always share a tier.
+            Tiers are computed, never hand-graded, and they are curved. Among the options that clear the bar and whose
+            context window holds the work, the population is ordered by cost and cut at the published proportions —
+            the cheapest {Math.round(tierCuts[0] * 100)}% are S, then A, B, C, and D. Options that cost exactly the same
+            always share a letter, and the curve is taken over every qualifying option, so filtering or searching the
+            table never moves a letter.
+          </p>
+          <p>
+            A letter is therefore a rank, not a fixed multiple of the cheapest price. One unusually cheap model used to
+            be enough to push every other option past the last fixed band, which left the middle of the board empty and
+            told the reader nothing. The trade is that adding or removing an option can move an unchanged one by a
+            letter.
           </p>
         </div>
         <div className="methodology-card">

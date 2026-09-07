@@ -4,7 +4,7 @@
 
 export type ScenarioId = string;
 export type MetricKey = "intelligence" | "codingAgent" | "agentic" | "longContext";
-export type Tier = "S" | "A" | "B" | "C";
+export type Tier = "S" | "A" | "B" | "C" | "D";
 export type Confidence = "High" | "Medium" | "Low";
 export type PlanKind = "Subscription" | "BYOK client" | "Pay as you go";
 export type EvidenceKind =
@@ -213,8 +213,7 @@ export type ScenarioCatalogDoc = {
   metric: MetricKey;
   metricNote: string;
   profileNote: string;
-  tierCuts: [number, number, number];
-  costRatioBands: [number, number, number];
+  tierCuts: [number, number, number, number];
   ranking: RankingWeights;
   scenarios: Scenario[];
 };
@@ -227,7 +226,6 @@ export type Catalog = {
   capabilityIndex: CapabilityIndex;
   modelCatalogUpdatedAt: string;
   planCatalogUpdatedAt: string;
-  tierCuts: [number, number, number];
-  costRatioBands: [number, number, number];
+  tierCuts: [number, number, number, number];
   rankingWeights: RankingWeights;
 };

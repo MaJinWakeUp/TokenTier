@@ -242,7 +242,7 @@ test("F2: plan best is never an ineligible plan", () => {
   }
 });
 
-// -- Finding 3: costTiers ratio bands, equal costs share tiers ---------------
+// -- Finding 3: curved cost tiers, equal costs share tiers -------------------
 
 test("F3: identical costs share the same tier", () => {
   const evals = [
@@ -257,20 +257,60 @@ test("F3: identical costs share the same tier", () => {
   assert.equal(allTiers[0], "S", "Identical costs should all be S");
 });
 
-test("F3: ratio band boundaries (1.25/2/4)", () => {
-  const evals = [
-    { model: { id: "cheap" }, costPerCall: 0.10, monthlyCost: 10, index: 60, withinBudget: true, eligible: true },
-    { model: { id: "s-a" }, costPerCall: 0.125, monthlyCost: 12.5, index: 55, withinBudget: true, eligible: true }, // 1.25x = S boundary
-    { model: { id: "a-b" }, costPerCall: 0.20, monthlyCost: 20, index: 50, withinBudget: true, eligible: true }, // 2x = A boundary
-    { model: { id: "b-c" }, costPerCall: 0.40, monthlyCost: 40, index: 45, withinBudget: true, eligible: true }, // 4x = B boundary
-    { model: { id: "c" }, costPerCall: 0.41, monthlyCost: 41, index: 44, withinBudget: true, eligible: true }, // >4x = C
-  ];
+test("F3: the curve fills every letter and keeps the cost order", () => {
+  // Ten distinct prices over five letters: two per letter, cheapest first.
+  const evals = Array.from({ length: 10 }, (_, i) => ({
+    model: { id: `m${i}` },
+    costPerCall: (i + 1) / 100,
+    monthlyCost: i + 1,
+    index: 60 - i,
+    withinBudget: true,
+    eligible: true,
+  }));
   const tiers = costTiers(evals);
-  assert.equal(tiers.get("cheap"), "S", "Cheapest is S");
-  assert.equal(tiers.get("s-a"), "S", "1.25x boundary is S");
-  assert.equal(tiers.get("a-b"), "A", "2x boundary is A");
-  assert.equal(tiers.get("b-c"), "B", "4x boundary is B");
-  assert.equal(tiers.get("c"), "C", ">4x is C");
+  const letters = evals.map((e) => tiers.get(e.model.id));
+
+  assert.deepEqual(
+    letters,
+    ["S", "S", "A", "A", "B", "B", "C", "C", "D", "D"],
+    "even quintiles over ten distinct prices",
+  );
+  // A cheaper option is never placed below a dearer one.
+  const rank = { S: 5, A: 4, B: 3, C: 2, D: 1 };
+  for (let i = 1; i < letters.length; i += 1) {
+    assert.ok(rank[letters[i]] <= rank[letters[i - 1]], `${letters[i - 1]} then ${letters[i]} is monotone`);
+  }
+});
+
+test("F3: a letter is never skipped in the middle of the board", () => {
+  // One model an order of magnitude cheaper than the rest is exactly what
+  // collapsed the old fixed bands into a populated S and an empty A and B.
+  const costs = [0.001, 0.04, 0.045, 0.05, 0.06, 0.08, 0.12, 0.2, 0.29];
+  const evals = costs.map((cost, i) => ({
+    model: { id: `m${i}` },
+    costPerCall: cost,
+    monthlyCost: cost * 100,
+    index: 60,
+    withinBudget: true,
+    eligible: true,
+  }));
+  const used = new Set(costTiers(evals).values());
+  assert.deepEqual([...used].sort(), ["A", "B", "C", "D", "S"], "every letter is used");
+});
+
+test("F3: fewer distinct prices than letters stays contiguous from S", () => {
+  const evals = [0.01, 0.02, 0.03].map((cost, i) => ({
+    model: { id: `m${i}` },
+    costPerCall: cost,
+    monthlyCost: cost * 100,
+    index: 60,
+    withinBudget: true,
+    eligible: true,
+  }));
+  const tiers = costTiers(evals);
+  // Three prices cannot fill five letters; they take the top three in order
+  // rather than leaving a hole.
+  assert.deepEqual([tiers.get("m0"), tiers.get("m1"), tiers.get("m2")], ["S", "A", "B"]);
 });
 
 test("F3: empty population returns no tiers", () => {

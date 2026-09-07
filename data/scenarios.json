@@ -4,9 +4,10 @@
   "metricNote": "Artificial Analysis publishes a headline Intelligence Index per model, plus Coding Agent and Agentic indices as separate leaderboards. Per-model sub-index values are not published on the model pages, so every scenario currently gates on the headline index. When a sub-index becomes available per model, switch that scenario's gate.metric and re-anchor its minIndex.",
   "profileNote": "Each profile is a typical month of one kind of work: the tokens one request sends and returns, how many requests a month, and how much of the input is a cache read rather than fresh context. The cache share matters as much as the token counts — an agent that resends a stable repo prefix pays the cached rate for most of its input. Every number is an editable starting point, not a measurement; the Recommend view lets you replace all four.",
   "tierCuts": [
-    0.15,
-    0.5,
-    0.85
+    0.2,
+    0.4,
+    0.6,
+    0.8
   ],
   "ranking": {
     "models": {
@@ -143,10 +144,5 @@
         "preferredMetric": "agentic"
       }
     }
-  ],
-  "costRatioBands": [
-    1.25,
-    2,
-    4
   ]
 }

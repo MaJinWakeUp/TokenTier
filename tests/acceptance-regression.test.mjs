@@ -16,8 +16,8 @@ import {
   modelPlacements,
   planPlacements,
   planWorkingModel,
-  tierByCostRatio,
-  DEFAULT_RATIO_BANDS,
+  curveTiers,
+  DEFAULT_TIER_CUTS,
 } from "../build/lib/domain/placement.js";
 import { gateModel, scenarioTokens } from "../build/lib/domain/eligibility.js";
 import { readFileSync } from "node:fs";
@@ -42,7 +42,6 @@ const catalog = {
   modelCatalogUpdatedAt: dataset.updatedAt,
   planCatalogUpdatedAt: planDoc.updatedAt,
   tierCuts: scenarioDoc.tierCuts,
-  costRatioBands: scenarioDoc.costRatioBands,
   rankingWeights: scenarioDoc.ranking,
 };
 
@@ -137,7 +136,7 @@ test("AC1: zero calls with positive budget does not recommend a paid plan", () =
 
 // -- AC3: preset placements use cost ratio rules ------------------------------
 
-test("AC3: planPlacements uses cost ratio bands not z-score percentiles", () => {
+test("AC3: planPlacements leaves conditional coverage off the board", () => {
   const scenario = scenarioDoc.scenarios.find((s) => s.id === "code-hard");
   const placements = planPlacements(planDoc.plans, scenario, modelById, scenarioDoc.tierCuts, scenarioDoc.ranking.plans);
   // OpenCode Go has conditional coverage (5h+weekly caps), so it must NOT be tiered.
@@ -165,7 +164,7 @@ test("AC3: planPlacements excludes plans with unknown coverage from qualified ti
   }
 });
 
-test("AC3: modelPlacements uses cost ratio bands (S for cheapest, not percentile)", () => {
+test("AC3: modelPlacements curves the board and puts the cheapest in S", () => {
   const scenario = scenarioDoc.scenarios.find((s) => s.id === "daily");
   const placements = modelPlacements(dataset.models, scenario, scenarioDoc.tierCuts, scenarioDoc.ranking.models);
   const tiered = [...placements.entries()].filter(([, p]) => p.state === "tier");
@@ -184,20 +183,31 @@ test("AC3: modelPlacements uses cost ratio bands (S for cheapest, not percentile
   }
 });
 
-test("AC3: tierByCostRatio assigns correct tiers at boundaries", () => {
-  assert.equal(tierByCostRatio(1, 1), "S");
-  assert.equal(tierByCostRatio(1.25, 1), "S");
-  assert.equal(tierByCostRatio(1.26, 1), "A");
-  assert.equal(tierByCostRatio(2, 1), "A");
-  assert.equal(tierByCostRatio(2.01, 1), "B");
-  assert.equal(tierByCostRatio(4, 1), "B");
-  assert.equal(tierByCostRatio(4.01, 1), "C");
-  assert.equal(tierByCostRatio(0, 1), "S");
-  assert.equal(tierByCostRatio(1, 0), "C");
+test("AC3: the curve cuts at the published proportions", () => {
+  const items = Array.from({ length: 20 }, (_, i) => ({ id: `m${i}`, cost: i + 1 }));
+  const tiers = curveTiers(items, DEFAULT_TIER_CUTS);
+  // Twenty distinct prices, four boundaries at 0.2/0.4/0.6/0.8: four per letter.
+  for (const [letter, expected] of [["S", 4], ["A", 4], ["B", 4], ["C", 4], ["D", 4]]) {
+    const count = [...tiers.values()].filter((tier) => tier === letter).length;
+    assert.equal(count, expected, `${letter} holds ${expected} of twenty`);
+  }
+  assert.equal(tiers.get("m0"), "S", "cheapest is S");
+  assert.equal(tiers.get("m19"), "D", "dearest is D");
 });
 
-test("AC3: DEFAULT_RATIO_BANDS is 1.25/2/4", () => {
-  assert.deepEqual(DEFAULT_RATIO_BANDS, [1.25, 2, 4]);
+test("AC3: DEFAULT_TIER_CUTS is even quintiles", () => {
+  assert.deepEqual(DEFAULT_TIER_CUTS, [0.2, 0.4, 0.6, 0.8]);
+});
+
+test("AC3: the curve is independent of input order and groups equal prices", () => {
+  const items = [
+    { id: "b", cost: 2 }, { id: "a", cost: 1 }, { id: "e", cost: 2 },
+    { id: "d", cost: 4 }, { id: "c", cost: 3 }, { id: "f", cost: 5 },
+  ];
+  const forward = curveTiers(items);
+  const reversed = curveTiers([...items].reverse());
+  assert.deepEqual([...forward.entries()].sort(), [...reversed.entries()].sort());
+  assert.equal(forward.get("b"), forward.get("e"), "equal prices share a letter");
 });
 
 // -- AC4: quotaDetail authoritative, credit from quota.amount+resetWindow ---
@@ -401,11 +411,41 @@ test("AC7: unsupported pricing model is ineligible but not labeled unscored in r
   assert.ok(!tiers.has("grok-4-5"), "Unsupported-pricing model should not be in cost tiers");
 });
 
-// -- AC7: scenarios costRatioBands field --------------------------------------
+// -- AC7: scenarios tierCuts field --------------------------------------------
 
-test("AC7: scenarios document has costRatioBands [1.25, 2, 4]", () => {
-  assert.ok(scenarioDoc.costRatioBands, "Scenarios must have costRatioBands");
-  assert.deepEqual(scenarioDoc.costRatioBands, [1.25, 2, 4]);
+test("AC7: scenarios document publishes four tier cuts", () => {
+  assert.ok(Array.isArray(scenarioDoc.tierCuts), "Scenarios must publish tierCuts");
+  assert.equal(scenarioDoc.tierCuts.length, 4, "five letters need four boundaries");
+  for (let i = 1; i < scenarioDoc.tierCuts.length; i += 1) {
+    assert.ok(scenarioDoc.tierCuts[i] > scenarioDoc.tierCuts[i - 1], "cuts strictly increase");
+  }
+  assert.equal("costRatioBands" in scenarioDoc, false, "the retired ratio bands are gone");
+});
+
+test("AC7: every scenario board is contiguous from S, models and plans", () => {
+  const order = ["S", "A", "B", "C", "D"];
+  const contiguous = (placements, label) => {
+    const used = new Set(
+      [...placements.values()].filter((p) => p.state === "tier").map((p) => p.tier),
+    );
+    assert.ok(used.size > 0, `${label}: something is tiered`);
+    assert.deepEqual(
+      order.filter((letter) => used.has(letter)),
+      order.slice(0, used.size),
+      `${label}: letters used are contiguous from S, got ${[...used].join(",")}`,
+    );
+  };
+
+  for (const scenario of scenarioDoc.scenarios) {
+    contiguous(
+      modelPlacements(dataset.models, scenario, scenarioDoc.tierCuts, scenarioDoc.ranking.models),
+      `${scenario.id} models`,
+    );
+    contiguous(
+      planPlacements(planDoc.plans, scenario, modelById, scenarioDoc.tierCuts, scenarioDoc.ranking.plans),
+      `${scenario.id} plans`,
+    );
+  }
 });
 
 // -- AC2: the plan a reader is shown is the plan the engine chose ------------
@@ -477,11 +517,14 @@ test("AC2: an access requirement actually filters the candidates", async () => {
   );
 });
 
-test("AC2: the methodology describes cost ratio bands, not percentiles", () => {
+test("AC2: the methodology describes the curve it actually applies", () => {
   const methodology = readFileSync(new URL("../features/rankings/methodology.tsx", import.meta.url), "utf8");
-  assert.match(methodology, /cost ratio/, "the methodology names the rule it uses");
-  assert.match(methodology, /costRatioBands/, "and reads the published bands rather than restating them");
-  assert.doesNotMatch(methodology, /percentile/i, "no percentile language remains");
+  assert.match(methodology, /curved/, "the methodology names the rule it uses");
+  assert.match(methodology, /tierCuts/, "and reads the published cuts rather than restating them");
+  // The trade the curve makes is stated, not buried: a letter is a rank, so
+  // adding an option can move an unchanged one.
+  assert.match(methodology, /rank, not a fixed multiple/);
+  assert.doesNotMatch(methodology, /costRatioBands/, "the retired bands are not referenced");
 });
 
 // -- AC6: build config resolves .js extension imports ------------------------

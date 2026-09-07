@@ -242,6 +242,31 @@ Chrome. These exercise client hydration, not just server render.
   which is what GitHub Pages publishes, and all three render correctly through
   the Vinext worker in the test suite.
 
+## Tier policy: curved, not banded
+
+The board assigns S/A/B/C/D by curving the qualifying population — ordered by
+cost, cut at `scenarios.tierCuts` (even quintiles). This replaced fixed
+cost-ratio bands (1.25x / 2x / 4x against the cheapest).
+
+The bands were the more principled rule in one respect: a letter meant the same
+multiple of the cheapest price in every scenario and at any catalog size. But
+they assumed a reasonably smooth price distribution, and this catalog does not
+have one. GLM-5.3-Flash is roughly eight times cheaper than the next qualifying
+model, which pushed everything else past the last band: medium coding rendered a
+populated S, an empty A and B, and thirteen models in C.
+
+What the curve gives up: a letter is a rank, so adding or removing an option can
+move an unchanged one by a letter. What it keeps: equal costs still share a
+letter, ordering is still deterministic by cost then id, and the curve is taken
+over the whole qualifying population, so filtering the table never moves a
+letter. `scenarios.costRatioBands` was removed rather than left as a dead knob,
+and `tierAtRank` — a second, unused tiering implementation — was deleted.
+`costTiers` in `recommend.ts` now delegates to the same `curveTiers`, so there is
+one definition of a tier letter rather than two.
+
+The board also prints only the letters it can fill: with fewer distinct prices
+than letters, it uses them from S downward instead of leaving a gap.
+
 ## Catalog uncertainties still unresolved
 
 The Intelligence Index v4.2 rebase and the GPT-6 Astra addition are recorded in

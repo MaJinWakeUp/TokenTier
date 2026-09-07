@@ -23,6 +23,7 @@
   --tier-a-bg: #60a5fa;
   --tier-b-bg: #fbbf24;
   --tier-c-bg: #cbd5e1;
+  --tier-d-bg: #94a3b8;
   --note-accent: #fbbf24;
   --note-soft: rgba(251, 191, 36, 0.11);
 
@@ -72,6 +73,7 @@ html[data-theme="light"] {
   --tier-a-bg: #60a5fa;
   --tier-b-bg: #fbbf24;
   --tier-c-bg: #cbd5e1;
+  --tier-d-bg: #94a3b8;
   --note-accent: #92400e;
   --note-soft: #fffbeb;
 
@@ -812,6 +814,10 @@ main {
   animation-delay: 240ms;
 }
 
+.tier-row:nth-child(5) {
+  animation-delay: 320ms;
+}
+
 .tier-label {
   display: flex;
   min-height: 150px;
@@ -855,6 +861,11 @@ main {
 
 .tier-c .tier-label {
   background: var(--tier-c-bg);
+  color: var(--ink);
+}
+
+.tier-d .tier-label {
+  background: var(--tier-d-bg);
   color: var(--ink);
 }
 
@@ -1405,6 +1416,7 @@ td:first-child {
 .mini-tier.tier-a { background: var(--tier-a-bg); }
 .mini-tier.tier-b { background: var(--tier-b-bg); }
 .mini-tier.tier-c { background: var(--tier-c-bg); }
+.mini-tier.tier-d { background: var(--tier-d-bg); }
 
 .empty-state {
   margin: 0;

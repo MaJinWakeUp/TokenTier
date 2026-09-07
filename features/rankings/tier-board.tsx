@@ -55,6 +55,26 @@ export function TierBoard({
   const gate = gateSummaryFor(scenarioId);
   const subscriptions = plans.filter((plan) => plan.kind === "Subscription");
 
+  // The curve fills every letter whenever there are at least as many distinct
+  // prices as tiers, so an empty row means a genuinely tiny population rather
+  // than a gap in the middle of the board. Either way it is not drawn.
+  const ranked: Array<Model | Plan> = lane === "api" ? models : subscriptions;
+  const rows = tierOrder
+    .map((tier) => ({
+      tier,
+      items: ranked
+        .filter((item) => {
+          const placement = lane === "api"
+            ? modelPlacement(item.id, scenarioId)
+            : planPlacement(item.id, scenarioId);
+          return placement.state === "tier" && placement.tier === tier;
+        })
+        .sort((a, b) => (lane === "api"
+          ? callCost(a as Model, settings) - callCost(b as Model, settings)
+          : ((a as Plan).monthly ?? Infinity) - ((b as Plan).monthly ?? Infinity))),
+    }))
+    .filter((row) => row.items.length > 0);
+
   const excludedModels = models
     .map((model) => ({ model, placement: modelPlacement(model.id, scenarioId) }))
     .filter(({ placement }) => placement.state !== "tier")
@@ -91,56 +111,34 @@ export function TierBoard({
       </div>
 
       <div className="tier-board">
-        {tierOrder.map((tier) => (
+        {rows.map(({ tier, items }) => (
           <div className={`tier-row tier-${tier.toLowerCase()}`} key={tier}>
             <div className="tier-label"><strong>{tier}</strong><span>{tierDescriptions[tier]}</span></div>
             <div className="tier-models" role="group" aria-label={`${tier} tier items`}>
-              {lane === "api" ? (() => {
-                const items = models
-                  .filter((model) => {
-                    const placement = modelPlacement(model.id, scenarioId);
-                    return placement.state === "tier" && placement.tier === tier;
-                  })
-                  .sort((a, b) => callCost(a, settings) - callCost(b, settings));
-                if (items.length === 0) return <p className="tier-empty">No models ranked in this tier for this scenario.</p>;
-                return items.map((item) => (
-                  <button
-                    aria-label={`${item.name}, ${item.provider}, ${price(callCost(item, settings), 3)} per call`}
-                    className={`tier-model ${isCompared(item.id) ? "selected" : ""}`}
-                    key={item.id}
-                    onClick={() => onInspect(item)}
-                    type="button"
-                  >
-                    <span className="provider-orb" data-provider={item.provider} />
-                    <span><strong title={item.name}>{item.name}</strong><small>{item.provider}</small></span>
-                    <b>{price(callCost(item, settings), 3)}<small>/ call</small></b>
-                  </button>
-                ));
-              })() : (() => {
-                const items = subscriptions
-                  .filter((plan) => {
-                    const placement = planPlacement(plan.id, scenarioId);
-                    return placement.state === "tier" && placement.tier === tier;
-                  })
-                  .sort((a, b) => (a.monthly ?? Infinity) - (b.monthly ?? Infinity));
-                if (items.length === 0) return <p className="tier-empty">No plans ranked in this tier for this scenario.</p>;
-                return items.map((item) => (
-                  <button
-                    aria-label={`${item.name}, ${item.provider}, $${item.monthly} per month`}
-                    className={`tier-model ${isCompared(item.id) ? "selected" : ""}`}
-                    key={item.id}
-                    onClick={() => onInspect(item)}
-                    type="button"
-                  >
-                    <span className="provider-orb" data-provider={item.provider} />
-                    <span>
-                      <strong title={item.name}>{item.name}</strong>
-                      <small>via {planWorkingModel(item, scenario, settings, modelById)?.name ?? item.provider}</small>
-                    </span>
-                    <b>${item.monthly}<small>/ month</small></b>
-                  </button>
-                ));
-              })()}
+              {items.map((item) => (
+                <button
+                  aria-label={lane === "api"
+                    ? `${item.name}, ${item.provider}, ${price(callCost(item as Model, settings), 3)} per call`
+                    : `${item.name}, ${item.provider}, $${(item as Plan).monthly} per month`}
+                  className={`tier-model ${isCompared(item.id) ? "selected" : ""}`}
+                  key={item.id}
+                  onClick={() => onInspect(item)}
+                  type="button"
+                >
+                  <span className="provider-orb" data-provider={item.provider} />
+                  <span>
+                    <strong title={item.name}>{item.name}</strong>
+                    <small>
+                      {lane === "api"
+                        ? item.provider
+                        : `via ${planWorkingModel(item as Plan, scenario, settings, modelById)?.name ?? item.provider}`}
+                    </small>
+                  </span>
+                  {lane === "api"
+                    ? <b>{price(callCost(item as Model, settings), 3)}<small>/ call</small></b>
+                    : <b>${(item as Plan).monthly}<small>/ month</small></b>}
+                </button>
+              ))}
             </div>
           </div>
         ))}

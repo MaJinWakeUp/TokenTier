@@ -10,7 +10,7 @@
 import type { Catalog, Model, Plan, Scenario, Tier, UsageSettings, AccessSurface } from "../catalog/types.js";
 import { gateModel, metricValue, type Rejection } from "./eligibility.js";
 import { callCost, planEstimate, planCoverageScore } from "./pricing.js";
-import { planWorkingModel } from "./placement.js";
+import { curveTiers, planWorkingModel } from "./placement.js";
 
 export type Objective = "cost" | "budget" | "capability";
 
@@ -222,50 +222,14 @@ export function recommend(
   };
 }
 
-// Versioned cost-band tiers: S/A/B/C by cost ratio among eligible models.
-// Uses ratio bands (1.25/2/4 by default): a model costing ≤1.25× the cheapest
-// is S, ≤2× is A, ≤4× is B, else C. This means equal costs always share the
-// same tier (F3), and the bands are meaningful regardless of population size.
-// Free/zero-cost models are S. Empty/singleton populations are handled.
-// Ties are deterministic (sorted by cost then by id).
+// Curved cost tiers over an evaluated population. This is the same curve the
+// board uses — one definition of a tier letter, not two.
 export function costTiers(
   evaluations: ApiEvaluation[],
-  ratioBands?: [number, number, number],
+  cuts?: [number, number, number, number],
 ): Map<string, Tier> {
-  const tiers = new Map<string, Tier>();
-  const bands = ratioBands ?? [1.25, 2, 4];
-
   const eligible = evaluations
-    .filter((e) => e.eligible)
-    .sort((a, b) => a.costPerCall - b.costPerCall || a.model.id.localeCompare(b.model.id));
-
-  if (eligible.length === 0) return tiers;
-
-  const cheapest = eligible[0].costPerCall;
-
-  for (const evaluation of eligible) {
-    const cost = evaluation.costPerCall;
-    // Free or zero-cost models are always S.
-    if (cost <= 0) {
-      tiers.set(evaluation.model.id, "S");
-      continue;
-    }
-    // When the cheapest is free, any positive cost is at least B.
-    if (cheapest <= 0) {
-      tiers.set(evaluation.model.id, "C");
-      continue;
-    }
-    const ratio = cost / cheapest;
-    if (ratio <= bands[0]) {
-      tiers.set(evaluation.model.id, "S");
-    } else if (ratio <= bands[1]) {
-      tiers.set(evaluation.model.id, "A");
-    } else if (ratio <= bands[2]) {
-      tiers.set(evaluation.model.id, "B");
-    } else {
-      tiers.set(evaluation.model.id, "C");
-    }
-  }
-
-  return tiers;
+    .filter((evaluation) => evaluation.eligible)
+    .map((evaluation) => ({ id: evaluation.model.id, cost: evaluation.costPerCall }));
+  return curveTiers(eligible, cuts);
 }

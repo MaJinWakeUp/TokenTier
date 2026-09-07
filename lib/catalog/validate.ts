@@ -400,7 +400,7 @@ export function validateScenarios(scenarios: unknown, dataset: ModelCatalogDoc):
   const errors: string[] = [];
   addExactKeyErrors(
     scenarios,
-    ["costRatioBands", "metric", "metricNote", "profileNote", "ranking", "scenarios", "schemaVersion", "tierCuts"],
+    ["metric", "metricNote", "profileNote", "ranking", "scenarios", "schemaVersion", "tierCuts"],
     "scenarios",
     errors,
   );
@@ -418,15 +418,15 @@ export function validateScenarios(scenarios: unknown, dataset: ModelCatalogDoc):
     }
   }
 
-  // Tier cuts are the percentile boundaries that keep the board balanced as the
-  // catalog grows, so they must be strictly increasing fractions.
+  // Tier cuts are the proportions the curve cuts the ordered population at.
+  // Five letters need four boundaries, strictly increasing, so every letter
+  // owns a nonempty slice of the ordering.
   const cuts = scenarios.tierCuts;
-  if (!Array.isArray(cuts) || cuts.length !== 3) {
-    errors.push("scenarios.tierCuts must be an array of three percentile boundaries.");
+  if (!Array.isArray(cuts) || cuts.length !== 4) {
+    errors.push("scenarios.tierCuts must be an array of four proportion boundaries, one per tier break.");
   } else if (
     cuts.some((cut) => !Number.isFinite(cut) || cut <= 0 || cut >= 1)
-    || cuts[0] >= cuts[1]
-    || cuts[1] >= cuts[2]
+    || cuts.some((cut, index) => index > 0 && (cuts[index - 1] as number) >= cut)
   ) {
     errors.push("scenarios.tierCuts must be strictly increasing fractions between 0 and 1.");
   }

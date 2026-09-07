@@ -26,12 +26,11 @@ const plans = (planCatalog as unknown as PlanCatalogDoc).plans as Plan[];
 const modelCatalogUpdatedAt = (modelCatalog as unknown as ModelCatalogDoc).updatedAt;
 const planCatalogUpdatedAt = (planCatalog as unknown as PlanCatalogDoc).updatedAt;
 const scenarios = (scenarioCatalog as unknown as ScenarioCatalogDoc).scenarios as Scenario[];
-const tierCuts = (scenarioCatalog as unknown as ScenarioCatalogDoc).tierCuts as [number, number, number];
-const costRatioBands = (scenarioCatalog as unknown as ScenarioCatalogDoc).costRatioBands as [number, number, number];
+const tierCuts = (scenarioCatalog as unknown as ScenarioCatalogDoc).tierCuts as [number, number, number, number];
 const rankingWeights = (scenarioCatalog as unknown as ScenarioCatalogDoc).ranking;
 const capabilityIndex = (modelCatalog as unknown as ModelCatalogDoc).capabilityIndex;
 
-export { models, modelById, plans, scenarios, capabilityIndex, modelCatalogUpdatedAt, planCatalogUpdatedAt, tierCuts, costRatioBands, rankingWeights };
+export { models, modelById, plans, scenarios, capabilityIndex, modelCatalogUpdatedAt, planCatalogUpdatedAt, tierCuts, rankingWeights };
 
 export const catalog: Catalog = {
   models,
@@ -42,7 +41,6 @@ export const catalog: Catalog = {
   modelCatalogUpdatedAt,
   planCatalogUpdatedAt,
   tierCuts,
-  costRatioBands,
   rankingWeights,
 };
 

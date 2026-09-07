@@ -107,13 +107,21 @@ Tiers are derived, never hand-graded. Two independent judgements are kept apart:
    a 0–100 composite of ten published evaluations. A model must clear that bar
    and hold the scenario's tokens in its context window to appear on the board.
    The bar is absolute, because "can it do this task" has a fixed answer.
-2. **Is it worth the money?** Among the models that cleared the bar, S/A/B/C are
-   assigned by cost ratio against the cheapest qualifying option, using the bands
-   in `data/scenarios.json` (`costRatioBands`, currently 1.25x / 2x / 4x). A
-   letter therefore means the same thing in every scenario and at any catalog
-   size, and two options that cost the same always share a tier. A percentile cut
-   could not promise either: it would move an unchanged model between letters
-   whenever a different model was added.
+2. **Is it worth the money?** Among the options that cleared the bar, S/A/B/C/D
+   are assigned by curving: the qualifying population is ordered by cost and cut
+   at the proportions in `data/scenarios.json` (`tierCuts`, currently even
+   quintiles). Options that cost exactly the same always share a letter, and the
+   curve is taken over every qualifying option, so filtering or searching the
+   table never moves a letter.
+
+   This replaced fixed cost-ratio bands (S within 1.25x of the cheapest, A within
+   2x, B within 4x, else C). Those bands had a real advantage — a letter meant
+   the same multiple of the cheapest price in every scenario — but one unusually
+   cheap model was enough to push every other option past the last band. On
+   medium coding that left a populated S, an empty A and B, and thirteen models
+   in C, which tells a reader nothing. The curve trades the absolute reading for
+   a board that always distinguishes: a letter is now a rank, so adding or
+   removing an option can move an unchanged one by a letter.
 
 Consequences worth knowing:
 
@@ -124,6 +132,9 @@ Consequences worth knowing:
 - Every score records the **index version** it was read under. Scores from
   different versions are not comparable, and `models:validate` refuses a catalog
   that mixes them.
+- The board prints only the letters it can fill. When a scenario qualifies fewer
+  options than there are letters, the letters are used from S downward rather
+  than leaving a gap in the middle.
 - `capability: null` is a deliberate third state. The model is listed and priced,
   but it receives no tier and is shown as *not independently scored* rather than
   silently passing or silently disappearing.
@@ -141,7 +152,7 @@ Consequences worth knowing:
 | --- | --- |
 | `data/api-models.json` | API models: token rates, context window, capability score, sources |
 | `data/plans.json` | Consumer plans: price, quota evidence, credit formulas, the models each plan includes |
-| `data/scenarios.json` | Scenario token profiles, capability bars, anchors, tier cuts, ranking weights |
+| `data/scenarios.json` | Scenario token profiles, capability bars, anchors, tier curve cuts, ranking weights |
 
 `npm run models:validate` validates all three together and prints how many
 models clear each scenario bar. The files only make sense as a set, so the
