@@ -177,6 +177,38 @@ export function planEstimate(
   }
 
   // Dollar-allowance plans: the published dollar amount is the verified cap.
+  // Request-limit plans publish a call count directly, so capacity needs no
+  // conversion: one published request is one call. The API-equivalent value is
+  // what those calls would have cost at list rates.
+  if (quota?.kind === "request-limit") {
+    const monthlyRequests = quota.amount * (windowFactor[quota.resetWindow] ?? 1);
+    const value = Number.isFinite(referenceCost) ? monthlyRequests * referenceCost : 0;
+
+    // Same period rule as the other allowances: only a monthly window with no
+    // shorter cap can prove monthly sufficiency.
+    const hasConditional = plan.conditionalLimits && plan.conditionalLimits.length > 0;
+    if (quota.resetWindow !== "monthly" || hasConditional) {
+      const label = hasConditional
+        ? `Multi-window cap: ${plan.conditionalLimits!.map((l) => l.description).join(", ")}`
+        : `${quota.resetWindow} reset — monthly distribution unknown`;
+      return {
+        callsLow: 0,
+        callsHigh: monthlyRequests,
+        valueLow: 0,
+        valueHigh: value,
+        basis: { kind: "conditional", label },
+      };
+    }
+
+    return {
+      callsLow: monthlyRequests,
+      callsHigh: monthlyRequests,
+      valueLow: value,
+      valueHigh: value,
+      basis: { kind: "allowance", label: "Official request limit" },
+    };
+  }
+
   // quotaDetail is authoritative — includedApiValue is NOT used as a fallback
   // when quotaDetail is present but relative/unknown.
   if (quota?.kind === "dollar-allowance") {

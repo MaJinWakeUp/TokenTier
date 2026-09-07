@@ -139,7 +139,7 @@ function migrateLegacyWorkload(): void {
 
 export function readStoredSettings(): RecommendSettings {
   const fallback = defaultSettings();
-  migrateLegacyOnce(migrateLegacyWorkload);
+  migrateLegacyOnce("workload", storageKeys.workload, migrateLegacyWorkload);
   const stored = readRecord(storageKeys.workload, workloadVersion, (payload) => fromStored(payload, fallback));
   return stored.state === "ok" ? stored.value : fallback;
 }

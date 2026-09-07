@@ -342,7 +342,7 @@ export function PriceBook({
                         </span>
                       </td>
                     )}
-                    {apiColumns.cost && <td><strong>{Number.isNaN(perCall) ? "Unsupported" : price(perCall, 3)}</strong></td>}
+                    {apiColumns.cost && <td><strong>{price(perCall, 3)}</strong></td>}
                   </tr>
                 );
               })}

@@ -76,7 +76,7 @@ function migrateLegacyBoards(items: Record<Subject, RankableItem[]>): void {
 }
 
 export function readBoards(items: Record<Subject, RankableItem[]>): StoredBoards {
-  migrateLegacyOnce(() => migrateLegacyBoards(items));
+  migrateLegacyOnce("boards", storageKeys.boards, () => migrateLegacyBoards(items));
   const stored = readRecord(storageKeys.boards, boardsVersion, (payload) => parseBoards(payload, items));
   if (stored.state === "ok") return stored.value;
   return { subject: "plans", boards: {} };

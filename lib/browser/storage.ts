@@ -19,7 +19,10 @@ export const storageKeys = {
   columns: `${namespace}.columns`,
   boards: `${namespace}.boards`,
   boardRecovery: `${namespace}.board-recovery`,
-  migrated: `${namespace}.migrated`,
+  // One marker per feature. A single shared marker meant whichever route the
+  // reader opened first claimed the migration and the other feature's legacy
+  // data was never imported.
+  migrated: (feature: string) => `${namespace}.migrated.${feature}`,
   theme: "tokentier-theme",
 } as const;
 
@@ -125,13 +128,21 @@ export function writeRecord(key: string, version: number, data: unknown): boolea
   return writeJson(key, { v: version, data });
 }
 
-// Legacy migration runs at most once per browser. It never deletes the old
-// keys: a reader who rolls back to the previous build still finds their work.
-export function migrateLegacyOnce(migrate: () => void): void {
-  if (readRaw(storageKeys.migrated) === "1") return;
+// Legacy migration runs at most once per feature per browser. It never deletes
+// the old keys: a reader who rolls back to the previous build still finds their
+// work.
+//
+// `destination` is the versioned record the migration writes. When it already
+// holds something, migration is skipped whatever the marker says — a migration
+// that ran and then re-ran would overwrite edits made since with the stale
+// legacy values. That also makes the upgrade from the older shared marker safe:
+// a feature that already migrated is recognised by its record, not the marker.
+export function migrateLegacyOnce(feature: string, destination: string, migrate: () => void): void {
+  const marker = storageKeys.migrated(feature);
+  if (readRaw(marker) === "1") return;
   try {
-    migrate();
+    if (readRaw(destination) === null) migrate();
   } finally {
-    writeRaw(storageKeys.migrated, "1");
+    writeRaw(marker, "1");
   }
 }

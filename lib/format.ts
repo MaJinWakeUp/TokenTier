@@ -38,13 +38,22 @@ export function providerFilterNames(providers: string[]) {
   return ["All", ...Array.from(new Set(providers)).sort(byProviderPriority)];
 }
 
+// A model whose published rates do not cover this workload's input size prices
+// as NaN on purpose (see unsupportedBeyond). Formatting that as "$NaN" reads as
+// a bug in the page rather than a gap in the catalog, so every money formatter
+// says so in words instead. Guarding here rather than at each call site means a
+// new caller cannot reintroduce it.
+export const unsupportedPriceLabel = "Unsupported";
+
 export function price(value: number, digits = 2) {
+  if (Number.isNaN(value)) return unsupportedPriceLabel;
   if (value === 0) return "$0.00";
   if (value < 0.01) return `$${value.toFixed(digits > 2 ? digits : 4)}`;
   return `$${value.toFixed(digits)}`;
 }
 
 export function monthlyPrice(value: number) {
+  if (Number.isNaN(value)) return unsupportedPriceLabel;
   if (value === 0) return "$0";
   if (value < 1) return `$${value.toFixed(2)}`;
   return `$${Math.round(value).toLocaleString()}`;
@@ -54,6 +63,7 @@ export function monthlyPrice(value: number) {
 // being judged against: $3.33 renders as "$3" beside an "over budget" tag on a
 // $3 budget. Keep cents whenever the rounded value would contradict the verdict.
 export function monthlyPriceAgainst(value: number, reference: number) {
+  if (Number.isNaN(value)) return unsupportedPriceLabel;
   const rounded = Math.round(value);
   const contradicts = (value > reference && rounded <= reference)
     || (value < reference && rounded > reference);

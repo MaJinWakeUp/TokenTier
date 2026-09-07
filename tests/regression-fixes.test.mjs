@@ -11,6 +11,7 @@ import {
   validateScenarios,
 } from "../scripts/update-models.mjs";
 import { callCost, planEstimate, planCoverageScore } from "../build/lib/domain/pricing.js";
+import { price, monthlyPrice, monthlyPriceAgainst, unsupportedPriceLabel } from "../build/lib/format.js";
 import { recommend, costTiers } from "../build/lib/domain/recommend.js";
 import { readFileSync } from "node:fs";
 
@@ -558,3 +559,123 @@ test("F7: validation accepts note that does not imply threshold pricing", () => 
 
 // Import validateModel for the F7 validation tests
 import { validateModel } from "../build/lib/catalog/validate.js";
+
+// -- PR #8 review: findings raised on the refactor branch ---------------------
+
+test("PR8: a request-limit quota is converted, not silently ignored", () => {
+  // The schema accepted request-limit and isVerifiedAllowance called it
+  // verified, but planEstimate had no branch for it, so a plan fell through to
+  // break-even and its published request count was never used.
+  const model = dataset.models.find((m) => m.capability !== null);
+  const settings = { input: 1000, output: 500, cacheRatio: 0 };
+  const base = {
+    id: "request-plan",
+    provider: model.provider,
+    name: "Request Plan",
+    kind: "Subscription",
+    monthly: 20,
+    modelIds: [model.id],
+    quota: "5,000 requests / month",
+    apiIncluded: "Yes",
+    evidence: "Official quota",
+    confidence: "High",
+    note: "",
+    source: "https://example.com/pricing",
+    verifiedAt: "2026-09-06",
+    access: ["api"],
+  };
+  const monthly = {
+    ...base,
+    quotaDetail: {
+      kind: "request-limit",
+      amount: 5000,
+      resetWindow: "monthly",
+      source: "https://example.com/pricing",
+      verifiedAt: "2026-09-06",
+    },
+  };
+
+  const estimate = planEstimate(monthly, settings, model, model);
+  assert.ok(estimate, "a request-limit plan produces an estimate");
+  assert.equal(estimate.basis.kind, "allowance", "a published request count is a verified allowance");
+  assert.equal(estimate.callsLow, 5000, "the published count is the capacity");
+  assert.equal(estimate.callsHigh, 5000);
+  assert.notEqual(estimate.basis.kind, "break-even", "it must not fall through to break-even");
+
+  // Coverage can now be proven, which it could not before.
+  assert.equal(planCoverageScore(monthly, settings, 4000, model, model), 100, "covers a smaller volume");
+  assert.ok(planCoverageScore(monthly, settings, 50_000, model, model) < 100, "does not cover a larger one");
+});
+
+test("PR8: a request limit on a shorter window stays conditional", () => {
+  const model = dataset.models.find((m) => m.capability !== null);
+  const settings = { input: 1000, output: 500, cacheRatio: 0 };
+  const weekly = {
+    id: "weekly-request-plan",
+    provider: model.provider,
+    name: "Weekly Request Plan",
+    kind: "Subscription",
+    monthly: 20,
+    modelIds: [model.id],
+    quota: "1,000 requests / week",
+    apiIncluded: "Yes",
+    evidence: "Official quota",
+    confidence: "High",
+    note: "",
+    source: "https://example.com/pricing",
+    verifiedAt: "2026-09-06",
+    access: ["api"],
+    quotaDetail: {
+      kind: "request-limit",
+      amount: 1000,
+      resetWindow: "weekly",
+      source: "https://example.com/pricing",
+      verifiedAt: "2026-09-06",
+    },
+  };
+  const estimate = planEstimate(weekly, settings, model, model);
+  assert.equal(estimate.basis.kind, "conditional", "a weekly window cannot prove a monthly total");
+  assert.equal(estimate.callsLow, 0, "the lower bound of a conditional estimate is zero");
+  assert.notEqual(planCoverageScore(weekly, settings, 100, model, model), 100, "conditional never reaches full coverage");
+});
+
+test("PR8: unsupported pricing never renders as a dollar amount", () => {
+  // callCost returns NaN when a model's rates are not verified at this input
+  // size. Every money formatter has to say so in words.
+  assert.equal(price(NaN), unsupportedPriceLabel);
+  assert.equal(price(NaN, 4), unsupportedPriceLabel);
+  assert.equal(monthlyPrice(NaN), unsupportedPriceLabel);
+  assert.equal(monthlyPriceAgainst(NaN, 30), unsupportedPriceLabel);
+  for (const formatted of [price(NaN), price(NaN, 4), monthlyPrice(NaN), monthlyPriceAgainst(NaN, 30)]) {
+    assert.doesNotMatch(formatted, /NaN/, "no formatter leaks the sentinel");
+  }
+  // The real path: a model priced past its verified ceiling.
+  const capped = dataset.models.find((m) => typeof m.unsupportedBeyond === "number");
+  if (capped) {
+    const beyond = { input: capped.unsupportedBeyond, output: 1000, cacheRatio: 0 };
+    assert.equal(price(callCost(capped, beyond), 4), unsupportedPriceLabel);
+    assert.equal(monthlyPrice(callCost(capped, beyond) * 900), unsupportedPriceLabel);
+  }
+});
+
+test("PR8: each feature migrates its own legacy data", () => {
+  // One shared marker meant whichever route the reader opened first claimed the
+  // migration and the other feature's legacy keys were never read.
+  const storage = readFileSync(new URL("../lib/browser/storage.ts", import.meta.url), "utf8");
+  assert.match(storage, /migrated: \(feature: string\)/, "the marker is keyed by feature");
+  assert.match(storage, /migrateLegacyOnce\(feature: string, destination: string/, "and takes the feature it guards");
+  // Re-running must not clobber a record written since the migration.
+  assert.match(storage, /if \(readRaw\(destination\) === null\) migrate\(\);/);
+
+  for (const [path, feature] of [
+    ["../features/recommend/state.ts", "workload"],
+    ["../features/tier-list/storage.ts", "boards"],
+  ]) {
+    const source = readFileSync(new URL(path, import.meta.url), "utf8");
+    assert.match(
+      source,
+      new RegExp(`migrateLegacyOnce\\("${feature}", storageKeys\\.${feature}`),
+      `${feature} migrates under its own marker`,
+    );
+  }
+});
