@@ -18,6 +18,7 @@ export const storageKeys = {
   workload: `${namespace}.workload`,
   columns: `${namespace}.columns`,
   boards: `${namespace}.boards`,
+  boardBackup: `${namespace}.boards-unreadable-backup`,
   boardRecovery: `${namespace}.board-recovery`,
   // One marker per feature. A single shared marker meant whichever route the
   // reader opened first claimed the migration and the other feature's legacy
@@ -114,9 +115,11 @@ export function readRecord<T>(
   version: number,
   parse: (payload: unknown) => T | null,
 ): RecordRead<T> {
-  const raw = readJson(key);
-  if (raw === null) return { state: "missing" };
-  if (typeof raw !== "object" || Array.isArray(raw)) return { state: "invalid" };
+  const text = readRaw(key);
+  if (text === null) return { state: "missing" };
+  let raw: unknown;
+  try { raw = JSON.parse(text); } catch { return { state: "invalid" }; }
+  if (raw === null || typeof raw !== "object" || Array.isArray(raw)) return { state: "invalid" };
   const envelope = raw as { v?: unknown; data?: unknown };
   if (typeof envelope.v !== "number") return { state: "invalid" };
   if (envelope.v !== version) return { state: "unknown-version", version: envelope.v };

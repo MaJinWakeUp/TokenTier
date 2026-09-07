@@ -22,6 +22,8 @@ import {
   legacyKeys,
   migrateLegacyOnce,
   readJson,
+  readRaw,
+  writeRaw,
   readRecord,
   removeKey,
   storageKeys,
@@ -40,12 +42,29 @@ type BoardsRecord = { subject: string; boards: Record<string, unknown> };
 function parseBoards(payload: unknown, items: Record<Subject, RankableItem[]>): StoredBoards | null {
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) return null;
   const record = payload as Partial<BoardsRecord>;
+  if (!isSubject(record.subject) || !record.boards || typeof record.boards !== "object" || Array.isArray(record.boards)
+    || Object.keys(record.boards).some((key) => !isSubject(key))) return null;
   const boards: Partial<Record<Subject, Board>> = {};
   for (const subject of subjects) {
     const entry = record.boards?.[subject.id];
-    if (!entry) continue;
+    if (!(subject.id in record.boards)) continue;
+    if (!entry || typeof entry !== "object" || Array.isArray(entry)) return null;
+    const payload = entry as { v?: unknown; t?: unknown; o?: unknown; p?: unknown };
+    if (payload.v !== undefined && payload.v !== 1 && payload.v !== 2) return null;
+    if (!Array.isArray(payload.t) || payload.t.length === 0) return null;
+    if (payload.t.some((tier: unknown) => !Array.isArray(tier) || tier.length !== 2 || typeof tier[0] !== "string" || typeof tier[1] !== "string")) return null;
+    const tierIds = new Set(payload.t.map((tier) => tier[0]));
+    if (payload.v !== 2 && (!Array.isArray(payload.p) || payload.p.some((row: unknown) => !Array.isArray(row) || typeof row[0] !== "string" || !tierIds.has(row[1])))) return null;
+    if (payload.v === 2 && (!Array.isArray(payload.o) || payload.o.some((row: unknown) =>
+      !Array.isArray(row) || typeof row[0] !== "string" || !tierIds.has(row[0]) || !Array.isArray(row[1]) || row[1].some((id: unknown) => typeof id !== "string")))) return null;
+    if (payload.v === 2) {
+      const rows = payload.o as [string, string[]][];
+      const ids = rows.flatMap((row) => row[1]);
+      if (new Set(rows.map((row) => row[0])).size !== rows.length || new Set(ids).size !== ids.length) return null;
+    }
     const decoded = decodeParsedBoard(entry, items[subject.id]);
-    if (decoded.state === "ok") boards[subject.id] = decoded.board;
+    if (decoded.state !== "ok") return null;
+    boards[subject.id] = decoded.board;
   }
   return {
     subject: isSubject(record.subject) ? record.subject : "plans",
@@ -75,16 +94,22 @@ function migrateLegacyBoards(items: Record<Subject, RankableItem[]>): void {
   });
 }
 
-export function readBoards(items: Record<Subject, RankableItem[]>): StoredBoards {
+export function readBoards(items: Record<Subject, RankableItem[]>): StoredBoards & { blocked: boolean } {
   migrateLegacyOnce("boards", storageKeys.boards, () => migrateLegacyBoards(items));
   const stored = readRecord(storageKeys.boards, boardsVersion, (payload) => parseBoards(payload, items));
-  if (stored.state === "ok") return stored.value;
-  return { subject: "plans", boards: {} };
+  if (stored.state === "ok") return { ...stored.value, blocked: false };
+  return { subject: "plans", boards: {}, blocked: stored.state !== "missing" };
 }
 
 // An untouched board is not saved: it would be announced as restored work on
 // the next visit. The record is still written, so the chosen subject survives.
 export function writeBoards(subject: Subject, boards: Record<Subject, Board>): boolean {
+  const current = readRecord(storageKeys.boards, boardsVersion, (payload) => parseBoards(payload, { plans: [], models: [] }));
+  if (current.state !== "ok" && current.state !== "missing") return false;
+  return persistBoards(subject, boards);
+}
+
+function persistBoards(subject: Subject, boards: Record<Subject, Board>): boolean {
   const payloads: Record<string, unknown> = {};
   for (const option of subjects) {
     const board = boards[option.id];
@@ -128,4 +153,15 @@ export function clearRecovery(): void {
 
 export function emptyBoards(): Record<Subject, Board> {
   return { plans: defaultBoard(), models: defaultBoard() };
+}
+
+// Preserve the exact bytes before an explicit replacement, including future formats.
+export function replaceUnreadableBoards(subject: Subject, boards: Record<Subject, Board>): boolean {
+  const raw = readRaw(storageKeys.boards);
+  if (raw !== null) {
+    const backup = readRaw(storageKeys.boardBackup);
+    if (backup !== null && backup !== raw) return false;
+    if (!writeRaw(storageKeys.boardBackup, raw)) return false;
+  }
+  return persistBoards(subject, boards);
 }

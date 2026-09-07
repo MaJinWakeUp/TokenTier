@@ -161,7 +161,7 @@ export function planEstimate(
         callsLow: 0,
         callsHigh: calls,
         valueLow: 0,
-        valueHigh: monthlyCredits,
+        valueHigh: calls * referenceCost,
         basis: { kind: "conditional", label },
       };
     }
@@ -170,8 +170,8 @@ export function planEstimate(
     return {
       callsLow: calls,
       callsHigh: calls,
-      valueLow: monthlyCredits,
-      valueHigh: monthlyCredits,
+      valueLow: calls * referenceCost,
+      valueHigh: calls * referenceCost,
       basis: { kind: "credit", label: "Official credit formula" },
     };
   }
@@ -270,16 +270,6 @@ export function planEstimate(
   // a relative limit with a verified allowance. Return an unknown-quota basis
   // so the UI shows the plan exists but its capacity is not measurable.
   if (quota?.kind === "relative-limit" || quota?.kind === "unknown") {
-    // A zero or free per-call cost is still reportable.
-    if (!Number.isFinite(referenceCost) || referenceCost <= 0) {
-      return {
-        callsLow: Infinity,
-        callsHigh: Infinity,
-        valueLow: 0,
-        valueHigh: 0,
-        basis: { kind: "free", label: "Free per-call cost" },
-      };
-    }
     return {
       callsLow: 0,
       callsHigh: 0,

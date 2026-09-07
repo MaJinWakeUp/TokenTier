@@ -263,8 +263,9 @@ test("AC4: credit capacity computed from quota.amount and resetWindow, not weekl
   const expectedMonthly = creditPlan.quotaDetail.amount * 4.33;
   const est = planEstimate(creditPlan, settings, model, model);
   assert.ok(est, "Should produce an estimate");
-  // For conditional plans, valueHigh = monthlyCredits
-  assert.ok(Math.abs(est.valueHigh - expectedMonthly) < 0.01, "valueHigh should match quota.amount * windowFactor");
+  // Credits determine calls; dollar value uses the working model API rate.
+  assert.ok(Math.abs(est.callsHigh - expectedMonthly / cpc) < 0.01);
+  assert.ok(Math.abs(est.valueHigh - est.callsHigh * callCost(model, settings, creditPlan.cacheRatio)) < 0.01);
 });
 
 test("AC4: zero divisor never displays Infinity or NaN", () => {
@@ -295,7 +296,7 @@ test("AC4: unknown price never classifies as unlimited", () => {
   const zeroModel = { ...model, input: 0, output: 0, cached: 0 };
   const est = planEstimate(plan, settings, zeroModel, zeroModel);
   assert.ok(est, "Should produce an estimate");
-  assert.equal(est.basis.kind, "free", "Zero cost with unknown quota should be free, not unlimited");
+  assert.equal(est.basis.kind, "unknown-quota", "A free API rate does not establish a subscription quota");
 });
 
 test("AC4: weekly reset window plan is conditional (not sufficient for monthly inputs)", () => {
@@ -402,10 +403,9 @@ test("AC7: unsupported pricing model is ineligible but not labeled unscored in r
   assert.ok(grok45Eval, "grok-4-5 should have an evaluation");
   assert.equal(grok45Eval.eligible, false, "grok-4-5 should be ineligible");
   assert.ok(Number.isNaN(grok45Eval.costPerCall), "Cost should be NaN (unsupported)");
-  // The rejection state should be "unscored" for pricing unsupported, but
-  // the model HAS a score — it just can't be priced. This is a pricing rejection.
+  // A scored model with missing pricing has a pricing rejection.
   assert.ok(grok45Eval.rejection, "Should have a rejection reason");
-  assert.equal(grok45Eval.rejection.state, "unscored", "Unsupported pricing rejection state");
+  assert.equal(grok45Eval.rejection.state, "pricing", "Unsupported pricing rejection state");
   // The model should NOT appear in the cost tiers
   const tiers = costTiers(result.api.evaluations);
   assert.ok(!tiers.has("grok-4-5"), "Unsupported-pricing model should not be in cost tiers");

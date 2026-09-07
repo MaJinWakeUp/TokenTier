@@ -6,8 +6,9 @@
 // so; it never falls back to the nearest thing that does not fit.
 
 import type { Catalog, Model, Plan, Scenario } from "../catalog/types.js";
+import { gateModel } from "./eligibility.js";
 import { monthlyPrice } from "../format.js";
-import { recommend, type Objective, type RecommendationResult, type Workload } from "./recommend.js";
+import { recommend, type Objective, type RecommendationResult, type Workload, type PlanEvaluation } from "./recommend.js";
 import type { Preference } from "./workload.js";
 
 export type Lane = "api" | "plans";
@@ -50,7 +51,31 @@ export type Decision = {
   difference: number;
   sameMonthlyPrice: boolean;
   caption: string;
+  apiReason: string;
+  planReason: string;
+  conditionalPlans: PlanEvaluation[];
 };
+
+export function conditionalCandidates(evaluations: PlanEvaluation[], calls: number): PlanEvaluation[] {
+  return evaluations.filter((entry) => entry.eligible && entry.withinBudget && (
+    entry.estimate?.basis.kind === "conditional"
+      ? entry.estimate.callsHigh >= calls
+      : entry.estimate !== null && entry.sufficientCoverage === null
+  )).sort((a, b) => (a.plan.monthly ?? Infinity) - (b.plan.monthly ?? Infinity) || a.plan.id.localeCompare(b.plan.id)).slice(0, 3);
+}
+
+function apiFailure(result: RecommendationResult, workload: Workload): string {
+  if (workload.access !== "any" && workload.access !== "api") return "Direct API is excluded by your access requirement. Choose API or any surface to compare it.";
+  if (result.api.evaluations.some((row) => row.eligible)) return "Eligible API models exceed your budget. Raise the budget, reduce call volume, or select Most capable to compare without a budget limit.";
+  const states = new Set(result.api.evaluations.map((row) => row.rejection?.state));
+  const reasons = [
+    states.has("context") && "context windows are too small (reduce input or output size)",
+    states.has("below") && "capability scores fall below the bar (choose a less demanding use case)",
+    states.has("unscored") && "required capability scores are missing",
+    states.has("pricing") && "pricing is unsupported at this input size",
+  ].filter(Boolean);
+  return reasons.length ? `No API model qualifies: ${reasons.join("; ")}.` : "No API models are available in this catalog.";
+}
 
 export function decide(
   catalog: Catalog,
@@ -127,10 +152,38 @@ export function decide(
   const difference = apiSpend - (planMonthly ?? 0);
   const sameMonthlyPrice = Math.abs(difference) < 0.005;
 
+  const apiReason = apiNoMatch ? apiFailure(result, workload) : "";
+  const affordablePlans = result.plans.evaluations.filter((row) => row.eligible && row.withinBudget);
+  const conditionalPlans = conditionalCandidates(result.plans.evaluations, workload.calls);
+  const planModels = result.plans.evaluations.flatMap((row) => row.plan.modelIds)
+    .map((id) => catalog.modelById.get(id)).filter((model): model is Model => Boolean(model));
+  const planGates = planModels.map((model) => gateModel(model, scenario, workload.input + workload.output));
+  const planEligibilityReason = planGates.some((gate) => gate === null)
+    ? "Plan models clear the capability and context requirements, but pricing or model-specific credit conversion is missing at this input size. Check provider evidence or reduce input size."
+    : `No plan model qualifies: ${[
+      planGates.some((gate) => gate?.state === "context") && "context windows are too small (reduce input or output)",
+      planGates.some((gate) => gate?.state === "below") && "capability scores are below the bar (choose a less demanding use case)",
+      planGates.some((gate) => gate?.state === "unscored") && "required capability scores are missing",
+      planGates.length === 0 && "model evidence is missing",
+    ].filter(Boolean).join("; ")}.`;
+  const planReason = !planNoMatch ? "" : workload.calls === 0
+    ? "No subscription is needed for zero calls."
+    : result.plans.evaluations.length === 0
+      ? "No subscription in the catalog supports your selected access surface."
+      : !result.plans.evaluations.some((row) => row.eligible)
+        ? planEligibilityReason
+        : affordablePlans.length === 0
+          ? "Eligible plans exceed your budget. Raise the budget to compare them."
+          : conditionalPlans.length > 0
+            ? "Published quotas do not prove coverage for this workload. Confirm the conditional candidates' limits with the provider before subscribing."
+            : affordablePlans.some((row) => row.estimate === null)
+              ? "Plan pricing cannot be converted at this input size. Check provider pricing or reduce the input size."
+              : "Published plan allowances are insufficient for this call volume. Reduce usage or compare another access surface.";
+
   const caption = apiNoMatch && planNoMatch
-    ? "No model or plan clears the capability bar for this workload."
+    ? `${apiReason} ${planReason}`
     : apiNoMatch
-      ? "No model clears the capability bar for this workload."
+      ? apiReason
       : planNoMatch || !plan
         ? `No subscription plan can be compared for this workload. ${apiModel!.name} API is estimated at ${monthlyPrice(apiSpend)}/mo.`
         : sameMonthlyPrice
@@ -162,6 +215,9 @@ export function decide(
     difference,
     sameMonthlyPrice,
     caption,
+    apiReason,
+    planReason,
+    conditionalPlans,
   };
 }
 

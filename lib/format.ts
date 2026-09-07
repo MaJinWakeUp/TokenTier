@@ -132,3 +132,15 @@ export function placementReason(placement: Placement, scenario: Scenario, metric
       return `Not scored on the ${label}, so no tier is assigned.`;
   }
 }
+
+// Capacity and economic parity must never share a numeric ranking.
+export function estimatePresentation(estimate: import("./domain/pricing.js").PlanEstimate | null) {
+  const unknown = { calls: "Unknown capacity", value: "Unknown API value", score: null as number | null };
+  if (!estimate || ["unknown-quota", "free"].includes(estimate.basis.kind)
+    || ![estimate.callsLow, estimate.callsHigh, estimate.valueLow, estimate.valueHigh].every(Number.isFinite)) return unknown;
+  const calls = `${formatEstimateRange(estimate.callsLow, estimate.callsHigh)} calls`;
+  const value = formatMoneyRange(estimate.valueLow, estimate.valueHigh);
+  if (estimate.basis.kind === "break-even") return { calls: `${calls} to reach API-cost parity`, value: `${value} at parity`, score: null };
+  if (estimate.basis.kind === "conditional") return { calls: `Up to ${compactNumber(estimate.callsHigh)} calls (conditional)`, value: `Up to ${price(estimate.valueHigh, 0)} API value (conditional)`, score: null };
+  return { calls, value, score: estimate.callsLow };
+}

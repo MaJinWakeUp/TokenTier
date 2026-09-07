@@ -7,7 +7,7 @@ import { contextSize, metricValue } from "@/lib/domain/eligibility";
 import { confidenceScore, planWorkingModel, tierRank, type Placement } from "@/lib/domain/placement";
 import { callCost, planEstimate } from "@/lib/domain/pricing";
 import {
-  formatEstimateRange,
+  estimatePresentation,
   monthlyPrice,
   placementClass,
   placementLabel,
@@ -87,10 +87,10 @@ function useCompareRows(items: Array<Model | Plan>, context: InspectionContext):
           render: (item) => {
             const estimate = planEstimate(item as Plan, settings, working(item), modelById.get((item as Plan).modelIds[0]));
             return estimate
-              ? <strong>{formatEstimateRange(estimate.callsLow, estimate.callsHigh)} calls</strong>
+              ? <strong>{estimatePresentation(estimate).calls}</strong>
               : <span className="muted-dash">—</span>;
           },
-          score: (item) => planEstimate(item as Plan, settings, working(item), modelById.get((item as Plan).modelIds[0]))?.callsLow ?? null,
+          score: (item) => estimatePresentation(planEstimate(item as Plan, settings, working(item), modelById.get((item as Plan).modelIds[0]))).score,
           better: "higher",
         },
         {

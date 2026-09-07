@@ -33,7 +33,7 @@ export type ApiEvaluation = {
   index: number | null;
   withinBudget: boolean;
   eligible: boolean;
-  rejection?: Rejection;
+  rejection?: Rejection | { state: "pricing" };
 };
 
 export type PlanEvaluation = {
@@ -83,7 +83,7 @@ function evaluateModel(
   const pricingUnsupported = Number.isNaN(costPerCall);
   const eligible = rejection === null && !pricingUnsupported;
   const finalRejection = pricingUnsupported
-    ? ({ state: "unscored" } as Rejection)
+    ? ({ state: "pricing" } as const)
     : rejection ?? undefined;
   return {
     model,
@@ -205,7 +205,7 @@ export function recommend(
     );
 
   const bestApi = selectBestApi(apiEvaluations, objective, workload.budget);
-  const bestPlan = selectBestPlan(planEvaluations);
+  const bestPlan = selectBestPlan(planEvaluations.filter((row) => workload.calls > 0 || row.plan.monthly === 0));
 
   return {
     api: {

@@ -49,7 +49,7 @@ test("a budget nothing can meet produces an explicit no-match, not a fallback", 
   const decision = decide(catalog, scenario, workload({ budget: 1, calls: 100_000 }), "cost", "either");
   assert.equal(decision.apiNoMatch, true);
   assert.equal(decision.apiModel, null);
-  assert.match(decision.caption, /No (model|model or plan) clears the capability bar/);
+  assert.match(decision.caption, /exceed your budget/);
   assert.match(announceDecision(decision, workload({ budget: 1, calls: 100_000 })), /No option qualifies|No qualified model/);
 });
 
@@ -144,4 +144,23 @@ test("a settled announcement is one sentence, not the whole panel", () => {
   const message = announceDecision(decision, workload());
   assert.ok(message.length < 120, `announcement stays short: ${message}`);
   assert.equal(message.split(". ").length <= 2, true);
+});
+
+
+test("no-match reasons distinguish access, budget and context", () => {
+  const budget = decide(catalog, scenario, workload({budget: 0}), "cost", "either");
+  assert.match(budget.apiReason, /exceed your budget/);
+  assert.ok(budget.frontier.find((p) => p.id === "capability").model);
+  const chat = decide(catalog, scenario, workload({access: "chat-app", budget: 10000}), "cost", "either");
+  assert.match(chat.apiReason, /excluded.*access/);
+  assert.equal(chat.plan, null);
+  assert.ok(chat.conditionalPlans.length > 0 && chat.conditionalPlans.length <= 3);
+  for (const entry of chat.conditionalPlans) {
+    assert.ok(entry.eligible && entry.withinBudget);
+    assert.notEqual(entry.sufficientCoverage, true);
+  }
+  const context = decide(catalog, scenario, workload({input: 20000000}), "cost", "either");
+  assert.match(context.apiReason, /context windows/);
+  const zero = decide(catalog, scenario, workload({calls: 0}), "cost", "either");
+  assert.ok(zero.plan === null || zero.plan.monthly === 0);
 });
