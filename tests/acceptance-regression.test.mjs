@@ -595,6 +595,16 @@ test("AC8: a scenario can leave a whole lane empty, and the catalog says which",
   assert.match(board, /rows\.length === 0 \? \(/, "the board branches on an empty lane");
   assert.match(board, /tier-board-empty/, "and renders a reason rather than nothing");
   assert.match(board, /\{rows\.length > 0 && \(/, "the letters-explained note is suppressed when there are no letters");
+  // An empty lane has three possible causes now — nothing clears the bar,
+  // everything qualified is over the price ceiling, or a mix — so the message
+  // is derived from the placements rather than assuming the first one.
+  assert.match(board, /const emptyLaneReason = \(\) =>/, "the reason is derived");
+  assert.match(board, /placement\.state === "over-cap"/, "and counts what the ceiling excluded");
+  assert.doesNotMatch(
+    board,
+    /with a quota that converts to this profile/,
+    "the old message assumed a requirement the board no longer applies",
+  );
 
   // Models are the lane that must never empty: the validator floor guarantees
   // at least three qualify for every scenario.

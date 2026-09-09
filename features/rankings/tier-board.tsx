@@ -58,6 +58,27 @@ export function TierBoard({
   // The curve fills every letter whenever there are at least as many distinct
   // prices as tiers, so an empty row means a genuinely tiny population rather
   // than a gap in the middle of the board. Either way it is not drawn.
+  // An empty lane has more than one cause now, and guessing the wrong one is
+  // worse than saying nothing: a plan can miss the board by failing the
+  // capability bar, by having no price to rank, or by costing more than this
+  // kind of work is worth. The message is derived from the placements that
+  // actually excluded things rather than assumed.
+  const emptyLaneReason = () => {
+    const label = scenario.label.toLowerCase();
+    if (lane === "api") return `No model clears the ${label} bar at this context size.`;
+
+    const overCap = excludedPlans.filter(({ placement }) => placement.state === "over-cap").length;
+    const offBar = excludedPlans.filter(({ placement }) =>
+      placement.state === "below" || placement.state === "context" || placement.state === "unscored").length;
+
+    if (overCap === 0) return `No subscription plan clears the ${label} bar.`;
+    if (offBar === 0) {
+      return `Every subscription plan that clears the ${label} bar costs more than $${scenario.planPriceCap}/mo.`;
+    }
+    return `No subscription plan is both under $${scenario.planPriceCap}/mo and clears the ${label} bar: `
+      + `${overCap} cost more, ${offBar} do not clear it.`;
+  };
+
   const placementFor = (item: Model | Plan) =>
     lane === "api" ? modelPlacement(item.id, scenarioId) : planPlacement(item.id, scenarioId);
 
@@ -122,12 +143,7 @@ export function TierBoard({
       </div>
 
       {rows.length === 0 ? (
-        // Nothing in this lane clears the bar. Saying so beats an empty board
-        // under a note claiming everything on it already qualified.
-        <p className="tier-board-empty">
-          No {lane === "api" ? "model" : "subscription plan"} clears the {scenario.label.toLowerCase()} bar
-          {lane === "plans" ? " with a quota that converts to this profile" : ""}. Every one is listed below with the reason.
-        </p>
+        <p className="tier-board-empty">{emptyLaneReason()} Every one is listed below with the reason.</p>
       ) : (
       <div className="tier-board">
         {rows.map(({ tier, items }) => (

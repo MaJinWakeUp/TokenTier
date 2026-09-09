@@ -394,6 +394,10 @@ test("keeps its ownership, licence and delivery guarantees", async () => {
   const ogImage = await readFile(new URL("../public/og.png", import.meta.url));
 
   assert.match(readme, /## Ownership and independence/);
+  // The catalog-changes log describes shipped behaviour. When the board changed
+  // to rank every priced plan, the entry saying a lane was empty became wrong.
+  assert.doesNotMatch(readme, /the plan lane on hard coding is now empty/i);
+  assert.match(readme, /planPriceCap/, "the README documents the board's price ceiling");
   assert.match(readme, /independent project created and maintained by Jin Ma/);
   assert.match(readme, /GitHub Pages is the published host/);
   assert.match(readme, /majinwakeup\.github\.io\/TokenTier/);

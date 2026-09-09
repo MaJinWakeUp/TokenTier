@@ -244,27 +244,25 @@ anchor, preserving the gap between the anchor's score and its own bar:
 The tier curve is unchanged: the board still runs S to D with no gaps, for
 models in every scenario.
 
-One visible consequence: **the plan lane on hard coding is now empty.** Twelve
-subscriptions still offer a model that clears the 45 bar — ChatGPT Plus and Pro
+One visible consequence is on the plan side of hard coding. Twelve
+subscriptions offer a model that clears the 45 bar — ChatGPT Plus and Pro
 through GPT-5.6 Sol, Claude Max through Opus 5, Cursor through Sol and Fable
-5.1, GLM Coding and OpenCode Go through GLM-5.3. What none of them has is a
-published quota that can be *shown* to cover 1,500 hard-coding calls a month:
+5.1, GLM Coding and OpenCode Go through GLM-5.3 — and all twelve are ranked on
+the board. **None of them can any longer prove it covers the volume**, so every
+card on that lane carries a capacity caveat:
 
 - ChatGPT and Claude publish relative limits ("rolling 5-hour", "5x Pro
-  allowance") that convert to no call count at all.
+  allowance") that convert to no call count at all — `unproven`.
 - The Cursor pools convert, but to 57, 200 and 1,197 calls against a
-  1,500-call month at 90K input.
+  1,500-call month at 90K input — `under volume`.
 - GLM Coding and OpenCode Go cap on a weekly or 5-hour window, so a monthly
-  total is conditional rather than proven.
+  total cannot follow — `capped`.
 
-The single plan that qualified under v4.2 was Cursor Ultra, whose working model
-was Grok 4.6 at 2,576 covered calls. Grok 4.6 fell from 51 to 44 on v4.3, below
-the bar, so Cursor Ultra's working model became the pricier GPT-5.6 Sol and the
-same $400 pool now buys 1,197 calls. That one score is what emptied the lane.
-
-The board states which lane cleared nothing and lists every plan with its reason
-underneath, rather than rendering a blank panel. The other six scenarios still
-tier between two and four plans.
+Cursor Ultra is the one that changed. Under v4.2 its working model was Grok 4.6,
+whose $400 pool covered 2,576 calls — the only plan on that lane with proven
+coverage. Grok 4.6 fell from 51 to 44, below the bar, so the working model
+became the pricier GPT-5.6 Sol and the same pool now buys 1,197 calls. One score
+moved the whole lane from "one plan proves it" to "none does".
 
 **Roster correction:** GPT-6 Astra was added to the model catalog on September 6
 but to no plan, so the ChatGPT subscriptions understated what they reach. Astra
