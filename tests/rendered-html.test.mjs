@@ -112,6 +112,11 @@ test("Rankings answers the cheapest-qualified question above the board", async (
   assert.deepEqual(letters, ["S", "A", "B", "C", "D"].slice(0, letters.length), "letters are contiguous from S");
   assert.doesNotMatch(markup, /No models ranked in this tier/, "no letter is printed empty");
   assert.doesNotMatch(markup, /No plans ranked in this tier/, "no letter is printed empty");
+  // A board with rows carries the note explaining what the letters mean; a lane
+  // where nothing qualifies carries the reason instead, never both and never
+  // neither.
+  assert.match(markup, /Everything on the board already clears/);
+  assert.doesNotMatch(markup, /class="tier-board-empty"/);
   assert.match(markup, /Primary pricing and quota sources/);
   assert.match(markup, /Artificial Analysis capability index ↗/);
   assert.match(markup, /Typical month/);

@@ -2202,6 +2202,18 @@ td:first-child {
   animation: view-fade 280ms ease both;
 }
 
+.tier-board-empty {
+  margin: 0;
+  padding: 34px 22px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 13px;
+  background: var(--bg-inset);
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.55;
+  text-align: center;
+}
+
 .tier-empty {
   display: flex;
   align-items: center;

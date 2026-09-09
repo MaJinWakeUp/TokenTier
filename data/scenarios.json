@@ -38,7 +38,7 @@
       "rationale": "About thirteen short exchanges a day. A system prompt and a little recent history are reused; the question itself is new each time.",
       "gate": {
         "metric": "intelligence",
-        "minIndex": 34,
+        "minIndex": 27,
         "anchor": "gemini-3-1-pro",
         "rationale": "Everyday questions still need a model that will not confidently invent an answer, which rules out the small-model tier."
       }
@@ -54,7 +54,7 @@
       "rationale": "Around seventeen requests a day against one file plus instructions, which get resent across a short back-and-forth, so roughly half the input is a cache read.",
       "gate": {
         "metric": "intelligence",
-        "minIndex": 34,
+        "minIndex": 27,
         "anchor": "gemini-3-1-pro",
         "rationale": "Even a self-contained function has to compile and pass its own test, so the bar sits above the small-model tier.",
         "preferredMetric": "codingAgent"
@@ -71,7 +71,7 @@
       "rationale": "A feature spanning several files at about thirty agent turns a day. The repo context is stable within a session, so most input is a cache read and the output is a tool call rather than an essay.",
       "gate": {
         "metric": "intelligence",
-        "minIndex": 45,
+        "minIndex": 38,
         "anchor": "claude-sonnet-5",
         "rationale": "Shipping a multi-file feature means holding several files in mind at once; below this bar the edits stop being coherent with each other.",
         "preferredMetric": "codingAgent"
@@ -88,7 +88,7 @@
       "rationale": "Long agent sessions on an unfamiliar large repository, about fifty turns a day. The prefix barely changes between turns, so three quarters of a very large input is billed at the cached rate.",
       "gate": {
         "metric": "intelligence",
-        "minIndex": 49,
+        "minIndex": 45,
         "anchor": "glm-5-3",
         "rationale": "An unfamiliar large repository punishes weak reasoning quietly, so hard coding admits only the frontier tier.",
         "preferredMetric": "codingAgent"
@@ -105,7 +105,7 @@
       "rationale": "Roughly seven whole documents a day. Each source is new, so little is cached and the input dominates the bill.",
       "gate": {
         "metric": "intelligence",
-        "minIndex": 49,
+        "minIndex": 45,
         "anchor": "glm-5-3",
         "rationale": "Holding a long document together and citing it accurately fails quietly rather than loudly, so research sits at the frontier bar.",
         "preferredMetric": "longContext"
@@ -122,7 +122,7 @@
       "rationale": "About ten drafting and revision passes a day on one piece. This is the one profile where output rivals input, so output rates decide the bill.",
       "gate": {
         "metric": "intelligence",
-        "minIndex": 41,
+        "minIndex": 36,
         "anchor": "gpt-5-6-luna",
         "rationale": "Copy that ships without a rewrite needs more than fluent text, but it does not need frontier reasoning."
       }
@@ -138,7 +138,7 @@
       "rationale": "Around five deliberate thinking sessions a day. A brief and some background are reused, the ideas are not, and answers run long.",
       "gate": {
         "metric": "intelligence",
-        "minIndex": 49,
+        "minIndex": 45,
         "anchor": "glm-5-3",
         "rationale": "Novel ideation is where frontier capability separates from competence, so innovation admits only the frontier tier.",
         "preferredMetric": "agentic"

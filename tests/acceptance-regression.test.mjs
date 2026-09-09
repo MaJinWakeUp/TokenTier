@@ -424,11 +424,13 @@ test("AC7: scenarios document publishes four tier cuts", () => {
 
 test("AC7: every scenario board is contiguous from S, models and plans", () => {
   const order = ["S", "A", "B", "C", "D"];
+  // Contiguity is the property: the letters in use run from S with no gap.
+  // A lane can legitimately be empty — no plan clears the hard-coding bar with a
+  // convertible quota — and an empty lane has no letters to be discontiguous.
   const contiguous = (placements, label) => {
     const used = new Set(
       [...placements.values()].filter((p) => p.state === "tier").map((p) => p.tier),
     );
-    assert.ok(used.size > 0, `${label}: something is tiered`);
     assert.deepEqual(
       order.filter((letter) => used.has(letter)),
       order.slice(0, used.size),
@@ -533,4 +535,25 @@ test("AC6: next.config has webpack extensionAlias for .js -> .ts", () => {
   const configSource = readFileSync(new URL("../next.config.ts", import.meta.url), "utf8");
   assert.match(configSource, /extensionAlias/, "next.config must have extensionAlias");
   assert.match(configSource, /\.js.*\[.*\.ts.*\.tsx.*\.js/, "extensionAlias must map .js to .ts/.tsx/.js");
+});
+
+// -- AC8: a lane where nothing qualifies explains itself ----------------------
+
+test("AC8: a scenario can leave a whole lane empty, and the catalog says which", () => {
+  // The harder v4.3 index pushed code-hard's plan lane to zero tiered plans.
+  // The board must be able to render that state, so the invariant worth holding
+  // is that an empty lane is a real possibility the UI accounts for, not that
+  // every lane is always populated.
+  const board = readFileSync(new URL("../features/rankings/tier-board.tsx", import.meta.url), "utf8");
+  assert.match(board, /rows\.length === 0 \? \(/, "the board branches on an empty lane");
+  assert.match(board, /tier-board-empty/, "and renders a reason rather than nothing");
+  assert.match(board, /\{rows\.length > 0 && \(/, "the letters-explained note is suppressed when there are no letters");
+
+  // Models are the lane that must never empty: the validator floor guarantees
+  // at least three qualify for every scenario.
+  for (const scenario of scenarioDoc.scenarios) {
+    const placements = modelPlacements(dataset.models, scenario, scenarioDoc.tierCuts, scenarioDoc.ranking.models);
+    const tiered = [...placements.values()].filter((p) => p.state === "tier");
+    assert.ok(tiered.length >= 3, `${scenario.id}: at least three models are tiered, got ${tiered.length}`);
+  }
 });

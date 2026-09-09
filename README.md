@@ -196,6 +196,41 @@ date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
 
+## Catalog changes, September 9 2026
+
+Artificial Analysis published **Intelligence Index v4.3** on September 7 2026,
+two days after v4.2. It upgrades Terminal-Bench to v4.0 — a harder 66-task set
+replacing v2.1 — and swaps AutomationBench-AA in for τ³-Banking. Category
+weights are unchanged, and the index still aggregates ten evaluations.
+
+Scores are not comparable across index versions, so all 22 scored models were
+re-read together at the same effort variant each record already cited. Every
+score fell again, by 1 to 8 points. Each scenario bar was re-derived from its
+anchor, preserving the gap between the anchor's score and its own bar:
+
+| Scenario | Anchor | Anchor 4.2 → 4.3 | Bar 4.2 → 4.3 |
+| --- | --- | --- | --- |
+| Daily use | Gemini 3.1 Pro | 37 → 30 | 34 → 27 |
+| Easy coding | Gemini 3.1 Pro | 37 → 30 | 34 → 27 |
+| Medium coding | Claude Sonnet 5 | 45 → 38 | 45 → 38 |
+| Hard coding | GLM-5.3 | 49 → 45 | 49 → 45 |
+| Research | GLM-5.3 | 49 → 45 | 49 → 45 |
+| Paper writing | GPT-5.6 Luna | 43 → 38 | 41 → 36 |
+| Innovation | GLM-5.3 | 49 → 45 | 49 → 45 |
+
+The tier curve is unchanged: the board still runs S to D with no gaps, for
+models in every scenario.
+
+One visible consequence: **no subscription plan clears the hard-coding bar any
+more.** Under v4.3 six models reach 45, and none of them is offered by a plan
+whose published quota converts to that profile, so the plan lane on hard coding
+is empty. The board says so explicitly and lists every plan with its reason
+underneath, rather than rendering a blank panel. The other six scenarios still
+tier between two and four plans.
+
+Claude Fable 5.1 and GPT-6 Astra now tie at 53 for the top score. Ties resolve
+by cost and then by id, so the recommendation stays deterministic.
+
 ## Catalog changes, September 6 2026
 
 Artificial Analysis published **Intelligence Index v4.2** on September 4 2026. It

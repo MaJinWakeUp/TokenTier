@@ -110,6 +110,14 @@ export function TierBoard({
         </p>
       </div>
 
+      {rows.length === 0 ? (
+        // Nothing in this lane clears the bar. Saying so beats an empty board
+        // under a note claiming everything on it already qualified.
+        <p className="tier-board-empty">
+          No {lane === "api" ? "model" : "subscription plan"} clears the {scenario.label.toLowerCase()} bar
+          {lane === "plans" ? " with a quota that converts to this profile" : ""}. Every one is listed below with the reason.
+        </p>
+      ) : (
       <div className="tier-board">
         {rows.map(({ tier, items }) => (
           <div className={`tier-row tier-${tier.toLowerCase()}`} key={tier}>
@@ -143,10 +151,13 @@ export function TierBoard({
           </div>
         ))}
       </div>
-      <p className="tier-note">
-        Everything on the board already clears the {scenario.label.toLowerCase()} capability bar, so the
-        letters rank value: models by per-call cost, plans by price and quota evidence. Select a card to view specs or compare.
-      </p>
+      )}
+      {rows.length > 0 && (
+        <p className="tier-note">
+          Everything on the board already clears the {scenario.label.toLowerCase()} capability bar, so the
+          letters rank value: models by per-call cost, plans by price and quota evidence. Select a card to view specs or compare.
+        </p>
+      )}
 
       {lane === "api" && excludedModels.length > 0 && (
         <details className="gate-excluded">

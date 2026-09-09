@@ -220,7 +220,15 @@ test("F2: budget objective picks highest index within budget when affordable", (
   if (result.api.best) {
     const affordable = result.api.evaluations.filter((e) => e.eligible && e.withinBudget);
     if (affordable.length > 0) {
-      const highestIndex = [...affordable].sort((a, b) => (b.index ?? 0) - (a.index ?? 0))[0];
+    // Same tie-break as selectBestApi: index, then cost, then id. Two models
+      // can share the top index — Claude Fable 5.1 and GPT-6 Astra both score 53
+      // on v4.3 — and without the tie-break this compares against whichever
+      // happened to come first in the catalog.
+      const highestIndex = [...affordable].sort(
+        (a, b) => (b.index ?? 0) - (a.index ?? 0)
+          || a.costPerCall - b.costPerCall
+          || a.model.id.localeCompare(b.model.id),
+      )[0];
       assert.equal(result.api.best.model.id, highestIndex.model.id, "Budget objective should pick highest index within budget");
     }
   }
