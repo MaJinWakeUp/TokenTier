@@ -15,7 +15,7 @@ import type { Model, Plan, ScenarioId } from "@/lib/catalog/types";
 import { scenarioTokens } from "@/lib/domain/eligibility";
 import { placementSort, planWorkingModel } from "@/lib/domain/placement";
 import { callCost } from "@/lib/domain/pricing";
-import { metricLabels, price, tierDescriptions, tierOrder } from "@/lib/format";
+import { capacityNote, metricLabels, placementReason, price, tierDescriptions, tierOrder } from "@/lib/format";
 
 export type Lane = "api" | "plans";
 
@@ -58,6 +58,17 @@ export function TierBoard({
   // The curve fills every letter whenever there are at least as many distinct
   // prices as tiers, so an empty row means a genuinely tiny population rather
   // than a gap in the middle of the board. Either way it is not drawn.
+  const placementFor = (item: Model | Plan) =>
+    lane === "api" ? modelPlacement(item.id, scenarioId) : planPlacement(item.id, scenarioId);
+
+  // A plan is ranked on price whatever its quota evidence says, so the card
+  // carries the caveat when its capacity is not proven.
+  const capacityOf = (item: Model | Plan) => {
+    if (lane !== "plans") return null;
+    const placement = placementFor(item);
+    return placement.state === "tier" ? capacityNote(placement.capacity) : null;
+  };
+
   const ranked: Array<Model | Plan> = lane === "api" ? models : subscriptions;
   const rows = tierOrder
     .map((tier) => ({
@@ -127,7 +138,8 @@ export function TierBoard({
                 <button
                   aria-label={lane === "api"
                     ? `${item.name}, ${item.provider}, ${price(callCost(item as Model, settings), 3)} per call`
-                    : `${item.name}, ${item.provider}, $${(item as Plan).monthly} per month`}
+                    : `${item.name}, ${item.provider}, $${(item as Plan).monthly} per month${capacityOf(item) ? `, ${capacityOf(item)}` : ""}`}
+                  title={lane === "plans" ? placementReason(placementFor(item), scenario, metric) : undefined}
                   className={`tier-model ${isCompared(item.id) ? "selected" : ""}`}
                   key={item.id}
                   onClick={() => onInspect(item)}
@@ -137,9 +149,15 @@ export function TierBoard({
                   <span>
                     <strong title={item.name}>{item.name}</strong>
                     <small>
-                      {lane === "api"
-                        ? item.provider
-                        : `via ${planWorkingModel(item as Plan, scenario, settings, modelById)?.name ?? item.provider}`}
+                      {lane === "api" ? item.provider : (
+                        <>
+                          {/* The caveat leads so the model name takes the
+                              truncation: which model is on the plan is in the
+                              details modal, whether its quota holds is not. */}
+                          {capacityOf(item) && <em className="tier-model-caveat">{capacityOf(item)} · </em>}
+                          {`via ${planWorkingModel(item as Plan, scenario, settings, modelById)?.name ?? item.provider}`}
+                        </>
+                      )}
                     </small>
                   </span>
                   {lane === "api"
@@ -155,7 +173,9 @@ export function TierBoard({
       {rows.length > 0 && (
         <p className="tier-note">
           Everything on the board already clears the {scenario.label.toLowerCase()} capability bar, so the
-          letters rank value: models by per-call cost, plans by price and quota evidence. Select a card to view specs or compare.
+          letters rank value: models by per-call cost, plans by monthly price. A plan is ranked on price whether or
+          not its published quota can be shown to cover this profile, so a card says when its capacity is short,
+          capped on a shorter window, or not convertible at all. Select a card to view specs or compare.
         </p>
       )}
 

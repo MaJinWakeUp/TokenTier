@@ -136,31 +136,78 @@ test("AC1: zero calls with positive budget does not recommend a paid plan", () =
 
 // -- AC3: preset placements use cost ratio rules ------------------------------
 
-test("AC3: planPlacements leaves conditional coverage off the board", () => {
+test("AC3: the plan board ranks the whole market and labels unproven capacity", () => {
+  // The board answers "what could I buy for this work, cheapest first". Hiding
+  // every plan whose quota cannot be converted emptied whole lanes and told the
+  // reader nothing, so a plan is placed once it clears the capability bar and
+  // has a price. What its quota proves is reported on the placement instead.
   const scenario = scenarioDoc.scenarios.find((s) => s.id === "code-hard");
   const placements = planPlacements(planDoc.plans, scenario, modelById, scenarioDoc.tierCuts, scenarioDoc.ranking.plans);
-  // OpenCode Go has conditional coverage (5h+weekly caps), so it must NOT be tiered.
+
   const opencodeGo = placements.get("opencode-go");
-  assert.notEqual(opencodeGo?.state, "tier", "OpenCode Go must not be tiered (conditional coverage)");
+  assert.equal(opencodeGo.state, "tier", "a conditional plan is on the board");
+  assert.equal(opencodeGo.capacity, "conditional", "and is labelled conditional");
+
+  const settings = { input: scenario.input, output: scenario.output, cacheRatio: scenario.cacheRatio };
+  for (const [id, placement] of placements) {
+    if (placement.state !== "tier") continue;
+    const plan = planDoc.plans.find((p) => p.id === id);
+    // Two things still gate the board: the capability bar and a price to rank.
+    assert.ok(planWorkingModel(plan, scenario, settings, modelById), `${id}: a model on this plan clears the bar`);
+    assert.ok(typeof plan.monthly === "number" && plan.monthly > 0, `${id}: has a monthly price`);
+    // And every placed plan declares what its quota proves.
+    assert.ok(
+      ["proven", "short", "conditional", "unknown"].includes(placement.capacity),
+      `${id}: carries a capacity verdict, got ${placement.capacity}`,
+    );
+  }
 });
 
-test("AC3: planPlacements excludes plans with unknown coverage from qualified tiers", () => {
+test("AC3: capacity matches what the plan's own estimate supports", () => {
   for (const scenario of scenarioDoc.scenarios) {
+    const settings = { input: scenario.input, output: scenario.output, cacheRatio: scenario.cacheRatio };
     const placements = planPlacements(planDoc.plans, scenario, modelById, scenarioDoc.tierCuts, scenarioDoc.ranking.plans);
     for (const [id, placement] of placements) {
-      if (placement.state === "tier") {
-        const plan = planDoc.plans.find((p) => p.id === id);
-        const settings = { input: scenario.input, output: scenario.output, cacheRatio: scenario.cacheRatio };
-        const wm = planWorkingModel(plan, scenario, settings, modelById);
-        const est = planEstimate(plan, settings, wm, modelById.get(plan.modelIds[0]));
-        // Tiered plans must have verified sufficient coverage (not conditional/unknown/break-even)
-        assert.ok(est, `${id}: tiered plan must have an estimate`);
-        assert.ok(est.basis.kind === "allowance" || est.basis.kind === "credit",
-          `${id}: tiered plan must have verified allowance or credit basis, got ${est.basis.kind}`);
-        const coverage = planCoverageScore(plan, settings, scenario.calls, wm, modelById.get(plan.modelIds[0]));
-        assert.equal(coverage, 100, `${id}: tiered plan must have 100 coverage`);
+      if (placement.state !== "tier") continue;
+      const plan = planDoc.plans.find((p) => p.id === id);
+      const wm = planWorkingModel(plan, scenario, settings, modelById);
+      const est = planEstimate(plan, settings, wm, modelById.get(plan.modelIds[0]));
+      const coverage = planCoverageScore(plan, settings, scenario.calls, wm, modelById.get(plan.modelIds[0]));
+
+      if (placement.capacity === "proven") {
+        assert.ok(est && (est.basis.kind === "allowance" || est.basis.kind === "credit" || est.basis.kind === "free"),
+          `${scenario.id}/${id}: proven capacity needs a verified basis, got ${est?.basis.kind}`);
+        assert.equal(coverage, 100, `${scenario.id}/${id}: proven capacity covers the volume`);
+      }
+      if (placement.capacity === "unknown") {
+        assert.ok(!est || est.basis.kind === "break-even" || est.basis.kind === "unknown-quota",
+          `${scenario.id}/${id}: unknown capacity has no convertible quota, got ${est?.basis.kind}`);
+      }
+      if (placement.capacity === "conditional") {
+        assert.equal(est.basis.kind, "conditional", `${scenario.id}/${id}: conditional capacity comes from a windowed cap`);
       }
     }
+  }
+});
+
+test("AC3: loosening the board did not loosen the recommendation", () => {
+  // The board shows the market; the recommendation still names only a plan whose
+  // allowance is verified, sufficient and affordable. These must not drift.
+  for (const scenario of scenarioDoc.scenarios) {
+    const workload = {
+      scenarioId: scenario.id,
+      input: scenario.input,
+      output: scenario.output,
+      calls: scenario.calls,
+      cacheRatio: scenario.cacheRatio,
+      budget: 500,
+      access: "any",
+    };
+    const best = recommend(catalog, scenario, workload, "cost").plans.best;
+    if (best === null) continue;
+    assert.equal(best.eligible, true, `${scenario.id}: recommended plan clears the bar`);
+    assert.equal(best.sufficientCoverage, true, `${scenario.id}: recommended plan proves coverage`);
+    assert.equal(best.withinBudget, true, `${scenario.id}: recommended plan fits the budget`);
   }
 });
 

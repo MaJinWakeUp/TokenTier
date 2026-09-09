@@ -114,6 +114,14 @@ Tiers are derived, never hand-graded. Two independent judgements are kept apart:
    curve is taken over every qualifying option, so filtering or searching the
    table never moves a letter.
 
+   Models are ordered by per-call cost and plans by monthly price. A plan is
+   ranked on price whether or not its published quota can be shown to cover the
+   profile, so the whole market is visible rather than only the few plans whose
+   quota converts; each card says when its capacity is short of the volume,
+   capped on a shorter window, or not convertible at all. The recommendation is
+   stricter and unchanged: it names a plan only when the allowance is verified,
+   sufficient and within budget.
+
    This replaced fixed cost-ratio bands (S within 1.25x of the cheapest, A within
    2x, B within 4x, else C). Those bands had a real advantage — a letter meant
    the same multiple of the cheapest price in every scenario — but one unusually

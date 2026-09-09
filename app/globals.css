@@ -2202,6 +2202,13 @@ td:first-child {
   animation: view-fade 280ms ease both;
 }
 
+/* The caveat rides on the "via <model>" line so the card keeps its two lines and
+   fixed height; the full reason is in the card's title. */
+.tier-model-caveat {
+  color: var(--note-accent);
+  font-style: normal;
+}
+
 .tier-board-empty {
   margin: 0;
   padding: 34px 22px;

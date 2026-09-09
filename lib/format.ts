@@ -1,7 +1,7 @@
 // Money, token, and label formatting shared by every view. Pure functions.
 
 import type { MetricKey, Plan, Scenario, ScenarioId, Tier } from "./catalog/types.js";
-import type { Placement } from "./domain/placement.js";
+import type { Placement, PlanCapacity } from "./domain/placement.js";
 import { scenarioTokens } from "./domain/eligibility.js";
 
 export const metricLabels: Record<MetricKey, string> = {
@@ -109,6 +109,28 @@ export function planQuota(plan: Plan, scenarioId: ScenarioId) {
   return range ? `${range} ${modelClass} local messages / 5h` : plan.quota;
 }
 
+// A plan on the board has cleared the capability bar and is ranked on price.
+// How well its published quota is known is a separate axis, and it has to be
+// visible or a plan with an unconvertible quota reads as though its capacity
+// were verified.
+// Short enough to survive a fixed-width card. The full sentence is in the
+// card's title and in the placement reason the price book shows.
+export const capacityLabels: Record<Exclude<PlanCapacity, "proven">, string> = {
+  short: "under volume",
+  conditional: "capped",
+  unknown: "unproven",
+};
+
+export const capacityReasons: Record<Exclude<PlanCapacity, "proven">, string> = {
+  short: "Its published allowance converts to fewer calls than this profile needs.",
+  conditional: "Its allowance is capped on a shorter window, so a monthly total cannot be proven.",
+  unknown: "It publishes no quota that converts to a call count, so capacity is unknown.",
+};
+
+export function capacityNote(capacity: PlanCapacity | undefined): string | null {
+  return capacity === undefined || capacity === "proven" ? null : capacityLabels[capacity];
+}
+
 export function placementLabel(placement: Placement) {
   return placement.state === "tier" ? placement.tier : "—";
 }
@@ -120,8 +142,13 @@ export function placementClass(placement: Placement) {
 export function placementReason(placement: Placement, scenario: Scenario, metric: MetricKey) {
   const label = metricLabels[metric];
   switch (placement.state) {
-    case "tier":
-      return `${label} ${placement.index} clears the ${placement.minIndex} bar for ${scenario.label} with ${placement.headroom} to spare. Tier ${placement.tier}: ${tierDescriptions[placement.tier].toLowerCase()}.`;
+    case "tier": {
+      const base = `${label} ${placement.index} clears the ${placement.minIndex} bar for ${scenario.label} with ${placement.headroom} to spare. Tier ${placement.tier}: ${tierDescriptions[placement.tier].toLowerCase()}.`;
+      const capacity = placement.capacity;
+      return capacity === undefined || capacity === "proven"
+        ? base
+        : `${base} ${capacityReasons[capacity]}`;
+    }
     case "below":
       return `${label} ${placement.index} is below the ${placement.minIndex} bar for ${scenario.label}.`;
     case "context":
