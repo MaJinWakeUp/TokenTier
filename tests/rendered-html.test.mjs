@@ -257,7 +257,25 @@ test("the catalog stays in validated data files", async () => {
     }
   }
   assert.ok(planById.get("opencode-go").modelIds.length > 5, "OpenCode Go lists the models its rate card publishes");
-  assert.deepEqual(planById.get("chatgpt-plus").modelIds, ["gpt-5-6-luna", "gpt-5-6-terra", "gpt-5-6-sol"]);
+  // The roster has to carry the frontier model the plan actually reaches, or the
+  // plan is judged on a weaker model than a subscriber would use. GPT-6 Astra
+  // was in the model catalog but on no plan until the v4.3 pass.
+  assert.deepEqual(
+    planById.get("chatgpt-plus").modelIds,
+    ["gpt-5-6-luna", "gpt-5-6-terra", "gpt-5-6-sol", "gpt-6-astra"],
+  );
+  for (const id of ["chatgpt-plus", "chatgpt-pro-5x", "chatgpt-pro-20x"]) {
+    assert.ok(planById.get(id).modelIds.includes("gpt-6-astra"), `${id} reaches GPT-6 Astra`);
+  }
+  assert.equal(planById.get("chatgpt-go").modelIds.includes("gpt-6-astra"), false, "Go does not include Astra");
+
+  // Every model in the catalog that a subscription actually offers should be on
+  // that subscription's roster. A model listed by no plan at all is only correct
+  // when no subscription in the catalog sells access to it.
+  const rosterIds = new Set(planCatalog.plans.flatMap((entry) => entry.modelIds));
+  for (const id of ["gpt-6-astra", "gpt-5-6-sol", "claude-opus-5", "glm-5-3"]) {
+    assert.ok(rosterIds.has(id), `${id} is offered by at least one plan`);
+  }
   assert.deepEqual(planById.get("glm-coding-lite").modelIds, ["glm-5-3", "glm-5-3-flash"]);
   assert.deepEqual(planById.get("glm-coding-lite").creditMultipliers["glm-5-3"], [6.9, 1.7, 24]);
   assert.deepEqual(planById.get("glm-coding-lite").creditMultipliers["glm-5-3-flash"], [2.3, 0.56, 8]);

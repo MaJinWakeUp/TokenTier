@@ -221,12 +221,35 @@ anchor, preserving the gap between the anchor's score and its own bar:
 The tier curve is unchanged: the board still runs S to D with no gaps, for
 models in every scenario.
 
-One visible consequence: **no subscription plan clears the hard-coding bar any
-more.** Under v4.3 six models reach 45, and none of them is offered by a plan
-whose published quota converts to that profile, so the plan lane on hard coding
-is empty. The board says so explicitly and lists every plan with its reason
+One visible consequence: **the plan lane on hard coding is now empty.** Twelve
+subscriptions still offer a model that clears the 45 bar — ChatGPT Plus and Pro
+through GPT-5.6 Sol, Claude Max through Opus 5, Cursor through Sol and Fable
+5.1, GLM Coding and OpenCode Go through GLM-5.3. What none of them has is a
+published quota that can be *shown* to cover 1,500 hard-coding calls a month:
+
+- ChatGPT and Claude publish relative limits ("rolling 5-hour", "5x Pro
+  allowance") that convert to no call count at all.
+- The Cursor pools convert, but to 57, 200 and 1,197 calls against a
+  1,500-call month at 90K input.
+- GLM Coding and OpenCode Go cap on a weekly or 5-hour window, so a monthly
+  total is conditional rather than proven.
+
+The single plan that qualified under v4.2 was Cursor Ultra, whose working model
+was Grok 4.6 at 2,576 covered calls. Grok 4.6 fell from 51 to 44 on v4.3, below
+the bar, so Cursor Ultra's working model became the pricier GPT-5.6 Sol and the
+same $400 pool now buys 1,197 calls. That one score is what emptied the lane.
+
+The board states which lane cleared nothing and lists every plan with its reason
 underneath, rather than rendering a blank panel. The other six scenarios still
 tier between two and four plans.
+
+**Roster correction:** GPT-6 Astra was added to the model catalog on September 6
+but to no plan, so the ChatGPT subscriptions understated what they reach. Astra
+is included for Plus, Pro, Business and Enterprise; it is now listed on ChatGPT
+Plus, Pro (5x) and Pro (20x). On Plus it is reachable through Work and Codex
+rather than the standard chat picker, which the plan note records. This does not
+change any board: `planWorkingModel` picks the cheapest model on a plan that
+clears the bar, and GPT-5.6 Sol is cheaper than Astra everywhere both qualify.
 
 Claude Fable 5.1 and GPT-6 Astra now tie at 53 for the top score. Ties resolve
 by cost and then by id, so the recommendation stays deterministic.

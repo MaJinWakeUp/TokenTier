@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-09-03",
+  "updatedAt": "2026-09-09",
   "currency": "USD",
   "plans": [
     {
@@ -37,17 +37,18 @@
       "kind": "Subscription",
       "monthly": 20,
       "source": "https://learn.chatgpt.com/docs/pricing",
-      "note": "Covers standard ChatGPT interface access; API platform usage is billed separately.",
+      "note": "Covers standard ChatGPT interface access; API platform usage is billed separately. On Plus, Astra is reachable through Work and Codex rather than the standard chat picker, within the existing allowance.",
       "quota": "Rolling 5-hour limit across GPT-5.6 Terra and Luna",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.25,
-      "verifiedAt": "2026-09-03",
+      "verifiedAt": "2026-09-09",
       "modelIds": [
         "gpt-5-6-luna",
         "gpt-5-6-terra",
-        "gpt-5-6-sol"
+        "gpt-5-6-sol",
+        "gpt-6-astra"
       ],
       "access": [
         "chat-app"
@@ -66,17 +67,18 @@
       "kind": "Subscription",
       "monthly": 100,
       "source": "https://learn.chatgpt.com/docs/pricing",
-      "note": "Higher allowances and prioritised access during peak times.",
+      "note": "Higher allowances and prioritised access during peak times. Includes GPT-6 Astra within the plan's rolling allowances.",
       "quota": "5x standard rolling allowances plus GPT-5.6 Sol access",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.35,
-      "verifiedAt": "2026-09-03",
+      "verifiedAt": "2026-09-09",
       "modelIds": [
         "gpt-5-6-luna",
         "gpt-5-6-terra",
-        "gpt-5-6-sol"
+        "gpt-5-6-sol",
+        "gpt-6-astra"
       ],
       "access": [
         "chat-app"
@@ -95,17 +97,18 @@
       "kind": "Subscription",
       "monthly": 200,
       "source": "https://learn.chatgpt.com/docs/pricing",
-      "note": "Maximum rolling allowances and prioritised throughput for heavy users.",
+      "note": "Maximum rolling allowances and prioritised throughput for heavy users. Includes GPT-6 Astra within the plan's rolling allowances.",
       "quota": "20x standard rolling allowances and continuous Sol access",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-09-03",
+      "verifiedAt": "2026-09-09",
       "modelIds": [
         "gpt-5-6-luna",
         "gpt-5-6-terra",
-        "gpt-5-6-sol"
+        "gpt-5-6-sol",
+        "gpt-6-astra"
       ],
       "access": [
         "chat-app"
