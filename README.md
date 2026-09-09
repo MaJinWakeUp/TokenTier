@@ -114,6 +114,29 @@ Tiers are derived, never hand-graded. Two independent judgements are kept apart:
    curve is taken over every qualifying option, so filtering or searching the
    table never moves a letter.
 
+   Models are ordered by per-call cost and plans by monthly price. A plan is
+   ranked on price whether or not its published quota can be shown to cover the
+   profile, so the whole market is visible rather than only the few plans whose
+   quota converts; each card says when its capacity is under the volume, capped
+   on a shorter window, or unproven. The recommendation is stricter and
+   unchanged: it names a plan only when the allowance is verified, sufficient
+   and within budget.
+
+   Each scenario also declares a `planPriceCap` — the most a reader doing that
+   kind of work would plausibly pay for a subscription. Plans above it are
+   listed with that reason instead of being ranked, so a daily-use board is not
+   dominated by $200 tiers bought for something else:
+
+   | Scenario | Ceiling |
+   | --- | --- |
+   | Daily use, easy coding | $30 |
+   | Medium coding, paper writing | $100 |
+   | Hard coding, research, innovation | $200 |
+
+   The ceiling bounds the board only. Recommend uses the budget the reader
+   enters, so a plan above the board's ceiling is still priced there for someone
+   who says they will spend that much.
+
    This replaced fixed cost-ratio bands (S within 1.25x of the cheapest, A within
    2x, B within 4x, else C). Those bands had a real advantage — a letter meant
    the same multiple of the cheapest price in every scenario — but one unusually
@@ -152,7 +175,7 @@ Consequences worth knowing:
 | --- | --- |
 | `data/api-models.json` | API models: token rates, context window, capability score, sources |
 | `data/plans.json` | Consumer plans: price, quota evidence, credit formulas, the models each plan includes |
-| `data/scenarios.json` | Scenario token profiles, capability bars, anchors, tier curve cuts, ranking weights |
+| `data/scenarios.json` | Scenario token profiles, capability bars, anchors, plan price ceilings, tier curve cuts, ranking weights |
 
 `npm run models:validate` validates all three together and prints how many
 models clear each scenario bar. The files only make sense as a set, so the
@@ -195,6 +218,62 @@ tier lists, recommendations, cost list, price book, source links, and update
 date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
+
+## Catalog changes, September 9 2026
+
+Artificial Analysis published **Intelligence Index v4.3** on September 7 2026,
+two days after v4.2. It upgrades Terminal-Bench to v4.0 — a harder 66-task set
+replacing v2.1 — and swaps AutomationBench-AA in for τ³-Banking. Category
+weights are unchanged, and the index still aggregates ten evaluations.
+
+Scores are not comparable across index versions, so all 22 scored models were
+re-read together at the same effort variant each record already cited. Every
+score fell again, by 1 to 8 points. Each scenario bar was re-derived from its
+anchor, preserving the gap between the anchor's score and its own bar:
+
+| Scenario | Anchor | Anchor 4.2 → 4.3 | Bar 4.2 → 4.3 |
+| --- | --- | --- | --- |
+| Daily use | Gemini 3.1 Pro | 37 → 30 | 34 → 27 |
+| Easy coding | Gemini 3.1 Pro | 37 → 30 | 34 → 27 |
+| Medium coding | Claude Sonnet 5 | 45 → 38 | 45 → 38 |
+| Hard coding | GLM-5.3 | 49 → 45 | 49 → 45 |
+| Research | GLM-5.3 | 49 → 45 | 49 → 45 |
+| Paper writing | GPT-5.6 Luna | 43 → 38 | 41 → 36 |
+| Innovation | GLM-5.3 | 49 → 45 | 49 → 45 |
+
+The tier curve is unchanged: the board still runs S to D with no gaps, for
+models in every scenario.
+
+One visible consequence is on the plan side of hard coding. Twelve
+subscriptions offer a model that clears the 45 bar — ChatGPT Plus and Pro
+through GPT-5.6 Sol, Claude Max through Opus 5, Cursor through Sol and Fable
+5.1, GLM Coding and OpenCode Go through GLM-5.3 — and all twelve are ranked on
+the board. **None of them can any longer prove it covers the volume**, so every
+card on that lane carries a capacity caveat:
+
+- ChatGPT and Claude publish relative limits ("rolling 5-hour", "5x Pro
+  allowance") that convert to no call count at all — `unproven`.
+- The Cursor pools convert, but to 57, 200 and 1,197 calls against a
+  1,500-call month at 90K input — `under volume`.
+- GLM Coding and OpenCode Go cap on a weekly or 5-hour window, so a monthly
+  total cannot follow — `capped`.
+
+Cursor Ultra is the one that changed. Under v4.2 its working model was Grok 4.6,
+whose $400 pool covered 2,576 calls — the only plan on that lane with proven
+coverage. Grok 4.6 fell from 51 to 44, below the bar, so the working model
+became the pricier GPT-5.6 Sol and the same pool now buys 1,197 calls. One score
+moved the whole lane from "one plan proves it" to "none does".
+
+**Roster correction:** GPT-6 Astra was added to the model catalog on September 6
+but to no plan, so the ChatGPT subscriptions understated what they reach. Astra
+is included for Plus, Pro, Business and Enterprise; it is now listed on ChatGPT
+Plus, Pro (5x) and Pro (20x). On Plus it is reachable through Work and Codex
+rather than the standard chat picker, which the plan note records. This does not
+change any board: `planWorkingModel` picks the cheapest model on a plan that
+clears the bar, and GPT-5.6 Sol is cheaper than Astra everywhere both qualify.
+
+Claude Fable 5.1 and GPT-6 Astra now tie at 53 for the top score. Ties resolve
+by cost and then by id, so the recommendation stays deterministic.
 
 ## Catalog changes, September 6 2026
 

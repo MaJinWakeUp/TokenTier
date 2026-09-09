@@ -458,7 +458,7 @@ export function validateScenarios(scenarios: unknown, dataset: ModelCatalogDoc):
     const location = `scenario ${record?.id ?? "?"}`;
     addExactKeyErrors(
       scenario,
-      ["cacheRatio", "calls", "description", "gate", "id", "input", "label", "output", "rationale"],
+      ["cacheRatio", "calls", "description", "gate", "id", "input", "label", "output", "planPriceCap", "rationale"],
       location,
       errors,
     );
@@ -488,6 +488,12 @@ export function validateScenarios(scenarios: unknown, dataset: ModelCatalogDoc):
     }
     if (!Number.isFinite(record.cacheRatio) || (record.cacheRatio as number) < 0 || (record.cacheRatio as number) > 0.95) {
       errors.push(`${location}.cacheRatio must be a fraction between 0 and 0.95.`);
+    }
+
+    // The board's price ceiling for this kind of work. A cap that admits no
+    // plan would empty the lane, so it has to be a real amount.
+    if (!Number.isFinite(record.planPriceCap) || (record.planPriceCap as number) <= 0) {
+      errors.push(`${location}.planPriceCap must be a positive monthly amount.`);
     }
 
     const gate = record.gate as Record<string, unknown> | undefined;

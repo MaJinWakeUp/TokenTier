@@ -15,7 +15,7 @@ import type { Model, Plan, ScenarioId } from "@/lib/catalog/types";
 import { scenarioTokens } from "@/lib/domain/eligibility";
 import { placementSort, planWorkingModel } from "@/lib/domain/placement";
 import { callCost } from "@/lib/domain/pricing";
-import { metricLabels, price, tierDescriptions, tierOrder } from "@/lib/format";
+import { capacityNote, metricLabels, placementReason, price, tierDescriptions, tierOrder } from "@/lib/format";
 
 export type Lane = "api" | "plans";
 
@@ -58,6 +58,38 @@ export function TierBoard({
   // The curve fills every letter whenever there are at least as many distinct
   // prices as tiers, so an empty row means a genuinely tiny population rather
   // than a gap in the middle of the board. Either way it is not drawn.
+  // An empty lane has more than one cause now, and guessing the wrong one is
+  // worse than saying nothing: a plan can miss the board by failing the
+  // capability bar, by having no price to rank, or by costing more than this
+  // kind of work is worth. The message is derived from the placements that
+  // actually excluded things rather than assumed.
+  const emptyLaneReason = () => {
+    const label = scenario.label.toLowerCase();
+    if (lane === "api") return `No model clears the ${label} bar at this context size.`;
+
+    const overCap = excludedPlans.filter(({ placement }) => placement.state === "over-cap").length;
+    const offBar = excludedPlans.filter(({ placement }) =>
+      placement.state === "below" || placement.state === "context" || placement.state === "unscored").length;
+
+    if (overCap === 0) return `No subscription plan clears the ${label} bar.`;
+    if (offBar === 0) {
+      return `Every subscription plan that clears the ${label} bar costs more than $${scenario.planPriceCap}/mo.`;
+    }
+    return `No subscription plan is both under $${scenario.planPriceCap}/mo and clears the ${label} bar: `
+      + `${overCap} cost more, ${offBar} do not clear it.`;
+  };
+
+  const placementFor = (item: Model | Plan) =>
+    lane === "api" ? modelPlacement(item.id, scenarioId) : planPlacement(item.id, scenarioId);
+
+  // A plan is ranked on price whatever its quota evidence says, so the card
+  // carries the caveat when its capacity is not proven.
+  const capacityOf = (item: Model | Plan) => {
+    if (lane !== "plans") return null;
+    const placement = placementFor(item);
+    return placement.state === "tier" ? capacityNote(placement.capacity) : null;
+  };
+
   const ranked: Array<Model | Plan> = lane === "api" ? models : subscriptions;
   const rows = tierOrder
     .map((tier) => ({
@@ -110,6 +142,9 @@ export function TierBoard({
         </p>
       </div>
 
+      {rows.length === 0 ? (
+        <p className="tier-board-empty">{emptyLaneReason()} Every one is listed below with the reason.</p>
+      ) : (
       <div className="tier-board">
         {rows.map(({ tier, items }) => (
           <div className={`tier-row tier-${tier.toLowerCase()}`} key={tier}>
@@ -119,7 +154,8 @@ export function TierBoard({
                 <button
                   aria-label={lane === "api"
                     ? `${item.name}, ${item.provider}, ${price(callCost(item as Model, settings), 3)} per call`
-                    : `${item.name}, ${item.provider}, $${(item as Plan).monthly} per month`}
+                    : `${item.name}, ${item.provider}, $${(item as Plan).monthly} per month${capacityOf(item) ? `, ${capacityOf(item)}` : ""}`}
+                  title={lane === "plans" ? placementReason(placementFor(item), scenario, metric) : undefined}
                   className={`tier-model ${isCompared(item.id) ? "selected" : ""}`}
                   key={item.id}
                   onClick={() => onInspect(item)}
@@ -129,9 +165,15 @@ export function TierBoard({
                   <span>
                     <strong title={item.name}>{item.name}</strong>
                     <small>
-                      {lane === "api"
-                        ? item.provider
-                        : `via ${planWorkingModel(item as Plan, scenario, settings, modelById)?.name ?? item.provider}`}
+                      {lane === "api" ? item.provider : (
+                        <>
+                          {/* The caveat leads so the model name takes the
+                              truncation: which model is on the plan is in the
+                              details modal, whether its quota holds is not. */}
+                          {capacityOf(item) && <em className="tier-model-caveat">{capacityOf(item)} · </em>}
+                          {`via ${planWorkingModel(item as Plan, scenario, settings, modelById)?.name ?? item.provider}`}
+                        </>
+                      )}
                     </small>
                   </span>
                   {lane === "api"
@@ -143,10 +185,17 @@ export function TierBoard({
           </div>
         ))}
       </div>
-      <p className="tier-note">
-        Everything on the board already clears the {scenario.label.toLowerCase()} capability bar, so the
-        letters rank value: models by per-call cost, plans by price and quota evidence. Select a card to view specs or compare.
-      </p>
+      )}
+      {rows.length > 0 && (
+        <p className="tier-note">
+          Everything on the board already clears the {scenario.label.toLowerCase()} capability bar, so the
+          letters rank value: models by per-call cost, plans by monthly price. A plan is ranked on price whether or
+          not its published quota can be shown to cover this profile, so a card says when its capacity is under the
+          volume, capped on a shorter window, or unproven.
+          {lane === "plans" && ` Plans above $${scenario.planPriceCap}/mo are listed below rather than ranked, since that is more than this kind of work is worth paying for.`}
+          {" "}Select a card to view specs or compare.
+        </p>
+      )}
 
       {lane === "api" && excludedModels.length > 0 && (
         <details className="gate-excluded">
@@ -183,8 +232,10 @@ export function TierBoard({
                   <strong>{plan.name}</strong>
                 </button>
                 <span className="gate-excluded-reason">
-                  {placement.state === "unscored"
-                    ? "Quota is conditional or cannot be converted to this profile"
+                  {placement.state === "over-cap"
+                    ? `$${placement.monthly}/mo · above the $${placement.cap} ceiling for ${scenario.label.toLowerCase()}`
+                    : placement.state === "unscored"
+                    ? "No convertible quota and no price to rank"
                     : reasonFor(
                         placement.state,
                         scenarioId,

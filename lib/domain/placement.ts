@@ -15,11 +15,28 @@ import type { Confidence, Model, Plan, Scenario, Tier, UsageSettings } from "../
 import { gateModel, metricValue, scenarioTokens, unscored, type Rejection } from "./eligibility.js";
 import { callCost, creditsPerCall, planEstimate, planCoverageScore } from "./pricing.js";
 
+// How well a plan's published quota is known to cover the scenario's volume.
+// A plan is ranked on the board by price whatever this says, so the board can
+// show the whole market; this is what stops a plan with an unconvertible quota
+// from being presented as though its capacity had been verified.
+export type PlanCapacity =
+  // A published allowance or credit formula that covers the volume.
+  | "proven"
+  // Converts, but to fewer calls than the scenario needs.
+  | "short"
+  // An allowance capped on a shorter window, so a monthly total cannot follow.
+  | "conditional"
+  // No quota that converts at all: a relative limit, or price break-even only.
+  | "unknown";
+
 export type Placement =
-  | { state: "tier"; tier: Tier; index: number; minIndex: number; headroom: number }
+  | { state: "tier"; tier: Tier; index: number; minIndex: number; headroom: number; capacity?: PlanCapacity }
   | { state: "below"; index: number; minIndex: number }
   | { state: "context"; index: number; minIndex: number }
   | { state: "unpriced" }
+  // Priced above what this kind of work is worth paying for. The plan is real
+  // and may well clear the bar; it is simply out of scope for this board.
+  | { state: "over-cap"; monthly: number; cap: number }
   | { state: "unscored" };
 
 export const noPlacement: Placement = unscored as Placement;
@@ -227,7 +244,7 @@ export function planPlacements(
     output: scenario.output,
     cacheRatio: scenario.cacheRatio,
   };
-  const eligible: Array<{ id: string; index: number; monthly: number }> = [];
+  const eligible: Array<{ id: string; index: number; monthly: number; capacity: PlanCapacity }> = [];
 
   for (const plan of plans) {
     const model = planWorkingModel(plan, scenario, settings, modelById);
@@ -239,37 +256,42 @@ export function planPlacements(
       placed.set(plan.id, { state: "unpriced" });
       continue;
     }
-
-    // Exclude plans with insufficient, unknown, or conditional coverage from
-    // qualified tiers. Only plans with verified, sufficient coverage get tiered.
-    const estimate = planEstimate(plan, settings, model, modelById.get(plan.modelIds[0]));
-    if (!estimate) {
-      placed.set(plan.id, { state: "unscored" });
-      continue;
-    }
-    if (estimate.basis.kind === "break-even") {
-      // Break-even: not a verified allowance, so not a qualified tier.
-      placed.set(plan.id, { state: "unpriced" });
-      continue;
-    }
-    if (estimate.basis.kind === "unknown-quota" || estimate.basis.kind === "conditional") {
-      // Unknown or conditional coverage: cannot prove sufficient monthly capacity.
-      placed.set(plan.id, { state: "unscored" });
+    // Each scenario declares the most a reader doing that work would plausibly
+    // pay. Above it the plan is listed with the reason rather than ranked.
+    if (plan.monthly > scenario.planPriceCap) {
+      placed.set(plan.id, { state: "over-cap", monthly: plan.monthly, cap: scenario.planPriceCap });
       continue;
     }
 
-    // Check coverage against the scenario's call volume.
-    const coverage = planCoverageScore(plan, settings, scenario.calls, model, modelById.get(plan.modelIds[0]));
-    if (coverage === null || coverage < 100) {
-      // Insufficient coverage: not a qualified tier.
-      placed.set(plan.id, { state: "unscored" });
-      continue;
+    // The board ranks the plans a reader could actually buy for this scenario,
+    // so a plan is placed once it clears the capability bar and has a price to
+    // rank. How well its quota is known is reported alongside it rather than
+    // used to hide it — excluding everything unproven left whole lanes empty
+    // and told the reader nothing about the market.
+    //
+    // The recommendation is the opposite and stays that way: selectBestPlan in
+    // recommend.ts still requires verified, sufficient coverage before naming a
+    // plan the best path.
+    const fallback = modelById.get(plan.modelIds[0]);
+    const estimate = planEstimate(plan, settings, model, fallback);
+    const coverage = planCoverageScore(plan, settings, scenario.calls, model, fallback);
+
+    let capacity: PlanCapacity;
+    if (!estimate || estimate.basis.kind === "break-even" || estimate.basis.kind === "unknown-quota") {
+      capacity = "unknown";
+    } else if (estimate.basis.kind === "conditional") {
+      capacity = "conditional";
+    } else if (coverage !== null && coverage >= 100) {
+      capacity = "proven";
+    } else {
+      capacity = "short";
     }
 
     eligible.push({
       id: plan.id,
       index: metricValue(model.capability, scenario.gate.metric) as number,
       monthly: plan.monthly,
+      capacity,
     });
   }
 
@@ -286,6 +308,7 @@ export function planPlacements(
       index: item.index,
       minIndex,
       headroom: item.index - minIndex,
+      capacity: item.capacity,
     });
   }
 
