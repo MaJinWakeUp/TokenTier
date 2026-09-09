@@ -176,6 +176,11 @@ export type Scenario = {
   description: string;
   rationale: string;
   gate: Gate;
+  // The most a reader doing this kind of work would plausibly pay for a
+  // subscription. Plans above it are kept off the tier board and listed with
+  // that reason, so a casual daily-use board is not dominated by $200 tiers.
+  // It bounds the board only; Recommend uses the reader's own budget.
+  planPriceCap: number;
 };
 
 export type CapabilityIndex = {

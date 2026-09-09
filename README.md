@@ -117,10 +117,25 @@ Tiers are derived, never hand-graded. Two independent judgements are kept apart:
    Models are ordered by per-call cost and plans by monthly price. A plan is
    ranked on price whether or not its published quota can be shown to cover the
    profile, so the whole market is visible rather than only the few plans whose
-   quota converts; each card says when its capacity is short of the volume,
-   capped on a shorter window, or not convertible at all. The recommendation is
-   stricter and unchanged: it names a plan only when the allowance is verified,
-   sufficient and within budget.
+   quota converts; each card says when its capacity is under the volume, capped
+   on a shorter window, or unproven. The recommendation is stricter and
+   unchanged: it names a plan only when the allowance is verified, sufficient
+   and within budget.
+
+   Each scenario also declares a `planPriceCap` — the most a reader doing that
+   kind of work would plausibly pay for a subscription. Plans above it are
+   listed with that reason instead of being ranked, so a daily-use board is not
+   dominated by $200 tiers bought for something else:
+
+   | Scenario | Ceiling |
+   | --- | --- |
+   | Daily use, easy coding | $30 |
+   | Medium coding, paper writing | $100 |
+   | Hard coding, research, innovation | $200 |
+
+   The ceiling bounds the board only. Recommend uses the budget the reader
+   enters, so a plan above the board's ceiling is still priced there for someone
+   who says they will spend that much.
 
    This replaced fixed cost-ratio bands (S within 1.25x of the cheapest, A within
    2x, B within 4x, else C). Those bands had a real advantage — a letter meant
@@ -160,7 +175,7 @@ Consequences worth knowing:
 | --- | --- |
 | `data/api-models.json` | API models: token rates, context window, capability score, sources |
 | `data/plans.json` | Consumer plans: price, quota evidence, credit formulas, the models each plan includes |
-| `data/scenarios.json` | Scenario token profiles, capability bars, anchors, tier curve cuts, ranking weights |
+| `data/scenarios.json` | Scenario token profiles, capability bars, anchors, plan price ceilings, tier curve cuts, ranking weights |
 
 `npm run models:validate` validates all three together and prints how many
 models clear each scenario bar. The files only make sense as a set, so the

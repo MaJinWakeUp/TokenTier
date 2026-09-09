@@ -174,8 +174,10 @@ export function TierBoard({
         <p className="tier-note">
           Everything on the board already clears the {scenario.label.toLowerCase()} capability bar, so the
           letters rank value: models by per-call cost, plans by monthly price. A plan is ranked on price whether or
-          not its published quota can be shown to cover this profile, so a card says when its capacity is short,
-          capped on a shorter window, or not convertible at all. Select a card to view specs or compare.
+          not its published quota can be shown to cover this profile, so a card says when its capacity is under the
+          volume, capped on a shorter window, or unproven.
+          {lane === "plans" && ` Plans above $${scenario.planPriceCap}/mo are listed below rather than ranked, since that is more than this kind of work is worth paying for.`}
+          {" "}Select a card to view specs or compare.
         </p>
       )}
 
@@ -214,8 +216,10 @@ export function TierBoard({
                   <strong>{plan.name}</strong>
                 </button>
                 <span className="gate-excluded-reason">
-                  {placement.state === "unscored"
-                    ? "Quota is conditional or cannot be converted to this profile"
+                  {placement.state === "over-cap"
+                    ? `$${placement.monthly}/mo · above the $${placement.cap} ceiling for ${scenario.label.toLowerCase()}`
+                    : placement.state === "unscored"
+                    ? "No convertible quota and no price to rank"
                     : reasonFor(
                         placement.state,
                         scenarioId,

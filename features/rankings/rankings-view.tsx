@@ -103,8 +103,12 @@ export function RankingsView() {
   const settings = useMemo(() => settingsFor(scenarioId), [scenarioId]);
   const leaders = useMemo(() => cheapestQualified(scenarioId), [scenarioId]);
   const bestModel = leaders.api.best;
+  // The dock leads the board, so it honours the same ceiling: naming a plan the
+  // cheapest qualifying option while the board refuses to rank it would be two
+  // answers to one question.
   const bestPlan = leaders.plans.evaluations
     .filter((evaluation) => evaluation.eligible && evaluation.plan.monthly !== null)
+    .filter((evaluation) => (evaluation.plan.monthly as number) <= scenario.planPriceCap)
     .sort((a, b) => (a.plan.monthly ?? Infinity) - (b.plan.monthly ?? Infinity))
     .at(0) ?? null;
 
@@ -174,7 +178,7 @@ export function RankingsView() {
                 <b>${bestPlan.plan.monthly}<small>/ mo</small></b>
               </button>
             ) : (
-              <p className="preset-leader-empty">No subscription plan clears the bar for this preset.</p>
+              <p className="preset-leader-empty">No subscription plan under ${scenario.planPriceCap}/mo clears the bar for this preset.</p>
             )}
           </div>
 

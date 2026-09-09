@@ -34,6 +34,9 @@ export type Placement =
   | { state: "below"; index: number; minIndex: number }
   | { state: "context"; index: number; minIndex: number }
   | { state: "unpriced" }
+  // Priced above what this kind of work is worth paying for. The plan is real
+  // and may well clear the bar; it is simply out of scope for this board.
+  | { state: "over-cap"; monthly: number; cap: number }
   | { state: "unscored" };
 
 export const noPlacement: Placement = unscored as Placement;
@@ -251,6 +254,12 @@ export function planPlacements(
     }
     if (plan.monthly === null || plan.monthly <= 0) {
       placed.set(plan.id, { state: "unpriced" });
+      continue;
+    }
+    // Each scenario declares the most a reader doing that work would plausibly
+    // pay. Above it the plan is listed with the reason rather than ranked.
+    if (plan.monthly > scenario.planPriceCap) {
+      placed.set(plan.id, { state: "over-cap", monthly: plan.monthly, cap: scenario.planPriceCap });
       continue;
     }
 

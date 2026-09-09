@@ -84,6 +84,7 @@ function scenario(overrides = {}) {
     cacheRatio: 0.6,
     description: "Feature development.",
     rationale: "A feature spanning several files at about thirty agent turns a day.",
+    planPriceCap: 100,
     gate: {
       metric: "intelligence",
       minIndex: 50,

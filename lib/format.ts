@@ -155,6 +155,8 @@ export function placementReason(placement: Placement, scenario: Scenario, metric
       return `Context window is smaller than the ${scenarioTokens(scenario).toLocaleString()} tokens this profile needs.`;
     case "unpriced":
       return "No fixed monthly price to rank against.";
+    case "over-cap":
+      return `$${placement.monthly}/mo is above the $${placement.cap} ceiling this board uses for ${scenario.label.toLowerCase()}. Set your own budget in Recommend to price it anyway.`;
     default:
       return `Not scored on the ${label}, so no tier is assigned.`;
   }
