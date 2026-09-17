@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-09-09",
+  "updatedAt": "2026-09-17",
   "currency": "USD",
   "plans": [
     {
@@ -578,7 +578,7 @@
         "kimi-k2-7-code",
         "qwen-3-8-max",
         "deepseek-v4-pro",
-        "deepseek-v4-flash"
+        "deepseek-v4-1-flash"
       ],
       "access": [
         "coding-client",

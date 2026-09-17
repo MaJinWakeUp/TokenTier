@@ -418,22 +418,40 @@ test("AC5: credit plan working model uses credits per call, not cheapest API rat
 
 // -- AC7: boundary tests for unsupportedBeyond --------------------------------
 
-test("AC7: Gemini note says UP TO 200K (inclusive), unsupported starts >200K", () => {
-  const gemini = dataset.models.find((m) => m.id === "gemini-3-1-pro");
-  assert.ok(gemini.unsupportedBeyond, "gemini-3-1-pro must have unsupportedBeyond");
+// unsupportedBeyond marks the input ceiling above which a model's published
+// rates stop. The catalog carried it on gemini-3-1-pro and grok-4-5 until both
+// providers published their above-200K rates; pinning the boundary behaviour to
+// whichever record happens to lack rates makes an ordinary catalog refresh fail
+// the suite, so these fixtures are synthetic.
+const cappedAbove200K = {
+  ...dataset.models[0],
+  id: "capped-above-200k",
+  input: 2, cached: 0.2, output: 12,
+  context: "1M", contextTokens: 1_000_000,
+  rateBands: undefined,
+  unsupportedBeyond: 200_001,
+};
+const cappedAt200K = {
+  ...dataset.models[0],
+  id: "capped-at-200k",
+  input: 2, cached: 0.3, output: 6,
+  context: "500K", contextTokens: 500_000,
+  rateBands: undefined,
+  unsupportedBeyond: 200_000,
+};
+
+test("AC7: an exclusive ceiling prices 200K and refuses 200,001", () => {
   // "up to 200K" means 200K is supported, unsupported starts ABOVE 200K
-  const atCost = callCost(gemini, { input: 200_000, output: 1000, cacheRatio: 0 });
-  const aboveCost = callCost(gemini, { input: 200_001, output: 1000, cacheRatio: 0 });
+  const atCost = callCost(cappedAbove200K, { input: 200_000, output: 1000, cacheRatio: 0 });
+  const aboveCost = callCost(cappedAbove200K, { input: 200_001, output: 1000, cacheRatio: 0 });
   assert.ok(Number.isFinite(atCost), "200K should be supported (inclusive 'up to')");
   assert.ok(Number.isNaN(aboveCost), "200001 should be unsupported");
 });
 
-test("AC7: Grok note says at/above 200K unsupported (inclusive boundary)", () => {
-  const grok = dataset.models.find((m) => m.id === "grok-4-5");
-  assert.ok(grok.unsupportedBeyond, "grok-4-5 must have unsupportedBeyond");
+test("AC7: an inclusive ceiling prices 199,999 and refuses 200K", () => {
   // "rates at or above 200K are not published" means 200K is the boundary
-  const belowCost = callCost(grok, { input: 199_999, output: 1000, cacheRatio: 0 });
-  const atCost = callCost(grok, { input: 200_000, output: 1000, cacheRatio: 0 });
+  const belowCost = callCost(cappedAt200K, { input: 199_999, output: 1000, cacheRatio: 0 });
+  const atCost = callCost(cappedAt200K, { input: 200_000, output: 1000, cacheRatio: 0 });
   assert.ok(Number.isFinite(belowCost), "199999 should be supported");
   assert.ok(Number.isNaN(atCost), "200000 should be unsupported (at/above 200K)");
 });
@@ -442,20 +460,25 @@ test("AC7: Grok note says at/above 200K unsupported (inclusive boundary)", () =>
 
 test("AC7: unsupported pricing model is ineligible but not labeled unscored in rejection", () => {
   const scenario = scenarioDoc.scenarios.find((s) => s.id === "research");
-  const result = recommend(catalog, scenario, {
+  const cappedCatalog = {
+    ...catalog,
+    models: [...dataset.models, cappedAt200K],
+    modelById: new Map([...modelById, [cappedAt200K.id, cappedAt200K]]),
+  };
+  const result = recommend(cappedCatalog, scenario, {
     scenarioId: scenario.id, input: 250_000, output: scenario.output,
     calls: scenario.calls, cacheRatio: scenario.cacheRatio, budget: 1000, access: "any",
   }, "cost");
-  const grok45Eval = result.api.evaluations.find((e) => e.model.id === "grok-4-5");
-  assert.ok(grok45Eval, "grok-4-5 should have an evaluation");
-  assert.equal(grok45Eval.eligible, false, "grok-4-5 should be ineligible");
-  assert.ok(Number.isNaN(grok45Eval.costPerCall), "Cost should be NaN (unsupported)");
+  const cappedEval = result.api.evaluations.find((e) => e.model.id === cappedAt200K.id);
+  assert.ok(cappedEval, "the capped model should have an evaluation");
+  assert.equal(cappedEval.eligible, false, "the capped model should be ineligible");
+  assert.ok(Number.isNaN(cappedEval.costPerCall), "Cost should be NaN (unsupported)");
   // A scored model with missing pricing has a pricing rejection.
-  assert.ok(grok45Eval.rejection, "Should have a rejection reason");
-  assert.equal(grok45Eval.rejection.state, "pricing", "Unsupported pricing rejection state");
+  assert.ok(cappedEval.rejection, "Should have a rejection reason");
+  assert.equal(cappedEval.rejection.state, "pricing", "Unsupported pricing rejection state");
   // The model should NOT appear in the cost tiers
   const tiers = costTiers(result.api.evaluations);
-  assert.ok(!tiers.has("grok-4-5"), "Unsupported-pricing model should not be in cost tiers");
+  assert.ok(!tiers.has(cappedAt200K.id), "Unsupported-pricing model should not be in cost tiers");
 });
 
 // -- AC7: scenarios tierCuts field --------------------------------------------
