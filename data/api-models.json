@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "updatedAt": "2026-09-09",
+  "updatedAt": "2026-09-17",
   "currency": "USD",
   "unit": "per-million-tokens",
   "capabilityIndex": {
@@ -20,7 +20,7 @@
       "output": 50,
       "context": "1.05M",
       "source": "https://developers.openai.com/api/docs/models/compare",
-      "verifiedAt": "2026-09-06",
+      "verifiedAt": "2026-09-17",
       "note": "OpenAI's frontier model, released 3 September 2026. Published rates apply across the full context window; maximum output is 128K tokens.",
       "capability": {
         "metrics": {
@@ -42,7 +42,7 @@
       "output": 20,
       "context": "1.05M",
       "source": "https://developers.openai.com/api/docs/models/compare",
-      "verifiedAt": "2026-09-03",
+      "verifiedAt": "2026-09-17",
       "note": "Standard rate reduced to $4 input / $0.40 cached / $20 output; the catalog previously carried $5 / $0.50 / $30.",
       "capability": {
         "metrics": {
@@ -64,7 +64,7 @@
       "output": 12,
       "context": "1.05M",
       "source": "https://developers.openai.com/api/docs/models/compare",
-      "verifiedAt": "2026-08-16",
+      "verifiedAt": "2026-09-17",
       "note": "Live comparison-page rate; some search snippets remain stale.",
       "capability": {
         "metrics": {
@@ -86,7 +86,7 @@
       "output": 1.2,
       "context": "1.05M",
       "source": "https://developers.openai.com/api/docs/models/compare",
-      "verifiedAt": "2026-08-16",
+      "verifiedAt": "2026-09-17",
       "note": "Live comparison-page rate; some model-detail snippets remain stale.",
       "capability": {
         "metrics": {
@@ -108,7 +108,7 @@
       "output": 25,
       "context": "1M",
       "source": "https://claude.com/pricing",
-      "verifiedAt": "2026-08-16",
+      "verifiedAt": "2026-09-17",
       "note": "Frontier reasoning and agentic model; succeeds Opus 4.8.",
       "capability": {
         "metrics": {
@@ -130,7 +130,7 @@
       "output": 50,
       "context": "1M",
       "source": "https://platform.claude.com/docs/en/about-claude/pricing",
-      "verifiedAt": "2026-09-03",
+      "verifiedAt": "2026-09-17",
       "note": "Cache hits and refreshes are priced at 0.025x base input ($0.25 / 1M) instead of the usual 0.1x. Supersedes Claude Fable 5.",
       "capability": {
         "metrics": {
@@ -152,7 +152,7 @@
       "output": 10,
       "context": "1M",
       "source": "https://www.anthropic.com/news/claude-sonnet-5",
-      "verifiedAt": "2026-08-16",
+      "verifiedAt": "2026-09-17",
       "note": "Permanent standard rate ($2 input / $10 output / $0.20 cached).",
       "capability": {
         "metrics": {
@@ -174,7 +174,7 @@
       "output": 5,
       "context": "1M",
       "source": "https://claude.com/pricing",
-      "verifiedAt": "2026-08-16",
+      "verifiedAt": "2026-09-17",
       "note": "High-speed, low-latency Claude model with 1M context.",
       "capability": {
         "metrics": {
@@ -195,9 +195,18 @@
       "cached": 0.2,
       "output": 12,
       "context": "1M",
+      "contextTokens": 1000000,
       "source": "https://ai.google.dev/gemini-api/docs/pricing",
-      "verifiedAt": "2026-08-16",
-      "note": "Standard price shown for prompts up to 200K tokens (inclusive). Rates above 200K are not published.",
+      "verifiedAt": "2026-09-17",
+      "note": "Standard price shown for prompts up to 200K tokens (inclusive). Prompts above 200K bill $4 input, $0.40 cached input, and $18 output per million tokens.",
+      "rateBands": [
+        {
+          "input": 4,
+          "cached": 0.4,
+          "output": 18,
+          "threshold": 200001
+        }
+      ],
       "capability": {
         "metrics": {
           "intelligence": 30
@@ -205,9 +214,7 @@
         "indexVersion": "4.3",
         "source": "https://artificialanalysis.ai/models/gemini-3-1-pro-preview",
         "verifiedAt": "2026-09-09"
-      },
-      "contextTokens": 1000000,
-      "unsupportedBeyond": 200001
+      }
     },
     {
       "id": "gemini-3-8-flash",
@@ -218,7 +225,7 @@
       "output": 7.5,
       "context": "1M",
       "source": "https://ai.google.dev/gemini-api/docs/pricing",
-      "verifiedAt": "2026-09-03",
+      "verifiedAt": "2026-09-17",
       "note": "Standard rate shown. An introductory rate of $0.75 input / $0.075 cached / $3.75 output runs through December 31, 2026. 1M input limit with 64K max output.",
       "capability": {
         "metrics": {
@@ -240,7 +247,7 @@
       "output": 6,
       "context": "500K",
       "source": "https://docs.x.ai/developers/models/grok-4.6",
-      "verifiedAt": "2026-08-16",
+      "verifiedAt": "2026-09-17",
       "note": "Prompts at or above 200K use $4 input, $1 cached input, and $12 output per million tokens.",
       "capability": {
         "metrics": {
@@ -269,9 +276,18 @@
       "cached": 0.3,
       "output": 6,
       "context": "500K",
+      "contextTokens": 500000,
       "source": "https://docs.x.ai/developers/pricing",
-      "verifiedAt": "2026-08-16",
-      "note": "Listed rates verified only below 200K input; rates at or above 200K are not published.",
+      "verifiedAt": "2026-09-17",
+      "note": "Prompts at or above 200K use $4 input, $0.60 cached input, and $12 output per million tokens.",
+      "rateBands": [
+        {
+          "input": 4,
+          "cached": 0.6,
+          "output": 12,
+          "threshold": 200000
+        }
+      ],
       "capability": {
         "metrics": {
           "intelligence": 39
@@ -280,9 +296,7 @@
         "variant": "high",
         "source": "https://artificialanalysis.ai/models/grok-4-5",
         "verifiedAt": "2026-09-09"
-      },
-      "contextTokens": 500000,
-      "unsupportedBeyond": 200000
+      }
     },
     {
       "id": "grok-4-3",
@@ -293,7 +307,7 @@
       "output": 2.5,
       "context": "1M",
       "source": "https://docs.x.ai/developers/pricing",
-      "verifiedAt": "2026-09-03",
+      "verifiedAt": "2026-09-17",
       "note": "Prompts at or above 200K use $2.50 input, $0.40 cached input, and $5 output.",
       "capability": {
         "metrics": {
@@ -323,7 +337,7 @@
       "output": 2,
       "context": "256K",
       "source": "https://docs.x.ai/developers/models/grok-build-0.1",
-      "verifiedAt": "2026-08-16",
+      "verifiedAt": "2026-09-17",
       "note": "Agentic coding and tool-calling model.",
       "capability": null,
       "contextTokens": 256000
@@ -333,12 +347,13 @@
       "provider": "DeepSeek",
       "name": "DeepSeek V4 Pro",
       "input": 1.32,
-      "cached": 0.014,
+      "cached": 0.0266,
       "output": 3.96,
       "context": "1M",
+      "contextTokens": 1000000,
       "source": "https://api-docs.deepseek.com/quick_start/pricing/",
-      "verifiedAt": "2026-08-16",
-      "note": "Standard peak pricing shown ($1.32 in / $3.96 out); off-peak discount (01:00–04:00 & 06:00–10:00 UTC) offers 50% lower rates ($0.66 in / $1.98 out).",
+      "verifiedAt": "2026-09-17",
+      "note": "Input and output are the published peak rates ($1.32 in / $3.96 out). Peak hours are 01:00-04:00 and 06:00-10:00 UTC, Monday to Friday; all other hours bill at half those rates ($0.66 in / $1.98 out). The cached rate is not a published figure: it is a time-weighted blend of the $0.044 peak and $0.022 off-peak cache-hit rates, weighted by the 35 peak and 133 off-peak hours in a week.",
       "capability": {
         "metrics": {
           "intelligence": 36
@@ -347,30 +362,7 @@
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/deepseek-v4-pro",
         "verifiedAt": "2026-09-09"
-      },
-      "contextTokens": 1000000
-    },
-    {
-      "id": "deepseek-v4-flash",
-      "provider": "DeepSeek",
-      "name": "DeepSeek V4 Flash",
-      "input": 0.44,
-      "cached": 0.007,
-      "output": 1.32,
-      "context": "1M",
-      "source": "https://api-docs.deepseek.com/quick_start/pricing/",
-      "verifiedAt": "2026-08-16",
-      "note": "Standard peak pricing shown ($0.44 in / $1.32 out); off-peak discount (01:00–04:00 & 06:00–10:00 UTC) offers 50% lower rates ($0.22 in / $0.66 out).",
-      "capability": {
-        "metrics": {
-          "intelligence": 35
-        },
-        "indexVersion": "4.3",
-        "variant": "max",
-        "source": "https://artificialanalysis.ai/models/deepseek-v4-flash",
-        "verifiedAt": "2026-09-09"
-      },
-      "contextTokens": 1000000
+      }
     },
     {
       "id": "mistral-large-3",
@@ -381,7 +373,7 @@
       "output": 1.5,
       "context": "256K",
       "source": "https://mistral.ai/pricing/api/",
-      "verifiedAt": "2026-08-16",
+      "verifiedAt": "2026-09-17",
       "capability": {
         "metrics": {
           "intelligence": 10
@@ -397,14 +389,14 @@
       "provider": "Mistral",
       "name": "Codestral",
       "input": 0.3,
-      "cached": 0.03,
+      "cached": null,
       "output": 0.9,
       "context": "256K",
+      "contextTokens": 256000,
       "source": "https://mistral.ai/pricing/api/",
-      "verifiedAt": "2026-08-16",
-      "note": "Specialized model for code generation and Fill-in-the-Middle (FIM) workflows.",
-      "capability": null,
-      "contextTokens": 256000
+      "verifiedAt": "2026-09-17",
+      "note": "Specialized model for code generation and Fill-in-the-Middle (FIM) workflows. Mistral publishes no cached input rate for it, so cache reads are priced at the full input rate. The catalog previously carried $0.03, which appears on no Mistral page.",
+      "capability": null
     },
     {
       "id": "glm-5-3",
@@ -415,7 +407,7 @@
       "output": 4.4,
       "context": "1M",
       "source": "https://docs.z.ai/guides/overview/pricing",
-      "verifiedAt": "2026-08-16",
+      "verifiedAt": "2026-09-17",
       "note": "Flagship 1M context model; available through GLM Coding Plan and OpenCode Zen.",
       "capability": {
         "metrics": {
@@ -437,8 +429,8 @@
       "output": 0.5,
       "context": "1M",
       "source": "https://docs.z.ai/guides/overview/pricing",
-      "verifiedAt": "2026-09-03",
-      "note": "Standard rate shown. A 50% promotional rate ($0.075 input / $0.015 cached / $0.25 output) runs through September 9, 2026.",
+      "verifiedAt": "2026-09-17",
+      "note": "Standard rate shown; the 50% promotional rate that ran through September 9, 2026 has ended. Cached input storage is free for a limited time.",
       "capability": {
         "metrics": {
           "intelligence": 42
@@ -458,7 +450,7 @@
       "output": 15,
       "context": "1M",
       "source": "https://www.kimi.com/resources/kimi-k3-pricing",
-      "verifiedAt": "2026-08-16",
+      "verifiedAt": "2026-09-17",
       "note": "Also available through OpenCode Zen; web search is billed separately.",
       "capability": {
         "metrics": {
@@ -480,7 +472,7 @@
       "output": 4,
       "context": "256K",
       "source": "https://www.kimi.com/en/resources/kimi-k2-7-code",
-      "verifiedAt": "2026-08-16",
+      "verifiedAt": "2026-09-17",
       "note": "Coding-specialized API; not ranked for general writing or research.",
       "capability": {
         "metrics": {
@@ -501,7 +493,7 @@
       "output": 4.25,
       "context": "1M",
       "source": "https://developer.meta.com/ai/products/meta-model-api/",
-      "verifiedAt": "2026-09-03",
+      "verifiedAt": "2026-09-17",
       "note": "Standard tier, not used to improve Meta products. A contributor tier (muse-spark-1.3-contributor) costs $0.10 input / $0.002 cached / $0.20 output in exchange for allowing Meta to train on prompts and outputs.",
       "capability": {
         "metrics": {
@@ -523,7 +515,7 @@
       "output": 6,
       "context": "1M",
       "source": "https://www.alibabacloud.com/help/en/model-studio/qwen3-8-max",
-      "verifiedAt": "2026-09-03",
+      "verifiedAt": "2026-09-17",
       "note": "International (Singapore) endpoint rate. The Beijing, US, Germany, Japan, and Hong Kong endpoints bill lower at $1.65 input / $0.206 cached / $4.951 output. Max input is 991,808 tokens of the 1M window.",
       "capability": {
         "metrics": {
@@ -534,6 +526,28 @@
         "verifiedAt": "2026-09-09"
       },
       "contextTokens": 1000000
+    },
+    {
+      "id": "deepseek-v4-1-flash",
+      "provider": "DeepSeek",
+      "name": "DeepSeek V4.1 Flash",
+      "input": 0.3,
+      "cached": 0.0036,
+      "output": 1.2,
+      "context": "1M",
+      "contextTokens": 1000000,
+      "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "verifiedAt": "2026-09-17",
+      "note": "Replaces DeepSeek V4 Flash; called as `deepseek-flash`, and the legacy `deepseek-v4-flash` identifier still routes here at Flash pricing. Input and output are the published peak rates ($0.30 in / $1.20 out). Peak hours are 01:00-04:00 and 06:00-10:00 UTC, Monday to Friday; all other hours bill at half those rates ($0.15 in / $0.60 out). The cached rate is not a published figure: it is a time-weighted blend of the $0.006 peak and $0.003 off-peak cache-hit rates, weighted by the 35 peak and 133 off-peak hours in a week. Maximum output is 384K tokens.",
+      "capability": {
+        "metrics": {
+          "intelligence": 40
+        },
+        "indexVersion": "4.3",
+        "variant": "max",
+        "source": "https://artificialanalysis.ai/models/deepseek-v4-1-flash",
+        "verifiedAt": "2026-09-17"
+      }
     }
   ]
 }

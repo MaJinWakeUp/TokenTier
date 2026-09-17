@@ -38,6 +38,29 @@ const catalog = {
   rankingWeights: scenarioDoc.ranking,
 };
 
+// -- Shared fixture: a model whose published rates stop at a ceiling ----------
+
+// unsupportedBeyond marks the input ceiling above which a model's published
+// rates stop. The catalog carried it on gemini-3-1-pro and grok-4-5 until both
+// providers published their above-200K rates; pinning the behaviour to whichever
+// record happens to lack rates makes an ordinary catalog refresh fail the suite.
+const cappedAt200K = {
+  ...dataset.models[0],
+  id: "capped-at-200k",
+  input: 2, cached: 0.3, output: 6,
+  context: "500K", contextTokens: 500_000,
+  rateBands: undefined,
+  unsupportedBeyond: 200_000,
+};
+const cappedAbove200K = {
+  ...dataset.models[0],
+  id: "capped-above-200k",
+  input: 2, cached: 0.2, output: 12,
+  context: "1M", contextTokens: 1_000_000,
+  rateBands: undefined,
+  unsupportedBeyond: 200_001,
+};
+
 // -- Finding 1: page imports recommend.ts, not old weighted ranking ------------
 
 test("F1: the recommendation the views render comes from the engine", async () => {
@@ -415,14 +438,12 @@ test("F4: positive credits with zero API cost produces finite credit capacity", 
 });
 
 test("F4: NaN cost returns null estimate, not free", () => {
-  const grok45 = dataset.models.find((m) => m.id === "grok-4-5");
-  assert.ok(grok45, "grok-4-5 must be in catalog");
   const settings = { input: 250000, output: 1000, cacheRatio: 0 }; // Beyond 200K
-  const cost = callCost(grok45, settings);
+  const cost = callCost(cappedAt200K, settings);
   assert.ok(Number.isNaN(cost), "Cost should be NaN beyond unsupportedBeyond");
   // planEstimate should return null for NaN cost
   const breakEvenPlan = planDoc.plans.find((p) => p.monthly && p.monthly > 0 && !p.weeklyCredits && p.includedApiValue === undefined);
-  const est = planEstimate(breakEvenPlan, settings, grok45, grok45);
+  const est = planEstimate(breakEvenPlan, settings, cappedAt200K, cappedAt200K);
   assert.equal(est, null, "NaN cost should return null estimate, not free");
 });
 
@@ -460,32 +481,31 @@ test("F5: the views branch on basis.kind, never on the label text", () => {
   assert.match(joined, /basis\.label/, "views still show the human label");
 });
 
-// -- Finding 6: grok-4-5 / gemini-3-1-pro unsupported beyond threshold --------
+// -- Finding 6: rates that stop at a published ceiling ------------------------
 
-test("F6: grok-4-5 returns NaN cost at or above 200K input", () => {
-  const grok45 = dataset.models.find((m) => m.id === "grok-4-5");
-  assert.ok(grok45, "grok-4-5 must be in catalog");
-  assert.ok(grok45.unsupportedBeyond, "grok-4-5 must have unsupportedBeyond");
-  const belowCost = callCost(grok45, { input: 199_999, output: 1000, cacheRatio: 0 });
-  const atCost = callCost(grok45, { input: 200_000, output: 1000, cacheRatio: 0 });
+test("F6: an inclusive ceiling returns NaN cost at or above 200K input", () => {
+  const belowCost = callCost(cappedAt200K, { input: 199_999, output: 1000, cacheRatio: 0 });
+  const atCost = callCost(cappedAt200K, { input: 200_000, output: 1000, cacheRatio: 0 });
   assert.ok(Number.isFinite(belowCost), "Cost below 200K should be finite");
   assert.ok(Number.isNaN(atCost), "Cost at 200K should be NaN (unsupported)");
 });
 
-test("F6: gemini-3-1-pro supported at 200K (inclusive), NaN above 200K", () => {
-  const gemini = dataset.models.find((m) => m.id === "gemini-3-1-pro");
-  assert.ok(gemini, "gemini-3-1-pro must be in catalog");
-  assert.ok(gemini.unsupportedBeyond, "gemini-3-1-pro must have unsupportedBeyond");
-  // Note says "up to 200K" = inclusive, so 200K is supported.
-  const atCost = callCost(gemini, { input: 200_000, output: 1000, cacheRatio: 0 });
-  const aboveCost = callCost(gemini, { input: 200_001, output: 1000, cacheRatio: 0 });
+test("F6: an exclusive ceiling is supported at 200K, NaN above 200K", () => {
+  // A note reading "up to 200K" is inclusive, so 200K itself is supported.
+  const atCost = callCost(cappedAbove200K, { input: 200_000, output: 1000, cacheRatio: 0 });
+  const aboveCost = callCost(cappedAbove200K, { input: 200_001, output: 1000, cacheRatio: 0 });
   assert.ok(Number.isFinite(atCost), "Cost at 200K should be finite (inclusive 'up to')");
   assert.ok(Number.isNaN(aboveCost), "Cost above 200K should be NaN (unsupported)");
 });
 
 test("F6: models with unsupportedBeyond are marked ineligible in recommendations", () => {
   const scenario = scenarioDoc.scenarios.find((s) => s.id === "research");
-  const result = recommend(catalog, scenario, {
+  const cappedCatalog = {
+    ...catalog,
+    models: [...dataset.models, cappedAt200K],
+    modelById: new Map([...modelById, [cappedAt200K.id, cappedAt200K]]),
+  };
+  const result = recommend(cappedCatalog, scenario, {
     scenarioId: scenario.id,
     input: 250_000, // Beyond 200K
     output: scenario.output,
@@ -494,10 +514,10 @@ test("F6: models with unsupportedBeyond are marked ineligible in recommendations
     budget: 1000,
     access: "any",
   }, "cost");
-  const grok45Eval = result.api.evaluations.find((e) => e.model.id === "grok-4-5");
-  assert.ok(grok45Eval, "grok-4-5 should have an evaluation");
-  assert.equal(grok45Eval.eligible, false, "grok-4-5 should be ineligible at 250K input");
-  assert.ok(Number.isNaN(grok45Eval.costPerCall), "grok-4-5 cost should be NaN");
+  const cappedEval = result.api.evaluations.find((e) => e.model.id === cappedAt200K.id);
+  assert.ok(cappedEval, "the capped model should have an evaluation");
+  assert.equal(cappedEval.eligible, false, "the capped model should be ineligible at 250K input");
+  assert.ok(Number.isNaN(cappedEval.costPerCall), "the capped model's cost should be NaN");
 });
 
 test("F6: grok-4-6 with rateBands still works at 200K (supported)", () => {
@@ -658,12 +678,9 @@ test("PR8: unsupported pricing never renders as a dollar amount", () => {
     assert.doesNotMatch(formatted, /NaN/, "no formatter leaks the sentinel");
   }
   // The real path: a model priced past its verified ceiling.
-  const capped = dataset.models.find((m) => typeof m.unsupportedBeyond === "number");
-  if (capped) {
-    const beyond = { input: capped.unsupportedBeyond, output: 1000, cacheRatio: 0 };
-    assert.equal(price(callCost(capped, beyond), 4), unsupportedPriceLabel);
-    assert.equal(monthlyPrice(callCost(capped, beyond) * 900), unsupportedPriceLabel);
-  }
+  const beyond = { input: cappedAt200K.unsupportedBeyond, output: 1000, cacheRatio: 0 };
+  assert.equal(price(callCost(cappedAt200K, beyond), 4), unsupportedPriceLabel);
+  assert.equal(monthlyPrice(callCost(cappedAt200K, beyond) * 900), unsupportedPriceLabel);
 });
 
 test("PR8: each feature migrates its own legacy data", () => {

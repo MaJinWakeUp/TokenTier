@@ -19,7 +19,7 @@ available under the MIT License.
 - Consumer subscription prices and their theoretical API-cost equivalents
 
 The equivalence figures are economic comparisons, not provider quotas or API
-credits. Prices were checked against official provider sources on September 3,
+credits. Prices were checked against official provider sources on September 17,
 2026; temporary, threshold, and volatile prices are labeled in the interface.
 
 ## Workload profiles
@@ -218,6 +218,111 @@ tier lists, recommendations, cost list, price book, source links, and update
 date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
+
+## Catalog changes, September 17 2026
+
+A price re-verification pass across all 24 models, plus a check of the capability
+index. **No rebase was needed:** Artificial Analysis is still on Intelligence
+Index v4.3, the version the catalog already carries, and its published
+leaderboard still has Claude Fable 5.1 and GPT-6 Astra tied at 53 with Claude
+Opus 5 at 51. Eighteen models matched their recorded rates exactly, five records
+changed, and one model was retired in favour of its replacement.
+
+**Gemini 3.1 Pro and Grok 4.5 are priceable above 200K for the first time.**
+Both carried `unsupportedBeyond` — the flag that makes `callCost` return NaN
+rather than silently bill a large prompt at a rate nobody published — because
+neither provider listed rates past 200K. Both now do:
+
+| Model | Rates past the threshold | Threshold |
+| --- | --- | --- |
+| Gemini 3.1 Pro | $4 input / $0.40 cached / $18 output | above 200K; rates up to 200K are inclusive |
+| Grok 4.5 | $4 input / $0.60 cached / $12 output | at or above 200K |
+
+Each is now a `rateBands` entry and the `unsupportedBeyond` ceiling is gone,
+which is the shape Grok 4.6 and Grok 4.3 already had. No board moved: the largest
+scenario profile is hard coding at 90K input, well under either threshold. The
+change is visible in Recommend, where a reader entering 250K input now gets $0.85
+and $0.84 per call instead of an unpriceable model.
+
+**DeepSeek V4 Pro's cached rate was wrong, and its replacement is an estimate.**
+The catalog carried $0.014; DeepSeek publishes $0.044 at peak and $0.022
+off-peak. The record now carries **$0.0266**, which is neither — it is a
+time-weighted blend of the two, by the 35 peak and 133 off-peak hours in a week.
+This is a deliberate exception to the rule that every number in the catalog is a
+published one, and the `note` says so in as many words, because a reader running
+a round-the-clock workload is billed at neither published rate. Input and output
+stay at the published peak. The effect is small, from +0.08% on paper writing to
++1.56% on hard coding, and no model changed tier in any scenario.
+
+**Both DeepSeek notes had the billing windows backwards.** They described
+01:00–04:00 and 06:00–10:00 UTC as the *discount* window. DeepSeek's page says
+the opposite: those hours are peak, and every other hour bills at half. The
+headline numbers were right — peak is correctly recorded as the standard rate —
+but the explanation under them told a reader to run their jobs at exactly the
+wrong time.
+
+Seven tests moved with this change. `unsupportedBeyond` had only ever been
+exercised through gemini-3-1-pro and grok-4-5, so publishing their rates left the
+engine's NaN path with no fixture and failed the suite. Those tests now build a
+synthetic capped model; the behaviour under test is unchanged, and an ordinary
+catalog refresh can no longer break them the same way.
+
+**GLM-5.3-Flash's note described an expired promotion.** It advertised a 50%
+promotional rate running through September 9, 2026, eight days before this pass.
+The headline rate was always the standard one and is unchanged; the note now
+records that the promotion has ended, and that cached input storage is free for a
+limited time, which is what Z.ai's page says today.
+
+**Codestral's cached rate was unsourced and is now `null`.** The catalog carried
+$0.03; Mistral publishes only $0.30 input and $0.90 output for it, and that $0.03
+appears on no Mistral page. `cached: null` is how Mistral Large 3 already records
+the same omission from the same page, and it is the honest reading — but it is
+not a free correction, because a null cached rate bills cache reads at the full
+input price. Codestral's modelled monthly cost rises accordingly, by 7% on paper
+writing and 129% on hard coding, where three quarters of input is assumed cached.
+Nothing it is ranked against moved: Codestral is `capability: null`, so it is
+listed and priced but sits in no tiering population.
+
+**DeepSeek V4 Flash was replaced by DeepSeek V4.1 Flash.** DeepSeek's pricing
+page now lists the model as `deepseek-flash` and documents that the legacy
+`deepseek-v4-flash` identifier still routes to V4.1 Flash at Flash pricing, so
+this is a replacement and not a rename: the new record was added and the old one
+retired.
+
+| | V4 Flash (retired) | V4.1 Flash |
+| --- | --- | --- |
+| Input / cached / output | $0.44 / $0.007 / $1.32 | $0.30 / $0.0036 / $1.20 |
+| Intelligence Index v4.3 | 35 | 40 |
+| Context | 1M | 1M, 384K maximum output |
+
+Its cached rate follows the same convention as DeepSeek V4 Pro above: input and
+output are the published peak rates, and the cached rate is a time-weighted blend
+of the $0.006 peak and $0.003 off-peak cache-hit rates. OpenCode Go was the one
+plan referencing the retired id and now points at the new one.
+
+**This is the only change in this pass that moved a board**, because the five
+extra index points clear two bars the old record missed:
+
+- **Medium coding** (bar 38) admits 16 models rather than 15. V4.1 Flash enters
+  at S as the cheapest qualifying option, and no other letter moved.
+- **Paper writing** (bar 36) admits 17 rather than 16. V4.1 Flash enters at S,
+  and the curve pushes Muse Spark 1.3 from S to A and Grok 4.5 from A to B.
+- **Daily use and easy coding** keep their shape: the retired record held S on
+  both lanes and its replacement takes it.
+- **Hard coding, research and innovation** are unchanged. 40 is still short of the
+  45 those three share.
+
+That Muse Spark 1.3 and Grok 4.5 moved without their own price or score changing
+is the curve working as intended, and the tradeoff recorded under "How tiers are
+decided": a letter is a rank within the qualifying population, so adding a
+cheaper option can demote an option that did not change.
+
+Every record now carries a `verifiedAt` of 2026-09-17, and the provenance date in
+the introduction moved with them.
+
+Kimi K2.7 Code was re-verified at $0.95 / $0.19 / $4.00 despite its recorded
+source URL now redirecting to another host, because the redirect resolves to the
+same page; the recorded link was left alone.
 
 ## Catalog changes, September 9 2026
 
@@ -436,6 +541,13 @@ the other's file stale and `tsc --noEmit` then fails on generated code. `next
 build` re-adds `.next/types/**/*.ts` to `include` every time it runs; `exclude`
 wins over `include`, so leaving both in place is stable. Do not remove the
 `.next` exclude to "resolve" the contradiction.
+
+The same contest reaches one tracked file. `npm run build:pages` rewrites
+`next-env.d.ts`, replacing the `vinext/types/augmentations` import with a plain
+`reference path` to the Next route types, so a local Pages build leaves that file
+modified in `git status`. Revert it (`git checkout next-env.d.ts`) rather than
+committing it: the checked-in version is the one the vinext build and
+`tsc --noEmit` need, and CI regenerates whatever the Pages export requires.
 
 Use `npm run build` for a deployment build, `npm run build:pages` for the static
 export that GitHub Pages publishes, and `npm test` for the full suite: the engine
