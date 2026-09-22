@@ -133,7 +133,7 @@ test("CLI and UI eligibility agree for all scenarios", () => {
     const requiredTokens = scenarioTokens(scenario);
     const cliEligible = new Set(eligibleModels(dataset, scenario).map((m) => m.id));
     const uiEligible = new Set(
-      dataset.models.filter((m) => gateModel(m, scenario, requiredTokens) === null).map((m) => m.id),
+      dataset.models.filter((m) => gateModel(m, scenario, requiredTokens, scenario.output) === null).map((m) => m.id),
     );
     assert.deepEqual([...cliEligible].sort(), [...uiEligible].sort(), `${scenario.id}: CLI and UI eligibility must match`);
   }
@@ -154,16 +154,23 @@ test("grok-4-6 uses threshold rates at or above 200K input", () => {
   assert.ok(atPerToken > belowPerToken, "Threshold rates should be higher per token than default rates");
 });
 
-test("grok-4-3 uses threshold rates at or above 200K input", () => {
-  const grok = dataset.models.find((m) => m.id === "grok-4-3");
-  assert.ok(grok?.rateBands?.length, "grok-4-3 must have rateBands");
-  const belowCost = callCost(grok, { input: 199_999, output: 500, cacheRatio: 0 });
-  const atCost = callCost(grok, { input: 200_000, output: 500, cacheRatio: 0 });
-  // Default: $1.25 input, $0.20 cached, $2.50 output
-  // Threshold: $2.50 input, $0.40 cached, $5 output
-  const belowPerToken = belowCost / 199_999;
-  const atPerToken = atCost / 200_000;
-  assert.ok(atPerToken > belowPerToken, "grok-4-3 threshold rates should be higher");
+// Every catalog model that publishes a threshold band must actually bill more
+// per token above it. Pinning this to one model id broke when grok-4-3 was
+// retired, so it now sweeps whatever the catalog currently carries.
+test("every banded model bills more per token at its threshold", () => {
+  const banded = dataset.models.filter((m) => m.rateBands?.length);
+  assert.ok(banded.length > 0, "catalog should carry at least one banded model");
+  for (const model of banded) {
+    const threshold = Math.min(...model.rateBands.map((b) => b.threshold));
+    const belowCost = callCost(model, { input: threshold - 1, output: 500, cacheRatio: 0 });
+    const atCost = callCost(model, { input: threshold, output: 500, cacheRatio: 0 });
+    const belowPerToken = belowCost / (threshold - 1);
+    const atPerToken = atCost / threshold;
+    assert.ok(
+      atPerToken > belowPerToken,
+      `${model.id} threshold rates should be higher per token than its default rates`,
+    );
+  }
 });
 
 // F4: break-even comparison is never confused for verified allowance.
@@ -278,7 +285,7 @@ test("costTiers assigns S to the cheapest eligible model", () => {
   const settings = { input: scenario.input, output: scenario.output, cacheRatio: scenario.cacheRatio };
   const evaluations = dataset.models.map((model) => {
     const requiredTokens = scenarioTokens(scenario);
-    const rejection = gateModel(model, scenario, requiredTokens);
+    const rejection = gateModel(model, scenario, requiredTokens, scenario.output);
     const costPerCall = callCost(model, settings);
     return {
       model,

@@ -1,11 +1,11 @@
 {
   "schemaVersion": 3,
-  "updatedAt": "2026-09-17",
+  "updatedAt": "2026-09-22",
   "currency": "USD",
   "unit": "per-million-tokens",
   "capabilityIndex": {
     "name": "Artificial Analysis Intelligence Index",
-    "version": "4.3",
+    "version": "4.3.2",
     "scale": "0-100 composite of ten published evaluations",
     "source": "https://artificialanalysis.ai/",
     "attribution": "Capability scores are published by Artificial Analysis and reproduced with attribution."
@@ -26,12 +26,13 @@
         "metrics": {
           "intelligence": 53
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/gpt-6-astra",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22"
       },
-      "contextTokens": 1050000
+      "contextTokens": 1050000,
+      "maxOutputTokens": 128000
     },
     {
       "id": "gpt-5-6-sol",
@@ -48,10 +49,10 @@
         "metrics": {
           "intelligence": 47
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/gpt-5-6-sol",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22"
       },
       "contextTokens": 1050000
     },
@@ -70,10 +71,10 @@
         "metrics": {
           "intelligence": 42
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/gpt-5-6-terra",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22"
       },
       "contextTokens": 1050000
     },
@@ -90,12 +91,12 @@
       "note": "Live comparison-page rate; some model-detail snippets remain stale.",
       "capability": {
         "metrics": {
-          "intelligence": 38
+          "intelligence": 37
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/gpt-5-6-luna",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22"
       },
       "contextTokens": 1050000
     },
@@ -114,10 +115,10 @@
         "metrics": {
           "intelligence": 51
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/claude-opus-5",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22"
       },
       "contextTokens": 1000000
     },
@@ -136,10 +137,10 @@
         "metrics": {
           "intelligence": 53
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/claude-fable-5-1",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22"
       },
       "contextTokens": 1000000
     },
@@ -158,10 +159,10 @@
         "metrics": {
           "intelligence": 38
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/claude-sonnet-5",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22"
       },
       "contextTokens": 1000000
     },
@@ -178,12 +179,12 @@
       "note": "High-speed, low-latency Claude model with 1M context.",
       "capability": {
         "metrics": {
-          "intelligence": 18
+          "intelligence": 15
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "variant": "non-reasoning",
         "source": "https://artificialanalysis.ai/models/claude-4-5-haiku",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22"
       },
       "contextTokens": 1000000
     },
@@ -211,9 +212,9 @@
         "metrics": {
           "intelligence": 30
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "source": "https://artificialanalysis.ai/models/gemini-3-1-pro-preview",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22"
       }
     },
     {
@@ -231,12 +232,13 @@
         "metrics": {
           "intelligence": 41
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "variant": "high",
         "source": "https://artificialanalysis.ai/models/gemini-3-8-flash",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22"
       },
-      "contextTokens": 1000000
+      "contextTokens": 1000000,
+      "maxOutputTokens": 64000
     },
     {
       "id": "grok-4-6",
@@ -253,10 +255,10 @@
         "metrics": {
           "intelligence": 44
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "variant": "high",
         "source": "https://artificialanalysis.ai/models/grok-4-6",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22"
       },
       "contextTokens": 500000,
       "rateBands": [
@@ -292,41 +294,11 @@
         "metrics": {
           "intelligence": 39
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "variant": "high",
         "source": "https://artificialanalysis.ai/models/grok-4-5",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22"
       }
-    },
-    {
-      "id": "grok-4-3",
-      "provider": "xAI",
-      "name": "Grok 4.3",
-      "input": 1.25,
-      "cached": 0.2,
-      "output": 2.5,
-      "context": "1M",
-      "source": "https://docs.x.ai/developers/pricing",
-      "verifiedAt": "2026-09-17",
-      "note": "Prompts at or above 200K use $2.50 input, $0.40 cached input, and $5 output.",
-      "capability": {
-        "metrics": {
-          "intelligence": 25
-        },
-        "indexVersion": "4.3",
-        "variant": "medium",
-        "source": "https://artificialanalysis.ai/models/grok-4-3",
-        "verifiedAt": "2026-09-09"
-      },
-      "contextTokens": 1000000,
-      "rateBands": [
-        {
-          "input": 2.5,
-          "cached": 0.4,
-          "output": 5,
-          "threshold": 200000
-        }
-      ]
     },
     {
       "id": "grok-build-0-1",
@@ -358,10 +330,10 @@
         "metrics": {
           "intelligence": 36
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/deepseek-v4-pro",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22"
       }
     },
     {
@@ -376,11 +348,12 @@
       "verifiedAt": "2026-09-17",
       "capability": {
         "metrics": {
-          "intelligence": 10
+          "intelligence": 9
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "source": "https://artificialanalysis.ai/models/mistral-large-3",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22",
+        "variant": "non-reasoning"
       },
       "contextTokens": 256000
     },
@@ -413,10 +386,10 @@
         "metrics": {
           "intelligence": 45
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/glm-5-3",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22"
       },
       "contextTokens": 1000000
     },
@@ -435,9 +408,9 @@
         "metrics": {
           "intelligence": 42
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "source": "https://artificialanalysis.ai/models/glm-5-3-flash",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22"
       },
       "contextTokens": 1000000
     },
@@ -456,10 +429,10 @@
         "metrics": {
           "intelligence": 44
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/kimi-k3",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22"
       },
       "contextTokens": 1000000
     },
@@ -478,9 +451,9 @@
         "metrics": {
           "intelligence": 26
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "source": "https://artificialanalysis.ai/models/kimi-k2-7-code",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22"
       },
       "contextTokens": 256000
     },
@@ -499,10 +472,10 @@
         "metrics": {
           "intelligence": 48
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/muse-spark-1-3",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22"
       },
       "contextTokens": 1000000
     },
@@ -519,11 +492,11 @@
       "note": "International (Singapore) endpoint rate. The Beijing, US, Germany, Japan, and Hong Kong endpoints bill lower at $1.65 input / $0.206 cached / $4.951 output. Max input is 991,808 tokens of the 1M window.",
       "capability": {
         "metrics": {
-          "intelligence": 40
+          "intelligence": 45
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "source": "https://artificialanalysis.ai/models/qwen3-8-max",
-        "verifiedAt": "2026-09-09"
+        "verifiedAt": "2026-09-22"
       },
       "contextTokens": 1000000
     },
@@ -541,13 +514,66 @@
       "note": "Replaces DeepSeek V4 Flash; called as `deepseek-flash`, and the legacy `deepseek-v4-flash` identifier still routes here at Flash pricing. Input and output are the published peak rates ($0.30 in / $1.20 out). Peak hours are 01:00-04:00 and 06:00-10:00 UTC, Monday to Friday; all other hours bill at half those rates ($0.15 in / $0.60 out). The cached rate is not a published figure: it is a time-weighted blend of the $0.006 peak and $0.003 off-peak cache-hit rates, weighted by the 35 peak and 133 off-peak hours in a week. Maximum output is 384K tokens.",
       "capability": {
         "metrics": {
-          "intelligence": 40
+          "intelligence": 39
         },
-        "indexVersion": "4.3",
+        "indexVersion": "4.3.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/deepseek-v4-1-flash",
-        "verifiedAt": "2026-09-17"
+        "verifiedAt": "2026-09-22"
+      },
+      "maxOutputTokens": 384000
+    },
+    {
+      "id": "grok-4-7",
+      "provider": "xAI",
+      "name": "Grok 4.7",
+      "input": 2,
+      "cached": 0.5,
+      "output": 6,
+      "context": "500K",
+      "contextTokens": 500000,
+      "source": "https://docs.x.ai/developers/pricing",
+      "verifiedAt": "2026-09-22",
+      "note": "Released 21 September 2026 at Grok 4.6 prices. Prompts at or above 200K use $4 input, $1 cached input, and $12 output per million tokens. A fast variant, available through Cursor and Grok Build only, serves output at twice the speed for twice the price.",
+      "rateBands": [
+        {
+          "input": 4,
+          "cached": 1,
+          "output": 12,
+          "threshold": 200000
+        }
+      ],
+      "capability": {
+        "metrics": {
+          "intelligence": 46
+        },
+        "indexVersion": "4.3.2",
+        "variant": "xhigh",
+        "source": "https://artificialanalysis.ai/models/grok-4-7",
+        "verifiedAt": "2026-09-22"
       }
+    },
+    {
+      "id": "step-5-preview",
+      "provider": "StepFun",
+      "name": "Step 5 Preview",
+      "input": 1,
+      "cached": 0.05,
+      "output": 2.7,
+      "context": "1M",
+      "contextTokens": 1000000,
+      "source": "https://platform.stepfun.ai/docs/en/guides/pricing/details",
+      "verifiedAt": "2026-09-22",
+      "note": "StepFun's flagship agentic model, released 18 September 2026. Sparse mixture-of-experts with text, image and video input. Maximum output is 64K tokens, and output tokens include the reasoning trace. The cache-miss input price covers writing new content to the cache.",
+      "capability": {
+        "metrics": {
+          "intelligence": 44
+        },
+        "indexVersion": "4.3.2",
+        "source": "https://artificialanalysis.ai/models/step-5",
+        "verifiedAt": "2026-09-22"
+      },
+      "maxOutputTokens": 64000
     }
   ]
 }

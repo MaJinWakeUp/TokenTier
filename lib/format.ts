@@ -153,6 +153,8 @@ export function placementReason(placement: Placement, scenario: Scenario, metric
       return `${label} ${placement.index} is below the ${placement.minIndex} bar for ${scenario.label}.`;
     case "context":
       return `Context window is smaller than the ${scenarioTokens(scenario).toLocaleString()} tokens this profile needs.`;
+    case "output":
+      return `Maximum output is ${placement.maxOutput.toLocaleString()} tokens, fewer than the ${scenario.output.toLocaleString()} this profile asks for.`;
     case "unpriced":
       return "No fixed monthly price to rank against.";
     case "over-cap":

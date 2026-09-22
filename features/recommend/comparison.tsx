@@ -117,6 +117,7 @@ export function DetailedComparison({
                             ? `index ${row.index}, clears the bar`
                             : row.rejection?.state === "pricing" ? "unsupported pricing at this input size"
                               : row.rejection?.state === "context" ? "context window too small"
+                                : row.rejection?.state === "output" ? "maximum output too small"
                                 : `index ${row.index}, below the ${scenario.gate.minIndex} bar`}
                       </small>
                     </div>

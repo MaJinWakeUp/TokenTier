@@ -73,7 +73,7 @@ function evaluateModel(
   budget: number,
 ): ApiEvaluation {
   const requiredTokens = settings.input + settings.output;
-  const rejection = gateModel(model, scenario, requiredTokens);
+  const rejection = gateModel(model, scenario, requiredTokens, settings.output);
   const costPerCall = callCost(model, settings);
   const monthlyCost = costPerCall * calls;
   const index = metricValue(model.capability, scenario.gate.metric);

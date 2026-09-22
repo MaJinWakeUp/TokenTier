@@ -128,7 +128,7 @@
       "planPriceCap": 100,
       "gate": {
         "metric": "intelligence",
-        "minIndex": 36,
+        "minIndex": 35,
         "anchor": "gpt-5-6-luna",
         "rationale": "Copy that ships without a rewrite needs more than fluent text, but it does not need frontier reasoning."
       }
