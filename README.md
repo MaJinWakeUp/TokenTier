@@ -116,11 +116,20 @@ Tiers are derived, never hand-graded. Two independent judgements are kept apart:
 
    Models are ordered by per-call cost and plans by monthly price. A plan is
    ranked on price whether or not its published quota can be shown to cover the
-   profile, so the whole market is visible rather than only the few plans whose
+   profile, so most of the market is visible rather than only the few plans whose
    quota converts; each card says when its capacity is under the volume, capped
    on a shorter window, or unproven. The recommendation is stricter and
    unchanged: it names a plan only when the allowance is verified, sufficient
    and within budget.
+
+   The one exception is a price floor: **subscriptions under $10 a month are not
+   listed.** Every one of them metered its AI access by a relative limit rather
+   than a quota that converts, and the usage they actually deliver sits far below
+   what their position on a price-ordered board implies. A card that ranks first
+   on price and cannot be shown to cover any of the volume misleads more than it
+   informs, so the floor removes them rather than ranking them with a caveat.
+   This is a deliberate exception to the "rank it and label it" rule above, and
+   it costs the board its entry tier.
 
    Each scenario also declares a `planPriceCap` — the most a reader doing that
    kind of work would plausibly pay for a subscription. Plans above it are
@@ -218,6 +227,144 @@ tier lists, recommendations, cost list, price book, source links, and update
 date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
+
+## Catalog changes, September 22 2026
+
+Two model additions that required a catalog-wide index rebase first, and Meta's
+new consumer subscription.
+
+### Rebased onto Intelligence Index v4.3.2
+
+Artificial Analysis moved to **v4.3.2**, a point revision of v4.3: the same ten
+evaluations and the same four category weights, with AA-Briefcase upgraded to
+v1.1 and GDPval-AA to v2.1. Grok 4.7 and Step 5 Preview are both published under
+it, and `models:validate` refuses a catalog that mixes index versions, so adding
+either model meant re-reading all 22 scored records first. That is the rebase
+procedure working as intended rather than an incidental cost: a point revision is
+still a revision, and the alternative is a catalog where two scores are not
+comparable with the other twenty-two.
+
+Most scores held. Five moved, and one variant label changed:
+
+| Model | v4.3 → v4.3.2 |
+| --- | --- |
+| Qwen3.8-Max | 40 → **45** |
+| Claude Haiku 4.5 | 18 → 15 |
+| GPT-5.6 Luna | 38 → 37 |
+| DeepSeek V4.1 Flash | 40 → 39 |
+| Mistral Large 3 | 10 → 9 |
+| Grok 4.3 | 25, but the page now reports the **high** variant where the record cited **medium** |
+
+Bars were re-derived from their anchors, preserving each gap. Six of the seven
+did not move because their anchors did not. **Paper writing fell from 36 to 35**,
+because its anchor GPT-5.6 Luna lost a point and the bar sits two below it.
+
+Two of those readings deserve a second look before they are trusted too far.
+Qwen3.8-Max gaining five points is far outside the drift of a point revision, and
+Artificial Analysis now names the model `Qwen3.8 Max (0902)` — this may be a newer
+snapshot rather than a re-scoring, which would make the comparison a different
+model rather than a moved score. Grok 4.3's variant change has the same shape:
+the score is identical at 25, but a score read at a different effort setting is
+not the same measurement, and the record now says `high` because that is what the
+page reports.
+
+### Added: Grok 4.7 and Step 5 Preview
+
+| | Grok 4.7 | Step 5 Preview |
+| --- | --- | --- |
+| Provider | xAI | StepFun |
+| Input / cached / output | $2 / $0.50 / $6 | $1 / $0.05 / $2.70 |
+| Above 200K | $4 / $1 / $12 | — |
+| Context | 500K | 1M, 64K maximum output |
+| Index v4.3.2 | 46 (xhigh) | 44 |
+
+Grok 4.7 ships at Grok 4.6's prices with a higher score, and carries the same
+200K rate band the rest of the Grok line uses. Its fast variant, which doubles
+both speed and price and is reachable only through Cursor and Grok Build, is
+recorded in the note rather than the headline rates, following the convention
+that a surcharge tier never sets the number on the board. Step 5 Preview is the
+cheapest model on the catalog that clears the paper writing, daily, easy and
+medium coding bars, which is what puts it at S on four lanes.
+
+StepFun is a new provider, and `rendered-html` enforces that every provider in
+the catalog has an orb colour of its own, so `app/globals.css` gained one. The
+colour is a chosen swatch picked for distinctness from the twelve already in use,
+not a brand asset.
+
+### Added: Meta One Premium
+
+Meta launched Meta One on September 16. The individual bundles are Core at $7.99
+and **Premium at $19.99**; single-product tiers run $2.99 to $3.99 and creator and
+business tiers run $14.99 to $499, none of which are listed here because Meta
+describes the added AI usage only for Core and Premium.
+
+Premium is recorded as `Official relative limit` with `quotaDetail.kind:
+"relative-limit"`, because Meta publishes no numeric allowance at all — the help
+centre says only that "usage allowance increases as you upgrade plans" and that
+unused usage does not roll over. That makes the card read *unproven*, which is
+the correct outcome rather than a gap.
+
+**The roster on this plan is inferred, and it is load-bearing.** Meta never states
+which model a Meta One tier serves. The record points at Muse Spark 1.3 on the
+strength of Meta naming Muse Spark as the model powering its Muse agent, and the
+plan's note says so. That inference sets the plan's capability to 48, which clears
+every bar in the catalog, so Premium ranks A on the four hardest lanes and B on
+the rest. It is marked `confidence: Low`. If Meta publishes a per-plan model
+matrix, or states that Meta One's AI benefit is confined to image and video
+generation, this record should be the first thing revisited — the AI benefit Meta
+actually documents for these tiers is media generation, not the text work the
+boards price.
+
+Meta One Core, at $7.99, was added in this pass and then removed by the price
+floor described below. On the inferred roster it had ranked S on all seven
+boards, which is exactly the outcome the floor exists to prevent.
+
+### Removed: subscriptions under $10, and Grok 4.3
+
+Three plans came off the board: **ChatGPT Go** ($8), **Google AI Plus** ($9.99)
+and **Meta One Core** ($7.99). All three metered AI access by a relative limit
+rather than a quota that converts to a call count, so each ranked near the top of
+a price-ordered board while delivering usage far below what that position
+implies. The price floor is recorded under "How tiers are decided" above, along
+with what it costs: Google AI Plus was the best-evidenced of the three at
+`confidence: High`, and a price threshold removes it alongside the weak ones.
+
+**Grok 4.3** was retired as superseded. At 25 on v4.3.2 it cleared no scenario
+bar in the catalog, so it was listed and priced but appeared on no board, and no
+plan referenced it — its removal moves nothing.
+
+### What moved
+
+Every board moved, which is unusual and worth reading as separate causes.
+
+New model entries:
+
+- **Step 5 Preview** enters at S on daily use, easy coding, medium coding and
+  paper writing. It does not clear the 45 bar the other three lanes share.
+- **Grok 4.7** enters at A on hard coding, research and innovation, and at B on
+  the other four.
+
+Re-scorings, from the rebase:
+
+- **Qwen3.8-Max** enters hard coding, research and innovation at A on its new 45.
+- **GPT-5.6 Luna** drops off medium coding entirely: at 37 it no longer clears
+  that lane's 38.
+- **Claude Sonnet 5** falls B to C on daily use, easy coding and paper writing,
+  and **DeepSeek V4 Pro** S to A on the same three.
+- **GPT-5.6 Sol** falls A to B and **Claude Opus 5** B to C on the three 45-bar
+  lanes, without either changing price or score.
+
+On the plan side, removing the entry tier promoted what sat behind it. SuperGrok
+Lite, OpenCode Go and GLM Coding Lite each rise A to S on daily use and easy
+coding; GLM Coding Lite and Kimi Moderato rise to S on medium coding and paper
+writing; ChatGPT Plus, Claude Pro and Cursor Pro each rise B to A on those two
+lanes. Cursor Pro+ falls A to B on the four hardest lanes, and Meta One Premium
+enters at A on those and B elsewhere.
+
+None of that is a judgement that an option got better or worse. A letter is a
+rank within the qualifying population, so new entrants, one re-scored model and
+three departures are each enough to move a lane without anything about the
+option that moved having changed.
 
 ## Catalog changes, September 17 2026
 

@@ -1013,6 +1013,7 @@ main {
 .provider-orb[data-provider="Kimi"] { background: #37b9e9; }
 .provider-orb[data-provider="Meta"] { background: #0064e0; }
 .provider-orb[data-provider="Alibaba"] { background: #ff6a00; }
+.provider-orb[data-provider="StepFun"] { background: #d6499b; }
 
 .prices-section {
   margin-top: 24px;

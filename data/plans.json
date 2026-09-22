@@ -1,35 +1,8 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-09-17",
+  "updatedAt": "2026-09-22",
   "currency": "USD",
   "plans": [
-    {
-      "id": "chatgpt-go",
-      "provider": "OpenAI",
-      "name": "ChatGPT Go",
-      "kind": "Subscription",
-      "monthly": 8,
-      "source": "https://learn.chatgpt.com/docs/pricing",
-      "note": "Entry tier with roughly 10× Free message, upload, and image limits; this plan may include ads. API platform usage is billed separately.",
-      "quota": "About 10× Free-tier messages, uploads, and image creation",
-      "evidence": "Official relative limit",
-      "confidence": "Medium",
-      "apiIncluded": "No",
-      "cacheRatio": 0.25,
-      "verifiedAt": "2026-08-21",
-      "modelIds": [
-        "gpt-5-6-luna"
-      ],
-      "access": [
-        "chat-app"
-      ],
-      "quotaDetail": {
-        "kind": "relative-limit",
-        "description": "About 10× Free-tier messages, uploads, and image creation",
-        "source": "https://learn.chatgpt.com/docs/pricing",
-        "verifiedAt": "2026-08-21"
-      }
-    },
     {
       "id": "chatgpt-plus",
       "provider": "OpenAI",
@@ -206,34 +179,6 @@
         "description": "20x Pro allowance and full context limits",
         "source": "https://claude.com/pricing",
         "verifiedAt": "2026-08-21"
-      }
-    },
-    {
-      "id": "google-ai-plus",
-      "provider": "Google",
-      "name": "Google AI Plus",
-      "kind": "Subscription",
-      "monthly": 9.99,
-      "source": "https://one.google.com/about/plans",
-      "note": "Consumer Gemini access with 2× Free usage limits. Gemini API usage is billed separately.",
-      "quota": "2× Free Gemini limits; compute-based limits refresh every 5 hours",
-      "evidence": "Official relative limit",
-      "confidence": "High",
-      "apiIncluded": "No",
-      "cacheRatio": 0.25,
-      "verifiedAt": "2026-09-03",
-      "modelIds": [
-        "gemini-3-1-pro",
-        "gemini-3-8-flash"
-      ],
-      "access": [
-        "chat-app"
-      ],
-      "quotaDetail": {
-        "kind": "relative-limit",
-        "description": "2× Free Gemini limits; compute-based limits refresh every 5 hours",
-        "source": "https://one.google.com/about/plans",
-        "verifiedAt": "2026-09-03"
       }
     },
     {
@@ -782,6 +727,32 @@
           "description": "28,000 credits per 5 hours"
         }
       ]
+    },
+    {
+      "id": "meta-one-premium",
+      "provider": "Meta",
+      "name": "Meta One Premium",
+      "kind": "Subscription",
+      "monthly": 19.99,
+      "source": "https://about.fb.com/news/2026/09/introducing-meta-one-subscription-service-more-features-ai/",
+      "note": "Top individual bundle, which Meta describes as the most room to create content with Meta AI. Meta publishes no per-plan model matrix. The roster here is inferred from Meta naming Muse Spark as the model powering its Muse agent; Meta does not state which model this tier serves for text, and the AI benefit it documents for Meta One is image and video generation rather than text work.",
+      "quota": "Meta's largest individual Meta AI allowance; no numeric allowance published",
+      "evidence": "Official relative limit",
+      "confidence": "Low",
+      "apiIncluded": "No",
+      "verifiedAt": "2026-09-22",
+      "modelIds": [
+        "meta-muse-spark-1-3"
+      ],
+      "access": [
+        "chat-app"
+      ],
+      "quotaDetail": {
+        "kind": "relative-limit",
+        "description": "Meta's largest individual Meta AI allowance; no numeric allowance published",
+        "source": "https://about.fb.com/news/2026/09/introducing-meta-one-subscription-service-more-features-ai/",
+        "verifiedAt": "2026-09-22"
+      }
     },
     {
       "id": "kimi-moderato",

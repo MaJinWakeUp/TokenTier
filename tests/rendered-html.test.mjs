@@ -126,7 +126,7 @@ test("Rankings answers the cheapest-qualified question above the board", async (
   );
 
   // Real catalog rows, from the data file rather than the component.
-  for (const name of ["Kimi K3", "Grok 4.6", "Claude Fable 5.1", "GLM-5.3-Flash", "Grok 4.3", "Gemini 3.8 Flash", "Muse Spark 1.3", "Qwen3.8-Max"]) {
+  for (const name of ["Kimi K3", "Grok 4.6", "Claude Fable 5.1", "GLM-5.3-Flash", "Grok 4.7", "Gemini 3.8 Flash", "Muse Spark 1.3", "Qwen3.8-Max"]) {
     assert.ok(markup.includes(name), `renders ${name}`);
   }
   for (const scenario of scenarios.scenarios) {
@@ -233,12 +233,11 @@ test("the catalog stays in validated data files", async () => {
     "Cursor Pro", "Cursor Pro Plus", "Cursor Ultra", "OpenCode Zen",
     "GLM Coding Lite", "GLM Coding Pro", "GLM Coding Max",
     "Kimi Moderato", "Kimi Allegretto", "Kimi Allegro", "Kimi Vivace",
-    "Google AI Plus", "Google AI Pro", "Google AI Ultra (5x)", "Google AI Ultra (20x)",
+    "Google AI Pro", "Google AI Ultra (5x)", "Google AI Ultra (20x)",
     "SuperGrok Heavy",
   ]) {
     assert.ok(planNames.includes(name), `plan catalog keeps ${name}`);
   }
-  assert.equal(planById.get("chatgpt-go").monthly, 8);
   assert.equal(planById.get("grok-super-lite").monthly, 10);
   assert.equal(planById.get("grok-super-plus").monthly, 100);
   assert.equal(
@@ -267,8 +266,6 @@ test("the catalog stays in validated data files", async () => {
   for (const id of ["chatgpt-plus", "chatgpt-pro-5x", "chatgpt-pro-20x"]) {
     assert.ok(planById.get(id).modelIds.includes("gpt-6-astra"), `${id} reaches GPT-6 Astra`);
   }
-  assert.equal(planById.get("chatgpt-go").modelIds.includes("gpt-6-astra"), false, "Go does not include Astra");
-
   // Every model in the catalog that a subscription actually offers should be on
   // that subscription's roster. A model listed by no plan at all is only correct
   // when no subscription in the catalog sells access to it.
