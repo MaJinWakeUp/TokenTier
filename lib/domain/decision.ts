@@ -70,6 +70,7 @@ function apiFailure(result: RecommendationResult, workload: Workload): string {
   const states = new Set(result.api.evaluations.map((row) => row.rejection?.state));
   const reasons = [
     states.has("context") && "context windows are too small (reduce input or output size)",
+    states.has("output") && "the requested output exceeds what these models can produce in one response (reduce output size)",
     states.has("below") && "capability scores fall below the bar (choose a less demanding use case)",
     states.has("unscored") && "required capability scores are missing",
     states.has("pricing") && "pricing is unsupported at this input size",
@@ -157,11 +158,12 @@ export function decide(
   const conditionalPlans = conditionalCandidates(result.plans.evaluations, workload.calls);
   const planModels = result.plans.evaluations.flatMap((row) => row.plan.modelIds)
     .map((id) => catalog.modelById.get(id)).filter((model): model is Model => Boolean(model));
-  const planGates = planModels.map((model) => gateModel(model, scenario, workload.input + workload.output));
+  const planGates = planModels.map((model) => gateModel(model, scenario, workload.input + workload.output, workload.output));
   const planEligibilityReason = planGates.some((gate) => gate === null)
     ? "Plan models clear the capability and context requirements, but pricing or model-specific credit conversion is missing at this input size. Check provider evidence or reduce input size."
     : `No plan model qualifies: ${[
       planGates.some((gate) => gate?.state === "context") && "context windows are too small (reduce input or output)",
+      planGates.some((gate) => gate?.state === "output") && "the requested output exceeds what these models can produce in one response (reduce output)",
       planGates.some((gate) => gate?.state === "below") && "capability scores are below the bar (choose a less demanding use case)",
       planGates.some((gate) => gate?.state === "unscored") && "required capability scores are missing",
       planGates.length === 0 && "model evidence is missing",

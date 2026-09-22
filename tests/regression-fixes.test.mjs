@@ -11,6 +11,7 @@ import {
   validateScenarios,
 } from "../scripts/update-models.mjs";
 import { callCost, planEstimate, planCoverageScore } from "../build/lib/domain/pricing.js";
+import { gateModel } from "../build/lib/domain/eligibility.js";
 import { price, monthlyPrice, monthlyPriceAgainst, unsupportedPriceLabel } from "../build/lib/format.js";
 import { recommend, costTiers } from "../build/lib/domain/recommend.js";
 import { readFileSync } from "node:fs";
@@ -479,6 +480,47 @@ test("F5: the views branch on basis.kind, never on the label text", () => {
   assert.doesNotMatch(joined, /basis === "/, "no view compares the basis to a string");
   assert.match(joined, /basis\.kind === "break-even"/, "views use the kind discriminant");
   assert.match(joined, /basis\.label/, "views still show the human label");
+});
+
+// -- Codex P2: a published output ceiling is enforced, not just described -----
+
+test("a model is ineligible when the workload asks for more output than it can produce", () => {
+  const scenario = scenarioDoc.scenarios.find((s) => s.id === "research");
+  const capped = dataset.models.find((m) => typeof m.maxOutputTokens === "number");
+  assert.ok(capped, "catalog should carry at least one model with a published output ceiling");
+  const within = { ...scenario, output: capped.maxOutputTokens };
+  const beyond = { ...scenario, output: capped.maxOutputTokens + 1 };
+  assert.equal(
+    gateModel(capped, scenario, capped.maxOutputTokens + within.input, within.output),
+    null,
+    "output exactly at the ceiling is still produceable",
+  );
+  const rejection = gateModel(capped, scenario, beyond.output + beyond.input, beyond.output);
+  assert.equal(rejection?.state, "output", "one token past the ceiling is rejected as an output miss");
+  assert.equal(rejection.maxOutput, capped.maxOutputTokens, "the rejection names the ceiling");
+});
+
+test("the output ceiling is independent of the context window", () => {
+  // Step 5 Preview is the case that prompted this: a 1M context window with a
+  // 64K output cap. The aggregate fits the window, so only an output-aware gate
+  // catches it.
+  const step = dataset.models.find((m) => m.id === "step-5-preview");
+  if (!step) return;
+  // A lane Step 5 actually clears, so the gate reaches the output check rather
+  // than stopping at the capability bar.
+  const scenario = scenarioDoc.scenarios.find((s) => s.id === "writing");
+  assert.ok(
+    step.capability.metrics.intelligence >= scenario.gate.minIndex,
+    "fixture must clear this lane's bar for the test to exercise the output gate",
+  );
+  const output = 100_000;
+  const total = 10_000 + output;
+  assert.ok(total < step.contextTokens, "the request fits the context window");
+  assert.equal(
+    gateModel(step, scenario, total, output)?.state,
+    "output",
+    "a request the window holds but the model cannot emit is still rejected",
+  );
 });
 
 // -- Finding 6: rates that stop at a published ceiling ------------------------

@@ -133,7 +133,7 @@ test("CLI and UI eligibility agree for all scenarios", () => {
     const requiredTokens = scenarioTokens(scenario);
     const cliEligible = new Set(eligibleModels(dataset, scenario).map((m) => m.id));
     const uiEligible = new Set(
-      dataset.models.filter((m) => gateModel(m, scenario, requiredTokens) === null).map((m) => m.id),
+      dataset.models.filter((m) => gateModel(m, scenario, requiredTokens, scenario.output) === null).map((m) => m.id),
     );
     assert.deepEqual([...cliEligible].sort(), [...uiEligible].sort(), `${scenario.id}: CLI and UI eligibility must match`);
   }
@@ -285,7 +285,7 @@ test("costTiers assigns S to the cheapest eligible model", () => {
   const settings = { input: scenario.input, output: scenario.output, cacheRatio: scenario.cacheRatio };
   const evaluations = dataset.models.map((model) => {
     const requiredTokens = scenarioTokens(scenario);
-    const rejection = gateModel(model, scenario, requiredTokens);
+    const rejection = gateModel(model, scenario, requiredTokens, scenario.output);
     const costPerCall = callCost(model, settings);
     return {
       model,

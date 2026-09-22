@@ -366,6 +366,61 @@ rank within the qualifying population, so new entrants, one re-scored model and
 three departures are each enough to move a lane without anything about the
 option that moved having changed.
 
+### Review fixes
+
+Two findings from the automated review on the pull request, both real.
+
+**Cursor's rosters were stale, and it mattered.** They were verified on September
+3, before Grok 4.7 existed, so the catalog asserted in Grok 4.7's own note that
+Cursor serves the model while no Cursor plan listed it. Cursor's model and pricing
+page lists Grok 4.7 on Pro, Pro+ and Ultra at $2 / $0.50 / $6, so all three
+rosters gained it. Because `planWorkingModel` picks the cheapest model on a plan
+that clears the bar, the three Cursor plans were being costed on hard coding,
+research and innovation through GPT-5.6 Sol at $4 / $20 when they in fact offer
+Grok 4.7 at $2 / $6 with a score that clears the same bar. Coverage roughly
+doubles:
+
+| Plan | Hard-coding calls covered |
+| --- | --- |
+| Cursor Pro | 57 → 123 |
+| Cursor Pro+ | 200 → 432 |
+| Cursor Ultra | 1,197 → **2,576** |
+
+Against a 1,500-call profile that moves **Cursor Ultra from under volume to proven
+coverage**, so hard coding has a plan that can demonstrate it covers the month
+again — the state the September 9 entry recorded as lost. No plan changed tier,
+because plans are ranked on price rather than on their working model.
+
+**A separate Grok 4.7 Fast record was not added**, though the review asked for
+one. Three reasons: the project's standing convention puts variant pricing in the
+`note` rather than in a second record, which is how Muse Spark 1.3's contributor
+tier and Qwen3.8-Max's regional endpoints are already handled; the Fast variant is
+not sold through the API at all, only through Cursor and Grok Build, and this
+catalog lists API models; and since Fast costs exactly twice the standard variant,
+`planWorkingModel` — which selects the cheapest qualifying model — could never
+choose it, so its absence cannot move any plan number in either direction.
+
+**A published output ceiling is now enforced rather than described.** `gateModel`
+checked only that the context window held `input + output`, so a model with a 1M
+window and a 64K output cap was priced normally for a request asking 100K of
+output — a call it must refuse. The workload form allows up to 500K output, so
+this was reachable. `maxOutputTokens` is now a validated field on the model
+record, must fit inside the model's own context window, and produces a rejection
+state of its own that the board, the comparison table and the no-match
+explanations all report.
+
+This was a pre-existing, catalog-wide gap rather than anything Step 5 Preview
+introduced: four records carried a published output ceiling in prose only, and all
+four are now structural — GPT-6 Astra at 128K, Gemini 3.8 Flash and Step 5 Preview
+at 64K, DeepSeek V4.1 Flash at 384K. No preset board moves, because the largest
+profile asks for 6,000 output tokens. It changes the Recommend view, where a
+custom workload beyond a model's ceiling now shows that model as ineligible
+instead of quoting a price for a response it cannot produce.
+
+Not done: the SuperGrok rosters were not re-checked for Grok 4.7 because the
+pricing page would not render, so those plans may carry the same staleness the
+Cursor ones did.
+
 ## Catalog changes, September 17 2026
 
 A price re-verification pass across all 24 models, plus a check of the capability

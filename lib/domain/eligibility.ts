@@ -29,11 +29,17 @@ export function scenarioTokens(scenario: Scenario) {
 export type Rejection =
   | { state: "below"; index: number; minIndex: number }
   | { state: "context"; index: number; minIndex: number }
+  | { state: "output"; index: number; minIndex: number; maxOutput: number }
   | { state: "unscored" };
 
 export const unscored: Rejection = { state: "unscored" };
 
-export function gateModel(model: Model, scenario: Scenario, requiredTokens: number): Rejection | null {
+export function gateModel(
+  model: Model,
+  scenario: Scenario,
+  requiredTokens: number,
+  outputTokens: number,
+): Rejection | null {
   const { metric, minIndex } = scenario.gate;
   const index = metricValue(model.capability, metric);
   if (index === null) return unscored;
@@ -42,6 +48,12 @@ export function gateModel(model: Model, scenario: Scenario, requiredTokens: numb
   // for backward compatibility with pre-v3 catalogs.
   const contextTokens = model.contextTokens ?? contextSize(model.context);
   if (contextTokens < requiredTokens) return { state: "context", index, minIndex };
+  // A published output ceiling binds independently of the context window: a
+  // model with a 1M window and a 64K output cap cannot produce a 100K answer,
+  // and pricing such a call would quote a request the model must refuse.
+  if (model.maxOutputTokens !== undefined && outputTokens > model.maxOutputTokens) {
+    return { state: "output", index, minIndex, maxOutput: model.maxOutputTokens };
+  }
   return null;
 }
 

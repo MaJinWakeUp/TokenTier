@@ -33,6 +33,7 @@ export type Placement =
   | { state: "tier"; tier: Tier; index: number; minIndex: number; headroom: number; capacity?: PlanCapacity }
   | { state: "below"; index: number; minIndex: number }
   | { state: "context"; index: number; minIndex: number }
+  | { state: "output"; index: number; minIndex: number; maxOutput: number }
   | { state: "unpriced" }
   // Priced above what this kind of work is worth paying for. The plan is real
   // and may well clear the bar; it is simply out of scope for this board.
@@ -131,7 +132,7 @@ export function modelPlacements(
   const eligible: Array<{ id: string; index: number; cost: number }> = [];
 
   for (const model of models) {
-    const rejection = gateModel(model, scenario, requiredTokens);
+    const rejection = gateModel(model, scenario, requiredTokens, settings.output);
     if (rejection) {
       placed.set(model.id, rejection as Placement);
       continue;
@@ -185,7 +186,7 @@ export function planWorkingModel(
   const eligible = plan.modelIds
     .map((id) => modelById.get(id))
     .filter((model): model is Model => Boolean(model))
-    .filter((model) => gateModel(model, scenario, requiredTokens) === null)
+    .filter((model) => gateModel(model, scenario, requiredTokens, settings.output) === null)
     // A credit-metered plan can only be costed on models it publishes multipliers for.
     .filter((model) => !plan.weeklyCredits || Boolean(plan.creditMultipliers?.[model.id]))
     // A model with unsupported pricing (NaN cost, F6) cannot be a working model.
@@ -226,7 +227,7 @@ export function planRejection(
   if (offered.length === 0) return noPlacement;
   // Report the closest miss, so the reason names the plan's best model.
   return offered
-    .map((model) => (gateModel(model, scenario, requiredTokens) ?? unscored) as Placement)
+    .map((model) => (gateModel(model, scenario, requiredTokens, settings.output) ?? unscored) as Placement)
     .sort((a, b) => placementSort(b, a))[0];
 }
 
@@ -327,6 +328,7 @@ export function gateSummary(models: Model[], placements: Map<string, Placement>)
     qualifying: values.filter((placement) => placement.state === "tier").length,
     below: values.filter((placement) => placement.state === "below").length,
     context: values.filter((placement) => placement.state === "context").length,
+    output: values.filter((placement) => placement.state === "output").length,
     unscored: values.filter((placement) => placement.state === "unscored").length,
     total: models.length,
   };

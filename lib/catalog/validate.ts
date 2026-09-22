@@ -30,7 +30,7 @@ const requiredModelKeys = [
   "source",
   "verifiedAt",
 ];
-const allowedModelKeys = new Set([...requiredModelKeys, "note", "rateBands", "unsupportedBeyond"]);
+const allowedModelKeys = new Set([...requiredModelKeys, "note", "rateBands", "unsupportedBeyond", "maxOutputTokens"]);
 const requiredCapabilityKeys = ["indexVersion", "metrics", "source", "verifiedAt"];
 const allowedCapabilityKeys = new Set([...requiredCapabilityKeys, "variant"]);
 const planKinds = new Set(["Subscription", "BYOK client", "Pay as you go"]);
@@ -223,6 +223,19 @@ function collectModelErrors(model: unknown, indexLabel: string): string[] {
     }
   }
 
+  // A published output ceiling is independent of the context window, so it is
+  // validated on its own and must fit inside the window it is drawn from.
+  if ("maxOutputTokens" in model && model.maxOutputTokens !== undefined) {
+    if (!Number.isInteger(model.maxOutputTokens) || (model.maxOutputTokens as number) <= 0) {
+      errors.push(`${location}.maxOutputTokens must be a positive integer token count when provided.`);
+    } else if (
+      Number.isInteger(model.contextTokens)
+      && (model.maxOutputTokens as number) > (model.contextTokens as number)
+    ) {
+      errors.push(`${location}.maxOutputTokens cannot exceed contextTokens.`);
+    }
+  }
+
   // unsupportedBeyond marks the input token limit for which rates are verified.
   // Beyond it, pricing is unsupported (F6).
   if ("unsupportedBeyond" in model && model.unsupportedBeyond !== undefined) {
@@ -393,7 +406,7 @@ function metricValue(model: Model | undefined, metric: string): number | null {
 // scenario's work. The CLI used to check the score only, so its qualifying
 // counts could disagree with the UI's.
 export function eligibleModels(dataset: ModelCatalogDoc, scenario: Scenario): Model[] {
-  return dataset.models.filter((model) => gateModel(model, scenario, scenarioTokens(scenario)) === null);
+  return dataset.models.filter((model) => gateModel(model, scenario, scenarioTokens(scenario), scenario.output) === null);
 }
 
 export function validateScenarios(scenarios: unknown, dataset: ModelCatalogDoc): ScenarioCatalogDoc {

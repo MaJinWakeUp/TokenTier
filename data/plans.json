@@ -390,8 +390,9 @@
       "apiIncluded": "Editor pool",
       "includedApiValue": 20,
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-09-03",
+      "verifiedAt": "2026-09-22",
       "modelIds": [
+        "grok-4-7",
         "grok-4-6",
         "grok-4-5",
         "claude-fable-5-1",
@@ -431,8 +432,9 @@
       "apiIncluded": "Editor pool",
       "includedApiValue": 70,
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-09-03",
+      "verifiedAt": "2026-09-22",
       "modelIds": [
+        "grok-4-7",
         "grok-4-6",
         "grok-4-5",
         "claude-fable-5-1",
@@ -472,8 +474,9 @@
       "apiIncluded": "Editor pool",
       "includedApiValue": 400,
       "cacheRatio": 0.45,
-      "verifiedAt": "2026-09-03",
+      "verifiedAt": "2026-09-22",
       "modelIds": [
+        "grok-4-7",
         "grok-4-6",
         "grok-4-5",
         "claude-fable-5-1",

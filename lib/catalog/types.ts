@@ -117,6 +117,10 @@ export type Model = {
   // When the workload's input exceeds this, callCost returns NaN to signal
   // unsupported pricing rather than silently using the base rate (F6).
   unsupportedBeyond?: number;
+  // Maximum tokens the model can produce in one response. Independent of the
+  // context window: a 1M-token window with a 64K output ceiling cannot answer a
+  // request for 100K of output. Absent means no published ceiling.
+  maxOutputTokens?: number;
 };
 
 export type Plan = {

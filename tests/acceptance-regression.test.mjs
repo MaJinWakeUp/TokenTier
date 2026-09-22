@@ -219,7 +219,7 @@ test("AC3: modelPlacements curves the board and puts the cheapest in S", () => {
   // Find the cheapest model and verify it's S.
   const settings = { input: scenario.input, output: scenario.output, cacheRatio: scenario.cacheRatio };
   const costs = dataset.models
-    .filter((m) => gateModel(m, scenario, scenarioTokens(scenario)) === null)
+    .filter((m) => gateModel(m, scenario, scenarioTokens(scenario), scenario.output) === null)
     .map((m) => ({ id: m.id, cost: callCost(m, settings) }))
     .filter((c) => Number.isFinite(c.cost))
     .sort((a, b) => a.cost - b.cost || a.id.localeCompare(b.id));
