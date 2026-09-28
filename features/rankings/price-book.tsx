@@ -388,7 +388,7 @@ export function PriceBook({
                     </td>
                     {planColumns.type && <td><span className="kind-pill">{plan.kind}</span></td>}
                     {planColumns.price && <td><strong>{planPrice(plan)}</strong>{plan.kind === "Subscription" && <small className="per-month"> / mo</small>}</td>}
-                    {planColumns.quota && <td className="wrap-cell">{planQuota(plan, scenarioId)}</td>}
+                    {planColumns.quota && <td className="wrap-cell">{planQuota(plan, workingModel)}</td>}
                     {planColumns.apiIncluded && <td>{plan.apiIncluded}</td>}
                     {planColumns.equivalent && (
                       <td>

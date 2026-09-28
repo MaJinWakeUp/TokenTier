@@ -217,7 +217,7 @@ export function BestPath({
                   <dd>{planCalls}</dd>
                 </div>
                 <div><dt>Model used</dt><dd>{planBest?.workingModel?.name ?? "None that clears the bar"}</dd></div>
-                <div><dt>Published quota</dt><dd>{planQuota(decision.plan, workload.scenarioId)}</dd></div>
+                <div><dt>Published quota</dt><dd>{planQuota(decision.plan, planBest?.workingModel ?? null)}</dd></div>
                 <div><dt>Confidence</dt><dd>{decision.plan.confidence} · {estimate.basis.label}</dd></div>
               </dl>
               {(decision.plan.confidence === "Low" || estimate.basis.kind === "break-even") && (

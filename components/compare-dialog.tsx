@@ -80,7 +80,7 @@ function useCompareRows(items: Array<Model | Plan>, context: InspectionContext):
           label: `Model used (${scenario.label.toLowerCase()})`,
           render: (item) => working(item)?.name ?? <span className="muted-dash">None clears the bar</span>,
         },
-        { label: "Published quota", render: (item) => planQuota(item as Plan, scenarioId) },
+        { label: "Published quota", render: (item) => planQuota(item as Plan, working(item)) },
         { label: "API included?", render: (item) => (item as Plan).apiIncluded },
         {
           label: `Equivalent calls (${scenario.label.toLowerCase()})`,

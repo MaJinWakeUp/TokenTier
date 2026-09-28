@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "updatedAt": "2026-09-22",
+  "updatedAt": "2026-09-28",
   "currency": "USD",
   "unit": "per-million-tokens",
   "capabilityIndex": {
@@ -574,6 +574,75 @@
         "verifiedAt": "2026-09-22"
       },
       "maxOutputTokens": 64000
+    },
+    {
+      "id": "claude-opus-5-5",
+      "provider": "Anthropic",
+      "name": "Claude Opus 5.5",
+      "input": 4,
+      "cached": 0.2,
+      "output": 20,
+      "context": "1M",
+      "contextTokens": 1000000,
+      "maxOutputTokens": 128000,
+      "source": "https://claude.com/pricing",
+      "verifiedAt": "2026-09-28",
+      "note": "Succeeds Opus 5 at a lower price. Cache reads are 0.05x input rather than Anthropic's usual 0.1x. The full 1M window is billed at standard rates; fast mode ($8 / $40) is a separate premium tier, not the headline rate.",
+      "capability": {
+        "metrics": {
+          "intelligence": 58
+        },
+        "indexVersion": "4.3.2",
+        "variant": "max",
+        "source": "https://artificialanalysis.ai/models/claude-opus-5-5",
+        "verifiedAt": "2026-09-28"
+      }
+    },
+    {
+      "id": "gpt-6-sol",
+      "provider": "OpenAI",
+      "name": "GPT-6 Sol",
+      "input": 2,
+      "cached": 0.2,
+      "output": 10,
+      "context": "1.05M",
+      "contextTokens": 1050000,
+      "maxOutputTokens": 128000,
+      "source": "https://developers.openai.com/api/docs/models/compare",
+      "verifiedAt": "2026-09-28",
+      "note": "GPT-6 mid tier, built for complex coding and agentic work. Half GPT-5.6 Sol's price. Maximum output is 128K tokens.",
+      "capability": {
+        "metrics": {
+          "intelligence": 48
+        },
+        "indexVersion": "4.3.2",
+        "variant": "max",
+        "source": "https://artificialanalysis.ai/models/gpt-6-sol",
+        "verifiedAt": "2026-09-28"
+      }
+    },
+    {
+      "id": "gpt-6-luna",
+      "provider": "OpenAI",
+      "name": "GPT-6 Luna",
+      "input": 0.1,
+      "cached": 0.01,
+      "output": 0.5,
+      "context": "1.05M",
+      "contextTokens": 1050000,
+      "maxOutputTokens": 128000,
+      "source": "https://developers.openai.com/api/docs/models/compare",
+      "verifiedAt": "2026-09-28",
+      "note": "OpenAI's most efficient GPT-6 model, for focused, high-volume tasks. Maximum output is 128K tokens.",
+      "capability": {
+        "metrics": {
+          "intelligence": 37
+        },
+        "indexVersion": "4.3.2",
+        "variant": "max",
+        "source": "https://artificialanalysis.ai/models/gpt-6-luna",
+        "verifiedAt": "2026-09-28"
+      }
     }
   ]
 }
