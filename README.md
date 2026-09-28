@@ -228,6 +228,70 @@ date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
 
+## Catalog changes, September 28 2026
+
+Three model additions: Anthropic's Claude Opus 5.5, and OpenAI's GPT-6 Sol and
+GPT-6 Luna, which fill in the GPT-6 line under Astra. All three are published
+under Intelligence Index **v4.3.2**, so no rebase was needed, and no scenario bar
+moved because no anchor's score moved.
+
+### Added: Claude Opus 5.5, GPT-6 Sol and GPT-6 Luna
+
+| | Claude Opus 5.5 | GPT-6 Sol | GPT-6 Luna |
+| --- | --- | --- | --- |
+| Provider | Anthropic | OpenAI | OpenAI |
+| Input / cached / output | $4 / $0.20 / $20 | $2 / $0.20 / $10 | $0.10 / $0.01 / $0.50 |
+| Context | 1M, 128K maximum output | 1.05M, 128K maximum output | 1.05M, 128K maximum output |
+| Index v4.3.2 | **58** (max) | 48 (max) | 37 (max) |
+
+Each is cheaper than the model it sits beside. Opus 5.5 undercuts Opus 5 ($5 /
+$25) and scores seven points higher, which makes it the highest-scoring model in
+the catalog. Its cache reads are billed at 0.05x input rather than Anthropic's
+usual 0.1x. Fast mode ($8 / $40) goes in the note and not in the headline rates,
+because a surcharge tier never sets the number on the board. GPT-6 Sol costs half
+what GPT-5.6 Sol does and scores one point higher. GPT-6 Luna matches GPT-5.6
+Luna's 37 at half the input price and less than half the output price.
+
+### Rosters
+
+- **ChatGPT Plus, Pro (5x) and Pro (20x)** gain GPT-6 Sol and GPT-6 Luna. The
+  plan's usage table now lists per-tier message ranges for both.
+- **Claude Max (5x) and (20x)** gain Opus 5.5 next to Opus 5. Claude Pro stays
+  Sonnet-only: the pricing table says Opus is on every paid plan but doesn't
+  name a version, and adding Opus to Pro would be a separate call that puts Pro
+  on the frontier boards for the first time.
+- **Cursor Pro, Pro Plus and Ultra** gain Opus 5.5, which appears on Cursor's
+  model list. Cursor doesn't list GPT-6 yet (it still lists GPT-5.6), so those
+  models were not added.
+- **OpenCode Go** gains GPT-6 Luna, which its model list now includes. GPT-6 Sol
+  is not on that list.
+
+### What it did to the board
+
+On the model boards, GPT-6 Luna takes **S on daily use, easy coding and paper
+writing**, the three lanes whose bars it clears. That pushes Step 5 Preview from
+S to A on all three, Qwen3.8-Max from A to B on daily use and writing, and
+Gemini 3.8 Flash from A to B on easy coding. GPT-6 Sol enters at **B** on medium
+coding and on the three lanes with a bar of 45 (hard coding, research and
+innovation). On those three lanes Opus 5.5 also enters at B, GPT-5.6 Sol falls
+from B to C, and Claude Fable 5.1 falls from C to D. Opus 5.5's 58 gives it the most
+headroom, but tiers are decided by cost rank among qualifying models, so it does
+not reach the top. On medium coding GPT-5.6 Terra rises from C to B, because the
+curve is recut over a larger population.
+
+No plan changed tier letter. Several changed their working model:
+
+- ChatGPT Plus and Pro are now judged via **GPT-6 Sol** on medium and hard
+  coding, research and innovation, replacing GPT-5.6 Terra or Sol. On daily use,
+  easy coding and writing they are judged via **GPT-6 Luna**, replacing GPT-5.6
+  Luna.
+- Claude Max (5x) and (20x) are now judged via **Opus 5.5** wherever they were
+  judged via Opus 5.
+- OpenCode Go is now judged via **GPT-6 Luna** on daily use, easy coding and
+  writing, replacing GLM-5.3-Flash. It stays at S.
+- Cursor's plans don't move. Grok 4.7 is still the cheapest model on the roster
+  that clears each bar.
+
 ## Catalog changes, September 22 2026
 
 Two model additions that required a catalog-wide index rebase first, and Meta's

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-09-22",
+  "updatedAt": "2026-09-28",
   "currency": "USD",
   "plans": [
     {
@@ -16,12 +16,14 @@
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.25,
-      "verifiedAt": "2026-09-09",
+      "verifiedAt": "2026-09-28",
       "modelIds": [
         "gpt-5-6-luna",
         "gpt-5-6-terra",
         "gpt-5-6-sol",
-        "gpt-6-astra"
+        "gpt-6-astra",
+        "gpt-6-luna",
+        "gpt-6-sol"
       ],
       "access": [
         "chat-app"
@@ -46,12 +48,14 @@
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.35,
-      "verifiedAt": "2026-09-09",
+      "verifiedAt": "2026-09-28",
       "modelIds": [
         "gpt-5-6-luna",
         "gpt-5-6-terra",
         "gpt-5-6-sol",
-        "gpt-6-astra"
+        "gpt-6-astra",
+        "gpt-6-luna",
+        "gpt-6-sol"
       ],
       "access": [
         "chat-app"
@@ -76,12 +80,14 @@
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-09-09",
+      "verifiedAt": "2026-09-28",
       "modelIds": [
         "gpt-5-6-luna",
         "gpt-5-6-terra",
         "gpt-5-6-sol",
-        "gpt-6-astra"
+        "gpt-6-astra",
+        "gpt-6-luna",
+        "gpt-6-sol"
       ],
       "access": [
         "chat-app"
@@ -137,9 +143,10 @@
       "apiIncluded": "Optional",
       "includedApiValue": 100,
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-08-21",
+      "verifiedAt": "2026-09-28",
       "modelIds": [
-        "claude-opus-5"
+        "claude-opus-5",
+        "claude-opus-5-5"
       ],
       "access": [
         "chat-app",
@@ -166,9 +173,10 @@
       "apiIncluded": "Optional",
       "includedApiValue": 200,
       "cacheRatio": 0.45,
-      "verifiedAt": "2026-08-21",
+      "verifiedAt": "2026-09-28",
       "modelIds": [
-        "claude-opus-5"
+        "claude-opus-5",
+        "claude-opus-5-5"
       ],
       "access": [
         "chat-app",
@@ -390,7 +398,7 @@
       "apiIncluded": "Editor pool",
       "includedApiValue": 20,
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-09-22",
+      "verifiedAt": "2026-09-28",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -405,7 +413,8 @@
         "kimi-k2-7-code",
         "gpt-5-6-luna",
         "gpt-5-6-terra",
-        "gpt-5-6-sol"
+        "gpt-5-6-sol",
+        "claude-opus-5-5"
       ],
       "access": [
         "coding-client"
@@ -432,7 +441,7 @@
       "apiIncluded": "Editor pool",
       "includedApiValue": 70,
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-09-22",
+      "verifiedAt": "2026-09-28",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -447,7 +456,8 @@
         "kimi-k2-7-code",
         "gpt-5-6-luna",
         "gpt-5-6-terra",
-        "gpt-5-6-sol"
+        "gpt-5-6-sol",
+        "claude-opus-5-5"
       ],
       "access": [
         "coding-client"
@@ -474,7 +484,7 @@
       "apiIncluded": "Editor pool",
       "includedApiValue": 400,
       "cacheRatio": 0.45,
-      "verifiedAt": "2026-09-22",
+      "verifiedAt": "2026-09-28",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -489,7 +499,8 @@
         "kimi-k2-7-code",
         "gpt-5-6-luna",
         "gpt-5-6-terra",
-        "gpt-5-6-sol"
+        "gpt-5-6-sol",
+        "claude-opus-5-5"
       ],
       "access": [
         "coding-client"
@@ -515,7 +526,7 @@
       "confidence": "High",
       "apiIncluded": "Yes",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-09-03",
+      "verifiedAt": "2026-09-28",
       "includedApiValue": 60,
       "modelIds": [
         "grok-4-6",
@@ -526,7 +537,8 @@
         "kimi-k2-7-code",
         "qwen-3-8-max",
         "deepseek-v4-pro",
-        "deepseek-v4-1-flash"
+        "deepseek-v4-1-flash",
+        "gpt-6-luna"
       ],
       "access": [
         "coding-client",
