@@ -124,7 +124,7 @@ export function ItemDetailsModal({
                 </div>
                 <div className="spec-box"><small>API Included?</small><strong>{item.apiIncluded}</strong></div>
                 <div className="spec-box"><small>Access surfaces</small><strong>{(item.access ?? []).join(", ") || "Not classified"}</strong></div>
-                <div className="spec-box full-span"><small>Published Quota / Rule</small><strong>{planQuota(item, context.scenarioId)}</strong></div>
+                <div className="spec-box full-span"><small>Published Quota / Rule</small><strong>{planQuota(item, planWorkingModel(item, scenario, context.settings, modelById))}</strong></div>
               </div>
             )}
 

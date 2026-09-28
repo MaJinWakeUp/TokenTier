@@ -320,7 +320,7 @@ test("the catalog stays in validated data files", async () => {
     assert.ok(entry.calls > 0 && entry.cacheRatio >= 0, `${entry.id} carries a call count and cache share`);
   }
 
-  assert.match(formatLib, /function planQuota[\s\S]*?if \(plan\.id === "chatgpt-go"\) return plan\.quota;[\s\S]*?const modelClass/);
+  assert.match(formatLib, /function planQuota\(plan: Plan, workingModel: Model \| null\)[\s\S]*?if \(plan\.id === "chatgpt-go"\) return plan\.quota;[\s\S]*?chatgptMessageRanges\[plan\.id\]\?\.\[workingModel\.id\]/);
   assert.match(formatLib, /function monthlyPrice\(value: number\)/);
   assert.match(catalogIndex, /api-models\.json/);
   assert.match(catalogIndex, /const defaultScenario = scenarioFor\("code-medium"\)/);

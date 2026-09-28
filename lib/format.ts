@@ -1,6 +1,6 @@
 // Money, token, and label formatting shared by every view. Pure functions.
 
-import type { MetricKey, Plan, Scenario, ScenarioId, Tier } from "./catalog/types.js";
+import type { MetricKey, Model, Plan, Scenario, Tier } from "./catalog/types.js";
 import type { Placement, PlanCapacity } from "./domain/placement.js";
 import { scenarioTokens } from "./domain/eligibility.js";
 
@@ -92,21 +92,29 @@ export function planPrice(plan: Plan) {
   return `$${plan.monthly}`;
 }
 
-export function planQuota(plan: Plan, scenarioId: ScenarioId) {
+// Published ChatGPT local-message ranges per 5 hours, by model. The range shown
+// is the one for the model the plan is judged on in this scenario, so the quota
+// always describes the same model the card names.
+const chatgptMessageRanges: Record<string, Record<string, string>> = {
+  "chatgpt-plus": {
+    "gpt-6-astra": "5–45", "gpt-6-sol": "15–150", "gpt-6-luna": "350–3,000",
+    "gpt-5-6-sol": "10–100", "gpt-5-6-terra": "25–200", "gpt-5-6-luna": "250–2,000",
+  },
+  "chatgpt-pro-5x": {
+    "gpt-6-astra": "25–225", "gpt-6-sol": "70–700", "gpt-6-luna": "1,750–14,000",
+    "gpt-5-6-sol": "50–500", "gpt-5-6-terra": "125–1,000", "gpt-5-6-luna": "1,250–10,000",
+  },
+  "chatgpt-pro-20x": {
+    "gpt-6-astra": "100–900", "gpt-6-sol": "300–3,000", "gpt-6-luna": "7,000–56,000",
+    "gpt-5-6-sol": "200–2,000", "gpt-5-6-terra": "500–4,000", "gpt-5-6-luna": "5,000–40,000",
+  },
+};
+
+export function planQuota(plan: Plan, workingModel: Model | null) {
   if (plan.id === "chatgpt-go") return plan.quota;
-  if (!plan.id.startsWith("chatgpt-")) return plan.quota;
-  const modelClass = ["daily", "code-easy"].includes(scenarioId)
-    ? "Luna"
-    : ["code-medium", "innovation"].includes(scenarioId)
-      ? "Terra"
-      : "Sol";
-  const ranges = {
-    "chatgpt-plus": { Luna: "250–2,000", Terra: "25–200", Sol: "10–100" },
-    "chatgpt-pro-5x": { Luna: "1,250–10,000", Terra: "125–1,000", Sol: "50–500" },
-    "chatgpt-pro-20x": { Luna: "5,000–40,000", Terra: "500–4,000", Sol: "200–2,000" },
-  } as const;
-  const range = ranges[plan.id as keyof typeof ranges]?.[modelClass];
-  return range ? `${range} ${modelClass} local messages / 5h` : plan.quota;
+  if (!workingModel) return plan.quota;
+  const range = chatgptMessageRanges[plan.id]?.[workingModel.id];
+  return range ? `${range} ${workingModel.name} local messages / 5h` : plan.quota;
 }
 
 // A plan on the board has cleared the capability bar and is ranked on price.

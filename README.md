@@ -266,6 +266,13 @@ Luna's 37 at half the input price and less than half the output price.
 - **OpenCode Go** gains GPT-6 Luna, which its model list now includes. GPT-6 Sol
   is not on that list.
 
+ChatGPT plans don't publish one quota. They publish a range of local messages
+per five hours for each model. The quota shown for a ChatGPT plan used to be
+chosen by scenario, so medium coding showed a GPT-5.6 Terra range next to "via
+GPT-6 Sol". It is now chosen by the plan's working model, with the published
+ranges for all six GPT-5.6 and GPT-6 models, so the quota always describes the
+model the card names.
+
 ### What it did to the board
 
 On the model boards, GPT-6 Luna takes **S on daily use, easy coding and paper
