@@ -12,7 +12,8 @@ import {
 } from "../scripts/update-models.mjs";
 import { callCost, planEstimate, planCoverageScore } from "../build/lib/domain/pricing.js";
 import { gateModel } from "../build/lib/domain/eligibility.js";
-import { price, monthlyPrice, monthlyPriceAgainst, unsupportedPriceLabel } from "../build/lib/format.js";
+import { planWorkingModel } from "../build/lib/domain/placement.js";
+import { price, monthlyPrice, monthlyPriceAgainst, planQuota, unsupportedPriceLabel } from "../build/lib/format.js";
 import { recommend, costTiers } from "../build/lib/domain/recommend.js";
 import { readFileSync } from "node:fs";
 
@@ -744,5 +745,23 @@ test("PR8: each feature migrates its own legacy data", () => {
       new RegExp(`migrateLegacyOnce\\("${feature}", storageKeys\\.${feature}`),
       `${feature} migrates under its own marker`,
     );
+  }
+});
+
+// A ChatGPT plan's quota must describe the model its card names. The published
+// message ranges are per model, so a range for any other model, or wording
+// about a model no longer on the roster, contradicts the "via" label.
+test("ChatGPT quotas never describe a model other than the working model", () => {
+  const modelNames = dataset.models.filter((m) => m.provider === "OpenAI").map((m) => m.name);
+  for (const plan of planDoc.plans.filter((p) => p.provider === "OpenAI")) {
+    for (const scenario of scenarioDoc.scenarios) {
+      const working = planWorkingModel(plan, scenario, scenario, modelById);
+      const quota = planQuota(plan, working);
+      for (const name of modelNames) {
+        if (name === working?.name) continue;
+        assert.ok(!quota.includes(name), `${plan.id} on ${scenario.id} is judged via ${working?.name} but its quota mentions ${name}: ${quota}`);
+      }
+      if (/Pro/.test(plan.name)) assert.match(quota, /No five-hour limit/, `${plan.id} reflects Pro's published no-five-hour-limit terms`);
+    }
   }
 });
