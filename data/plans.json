@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-09-28",
+  "updatedAt": "2026-09-30",
   "currency": "USD",
   "plans": [
     {
@@ -16,14 +16,15 @@
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.25,
-      "verifiedAt": "2026-09-28",
+      "verifiedAt": "2026-09-30",
       "modelIds": [
         "gpt-5-6-luna",
         "gpt-5-6-terra",
         "gpt-5-6-sol",
         "gpt-6-astra",
         "gpt-6-luna",
-        "gpt-6-sol"
+        "gpt-6-sol",
+        "gpt-6-1-sol"
       ],
       "access": [
         "chat-app"
@@ -48,14 +49,15 @@
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.35,
-      "verifiedAt": "2026-09-28",
+      "verifiedAt": "2026-09-30",
       "modelIds": [
         "gpt-5-6-luna",
         "gpt-5-6-terra",
         "gpt-5-6-sol",
         "gpt-6-astra",
         "gpt-6-luna",
-        "gpt-6-sol"
+        "gpt-6-sol",
+        "gpt-6-1-sol"
       ],
       "access": [
         "chat-app"
@@ -80,14 +82,15 @@
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-09-28",
+      "verifiedAt": "2026-09-30",
       "modelIds": [
         "gpt-5-6-luna",
         "gpt-5-6-terra",
         "gpt-5-6-sol",
         "gpt-6-astra",
         "gpt-6-luna",
-        "gpt-6-sol"
+        "gpt-6-sol",
+        "gpt-6-1-sol"
       ],
       "access": [
         "chat-app"

@@ -228,6 +228,44 @@ date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
 
+## Catalog changes, September 30 2026
+
+### Added: GPT-6.1 Sol
+
+| | GPT-6.1 Sol |
+| --- | --- |
+| Provider | OpenAI |
+| Input / cached / output | $2 / $0.10 / $10 |
+| Context | 1.05M, 128K maximum output |
+| Index v4.3.2 | 52 (max) |
+
+GPT-6.1 Sol is OpenAI's newer Sol model. It has GPT-6 Sol's input and output
+rates, half its cached rate, and scores four points higher. OpenAI's own GPT-6
+Sol page points to it as the newer model but does not deprecate GPT-6 Sol, so
+both stay in the catalog.
+
+It joins the ChatGPT Plus and Pro rosters, and becomes the working model for all
+three ChatGPT plans wherever GPT-6 Sol was: medium coding, hard coding, research
+and innovation. No plan changes tier letter. Plus's quota on those lanes now
+reads 15–160 GPT-6.1 Sol local messages per five hours, the range OpenAI
+publishes. Cursor and OpenCode Go do not list it.
+
+On the model boards it enters at **A** on hard coding, research and innovation,
+and at **B** on the other four lanes. Adding a model recuts every curve, so
+several neighbours moved up a letter: Qwen3.8-Max rises to S on the three 45
+lanes and to A on daily use and writing; Step 5 Preview returns to S on daily
+use, easy coding and writing; Gemini 3.8 Flash rises to A on easy coding and
+Grok 4.5 to A on medium coding. GPT-5.6 Terra falls from B to C on medium coding.
+
+### Open: ChatGPT Pro has changed shape
+
+OpenAI's pricing page changed between September 28 and September 30. Pro is now
+sold at $100, $200 and $500 a month, Pro plans "currently have no five-hour
+limit", and the Plus message table no longer lists the GPT-5.6 models. The Pro
+(5x) and (20x) records and the Pro message ranges in `lib/format.ts` still
+describe the earlier page. They need a separate pass, not a patch inside a model
+addition.
+
 ## Catalog changes, September 28 2026
 
 Three model additions: Anthropic's Claude Opus 5.5, and OpenAI's GPT-6 Sol and

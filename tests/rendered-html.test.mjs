@@ -262,7 +262,7 @@ test("the catalog stays in validated data files", async () => {
   // Luna joined the plan's published rate table in September 2026.
   assert.deepEqual(
     planById.get("chatgpt-plus").modelIds,
-    ["gpt-5-6-luna", "gpt-5-6-terra", "gpt-5-6-sol", "gpt-6-astra", "gpt-6-luna", "gpt-6-sol"],
+    ["gpt-5-6-luna", "gpt-5-6-terra", "gpt-5-6-sol", "gpt-6-astra", "gpt-6-luna", "gpt-6-sol", "gpt-6-1-sol"],
   );
   for (const id of ["chatgpt-plus", "chatgpt-pro-5x", "chatgpt-pro-20x"]) {
     assert.ok(planById.get(id).modelIds.includes("gpt-6-astra"), `${id} reaches GPT-6 Astra`);
@@ -271,7 +271,7 @@ test("the catalog stays in validated data files", async () => {
   // that subscription's roster. A model listed by no plan at all is only correct
   // when no subscription in the catalog sells access to it.
   const rosterIds = new Set(planCatalog.plans.flatMap((entry) => entry.modelIds));
-  for (const id of ["gpt-6-astra", "gpt-6-sol", "gpt-6-luna", "gpt-5-6-sol", "claude-opus-5", "claude-opus-5-5", "glm-5-3"]) {
+  for (const id of ["gpt-6-astra", "gpt-6-1-sol", "gpt-6-sol", "gpt-6-luna", "gpt-5-6-sol", "claude-opus-5", "claude-opus-5-5", "glm-5-3"]) {
     assert.ok(rosterIds.has(id), `${id} is offered by at least one plan`);
   }
   assert.deepEqual(planById.get("glm-coding-lite").modelIds, ["glm-5-3", "glm-5-3-flash"]);
