@@ -257,14 +257,35 @@ lanes and to A on daily use and writing; Step 5 Preview returns to S on daily
 use, easy coding and writing; Gemini 3.8 Flash rises to A on easy coding and
 Grok 4.5 to A on medium coding. GPT-5.6 Terra falls from B to C on medium coding.
 
-### Open: ChatGPT Pro has changed shape
+### ChatGPT Plus and Pro, re-read from OpenAI's page
 
-OpenAI's pricing page changed between September 28 and September 30. Pro is now
-sold at $100, $200 and $500 a month, Pro plans "currently have no five-hour
-limit", and the Plus message table no longer lists the GPT-5.6 models. The Pro
-(5x) and (20x) records and the Pro message ranges in `lib/format.ts` still
-describe the earlier page. They need a separate pass, not a patch inside a model
-addition.
+OpenAI's pricing page changed between September 28 and September 30, and the
+ChatGPT records now follow the new page.
+
+- **Pro is sold by price, not by multiplier.** The tiers are $100, $200 and
+  $500 a month, and the page no longer says how much more usage each gives than
+  Plus. The two existing records are renamed **ChatGPT Pro ($100)** and **($200)**,
+  and **ChatGPT Pro ($500)** is new. It adds GPT-6 Astra Ultrafast, which draws
+  included usage at 8x the Standard rate. The first two keep their old ids
+  (`chatgpt-pro-5x`, `chatgpt-pro-20x`) so that saved personal tier lists don't
+  turn their cards into retired ones. The ids are join keys, not labels.
+- **Pro's quota is honest about being unknown.** The page says Pro plans
+  "currently have no five-hour limit" and that weekly limits may apply, but
+  publishes no weekly figure. All three Pro records now carry
+  `quotaDetail.kind: "unknown"` with Low confidence, and their cards read
+  *unproven*. The Pro message ranges that `lib/format.ts` showed are removed,
+  because they described limits that no longer exist.
+- **The rosters are the four GPT-6 models.** The page lists GPT-6 Astra,
+  GPT-6.1 Sol, GPT-6 Sol and GPT-6 Luna for Plus and Pro. GPT-5.6 Sol, Terra and
+  Luna appear only in the legacy credit table, so they leave the ChatGPT rosters.
+  They stay in the catalog, because Cursor still offers all three.
+- **Plus keeps its published ranges.** They now cover exactly the four GPT-6
+  models.
+
+No tier letter moved. Every GPT-5.6 model had already been displaced as a
+working model by a cheaper GPT-6 one. Pro ($500) costs more than every board's
+price cap, so it is listed in the price book and off every board, the same
+treatment SuperGrok Heavy gets.
 
 ## Catalog changes, September 28 2026
 
