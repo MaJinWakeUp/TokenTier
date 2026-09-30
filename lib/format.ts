@@ -94,19 +94,11 @@ export function planPrice(plan: Plan) {
 
 // Published ChatGPT local-message ranges per 5 hours, by model. The range shown
 // is the one for the model the plan is judged on in this scenario, so the quota
-// always describes the same model the card names.
+// always describes the same model the card names. OpenAI publishes these for
+// Plus only; Pro plans have no five-hour limit and fall back to the plan quota.
 const chatgptMessageRanges: Record<string, Record<string, string>> = {
   "chatgpt-plus": {
-    "gpt-6-astra": "5–45", "gpt-6-sol": "15–150", "gpt-6-luna": "350–3,000",
-    "gpt-5-6-sol": "10–100", "gpt-5-6-terra": "25–200", "gpt-5-6-luna": "250–2,000",
-  },
-  "chatgpt-pro-5x": {
-    "gpt-6-astra": "25–225", "gpt-6-sol": "70–700", "gpt-6-luna": "1,750–14,000",
-    "gpt-5-6-sol": "50–500", "gpt-5-6-terra": "125–1,000", "gpt-5-6-luna": "1,250–10,000",
-  },
-  "chatgpt-pro-20x": {
-    "gpt-6-astra": "100–900", "gpt-6-sol": "300–3,000", "gpt-6-luna": "7,000–56,000",
-    "gpt-5-6-sol": "200–2,000", "gpt-5-6-terra": "500–4,000", "gpt-5-6-luna": "5,000–40,000",
+    "gpt-6-astra": "5–45", "gpt-6-1-sol": "15–160", "gpt-6-sol": "15–150", "gpt-6-luna": "350–3,000",
   },
 };
 

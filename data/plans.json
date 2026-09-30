@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-09-28",
+  "updatedAt": "2026-09-30",
   "currency": "USD",
   "plans": [
     {
@@ -10,93 +10,116 @@
       "kind": "Subscription",
       "monthly": 20,
       "source": "https://learn.chatgpt.com/docs/pricing",
-      "note": "Covers standard ChatGPT interface access; API platform usage is billed separately. On Plus, Astra is reachable through Work and Codex rather than the standard chat picker, within the existing allowance.",
-      "quota": "Rolling 5-hour limit across GPT-5.6 Terra and Luna",
+      "note": "Covers ChatGPT, Work and Codex; API platform usage is billed separately. OpenAI publishes a per-model range of local messages per five hours, and weekly limits may also apply.",
+      "quota": "Per-model local-message ranges per five hours; weekly limits may also apply",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.25,
-      "verifiedAt": "2026-09-28",
+      "verifiedAt": "2026-09-30",
       "modelIds": [
-        "gpt-5-6-luna",
-        "gpt-5-6-terra",
-        "gpt-5-6-sol",
-        "gpt-6-astra",
         "gpt-6-luna",
-        "gpt-6-sol"
+        "gpt-6-sol",
+        "gpt-6-1-sol",
+        "gpt-6-astra"
       ],
       "access": [
         "chat-app"
       ],
       "quotaDetail": {
         "kind": "relative-limit",
-        "description": "Rolling 5-hour limit across GPT-5.6 Terra and Luna",
+        "description": "Per-model local-message ranges per five hours; weekly limits may also apply",
         "source": "https://learn.chatgpt.com/docs/pricing",
-        "verifiedAt": "2026-09-03"
+        "verifiedAt": "2026-09-30"
       }
     },
     {
       "id": "chatgpt-pro-5x",
       "provider": "OpenAI",
-      "name": "ChatGPT Pro (5x)",
+      "name": "ChatGPT Pro ($100)",
       "kind": "Subscription",
       "monthly": 100,
       "source": "https://learn.chatgpt.com/docs/pricing",
-      "note": "Higher allowances and prioritised access during peak times. Includes GPT-6 Astra within the plan's rolling allowances.",
-      "quota": "5x standard rolling allowances plus GPT-5.6 Sol access",
+      "note": "Everything in Plus, with no five-hour limit. OpenAI no longer publishes how much more usage Pro gives than Plus, so capacity cannot be converted to calls.",
+      "quota": "No five-hour limit; weekly limits may apply and are not published",
       "evidence": "Official relative limit",
-      "confidence": "Medium",
+      "confidence": "Low",
       "apiIncluded": "No",
       "cacheRatio": 0.35,
-      "verifiedAt": "2026-09-28",
+      "verifiedAt": "2026-09-30",
       "modelIds": [
-        "gpt-5-6-luna",
-        "gpt-5-6-terra",
-        "gpt-5-6-sol",
-        "gpt-6-astra",
         "gpt-6-luna",
-        "gpt-6-sol"
+        "gpt-6-sol",
+        "gpt-6-1-sol",
+        "gpt-6-astra"
       ],
       "access": [
         "chat-app"
       ],
       "quotaDetail": {
-        "kind": "relative-limit",
-        "description": "5x standard rolling allowances plus GPT-5.6 Sol access",
+        "kind": "unknown",
+        "description": "No five-hour limit; weekly limits may apply and are not published",
         "source": "https://learn.chatgpt.com/docs/pricing",
-        "verifiedAt": "2026-09-03"
+        "verifiedAt": "2026-09-30"
       }
     },
     {
       "id": "chatgpt-pro-20x",
       "provider": "OpenAI",
-      "name": "ChatGPT Pro (20x)",
+      "name": "ChatGPT Pro ($200)",
       "kind": "Subscription",
       "monthly": 200,
       "source": "https://learn.chatgpt.com/docs/pricing",
-      "note": "Maximum rolling allowances and prioritised throughput for heavy users. Includes GPT-6 Astra within the plan's rolling allowances.",
-      "quota": "20x standard rolling allowances and continuous Sol access",
+      "note": "Everything in Plus, with no five-hour limit. OpenAI no longer publishes how much more usage Pro gives than Plus, so capacity cannot be converted to calls.",
+      "quota": "No five-hour limit; weekly limits may apply and are not published",
       "evidence": "Official relative limit",
-      "confidence": "Medium",
+      "confidence": "Low",
       "apiIncluded": "No",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-09-28",
+      "verifiedAt": "2026-09-30",
       "modelIds": [
-        "gpt-5-6-luna",
-        "gpt-5-6-terra",
-        "gpt-5-6-sol",
-        "gpt-6-astra",
         "gpt-6-luna",
-        "gpt-6-sol"
+        "gpt-6-sol",
+        "gpt-6-1-sol",
+        "gpt-6-astra"
       ],
       "access": [
         "chat-app"
       ],
       "quotaDetail": {
-        "kind": "relative-limit",
-        "description": "20x standard rolling allowances and continuous Sol access",
+        "kind": "unknown",
+        "description": "No five-hour limit; weekly limits may apply and are not published",
         "source": "https://learn.chatgpt.com/docs/pricing",
-        "verifiedAt": "2026-09-03"
+        "verifiedAt": "2026-09-30"
+      }
+    },
+    {
+      "id": "chatgpt-pro-500",
+      "provider": "OpenAI",
+      "name": "ChatGPT Pro ($500)",
+      "kind": "Subscription",
+      "monthly": 500,
+      "source": "https://learn.chatgpt.com/docs/pricing",
+      "note": "Everything in Plus, with no five-hour limit. OpenAI no longer publishes how much more usage Pro gives than Plus, so capacity cannot be converted to calls. Adds GPT-6 Astra Ultrafast, which draws included usage at 8x the Standard rate.",
+      "quota": "No five-hour limit; weekly limits may apply and are not published",
+      "evidence": "Official relative limit",
+      "confidence": "Low",
+      "apiIncluded": "No",
+      "verifiedAt": "2026-09-30",
+      "modelIds": [
+        "gpt-6-luna",
+        "gpt-6-sol",
+        "gpt-6-1-sol",
+        "gpt-6-astra"
+      ],
+      "access": [
+        "chat-app"
+      ],
+      "quotaDetail": {
+        "kind": "unknown",
+        "description": "No five-hour limit; weekly limits may apply and are not published",
+        "source": "https://learn.chatgpt.com/docs/pricing",
+        "verifiedAt": "2026-09-30"
       }
     },
     {
