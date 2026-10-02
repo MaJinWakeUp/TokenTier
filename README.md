@@ -298,14 +298,36 @@ $39, Allegro $99, Vivace $199, with their agent-credit and database-call
 allowances as recorded. Only the source URL moved, which matters because a
 source that no longer states the number is not a source.
 
-### Not re-verified: the four SuperGrok tiers
+### Re-sourced: three of the four SuperGrok tiers
 
-`x.ai/pricing`, `x.ai/grok`, `grok.com/supergrok` and `help.x.com` all refuse
-automated requests — 403, or a JavaScript shell with no content. Their
-`verifiedAt` dates are deliberately left at August 21 rather than bumped, so the
-site keeps marking them *verified Aug 21* and `models:validate --max-age=30`
-keeps failing until a human reads the page. A date bumped without a reading
-would be the one failure this pass exists to prevent.
+Every xAI page refuses automated requests, so these were read by a human from
+two screenshots. That turned out to matter, because the two pages disagree:
+`x.ai/pricing` lists Free, SuperGrok and SuperGrok Plus, while
+`grok.com/supergrok` carries all the paid tiers and prices each as "USD/month".
+All three records now cite the latter, since it is the page that states them.
+
+| Tier | Price | Change |
+| --- | --- | --- |
+| SuperGrok | $30 | confirmed; quota now "5x longer conversations in Chat; best model in Expert mode with higher limits" |
+| SuperGrok Plus | $100 | confirmed; quota reworded to the page's own usage language |
+| SuperGrok Heavy | $300 | confirmed; `confidence` raised from Low to Medium |
+
+Heavy had been `confidence: Low` because, in its own words, "the $300 price is
+corroborated from checkout and community sources". xAI now prints it, so the
+record stops apologising for itself and joins its siblings at Medium — their
+quotas are all relative limits that convert to no call count, which is what the
+Medium reflects.
+
+The old quota wording for SuperGrok and Plus — "shared weekly product usage pool
+with pay-as-you-go overage" — is on neither page and has been replaced by what
+is.
+
+### Still not verified: SuperGrok Lite
+
+Neither page prints a price for it, so its `verifiedAt` stays at August 21 and
+`models:validate --max-age=30` keeps failing. It has not been retired: the
+SuperGrok card lists "Everything in Lite", so the tier exists. A date bumped
+without a reading would be the one failure this pass exists to prevent.
 
 ## Catalog changes, September 30 2026
 

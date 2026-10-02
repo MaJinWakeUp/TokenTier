@@ -247,7 +247,8 @@ test("the catalog stays in validated data files", async () => {
     "https://grok.com/supergrok?referrer=pricing&target=supergroklite",
   );
   assert.deepEqual(planById.get("grok-super-lite").modelIds, ["grok-4-6"]);
-  assert.match(planById.get("grok-super").note, /Includes Grok 4\.6/);
+  assert.deepEqual(planById.get("grok-super").modelIds, ["grok-4-6"]);
+  assert.match(planById.get("grok-super").note, /Grok 4\.6/, "the note says which model the roster reflects");
 
   // Plans that pointed at a retired model were repointed, not left dangling.
   const modelIds = new Set(catalog.models.map((entry) => entry.id));

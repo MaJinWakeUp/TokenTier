@@ -332,14 +332,14 @@
       "name": "SuperGrok",
       "kind": "Subscription",
       "monthly": 30,
-      "source": "https://x.ai/pricing",
-      "note": "Includes Grok 4.6 access with higher limits, image and video generation, and live web and X search. API usage is separate.",
-      "quota": "Shared weekly product usage pool with pay-as-you-go overage",
+      "source": "https://grok.com/supergrok",
+      "note": "Card lists Grok Bot, everything in Lite, Expert mode at higher limits, HD 720p 30-second video, longer voice conversations and faster replies. xAI's pricing page names Grok 4.6 as the included model, which is what the roster reflects. No published figure converts to a call count. API usage is separate.",
+      "quota": "5x longer conversations in Chat; best model in Expert mode with higher limits",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-08-21",
+      "verifiedAt": "2026-10-02",
       "modelIds": [
         "grok-4-6"
       ],
@@ -348,9 +348,9 @@
       ],
       "quotaDetail": {
         "kind": "relative-limit",
-        "description": "Shared weekly product usage pool with pay-as-you-go overage",
-        "source": "https://x.ai/pricing",
-        "verifiedAt": "2026-08-21"
+        "description": "5x longer conversations in Chat; best model in Expert mode with higher limits",
+        "source": "https://grok.com/supergrok",
+        "verifiedAt": "2026-10-02"
       }
     },
     {
@@ -359,14 +359,14 @@
       "name": "SuperGrok Plus",
       "kind": "Subscription",
       "monthly": 100,
-      "source": "https://x.ai/pricing",
-      "note": "Same Grok model as standard SuperGrok with significantly higher weekly usage, faster replies, priority peak access, and early features. API usage is separate.",
-      "quota": "Significantly higher shared weekly product pool plus priority access at peak times",
+      "source": "https://grok.com/supergrok",
+      "note": "Everything in SuperGrok plus 1080p video, lightning-fast replies, priority access at peak times and early features. No published figure converts to a call count. API usage is separate.",
+      "quota": "Significantly higher usage across Chat, Imagine, Voice and Build, with priority access at peak times",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.3,
-      "verifiedAt": "2026-08-21",
+      "verifiedAt": "2026-10-02",
       "modelIds": [
         "grok-4-6"
       ],
@@ -375,9 +375,9 @@
       ],
       "quotaDetail": {
         "kind": "relative-limit",
-        "description": "Significantly higher shared weekly product pool plus priority access at peak times",
-        "source": "https://x.ai/pricing",
-        "verifiedAt": "2026-08-21"
+        "description": "Significantly higher usage across Chat, Imagine, Voice and Build, with priority access at peak times",
+        "source": "https://grok.com/supergrok",
+        "verifiedAt": "2026-10-02"
       }
     },
     {
@@ -386,14 +386,14 @@
       "name": "SuperGrok Heavy",
       "kind": "Subscription",
       "monthly": 300,
-      "source": "https://x.ai/pricing",
-      "note": "Highest individual Grok tier with Heavy-model and Build Mode access. The public comparison lists the tier but the $300 price is corroborated from checkout and community sources.",
-      "quota": "Highest shared weekly Grok product pool and early feature access",
+      "source": "https://grok.com/supergrok",
+      "note": "Billed as a larger team of agents collaborating on an answer, and includes X Premium+ at no extra cost plus dedicated support. No published figure converts to a call count. API usage is separate.",
+      "quota": "Everything in SuperGrok Plus, with the highest usage at the fastest speed",
       "evidence": "Official relative limit",
-      "confidence": "Low",
+      "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.35,
-      "verifiedAt": "2026-08-21",
+      "verifiedAt": "2026-10-02",
       "modelIds": [
         "grok-4-6"
       ],
@@ -402,9 +402,9 @@
       ],
       "quotaDetail": {
         "kind": "relative-limit",
-        "description": "Highest shared weekly Grok product pool and early feature access",
-        "source": "https://x.ai/pricing",
-        "verifiedAt": "2026-08-21"
+        "description": "Everything in SuperGrok Plus, with the highest usage at the fastest speed",
+        "source": "https://grok.com/supergrok",
+        "verifiedAt": "2026-10-02"
       }
     },
     {
