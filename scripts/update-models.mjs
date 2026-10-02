@@ -28,6 +28,17 @@ import {
   validatePlans,
   validateScenarios,
 } from "../build/lib/catalog/validate.js";
+import { defaultMaxAgeDays, freshnessReport } from "../build/lib/domain/freshness.js";
+
+export { defaultMaxAgeDays, freshnessReport } from "../build/lib/domain/freshness.js";
+
+// The CLI asks "how stale is this now", so it measures against today.
+function localIsoDate(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
 const defaultCatalogPath = fileURLToPath(
   new URL("../data/api-models.json", import.meta.url),
@@ -173,7 +184,7 @@ export async function updateCatalog({
 function usage() {
   return [
     "Usage:",
-    "  node scripts/update-models.mjs validate",
+    "  node scripts/update-models.mjs validate [--max-age=<days>]",
     "  node scripts/update-models.mjs add <input.json> [--dry-run]",
     "  node scripts/update-models.mjs update <input.json> [--dry-run]",
   ].join("\n");
@@ -184,11 +195,19 @@ export async function main(args = process.argv.slice(2)) {
   if (!command || !["validate", "add", "update"].includes(command)) {
     throw new Error(usage());
   }
-  const unknownFlags = flags.filter((flag) => flag !== "--dry-run");
+  // --max-age turns the freshness report from an advisory into a gate. It is
+  // opt-in so that data ageing never blocks an unrelated build, while a refresh
+  // pass can demand that nothing is past its date.
+  const maxAgeFlag = [command, inputPath, ...flags].find((flag) => typeof flag === "string" && flag.startsWith("--max-age="));
+  const maxAgeDays = maxAgeFlag ? Number(maxAgeFlag.slice("--max-age=".length)) : defaultMaxAgeDays;
+  if (maxAgeFlag && (!Number.isFinite(maxAgeDays) || maxAgeDays < 0)) {
+    throw new Error(`--max-age= needs a number of days.\n${usage()}`);
+  }
+  const unknownFlags = flags.filter((flag) => flag !== "--dry-run" && !flag.startsWith("--max-age="));
   if (unknownFlags.length > 0) throw new Error(`Unknown option: ${unknownFlags[0]}\n${usage()}`);
 
   if (command === "validate") {
-    if (inputPath || flags.length > 0) throw new Error(usage());
+    if (inputPath && !inputPath.startsWith("--max-age=")) throw new Error(usage());
     const { dataset, plans, scenarios } = await validateAllFiles();
     const scored = dataset.models.filter((model) => model.capability !== null).length;
     console.log(
@@ -206,6 +225,21 @@ export async function main(args = process.argv.slice(2)) {
         `  ${scenario.id.padEnd(12)} ${scenario.gate.metric} >= ${String(scenario.gate.minIndex).padStart(3)}`
         + ` · ${eligible}/${dataset.models.length} models qualify`,
       );
+    }
+
+    // Validation checks shape; this checks age. A record can be perfectly formed
+    // and six weeks out of date, which is the failure mode that matters for a
+    // site whose claim is that its numbers are current and sourced.
+    const report = freshnessReport(dataset.models, plans.plans, localIsoDate(), maxAgeDays);
+    console.log(
+      `\nFreshness: ${report.counted} dated records, oldest ${report.oldest}`
+      + ` · ${report.stale.length} past ${maxAgeDays} days.`,
+    );
+    for (const record of report.stale) {
+      console.log(`  ${String(record.ageDays).padStart(3)}d  ${record.kind.padEnd(17)} ${record.id} (${record.verifiedAt})`);
+    }
+    if (maxAgeFlag && report.stale.length > 0) {
+      throw new Error(`${report.stale.length} record(s) older than ${maxAgeDays} days. Re-verify them or raise --max-age.`);
     }
     return;
   }

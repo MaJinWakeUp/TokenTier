@@ -6,6 +6,7 @@ import type { Model, Plan } from "@/lib/catalog/types";
 import type { Decision } from "@/lib/domain/decision";
 import type { PlanEvaluation } from "@/lib/domain/recommend";
 import type { Workload } from "@/lib/domain/workload";
+import { hasThresholdPricing } from "@/lib/domain/pricing";
 import { estimatePresentation, monthlyPrice, price } from "@/lib/format";
 
 type Lane = "api" | "plans";
@@ -114,7 +115,7 @@ export function DetailedComparison({
                         {row.model.provider} · {row.index === null
                           ? "not scored"
                           : row.eligible
-                            ? `index ${row.index}, clears the bar`
+                            ? `index ${row.index}, clears the bar${hasThresholdPricing(row.model, workload.input) ? " · higher rate band at this input size" : ""}`
                             : row.rejection?.state === "pricing" ? "unsupported pricing at this input size"
                               : row.rejection?.state === "context" ? "context window too small"
                                 : row.rejection?.state === "output" ? "maximum output too small"

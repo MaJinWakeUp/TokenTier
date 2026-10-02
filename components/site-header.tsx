@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useSyncExternalStore } from "react";
-import { modelCatalogUpdatedAt, planCatalogUpdatedAt } from "@/lib/catalog";
+import { latestCatalogUpdate, oldestCatalogVerification } from "@/lib/catalog";
+import { ageInDays, defaultMaxAgeDays } from "@/lib/domain/freshness";
 import {
   applyThemeMode,
   getServerThemeSnapshot,
@@ -20,11 +21,6 @@ const navItems: Array<{ href: string; label: string; short: string }> = [
   { href: routes.tierList, label: "My tier list", short: "Mine" },
 ];
 
-// One date for the whole catalog: the later of the two documents, because a
-// reader asking "how fresh is this?" means the page, not a single file.
-export const latestCatalogUpdate =
-  modelCatalogUpdatedAt > planCatalogUpdatedAt ? modelCatalogUpdatedAt : planCatalogUpdatedAt;
-
 export const catalogUpdatedLabel = new Intl.DateTimeFormat("en-US", {
   month: "short",
   day: "numeric",
@@ -37,6 +33,17 @@ export function daysSinceCatalogUpdate(now: Date = new Date()): number {
   const days = Math.floor((now.getTime() - updated.getTime()) / (1000 * 60 * 60 * 24));
   return Number.isFinite(days) ? days : 0;
 }
+
+// How far the oldest record lags the date the page advertises. Measured between
+// two catalog dates, so it is identical on the server and in the browser.
+export const oldestRecordLag = ageInDays(oldestCatalogVerification, latestCatalogUpdate);
+
+export const oldestVerifiedLabel = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
+}).format(new Date(`${oldestCatalogVerification}T00:00:00Z`));
 
 export function useTheme(): [ThemeMode, ThemeAppearance] {
   const snapshot = useSyncExternalStore(subscribeTheme, getThemeSnapshot, getServerThemeSnapshot);
@@ -52,7 +59,8 @@ export function useTheme(): [ThemeMode, ThemeAppearance] {
 export function SiteHeader() {
   const pathname = usePathname();
   const [themeMode] = useTheme();
-  const stale = daysSinceCatalogUpdate() > 30;
+  // Stale when the page itself is old, or when any record behind it is.
+  const stale = daysSinceCatalogUpdate() > defaultMaxAgeDays || oldestRecordLag > defaultMaxAgeDays;
 
   // The exported site can be served with or without a trailing slash, and the
   // root has to match exactly or every route would look active.
@@ -83,7 +91,12 @@ export function SiteHeader() {
         ))}
       </nav>
       <div className="header-actions">
-        <span className={`freshness ${stale ? "stale" : ""}`} title={`Data updated ${catalogUpdatedLabel}`}>
+        <span
+          className={`freshness ${stale ? "stale" : ""}`}
+          title={oldestRecordLag > defaultMaxAgeDays
+            ? `Data updated ${catalogUpdatedLabel}. The oldest record behind it was last verified ${oldestVerifiedLabel}, ${oldestRecordLag} days earlier.`
+            : `Data updated ${catalogUpdatedLabel}. Every record verified within ${defaultMaxAgeDays} days of that.`}
+        >
           <i /> Updated {catalogUpdatedLabel}
         </span>
         <div className="theme-switcher" role="group" aria-label="Theme">

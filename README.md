@@ -200,6 +200,33 @@ validator enforces the joins between them:
 - no scenario may admit fewer than three models — a bar that admits almost
   nothing is a data error, not a strict standard.
 
+### How fresh the numbers are
+
+Validation checks shape; a record can be perfectly formed and six weeks out of
+date. `models:validate` therefore closes with a freshness block listing every
+dated record past 30 days, worst first. Model prices, capability scores and plan
+records are counted separately because they age independently.
+
+```bash
+npm run models:validate                 # reports; never blocks a build
+npm run models:validate -- --max-age=30 # exits non-zero while anything is older
+```
+
+The site reports the same thing rather than rounding it off. The header's
+"Updated" date is the newer of the two catalog files — what the page claims —
+but its freshness dot turns amber on the **oldest record behind that claim**, and
+the tooltip names that record's date. In the price book, a row whose
+`verifiedAt` lags the catalog date by more than 30 days is marked *verified
+&lt;date&gt;*; rows within the window say nothing, because freshness is only
+worth a reader's attention when it is bad. The details panel shows the
+verification date for a model's rates and a plan's terms, not only for its
+capability score.
+
+Record age is measured against the catalog's own update date rather than the
+clock, so the same page renders identically on the server and in the browser.
+The CLI measures against today, because a maintainer is asking a different
+question.
+
 ## Refresh the API model catalog
 
 API models live in `data/api-models.json`. To add one later, create a JSON file

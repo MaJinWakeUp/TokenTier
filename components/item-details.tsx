@@ -72,7 +72,13 @@ export function ItemDetailsModal({
           <div className="detail-modal-body">
             {"input" in item ? (
               <div className="detail-specs-grid">
-                <div className="spec-box"><small>Input Rate</small><strong>{price(item.input)} / 1M</strong></div>
+                <div className="spec-box">
+                  <small>Input Rate</small>
+                  <strong>{price(item.input)} / 1M</strong>
+                  <small className="spec-box-note">
+                    rates verified {item.verifiedAt} · <a href={item.source} rel="noreferrer" target="_blank">source</a>
+                  </small>
+                </div>
                 <div className="spec-box"><small>Cached Input</small><strong>{item.cached !== null ? `${price(item.cached, 4)} / 1M` : "—"}</strong></div>
                 <div className="spec-box"><small>Output Rate</small><strong>{price(item.output)} / 1M</strong></div>
                 <div className="spec-box"><small>Context Window</small><strong>{item.context}</strong></div>
@@ -102,7 +108,13 @@ export function ItemDetailsModal({
               </div>
             ) : (
               <div className="detail-specs-grid">
-                <div className="spec-box"><small>Monthly Price</small><strong>{planPrice(item)}</strong></div>
+                <div className="spec-box">
+                  <small>Monthly Price</small>
+                  <strong>{planPrice(item)}</strong>
+                  <small className="spec-box-note">
+                    plan verified {item.verifiedAt} · <a href={item.source} rel="noreferrer" target="_blank">source</a>
+                  </small>
+                </div>
                 <div className="spec-box"><small>Quota Evidence</small><strong>{item.confidence} ({item.evidence})</strong></div>
                 <div className="spec-box">
                   <small>Model used for {scenario.label}</small>

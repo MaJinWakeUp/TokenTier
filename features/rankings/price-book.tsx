@@ -13,9 +13,11 @@ import {
   settingsFor,
 } from "@/lib/catalog";
 import type { Model, Plan, ScenarioId } from "@/lib/catalog/types";
+import { latestCatalogUpdate } from "@/lib/catalog";
 import { contextSize, metricValue } from "@/lib/domain/eligibility";
+import { lagBehind } from "@/lib/domain/freshness";
 import { confidenceScore, placementSort, planWorkingModel } from "@/lib/domain/placement";
-import { callCost, planEstimate } from "@/lib/domain/pricing";
+import { callCost, hasThresholdPricing, planEstimate } from "@/lib/domain/pricing";
 import {
   estimatePresentation,
   metricLabels,
@@ -63,6 +65,35 @@ function SortableHeader({
         </span>
       </button>
     </th>
+  );
+}
+
+const shortDate = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+
+// Freshness is only worth the reader's attention when it is bad, so a row says
+// nothing until it falls behind the date the page advertises.
+function StaleMark({ verifiedAt, lag }: { verifiedAt: string; lag: number }) {
+  return (
+    <span
+      className="row-stale"
+      title={`Last verified ${verifiedAt}, ${lag} days before this catalog update. The rest of the catalog is newer.`}
+    >
+      verified {shortDate.format(new Date(`${verifiedAt}T00:00:00Z`))}
+    </span>
+  );
+}
+
+// The rate columns show a model's base band. When the workload is large enough
+// to bill at a higher one, the estimate and the rates beside it would otherwise
+// disagree with no explanation.
+function BandMark({ input }: { input: number }) {
+  return (
+    <small
+      className="rate-band-note"
+      title={`At ${input.toLocaleString()} input tokens this model bills at a higher published rate band than the per-million rates shown in this row.`}
+    >
+      higher band
+    </small>
   );
 }
 
@@ -304,6 +335,8 @@ export function PriceBook({
                 const perCall = callCost(model, settings);
                 const placement = modelPlacement(model.id, scenarioId);
                 const modelIndex = metricValue(model.capability, metric);
+                const lag = lagBehind(model.verifiedAt, latestCatalogUpdate);
+                const banded = hasThresholdPricing(model, settings.input);
                 return (
                   <tr key={model.id}>
                     <td className="sticky-col">
@@ -315,6 +348,7 @@ export function PriceBook({
                           </div>
                           <div className="model-cell-sub">
                             <small>{model.provider}</small>
+                            {lag > 0 && <StaleMark verifiedAt={model.verifiedAt} lag={lag} />}
                             {model.note && <details className="row-note"><summary>Note</summary><p>{model.note}</p></details>}
                           </div>
                         </div>
@@ -323,9 +357,9 @@ export function PriceBook({
                         </a>
                       </div>
                     </td>
-                    {apiColumns.input && <td>{price(model.input)}</td>}
-                    {apiColumns.cached && <td>{model.cached === null ? "—" : price(model.cached, 4)}</td>}
-                    {apiColumns.output && <td>{price(model.output)}</td>}
+                    {apiColumns.input && <td className={banded ? "rate-superseded" : undefined}>{price(model.input)}</td>}
+                    {apiColumns.cached && <td className={banded ? "rate-superseded" : undefined}>{model.cached === null ? "—" : price(model.cached, 4)}</td>}
+                    {apiColumns.output && <td className={banded ? "rate-superseded" : undefined}>{price(model.output)}</td>}
                     {apiColumns.context && <td>{model.context}</td>}
                     {apiColumns.index && (
                       <td>
@@ -341,7 +375,12 @@ export function PriceBook({
                         </span>
                       </td>
                     )}
-                    {apiColumns.cost && <td><strong>{price(perCall, 3)}</strong></td>}
+                    {apiColumns.cost && (
+                      <td>
+                        <strong>{price(perCall, 3)}</strong>
+                        {banded && <BandMark input={settings.input} />}
+                      </td>
+                    )}
                   </tr>
                 );
               })}
@@ -367,6 +406,7 @@ export function PriceBook({
                 const workingModel = planWorkingModel(plan, scenario, settings, modelById);
                 const estimate = planEstimate(plan, settings, workingModel, modelById.get(plan.modelIds[0]));
                 const placement = planPlacement(plan.id, scenarioId);
+                const lag = lagBehind(plan.verifiedAt, latestCatalogUpdate);
                 return (
                   <tr key={plan.id}>
                     <td className="sticky-col">
@@ -378,6 +418,7 @@ export function PriceBook({
                           </div>
                           <div className="model-cell-sub">
                             <small>{plan.provider}</small>
+                            {lag > 0 && <StaleMark verifiedAt={plan.verifiedAt} lag={lag} />}
                             <details className="row-note"><summary>Note</summary><p>{plan.note}</p></details>
                           </div>
                         </div>
