@@ -18,7 +18,7 @@ export function ageInDays(verifiedAt: string, reference: string): number {
   return Math.max(0, Math.floor((to - from) / 86_400_000));
 }
 
-export type StaleKind = "model-price" | "model-capability" | "plan";
+export type StaleKind = "model-price" | "model-capability" | "plan" | "plan-quota";
 
 export type StaleRecord = {
   kind: StaleKind;
@@ -52,6 +52,19 @@ function collect(models: Model[], plans: Plan[]): StaleRecord[] {
   }
   for (const plan of plans) {
     records.push({ kind: "plan", id: plan.id, name: plan.name, verifiedAt: plan.verifiedAt, ageDays: 0 });
+    // The quota carries its own date because it ages on its own: a plan whose
+    // price was re-read last week can still be claiming a quota from a page
+    // nobody has opened in months, and the quota is what the engine converts
+    // into covered calls. Counting it under the plan's date would hide that.
+    if (plan.quotaDetail) {
+      records.push({
+        kind: "plan-quota",
+        id: plan.id,
+        name: plan.name,
+        verifiedAt: plan.quotaDetail.verifiedAt,
+        ageDays: 0,
+      });
+    }
   }
   return records;
 }

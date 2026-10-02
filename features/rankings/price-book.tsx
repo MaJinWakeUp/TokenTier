@@ -85,15 +85,17 @@ function StaleMark({ verifiedAt, lag }: { verifiedAt: string; lag: number }) {
 
 // The rate columns show a model's base band. When the workload is large enough
 // to bill at a higher one, the estimate and the rates beside it would otherwise
-// disagree with no explanation.
+// disagree with no explanation. This sits in the always-rendered name cell
+// rather than beside a rate or the estimate, because every one of those columns
+// can be switched off — and the reader who hides them is no less misled.
 function BandMark({ input }: { input: number }) {
   return (
-    <small
+    <span
       className="rate-band-note"
-      title={`At ${input.toLocaleString()} input tokens this model bills at a higher published rate band than the per-million rates shown in this row.`}
+      title={`At ${input.toLocaleString()} input tokens this model bills at a higher published rate band than its base per-million rates.`}
     >
       higher band
-    </small>
+    </span>
   );
 }
 
@@ -349,6 +351,7 @@ export function PriceBook({
                           <div className="model-cell-sub">
                             <small>{model.provider}</small>
                             {lag > 0 && <StaleMark verifiedAt={model.verifiedAt} lag={lag} />}
+                            {banded && <BandMark input={settings.input} />}
                             {model.note && <details className="row-note"><summary>Note</summary><p>{model.note}</p></details>}
                           </div>
                         </div>
@@ -378,7 +381,6 @@ export function PriceBook({
                     {apiColumns.cost && (
                       <td>
                         <strong>{price(perCall, 3)}</strong>
-                        {banded && <BandMark input={settings.input} />}
                       </td>
                     )}
                   </tr>

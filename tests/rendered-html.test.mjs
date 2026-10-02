@@ -714,7 +714,7 @@ test("the page does not claim to be fresher than its oldest record", async () =>
   const markup = await html("/");
   for (const record of report.stale.filter((entry) => entry.kind !== "model-capability")) {
     assert.ok(
-      markup.includes(record.name) || record.kind === "plan",
+      markup.includes(record.name) || record.kind === "plan" || record.kind === "plan-quota",
       `${record.id} is listed on the page that reports its age`,
     );
   }
@@ -728,6 +728,20 @@ test("a workload that bills at a higher rate band says so", async () => {
   assert.match(priceBook, /hasThresholdPricing\(model, settings\.input\)/);
   assert.match(priceBook, /banded \? "rate-superseded" : undefined/);
   assert.match(priceBook, /\{banded && <BandMark input=\{settings\.input\} \/>\}/);
+
+  // Every rate and estimate column can be switched off. The disclosure has to
+  // sit ahead of all of them, in the name cell that always renders, or hiding a
+  // column quietly withdraws the warning while the row still misleads.
+  // Measured from the start of the model row, so the header's own column
+  // toggles do not count as the first optional column.
+  const row = priceBook.slice(priceBook.indexOf("const banded = hasThresholdPricing"));
+  const bandMarkAt = row.indexOf("<BandMark");
+  const firstOptionalColumnAt = row.indexOf("{apiColumns.");
+  assert.ok(bandMarkAt > 0 && firstOptionalColumnAt > 0, "the row renders both a band mark and optional columns");
+  assert.ok(
+    bandMarkAt < firstOptionalColumnAt,
+    "the band disclosure must render before the first toggleable column, not inside one",
+  );
 
   const styles = await read("app/globals.css");
   assert.match(styles, /\.rate-superseded\s*\{[^}]*text-decoration:\s*line-through/s);

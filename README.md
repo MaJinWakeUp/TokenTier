@@ -289,6 +289,39 @@ is real but comes from the Agent SDK article, which the `quotaDetail` now cites,
 and it covers Agent SDK usage in your own projects — not interactive Claude
 Code, web chat or Cowork. The note says so. Price unchanged at $20.
 
+Saying that in the note was not enough. The record also carried
+`quotaDetail.kind: "dollar-allowance"`, and the engine converts a monthly dollar
+allowance straight into a covered call count — so a credit scoped to the Agent
+SDK was being counted as proof that Pro covered the chat and coding-client
+workloads it is actually ranked on. Pro's own `access` list never claimed `api`,
+so the allowance applied to a surface the plan does not even offer. It is now a
+`relative-limit` with `evidence: "Official relative limit"`, matching Max 5x and
+20x, which publish the same credit and were already modelled that way. The
+dollar figures came off all three; with a `quotaDetail` present, the legacy
+`includedApiValue` field was never read, and leaving it invited the misreading
+back in.
+
+**This empties the chat-app board of winners.** Every consumer chat plan in the
+catalog — ChatGPT Plus, Claude Pro, Google AI Pro, SuperGrok, Meta One Premium,
+Kimi — publishes a relative limit, and none converts to a monthly call count.
+Pro was the only one that appeared provable, and only because of this bug. A
+chat-app workload now lists all nineteen plans with their prices and reports no
+proven winner, which is the honest answer: no provider publishes enough to earn
+one. The regression test that asserted a chat-app winner always exists was
+encoding the bug, and now asserts what actually has to hold — that no winner is
+ever drawn from the wrong access surface.
+
+### Added: quota dates are counted separately from plan dates
+
+`verifiedAt` on a plan and on its `quotaDetail` age independently, and the
+freshness report was only counting the first. Claude Max 5x and 20x were reading
+as fresh on a September 28 plan date while the quota each is judged on had not
+been re-read since August 21. The report now counts `plan-quota` as its own
+record kind, which took the catalog from 83 dated records to 110 and surfaced
+four stale entries that three of them had been hiding. They are reported, not
+back-dated: nobody has opened those pages, and pretending otherwise is the thing
+the report exists to prevent.
+
 ### Corrected: the Kimi membership source URL
 
 `www.kimi.com` now serves a yuan-denominated lineup including an Andante tier

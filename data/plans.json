@@ -131,10 +131,9 @@
       "source": "https://claude.com/pricing",
       "note": "The $20 monthly credit covers Claude Agent SDK usage in your own projects only — not interactive Claude Code, web chat or Cowork — and usage past it bills at standard API rates. App-level rate limits apply and vary with context size and demand.",
       "quota": "$20/month of Agent SDK credit; app usage is \"more usage\" than Free with no published multiple",
-      "evidence": "Official credit",
+      "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "Optional",
-      "includedApiValue": 20,
       "cacheRatio": 0.3,
       "verifiedAt": "2026-10-02",
       "modelIds": [
@@ -145,9 +144,8 @@
         "coding-client"
       ],
       "quotaDetail": {
-        "kind": "dollar-allowance",
-        "amount": 20,
-        "resetWindow": "monthly",
+        "kind": "relative-limit",
+        "description": "App usage is \"more usage\" than Free with no published multiple; the $20 monthly credit is scoped to Claude Agent SDK projects and does not meter this plan's chat or coding-client surfaces",
         "source": "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan",
         "verifiedAt": "2026-10-02"
       }
@@ -164,7 +162,6 @@
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "Optional",
-      "includedApiValue": 100,
       "cacheRatio": 0.4,
       "verifiedAt": "2026-09-28",
       "modelIds": [
@@ -194,7 +191,6 @@
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "Optional",
-      "includedApiValue": 200,
       "cacheRatio": 0.45,
       "verifiedAt": "2026-09-28",
       "modelIds": [

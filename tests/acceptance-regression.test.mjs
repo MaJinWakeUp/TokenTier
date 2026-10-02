@@ -260,17 +260,40 @@ test("AC3: the curve is independent of input order and groups equal prices", () 
 // -- AC4: quotaDetail authoritative, credit from quota.amount+resetWindow ---
 
 test("AC4: quotaDetail is authoritative over includedApiValue for relative-limit plans", () => {
-  // claude-max-5x has includedApiValue=100 but quotaDetail.kind=relative-limit.
-  // The estimate should NOT use includedApiValue as a dollar allowance.
-  const plan = planDoc.plans.find((p) => p.id === "claude-max-5x");
-  assert.equal(plan.quotaDetail.kind, "relative-limit");
-  assert.equal(plan.includedApiValue, 100);
   const scenario = scenarioDoc.scenarios.find((s) => s.id === "code-medium");
   const settings = { input: scenario.input, output: scenario.output, cacheRatio: 0.6 };
-  const wm = planWorkingModel(plan, scenario, settings, modelById);
-  const est = planEstimate(plan, settings, wm, modelById.get(plan.modelIds[0]));
-  assert.ok(est, "Should produce an estimate");
-  assert.notEqual(est.basis.kind, "allowance", "Relative-limit plan must not be classified as dollar allowance");
+
+  // A plan that still carries the pre-v3 includedApiValue alongside a
+  // relative-limit quotaDetail. The fixture is synthetic because no catalog
+  // plan has that shape any more, and the rule must not stop being tested the
+  // day the last one is cleaned up.
+  const base = planDoc.plans.find((p) => p.quotaDetail?.kind === "relative-limit");
+  assert.ok(base, "Catalog must have a relative-limit plan to model the fixture on");
+  const legacy = { ...base, id: "fixture-legacy", includedApiValue: 100 };
+  const legacyEstimate = planEstimate(
+    legacy,
+    settings,
+    planWorkingModel(legacy, scenario, settings, modelById),
+    modelById.get(legacy.modelIds[0]),
+  );
+  assert.ok(legacyEstimate, "Should produce an estimate");
+  assert.notEqual(
+    legacyEstimate.basis.kind,
+    "allowance",
+    "Relative-limit quotaDetail must win over a legacy includedApiValue",
+  );
+  assert.equal(legacyEstimate.callsLow, 0, "An unconvertible quota proves no calls");
+
+  // And the same rule across every relative-limit plan the catalog actually holds.
+  for (const plan of planDoc.plans.filter((p) => p.quotaDetail?.kind === "relative-limit")) {
+    const estimate = planEstimate(
+      plan,
+      settings,
+      planWorkingModel(plan, scenario, settings, modelById),
+      modelById.get(plan.modelIds[0]),
+    );
+    assert.notEqual(estimate.basis.kind, "allowance", `${plan.id} must not be classified as a dollar allowance`);
+  }
 });
 
 test("AC4: OpenCode Go 5h+weekly caps make it conditional", () => {

@@ -4719,8 +4719,9 @@ footer.site-footer {
 }
 
 .rate-band-note {
-  display: block;
-  margin-top: 2px;
+  padding: 1px 7px;
+  border: 1px dashed var(--note-accent);
+  border-radius: 999px;
   color: var(--note-accent);
   font-size: 13px;
   white-space: nowrap;
