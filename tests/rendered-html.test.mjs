@@ -81,13 +81,16 @@ test("every section is its own route with its own title and canonical", async ()
 test("Rankings answers the cheapest-qualified question above the board", async () => {
   const markup = await html("/");
   const catalog = JSON.parse(await read("data/api-models.json"));
+  const planCatalog = JSON.parse(await read("data/plans.json"));
   const scenarios = JSON.parse(await read("data/scenarios.json"));
+  // The header shows the later of the two documents, so the expectation reads
+  // both rather than pinning one of them to a date that goes stale.
   const catalogDate = new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
     timeZone: "UTC",
-  }).format(new Date(`${[catalog.updatedAt, "2026-08-21"].sort().at(-1)}T00:00:00Z`));
+  }).format(new Date(`${[catalog.updatedAt, planCatalog.updatedAt].sort().at(-1)}T00:00:00Z`));
 
   assert.match(markup, /rel="icon" href="https:\/\/majinwakeup\.github\.io\/TokenTier\/favicon\.svg"/i);
   assert.match(markup, /property="og:image" content="https:\/\/majinwakeup\.github\.io\/TokenTier\/og\.png"/i);

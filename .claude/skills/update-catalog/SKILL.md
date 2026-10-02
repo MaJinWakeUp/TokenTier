@@ -212,9 +212,9 @@ unless the user overrides it.
   call count, so each sorted to the top of a price-ordered board while unable to
   show it covered any of the workload. Check a new plan's price against the
   floor before writing the record, and say so rather than adding it and waiting
-  to be told. It removed ChatGPT Go at $8, Google AI Plus at $9.99 (a
-  `confidence: High` record) and Meta One Core at $7.99; OpenCode Go and
-  SuperGrok Lite at exactly $10 were deliberately kept.
+  to be told. It removed ChatGPT Go at 8 USD, Google AI Plus at 9.99 USD (a
+  `confidence: High` record) and Meta One Core at 7.99 USD; OpenCode Go and
+  SuperGrok Lite at exactly 10 USD were deliberately kept.
 - **A temporary or introductory price** is not the headline number. The standard
   rate goes in `input`/`cached`/`output`; the discount goes in `note` with its
   end date. A promotion must never move a model up the board.

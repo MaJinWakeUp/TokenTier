@@ -255,6 +255,58 @@ date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
 
+## Catalog changes, October 2 2026
+
+A freshness pass, driven by the new report at the end of `models:validate`
+rather than by memory. Ten plan records had not been re-read since August 21
+while every model price was within fifteen days — a gap the page had no way to
+show, because it advertised the newer of the two file dates. Six were
+re-verified; four could not be.
+
+### Corrected: the OpenCode Zen model roster
+
+Zen listed one model, Kimi K3. Its own page offers 26 of the catalog's 29. A
+plan is judged on the cheapest model it offers that clears the bar, so a
+one-model roster understated it badly — and because Kimi K3 does not clear the
+45 bar, Zen was being dropped from three boards entirely:
+
+| Scenario | Working model before | After |
+| --- | --- | --- |
+| Daily use, easy coding, writing | Kimi K3 | GPT-6 Luna |
+| Medium coding | Kimi K3 | GLM-5.3-Flash |
+| Hard coding, research, innovation | *gated out* | Muse Spark 1.3 |
+
+Nothing about Zen's terms changed: still pay-as-you-go, still no monthly fee.
+`modelIds` is the field that rots quietly, because a plan can gain model access
+without any price change to prompt a re-read.
+
+### Corrected: Claude Pro's published quota
+
+The record claimed "5x Free plan allowances". Anthropic's pricing page says only
+"more usage" for Pro and reserves the 5x and 20x language for Max, so that
+multiple was not supported by the page the record cited. The $20 monthly figure
+is real but comes from the Agent SDK article, which the `quotaDetail` now cites,
+and it covers Agent SDK usage in your own projects — not interactive Claude
+Code, web chat or Cowork. The note says so. Price unchanged at $20.
+
+### Corrected: the Kimi membership source URL
+
+`www.kimi.com` now serves a yuan-denominated lineup including an Andante tier
+the catalog never carried. The USD figures the four records hold are on
+`www.kimi.ai`, where all four were re-read unchanged: Moderato $19, Allegretto
+$39, Allegro $99, Vivace $199, with their agent-credit and database-call
+allowances as recorded. Only the source URL moved, which matters because a
+source that no longer states the number is not a source.
+
+### Not re-verified: the four SuperGrok tiers
+
+`x.ai/pricing`, `x.ai/grok`, `grok.com/supergrok` and `help.x.com` all refuse
+automated requests — 403, or a JavaScript shell with no content. Their
+`verifiedAt` dates are deliberately left at August 21 rather than bumped, so the
+site keeps marking them *verified Aug 21* and `models:validate --max-age=30`
+keeps failing until a human reads the page. A date bumped without a reading
+would be the one failure this pass exists to prevent.
+
 ## Catalog changes, September 30 2026
 
 ### Added: GPT-6.1 Sol
