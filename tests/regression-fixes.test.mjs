@@ -191,9 +191,16 @@ test("F2: chat-app access does not recommend direct API models", () => {
   }, "cost");
   assert.equal(result.api.best, null, "chat-app access should not recommend direct API");
   assert.equal(result.api.noMatch, true, "No API match for chat-app access");
-  assert.ok(result.plans.best, "Should still have plan options for chat-app");
-  const bestPlan = result.plans.best;
-  assert.ok(bestPlan.plan.access?.includes("chat-app"), "Best plan must have chat-app access");
+  assert.ok(result.plans.evaluations.length > 0, "Should still surface plan options for chat-app");
+  for (const row of result.plans.evaluations) {
+    assert.ok(row.plan.access?.includes("chat-app"), `${row.plan.id} must have chat-app access`);
+  }
+  // A winner is not guaranteed: every consumer chat plan publishes a relative
+  // limit, so none can be proven to cover the workload. What must never happen
+  // is a winner drawn from the wrong access surface.
+  if (result.plans.best) {
+    assert.ok(result.plans.best.plan.access?.includes("chat-app"), "Best plan must have chat-app access");
+  }
 });
 
 test("F2: budget objective returns null when nothing is affordable", () => {

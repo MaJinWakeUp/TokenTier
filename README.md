@@ -200,6 +200,33 @@ validator enforces the joins between them:
 - no scenario may admit fewer than three models — a bar that admits almost
   nothing is a data error, not a strict standard.
 
+### How fresh the numbers are
+
+Validation checks shape; a record can be perfectly formed and six weeks out of
+date. `models:validate` therefore closes with a freshness block listing every
+dated record past 30 days, worst first. Model prices, capability scores and plan
+records are counted separately because they age independently.
+
+```bash
+npm run models:validate                 # reports; never blocks a build
+npm run models:validate -- --max-age=30 # exits non-zero while anything is older
+```
+
+The site reports the same thing rather than rounding it off. The header's
+"Updated" date is the newer of the two catalog files — what the page claims —
+but its freshness dot turns amber on the **oldest record behind that claim**, and
+the tooltip names that record's date. In the price book, a row whose
+`verifiedAt` lags the catalog date by more than 30 days is marked *verified
+&lt;date&gt;*; rows within the window say nothing, because freshness is only
+worth a reader's attention when it is bad. The details panel shows the
+verification date for a model's rates and a plan's terms, not only for its
+capability score.
+
+Record age is measured against the catalog's own update date rather than the
+clock, so the same page renders identically on the server and in the browser.
+The CLI measures against today, because a maintainer is asking a different
+question.
+
 ## Refresh the API model catalog
 
 API models live in `data/api-models.json`. To add one later, create a JSON file
@@ -227,6 +254,113 @@ tier lists, recommendations, cost list, price book, source links, and update
 date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
+
+## Catalog changes, October 2 2026
+
+A freshness pass, driven by the new report at the end of `models:validate`
+rather than by memory. Ten plan records had not been re-read since August 21
+while every model price was within fifteen days — a gap the page had no way to
+show, because it advertised the newer of the two file dates. Six were
+re-verified; four could not be.
+
+### Corrected: the OpenCode Zen model roster
+
+Zen listed one model, Kimi K3. Its own page offers 26 of the catalog's 29. A
+plan is judged on the cheapest model it offers that clears the bar, so a
+one-model roster understated it badly — and because Kimi K3 does not clear the
+45 bar, Zen was being dropped from three boards entirely:
+
+| Scenario | Working model before | After |
+| --- | --- | --- |
+| Daily use, easy coding, writing | Kimi K3 | GPT-6 Luna |
+| Medium coding | Kimi K3 | GLM-5.3-Flash |
+| Hard coding, research, innovation | *gated out* | Muse Spark 1.3 |
+
+Nothing about Zen's terms changed: still pay-as-you-go, still no monthly fee.
+`modelIds` is the field that rots quietly, because a plan can gain model access
+without any price change to prompt a re-read.
+
+### Corrected: Claude Pro's published quota
+
+The record claimed "5x Free plan allowances". Anthropic's pricing page says only
+"more usage" for Pro and reserves the 5x and 20x language for Max, so that
+multiple was not supported by the page the record cited. The $20 monthly figure
+is real but comes from the Agent SDK article, which the `quotaDetail` now cites,
+and it covers Agent SDK usage in your own projects — not interactive Claude
+Code, web chat or Cowork. The note says so. Price unchanged at $20.
+
+Saying that in the note was not enough. The record also carried
+`quotaDetail.kind: "dollar-allowance"`, and the engine converts a monthly dollar
+allowance straight into a covered call count — so a credit scoped to the Agent
+SDK was being counted as proof that Pro covered the chat and coding-client
+workloads it is actually ranked on. Pro's own `access` list never claimed `api`,
+so the allowance applied to a surface the plan does not even offer. It is now a
+`relative-limit` with `evidence: "Official relative limit"`, matching Max 5x and
+20x, which publish the same credit and were already modelled that way. The
+dollar figures came off all three; with a `quotaDetail` present, the legacy
+`includedApiValue` field was never read, and leaving it invited the misreading
+back in.
+
+**This empties the chat-app board of winners.** Every consumer chat plan in the
+catalog — ChatGPT Plus, Claude Pro, Google AI Pro, SuperGrok, Meta One Premium,
+Kimi — publishes a relative limit, and none converts to a monthly call count.
+Pro was the only one that appeared provable, and only because of this bug. A
+chat-app workload now lists all nineteen plans with their prices and reports no
+proven winner, which is the honest answer: no provider publishes enough to earn
+one. The regression test that asserted a chat-app winner always exists was
+encoding the bug, and now asserts what actually has to hold — that no winner is
+ever drawn from the wrong access surface.
+
+### Added: quota dates are counted separately from plan dates
+
+`verifiedAt` on a plan and on its `quotaDetail` age independently, and the
+freshness report was only counting the first. Claude Max 5x and 20x were reading
+as fresh on a September 28 plan date while the quota each is judged on had not
+been re-read since August 21. The report now counts `plan-quota` as its own
+record kind, which took the catalog from 83 dated records to 110 and surfaced
+four stale entries that three of them had been hiding. They are reported, not
+back-dated: nobody has opened those pages, and pretending otherwise is the thing
+the report exists to prevent.
+
+### Corrected: the Kimi membership source URL
+
+`www.kimi.com` now serves a yuan-denominated lineup including an Andante tier
+the catalog never carried. The USD figures the four records hold are on
+`www.kimi.ai`, where all four were re-read unchanged: Moderato $19, Allegretto
+$39, Allegro $99, Vivace $199, with their agent-credit and database-call
+allowances as recorded. Only the source URL moved, which matters because a
+source that no longer states the number is not a source.
+
+### Re-sourced: three of the four SuperGrok tiers
+
+Every xAI page refuses automated requests, so these were read by a human from
+two screenshots. That turned out to matter, because the two pages disagree:
+`x.ai/pricing` lists Free, SuperGrok and SuperGrok Plus, while
+`grok.com/supergrok` carries all the paid tiers and prices each as "USD/month".
+All three records now cite the latter, since it is the page that states them.
+
+| Tier | Price | Change |
+| --- | --- | --- |
+| SuperGrok | $30 | confirmed; quota now "5x longer conversations in Chat; best model in Expert mode with higher limits" |
+| SuperGrok Plus | $100 | confirmed; quota reworded to the page's own usage language |
+| SuperGrok Heavy | $300 | confirmed; `confidence` raised from Low to Medium |
+
+Heavy had been `confidence: Low` because, in its own words, "the $300 price is
+corroborated from checkout and community sources". xAI now prints it, so the
+record stops apologising for itself and joins its siblings at Medium — their
+quotas are all relative limits that convert to no call count, which is what the
+Medium reflects.
+
+The old quota wording for SuperGrok and Plus — "shared weekly product usage pool
+with pay-as-you-go overage" — is on neither page and has been replaced by what
+is.
+
+### Still not verified: SuperGrok Lite
+
+Neither page prints a price for it, so its `verifiedAt` stays at August 21 and
+`models:validate --max-age=30` keeps failing. It has not been retired: the
+SuperGrok card lists "Everything in Lite", so the tier exists. A date bumped
+without a reading would be the one failure this pass exists to prevent.
 
 ## Catalog changes, September 30 2026
 

@@ -362,6 +362,13 @@ main {
   box-shadow: 0 0 0 5px var(--brand-accent-soft);
 }
 
+/* The header has set this class for a long time with nothing to show for it.
+   Amber when the catalog is old, or when any record behind it is. */
+.freshness.stale i {
+  background: var(--note-accent);
+  box-shadow: 0 0 0 5px var(--note-soft);
+}
+
 .explore-hero {
   display: flex;
   align-items: center;
@@ -1447,25 +1454,6 @@ td:first-child {
   text-align: center;
 }
 
-.plan-card {
-  display: flex;
-  min-height: 330px;
-  flex-direction: column;
-  padding: 23px;
-  border: 1px solid var(--border-strong);
-  border-radius: 18px;
-  background: var(--bg-surface);
-  color: var(--text-primary);
-  box-shadow: var(--card-shadow);
-  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease, background-color 200ms ease;
-}
-
-.plan-card:hover {
-  border-color: var(--brand-accent);
-  box-shadow: var(--card-shadow);
-  transform: translateY(-3px);
-}
-
 .equivalent {
   display: flex;
   flex-direction: column;
@@ -1813,12 +1801,6 @@ td:first-child {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
-}
-
-.model-cost-column {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
 }
 
 .model-cost-row {
@@ -2686,10 +2668,6 @@ td:first-child {
 
   
 
-  .plan-card {
-    min-height: 310px;
-  }
-
   .search-shortcut-kbd {
     display: none;
   }
@@ -2781,8 +2759,7 @@ td:first-child {
   to { opacity: 1; }
 }
 
-.detail-modal,
-.compare-modal {
+.detail-modal {
   position: relative;
   width: 100%;
   max-width: 640px;
@@ -2794,10 +2771,6 @@ td:first-child {
   color: var(--text-primary);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
   animation: modal-slide 200ms ease-out;
-}
-
-.compare-modal {
-  max-width: 900px;
 }
 
 @keyframes modal-slide {
@@ -2819,8 +2792,7 @@ td:first-child {
   gap: 12px;
 }
 
-.detail-modal-title-wrap h3,
-.compare-modal h3 {
+.detail-modal-title-wrap h3 {
   margin: 0;
   font-size: 20px;
   font-weight: 700;
@@ -4721,4 +4693,36 @@ footer.site-footer {
    match the card beside it. */
 .path-card-empty {
   align-self: start;
+}
+
+/* --- Record freshness and rate bands -------------------------------------
+   A row says nothing about its age until it falls behind the date the page
+   advertises; the rate columns say nothing about bands until the workload
+   actually bills at one. Both are quiet by default and only speak up when the
+   table would otherwise mislead.
+   ------------------------------------------------------------------------ */
+
+.row-stale {
+  padding: 1px 7px;
+  border: 1px solid var(--note-accent);
+  border-radius: 999px;
+  background: var(--note-soft);
+  color: var(--note-accent);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.rate-superseded {
+  color: var(--text-muted);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.rate-band-note {
+  padding: 1px 7px;
+  border: 1px dashed var(--note-accent);
+  border-radius: 999px;
+  color: var(--note-accent);
+  font-size: 13px;
+  white-space: nowrap;
 }

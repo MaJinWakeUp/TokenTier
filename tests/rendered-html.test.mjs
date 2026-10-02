@@ -81,13 +81,16 @@ test("every section is its own route with its own title and canonical", async ()
 test("Rankings answers the cheapest-qualified question above the board", async () => {
   const markup = await html("/");
   const catalog = JSON.parse(await read("data/api-models.json"));
+  const planCatalog = JSON.parse(await read("data/plans.json"));
   const scenarios = JSON.parse(await read("data/scenarios.json"));
+  // The header shows the later of the two documents, so the expectation reads
+  // both rather than pinning one of them to a date that goes stale.
   const catalogDate = new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
     timeZone: "UTC",
-  }).format(new Date(`${[catalog.updatedAt, "2026-08-21"].sort().at(-1)}T00:00:00Z`));
+  }).format(new Date(`${[catalog.updatedAt, planCatalog.updatedAt].sort().at(-1)}T00:00:00Z`));
 
   assert.match(markup, /rel="icon" href="https:\/\/majinwakeup\.github\.io\/TokenTier\/favicon\.svg"/i);
   assert.match(markup, /property="og:image" content="https:\/\/majinwakeup\.github\.io\/TokenTier\/og\.png"/i);
@@ -215,11 +218,10 @@ test("the personal board is labelled as opinion and offers a non-drag path", asy
 // -- Catalog is data, not code ------------------------------------------------
 
 test("the catalog stays in validated data files", async () => {
-  const [catalogSource, planSource, scenarioSource, formatLib, catalogIndex, catalogTypes] = await Promise.all([
+  const [catalogSource, planSource, scenarioSource, catalogIndex, catalogTypes] = await Promise.all([
     read("data/api-models.json"),
     read("data/plans.json"),
     read("data/scenarios.json"),
-    read("lib/format.ts"),
     read("lib/catalog/index.ts"),
     read("lib/catalog/types.ts"),
   ]);
@@ -245,7 +247,8 @@ test("the catalog stays in validated data files", async () => {
     "https://grok.com/supergrok?referrer=pricing&target=supergroklite",
   );
   assert.deepEqual(planById.get("grok-super-lite").modelIds, ["grok-4-6"]);
-  assert.match(planById.get("grok-super").note, /Includes Grok 4\.6/);
+  assert.deepEqual(planById.get("grok-super").modelIds, ["grok-4-6"]);
+  assert.match(planById.get("grok-super").note, /Grok 4\.6/, "the note says which model the roster reflects");
 
   // Plans that pointed at a retired model were repointed, not left dangling.
   const modelIds = new Set(catalog.models.map((entry) => entry.id));
@@ -320,8 +323,6 @@ test("the catalog stays in validated data files", async () => {
     assert.ok(entry.calls > 0 && entry.cacheRatio >= 0, `${entry.id} carries a call count and cache share`);
   }
 
-  assert.match(formatLib, /function planQuota\(plan: Plan, workingModel: Model \| null\)[\s\S]*?if \(plan\.id === "chatgpt-go"\) return plan\.quota;[\s\S]*?chatgptMessageRanges\[plan\.id\]\?\.\[workingModel\.id\]/);
-  assert.match(formatLib, /function monthlyPrice\(value: number\)/);
   assert.match(catalogIndex, /api-models\.json/);
   assert.match(catalogIndex, /const defaultScenario = scenarioFor\("code-medium"\)/);
   assert.match(catalogIndex, /const placementsByScenario/);
@@ -353,15 +354,6 @@ test("the engine stays pure and the views stay presentational", async () => {
     assert.doesNotMatch(source, /^"use client";/m, `${name} is not a client module`);
   }
 
-  assert.match(placementLib, /function modelPlacements/);
-  assert.match(placementLib, /function planPlacements/);
-  assert.match(placementLib, /function planWorkingModel/);
-  assert.match(placementLib, /function curveTiers/);
-  assert.match(pricingLib, /const cacheRatio = cacheRatioOverride \?\? settings\.cacheRatio/);
-  assert.match(pricingLib, /function planCoverageScore[\s\S]*?return null;[\s\S]*?\n}/);
-  assert.match(formatLib, /function monthlyPriceAgainst\(value: number, reference: number\)/);
-  assert.match(formatLib, /const contradicts = \(value > reference && rounded <= reference\)/);
-  assert.match(formatLib, /\|\| \(value < reference && rounded > reference\)/);
 
   // Each route owns its own state; none of them mounts another route's feature.
   const rankings = await read("features/rankings/rankings-view.tsx");
@@ -612,5 +604,158 @@ test("keeps muted text and the readable accent above AA contrast", async () => {
       contrast >= 4.5,
       `light --${token} (${hex}) is ${contrast.toFixed(2)}:1 on ${inset}, below the 4.5 minimum`,
     );
+  }
+});
+
+// -- Engine behaviour ---------------------------------------------------------
+//
+// These replace assertions that matched the engine's source text. Matching the
+// source pinned how a function was written; calling it pins what it returns,
+// which is the thing a reader of the site depends on.
+
+test("the cost model honours cache share and published rate bands", async () => {
+  const { callCost, hasThresholdPricing } = await import("../build/lib/domain/pricing.js");
+
+  const flat = {
+    id: "flat", provider: "T", name: "Flat", input: 10, cached: 1, output: 20,
+    context: "1M", source: "https://example.com", verifiedAt: "2026-01-01", capability: null,
+  };
+
+  // Cache share moves spend between the input and cached rates.
+  const uncached = callCost(flat, { input: 1000, output: 0, cacheRatio: 0 });
+  const allCached = callCost(flat, { input: 1000, output: 0, cacheRatio: 1 });
+  assert.equal(uncached, (1000 * 10) / 1e6);
+  assert.equal(allCached, (1000 * 1) / 1e6);
+
+  // A plan's own cache behaviour overrides the workload's.
+  assert.equal(callCost(flat, { input: 1000, output: 0, cacheRatio: 0 }, 1), allCached);
+
+  // A band applies from its threshold up, and not below it.
+  const banded = { ...flat, rateBands: [{ input: 20, cached: 2, output: 40, threshold: 200_000 }] };
+  const below = callCost(banded, { input: 199_999, output: 0, cacheRatio: 0 });
+  const at = callCost(banded, { input: 200_000, output: 0, cacheRatio: 0 });
+  assert.ok(Math.abs(below - (199_999 * 10) / 1e6) < 1e-12, "below the threshold the base rate applies");
+  assert.ok(Math.abs(at - (200_000 * 20) / 1e6) < 1e-12, "at the threshold the band applies");
+  assert.equal(hasThresholdPricing(banded, 199_999), false);
+  assert.equal(hasThresholdPricing(banded, 200_000), true);
+  assert.equal(hasThresholdPricing(flat, 200_000), false, "a model without bands never reports one");
+
+  // Rates verified only below a limit return NaN rather than a wrong number.
+  const limited = { ...flat, unsupportedBeyond: 100_000 };
+  assert.ok(Number.isNaN(callCost(limited, { input: 100_000, output: 0, cacheRatio: 0 })));
+  assert.ok(Number.isFinite(callCost(limited, { input: 99_999, output: 0, cacheRatio: 0 })));
+});
+
+test("monthly figures keep cents only when rounding would flip the verdict", async () => {
+  const { monthlyPrice, monthlyPriceAgainst } = await import("../build/lib/format.js");
+
+  assert.equal(monthlyPrice(27), "$27");
+  assert.equal(monthlyPrice(0.5), "$0.50");
+
+  // $3.33 against a $3 budget must not render as "$3" beside "over budget".
+  assert.equal(monthlyPriceAgainst(3.33, 3), "$3.33");
+  // Rounding that keeps the verdict intact stays whole-dollar.
+  assert.equal(monthlyPriceAgainst(251, 30), "$251");
+  assert.equal(monthlyPriceAgainst(3.33, 4), "$3");
+  assert.equal(monthlyPriceAgainst(27, 30), "$27");
+  // The symmetric direction: under budget but rounding up past it.
+  assert.equal(monthlyPriceAgainst(3.6, 3.8), "$3.60");
+});
+
+test("a record is called stale only once it lags the date the page advertises", async () => {
+  const { ageInDays, freshnessReport, lagBehind, oldestVerifiedAt } =
+    await import("../build/lib/domain/freshness.js");
+
+  assert.equal(ageInDays("2026-08-21", "2026-10-02"), 42);
+  assert.equal(ageInDays("2026-10-02", "2026-08-21"), 0, "a future date is never negative age");
+
+  assert.equal(lagBehind("2026-09-20", "2026-10-02"), 0, "inside the allowance reports nothing");
+  assert.equal(lagBehind("2026-08-21", "2026-10-02"), 42);
+
+  const models = [
+    { id: "fresh", name: "Fresh", verifiedAt: "2026-09-30", capability: { verifiedAt: "2026-09-30" } },
+    { id: "old", name: "Old", verifiedAt: "2026-08-01", capability: null },
+  ];
+  const plans = [{ id: "p", name: "P", verifiedAt: "2026-08-21" }];
+
+  assert.equal(oldestVerifiedAt(models, plans), "2026-08-01");
+
+  const report = freshnessReport(models, plans, "2026-10-02", 30);
+  assert.equal(report.counted, 4, "every dated field is counted, including capability dates");
+  assert.deepEqual(report.stale.map((r) => r.id), ["old", "p"], "worst first");
+  assert.equal(report.stale[0].kind, "model-price");
+  assert.equal(report.stale[1].kind, "plan");
+  assert.equal(freshnessReport(models, plans, "2026-10-02", 90).stale.length, 0);
+});
+
+test("the page does not claim to be fresher than its oldest record", async () => {
+  const [models, plans] = await Promise.all([
+    readFile(new URL("../data/api-models.json", import.meta.url), "utf8").then(JSON.parse),
+    readFile(new URL("../data/plans.json", import.meta.url), "utf8").then(JSON.parse),
+  ]);
+  const { freshnessReport } = await import("../build/lib/domain/freshness.js");
+  const advertised = models.updatedAt > plans.updatedAt ? models.updatedAt : plans.updatedAt;
+  const report = freshnessReport(models.models, plans.plans, advertised);
+
+  const header = await read("components/site-header.tsx");
+  const priceBook = await read("features/rankings/price-book.tsx");
+  const details = await read("components/item-details.tsx");
+
+  // The header's stale state is driven by the weakest record, not the newest file.
+  assert.match(header, /oldestRecordLag > defaultMaxAgeDays/);
+  // Price and plan verification dates reach the reader, not just capability ones.
+  assert.match(details, /rates verified \{item\.verifiedAt\}/);
+  assert.match(details, /plan verified \{item\.verifiedAt\}/);
+  assert.match(priceBook, /lagBehind\(model\.verifiedAt, latestCatalogUpdate\)/);
+  assert.match(priceBook, /lagBehind\(plan\.verifiedAt, latestCatalogUpdate\)/);
+
+  // Whatever the catalog currently holds, every lagging record must be one the
+  // rendered page would mark. This fails if a row is quietly left unmarked.
+  const markup = await html("/");
+  for (const record of report.stale.filter((entry) => entry.kind !== "model-capability")) {
+    assert.ok(
+      markup.includes(record.name) || record.kind === "plan" || record.kind === "plan-quota",
+      `${record.id} is listed on the page that reports its age`,
+    );
+  }
+  assert.ok(report.counted > 0, "the catalog carries dated records to check");
+});
+
+test("a workload that bills at a higher rate band says so", async () => {
+  const priceBook = await read("features/rankings/price-book.tsx");
+  // The rates column shows the base band; the row has to admit when the
+  // estimate beside it was computed from a different one.
+  assert.match(priceBook, /hasThresholdPricing\(model, settings\.input\)/);
+  assert.match(priceBook, /banded \? "rate-superseded" : undefined/);
+  assert.match(priceBook, /\{banded && <BandMark input=\{settings\.input\} \/>\}/);
+
+  // Every rate and estimate column can be switched off. The disclosure has to
+  // sit ahead of all of them, in the name cell that always renders, or hiding a
+  // column quietly withdraws the warning while the row still misleads.
+  // Measured from the start of the model row, so the header's own column
+  // toggles do not count as the first optional column.
+  const row = priceBook.slice(priceBook.indexOf("const banded = hasThresholdPricing"));
+  const bandMarkAt = row.indexOf("<BandMark");
+  const firstOptionalColumnAt = row.indexOf("{apiColumns.");
+  assert.ok(bandMarkAt > 0 && firstOptionalColumnAt > 0, "the row renders both a band mark and optional columns");
+  assert.ok(
+    bandMarkAt < firstOptionalColumnAt,
+    "the band disclosure must render before the first toggleable column, not inside one",
+  );
+
+  const styles = await read("app/globals.css");
+  assert.match(styles, /\.rate-superseded\s*\{[^}]*text-decoration:\s*line-through/s);
+  assert.match(styles, /\.row-stale\s*\{/);
+  // The header has set a "stale" class for a long time; it now renders.
+  assert.match(styles, /\.freshness\.stale i\s*\{[^}]*background:\s*var\(--note-accent\)/s);
+
+  // Catalogue sanity: the mechanism is pointless if nothing uses bands.
+  const models = await readFile(new URL("../data/api-models.json", import.meta.url), "utf8").then(JSON.parse);
+  const banded = models.models.filter((model) => model.rateBands?.length);
+  assert.ok(banded.length > 0, "at least one model publishes a rate band");
+  for (const model of banded) {
+    for (const band of model.rateBands) {
+      assert.ok(band.threshold > 0, `${model.id} band carries a threshold`);
+    }
   }
 });

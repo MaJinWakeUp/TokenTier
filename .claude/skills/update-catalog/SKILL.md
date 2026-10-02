@@ -18,13 +18,89 @@ nothing to hand-edit in the UI.
 
 ## The rule that governs everything here
 
-**Never scrape, infer, or estimate a number.** Every price and every capability
-score is read by a human from the provider's own published page or from
-Artificial Analysis, and pasted in with its `source` URL and `verifiedAt` date.
-If a number cannot be confirmed from an official page, the change does not go in
-— record the uncertainty in `note` instead, or leave the model out. Third-party
-write-ups are not sources. See "Judgment calls" below for the standing
-precedents.
+**Every number is traceable to an official page.** A price or capability score
+comes from the provider's own published page or from Artificial Analysis, and
+carries its `source` URL and `verifiedAt` date. Third-party write-ups are not
+sources, and a number nobody can point at does not go in — record the
+uncertainty in `note`, or leave the model out.
+
+How the page gets read is a tradeoff, not a rule. The conservative default is a
+human reading it and pasting the number. Fetching the page, and deriving a
+figure the provider does not publish directly, are both ordinary options — offer
+them, say plainly what each costs in traceability, and let the user choose
+rather than refusing on principle. Precedent: on a full re-verification pass the
+numbers were fetched rather than transcribed, and DeepSeek V4 Pro's cached rate
+is a time-weighted blend of the published peak and off-peak rates, chosen over
+the published peak figure after the arithmetic was laid out.
+
+**A derived number must announce itself.** `models:validate` checks shape, not
+provenance, and will pass a fabricated figure silently. Any number that is not
+read verbatim off the source states in its `note` that it is derived and how it
+was computed — as the DeepSeek V4 Pro record does.
+
+## Two kinds of pass
+
+**A targeted change** — one model repriced, one plan edited — runs the routine
+below for that record and stops.
+
+**A refresh pass** keeps the whole catalog honest, and is what to run when the
+user asks to "update the site" without naming a record. It starts from the data
+rather than from memory: the records nobody has thought about are exactly the
+ones that rot. Begin at step 0, work the stale list, and finish the routine once
+for everything the pass touched.
+
+### 0. Ask the data what is out of date
+
+```bash
+npm run models:validate
+```
+
+The closing **Freshness** block lists every dated record past 30 days, worst
+first, as `age · kind · id (verifiedAt)`. Model prices, capability scores and
+plan records are all counted separately, because they age independently — a
+model repriced last week can still carry a capability score from two rebases ago.
+
+Work that list top-down. For each record, open its `source` URL, read the page,
+and either:
+
+- **confirm it** — the number is unchanged: bump `verifiedAt` to today and say so;
+  an unchanged number that was re-read is not a no-op, it is the evidence;
+- **correct it** — write the new number with the same `verifiedAt` bump; or
+- **retire it** — the product is gone (see retiring, below).
+
+Re-verifying a record you did not change is the point of the pass, not wasted
+work. `verifiedAt` is a claim about when a human last looked, and the site shows
+it: rows that lag the catalog's own update date are marked *verified <date>* in
+the price book, and the header's freshness dot goes amber on the oldest record,
+not the newest file.
+
+Before shipping, confirm the pass actually closed the gap:
+
+```bash
+npm run models:validate -- --max-age=30
+```
+
+That exits non-zero while anything is still past the threshold, and prints what.
+Plain `models:validate` only reports, so an ageing catalog never blocks an
+unrelated build.
+
+### What a refresh pass covers
+
+Walk these in order; the first is the only one the stale list surfaces on its own.
+
+1. **Stale records** — the freshness block above.
+2. **New models from providers already in the catalog.** Check each provider's
+   pricing page for models released since the last pass. A provider lane that
+   has not gained a model in months usually means nobody looked.
+3. **Retired models.** A model still listed whose provider page no longer
+   mentions it, or marks it legacy with a shutdown date, should go — repoint
+   every plan `modelIds` that referenced it first.
+4. **Plan entitlements, not just plan prices.** `modelIds` is the field that
+   rots quietly: plans gain and lose model access without a price change, and a
+   wrong roster silently changes which model a plan is judged on.
+5. **Index drift.** If Artificial Analysis has published a new index version,
+   that is a rebase (see below), not a per-model edit.
+6. **The $10 plan floor** still holds for anything added.
 
 ## Routine
 
@@ -67,10 +143,11 @@ touch `plans.json`.
 npm run models:validate
 ```
 
-Prints the model, plan, and scenario counts and how many models clear each
-scenario bar. Read that last block — a bar that suddenly admits far more or far
-fewer models than before is the signal that something moved, even when validation
-passes.
+Prints the model, plan and scenario counts, how many models clear each scenario
+bar, and the freshness block. Read the bar block — a bar that suddenly admits far
+more or far fewer models than before is the signal that something moved, even
+when validation passes. After a refresh pass, re-run with `--max-age=30` and
+expect it to pass.
 
 ### 4. Test and type-check
 
@@ -129,6 +206,15 @@ score to fill the gap.
 These recur, and the project has already decided them. Follow the precedent
 unless the user overrides it.
 
+- **Subscriptions under $10 a month stay out.** The floor is *exclusive*: $10
+  itself is kept, and it does not reach `monthly: null` pay-as-you-go entries.
+  Every plan it removed metered access by a relative limit that converts to no
+  call count, so each sorted to the top of a price-ordered board while unable to
+  show it covered any of the workload. Check a new plan's price against the
+  floor before writing the record, and say so rather than adding it and waiting
+  to be told. It removed ChatGPT Go at 8 USD, Google AI Plus at 9.99 USD (a
+  `confidence: High` record) and Meta One Core at 7.99 USD; OpenCode Go and
+  SuperGrok Lite at exactly 10 USD were deliberately kept.
 - **A temporary or introductory price** is not the headline number. The standard
   rate goes in `input`/`cached`/`output`; the discount goes in `note` with its
   end date. A promotion must never move a model up the board.

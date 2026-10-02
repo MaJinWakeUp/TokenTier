@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-09-30",
+  "updatedAt": "2026-10-02",
   "currency": "USD",
   "plans": [
     {
@@ -129,14 +129,13 @@
       "kind": "Subscription",
       "monthly": 20,
       "source": "https://claude.com/pricing",
-      "note": "App-level rate limit applies. Agent SDK usage can be charged against plan credits with an extra fee.",
-      "quota": "5x Free plan allowances, dynamic by context size and demand",
-      "evidence": "Official credit",
+      "note": "The $20 monthly credit covers Claude Agent SDK usage in your own projects only — not interactive Claude Code, web chat or Cowork — and usage past it bills at standard API rates. App-level rate limits apply and vary with context size and demand.",
+      "quota": "$20/month of Agent SDK credit; app usage is \"more usage\" than Free with no published multiple",
+      "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "Optional",
-      "includedApiValue": 20,
       "cacheRatio": 0.3,
-      "verifiedAt": "2026-08-21",
+      "verifiedAt": "2026-10-02",
       "modelIds": [
         "claude-sonnet-5"
       ],
@@ -145,11 +144,10 @@
         "coding-client"
       ],
       "quotaDetail": {
-        "kind": "dollar-allowance",
-        "amount": 20,
-        "resetWindow": "monthly",
-        "source": "https://claude.com/pricing",
-        "verifiedAt": "2026-08-21"
+        "kind": "relative-limit",
+        "description": "App usage is \"more usage\" than Free with no published multiple; the $20 monthly credit is scoped to Claude Agent SDK projects and does not meter this plan's chat or coding-client surfaces",
+        "source": "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan",
+        "verifiedAt": "2026-10-02"
       }
     },
     {
@@ -164,7 +162,6 @@
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "Optional",
-      "includedApiValue": 100,
       "cacheRatio": 0.4,
       "verifiedAt": "2026-09-28",
       "modelIds": [
@@ -194,7 +191,6 @@
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "Optional",
-      "includedApiValue": 200,
       "cacheRatio": 0.45,
       "verifiedAt": "2026-09-28",
       "modelIds": [
@@ -332,14 +328,14 @@
       "name": "SuperGrok",
       "kind": "Subscription",
       "monthly": 30,
-      "source": "https://x.ai/pricing",
-      "note": "Includes Grok 4.6 access with higher limits, image and video generation, and live web and X search. API usage is separate.",
-      "quota": "Shared weekly product usage pool with pay-as-you-go overage",
+      "source": "https://grok.com/supergrok",
+      "note": "Card lists Grok Bot, everything in Lite, Expert mode at higher limits, HD 720p 30-second video, longer voice conversations and faster replies. xAI's pricing page names Grok 4.6 as the included model, which is what the roster reflects. No published figure converts to a call count. API usage is separate.",
+      "quota": "5x longer conversations in Chat; best model in Expert mode with higher limits",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-08-21",
+      "verifiedAt": "2026-10-02",
       "modelIds": [
         "grok-4-6"
       ],
@@ -348,9 +344,9 @@
       ],
       "quotaDetail": {
         "kind": "relative-limit",
-        "description": "Shared weekly product usage pool with pay-as-you-go overage",
-        "source": "https://x.ai/pricing",
-        "verifiedAt": "2026-08-21"
+        "description": "5x longer conversations in Chat; best model in Expert mode with higher limits",
+        "source": "https://grok.com/supergrok",
+        "verifiedAt": "2026-10-02"
       }
     },
     {
@@ -359,14 +355,14 @@
       "name": "SuperGrok Plus",
       "kind": "Subscription",
       "monthly": 100,
-      "source": "https://x.ai/pricing",
-      "note": "Same Grok model as standard SuperGrok with significantly higher weekly usage, faster replies, priority peak access, and early features. API usage is separate.",
-      "quota": "Significantly higher shared weekly product pool plus priority access at peak times",
+      "source": "https://grok.com/supergrok",
+      "note": "Everything in SuperGrok plus 1080p video, lightning-fast replies, priority access at peak times and early features. No published figure converts to a call count. API usage is separate.",
+      "quota": "Significantly higher usage across Chat, Imagine, Voice and Build, with priority access at peak times",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.3,
-      "verifiedAt": "2026-08-21",
+      "verifiedAt": "2026-10-02",
       "modelIds": [
         "grok-4-6"
       ],
@@ -375,9 +371,9 @@
       ],
       "quotaDetail": {
         "kind": "relative-limit",
-        "description": "Significantly higher shared weekly product pool plus priority access at peak times",
-        "source": "https://x.ai/pricing",
-        "verifiedAt": "2026-08-21"
+        "description": "Significantly higher usage across Chat, Imagine, Voice and Build, with priority access at peak times",
+        "source": "https://grok.com/supergrok",
+        "verifiedAt": "2026-10-02"
       }
     },
     {
@@ -386,14 +382,14 @@
       "name": "SuperGrok Heavy",
       "kind": "Subscription",
       "monthly": 300,
-      "source": "https://x.ai/pricing",
-      "note": "Highest individual Grok tier with Heavy-model and Build Mode access. The public comparison lists the tier but the $300 price is corroborated from checkout and community sources.",
-      "quota": "Highest shared weekly Grok product pool and early feature access",
+      "source": "https://grok.com/supergrok",
+      "note": "Billed as a larger team of agents collaborating on an answer, and includes X Premium+ at no extra cost plus dedicated support. No published figure converts to a call count. API usage is separate.",
+      "quota": "Everything in SuperGrok Plus, with the highest usage at the fastest speed",
       "evidence": "Official relative limit",
-      "confidence": "Low",
+      "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.35,
-      "verifiedAt": "2026-08-21",
+      "verifiedAt": "2026-10-02",
       "modelIds": [
         "grok-4-6"
       ],
@@ -402,9 +398,9 @@
       ],
       "quotaDetail": {
         "kind": "relative-limit",
-        "description": "Highest shared weekly Grok product pool and early feature access",
-        "source": "https://x.ai/pricing",
-        "verifiedAt": "2026-08-21"
+        "description": "Everything in SuperGrok Plus, with the highest usage at the fastest speed",
+        "source": "https://grok.com/supergrok",
+        "verifiedAt": "2026-10-02"
       }
     },
     {
@@ -599,9 +595,34 @@
       "evidence": "Price break-even",
       "confidence": "Low",
       "apiIncluded": "Yes",
-      "verifiedAt": "2026-08-21",
+      "verifiedAt": "2026-10-02",
       "modelIds": [
-        "kimi-k3"
+        "gpt-6-astra",
+        "gpt-6-1-sol",
+        "gpt-6-sol",
+        "gpt-6-luna",
+        "gpt-5-6-sol",
+        "gpt-5-6-terra",
+        "gpt-5-6-luna",
+        "claude-fable-5-1",
+        "claude-opus-5-5",
+        "claude-opus-5",
+        "claude-sonnet-5",
+        "claude-haiku-4-5",
+        "gemini-3-8-flash",
+        "gemini-3-1-pro",
+        "grok-4-7",
+        "grok-4-6",
+        "grok-4-5",
+        "grok-build-0-1",
+        "meta-muse-spark-1-3",
+        "qwen-3-8-max",
+        "deepseek-v4-1-flash",
+        "deepseek-v4-pro",
+        "glm-5-3",
+        "glm-5-3-flash",
+        "kimi-k3",
+        "kimi-k2-7-code"
       ],
       "access": [
         "api"
@@ -610,7 +631,7 @@
         "kind": "unknown",
         "description": "Direct token pass-through with no monthly fee",
         "source": "https://opencode.ai/docs/zen/",
-        "verifiedAt": "2026-08-21"
+        "verifiedAt": "2026-10-02"
       }
     },
     {
@@ -798,14 +819,14 @@
       "name": "Kimi Moderato",
       "kind": "Subscription",
       "monthly": 19,
-      "source": "https://www.kimi.com/help/membership/membership-pricing",
+      "source": "https://www.kimi.ai/help/membership/membership-pricing",
       "note": "Shared Kimi membership pool; task counts are vendor estimates based on typical token use and are not API calls.",
       "quota": "60 Agent credits; 1× Kimi Code credits; 2,000 database calls",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.25,
-      "verifiedAt": "2026-08-21",
+      "verifiedAt": "2026-10-02",
       "modelIds": [
         "kimi-k3"
       ],
@@ -816,8 +837,8 @@
       "quotaDetail": {
         "kind": "relative-limit",
         "description": "60 Agent credits; 1× Kimi Code credits; 2,000 database calls",
-        "source": "https://www.kimi.com/help/membership/membership-pricing",
-        "verifiedAt": "2026-08-21"
+        "source": "https://www.kimi.ai/help/membership/membership-pricing",
+        "verifiedAt": "2026-10-02"
       }
     },
     {
@@ -826,14 +847,14 @@
       "name": "Kimi Allegretto",
       "kind": "Subscription",
       "monthly": 39,
-      "source": "https://www.kimi.com/help/membership/membership-pricing",
+      "source": "https://www.kimi.ai/help/membership/membership-pricing",
       "note": "Shared Kimi membership pool with Kimi Claw. Task counts are vendor estimates, not API-call guarantees.",
       "quota": "150 Agent credits; 5× Kimi Code credits; 5,000 database calls",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.25,
-      "verifiedAt": "2026-08-21",
+      "verifiedAt": "2026-10-02",
       "modelIds": [
         "kimi-k3"
       ],
@@ -844,8 +865,8 @@
       "quotaDetail": {
         "kind": "relative-limit",
         "description": "150 Agent credits; 5× Kimi Code credits; 5,000 database calls",
-        "source": "https://www.kimi.com/help/membership/membership-pricing",
-        "verifiedAt": "2026-08-21"
+        "source": "https://www.kimi.ai/help/membership/membership-pricing",
+        "verifiedAt": "2026-10-02"
       }
     },
     {
@@ -854,14 +875,14 @@
       "name": "Kimi Allegro",
       "kind": "Subscription",
       "monthly": 99,
-      "source": "https://www.kimi.com/help/membership/membership-pricing",
+      "source": "https://www.kimi.ai/help/membership/membership-pricing",
       "note": "Larger shared Kimi membership pool with four concurrent Agent tasks. Task counts are estimates, not API calls.",
       "quota": "360 Agent credits; 15× Kimi Code credits; 12,000 database calls",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.3,
-      "verifiedAt": "2026-08-21",
+      "verifiedAt": "2026-10-02",
       "modelIds": [
         "kimi-k3"
       ],
@@ -872,8 +893,8 @@
       "quotaDetail": {
         "kind": "relative-limit",
         "description": "360 Agent credits; 15× Kimi Code credits; 12,000 database calls",
-        "source": "https://www.kimi.com/help/membership/membership-pricing",
-        "verifiedAt": "2026-08-21"
+        "source": "https://www.kimi.ai/help/membership/membership-pricing",
+        "verifiedAt": "2026-10-02"
       }
     },
     {
@@ -882,14 +903,14 @@
       "name": "Kimi Vivace",
       "kind": "Subscription",
       "monthly": 199,
-      "source": "https://www.kimi.com/help/membership/membership-pricing",
+      "source": "https://www.kimi.ai/help/membership/membership-pricing",
       "note": "Kimi's highest membership pool and concurrency. Task counts are vendor estimates, not API-call guarantees.",
       "quota": "720 Agent credits; 30× Kimi Code credits; 24,000 database calls",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.35,
-      "verifiedAt": "2026-08-21",
+      "verifiedAt": "2026-10-02",
       "modelIds": [
         "kimi-k3"
       ],
@@ -900,8 +921,8 @@
       "quotaDetail": {
         "kind": "relative-limit",
         "description": "720 Agent credits; 30× Kimi Code credits; 24,000 database calls",
-        "source": "https://www.kimi.com/help/membership/membership-pricing",
-        "verifiedAt": "2026-08-21"
+        "source": "https://www.kimi.ai/help/membership/membership-pricing",
+        "verifiedAt": "2026-10-02"
       }
     }
   ]

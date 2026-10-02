@@ -18,6 +18,7 @@ import type {
   UsageSettings,
 } from "./types.js";
 import { modelPlacements, planPlacements, gateSummary, type Placement } from "../domain/placement.js";
+import { oldestVerifiedAt } from "../domain/freshness.js";
 import { providerFilterNames } from "../format.js";
 
 const models = (modelCatalog as unknown as ModelCatalogDoc).models as Model[];
@@ -29,6 +30,15 @@ const scenarios = (scenarioCatalog as unknown as ScenarioCatalogDoc).scenarios a
 const tierCuts = (scenarioCatalog as unknown as ScenarioCatalogDoc).tierCuts as [number, number, number, number];
 const rankingWeights = (scenarioCatalog as unknown as ScenarioCatalogDoc).ranking;
 const capabilityIndex = (modelCatalog as unknown as ModelCatalogDoc).capabilityIndex;
+
+// One date for the whole catalog: the later of the two documents, because a
+// reader asking "how fresh is this?" means the page, not a single file.
+export const latestCatalogUpdate =
+  modelCatalogUpdatedAt > planCatalogUpdatedAt ? modelCatalogUpdatedAt : planCatalogUpdatedAt;
+
+// The newest file date is what the page claims; this is the oldest record
+// behind that claim. Both are facts, and showing only the first overstates.
+export const oldestCatalogVerification = oldestVerifiedAt(models, plans) ?? latestCatalogUpdate;
 
 export { models, modelById, plans, scenarios, capabilityIndex, modelCatalogUpdatedAt, planCatalogUpdatedAt, tierCuts, rankingWeights };
 
