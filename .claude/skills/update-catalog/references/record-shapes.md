@@ -56,8 +56,8 @@ Optional: `note`, `rateBands`, `unsupportedBeyond`.
 Required: `id`, `provider`, `name`, `kind`, `monthly`, `source`, `note`, `quota`,
 `evidence`, `confidence`, `apiIncluded`, `verifiedAt`, `modelIds`.
 Optional: `access`, `cacheRatio`, `conditionalLimits`, `creditMultipliers`,
-`includedApiValue`, `overageInput`, `overageOutput`, `quotaDetail`,
-`weeklyCredits`.
+`includedApiValue`, `modelAllowances`, `overageInput`, `overageOutput`,
+`quotaDetail`, `weeklyCredits`.
 
 ```json
 {
@@ -105,6 +105,14 @@ Joins and pairings validation enforces:
 - `creditMultipliers` needs an entry — `[input, cached, output]`, all
   nonnegative — for **every** id in `modelIds`, and requires `weeklyCredits`;
   `weeklyCredits` likewise requires `creditMultipliers`;
+- `modelAllowances` is a positive monthly dollar cap for **every** id in
+  `modelIds`, and requires a `dollar-allowance` quotaDetail whose
+  `resetWindow` is `monthly` and whose `amount` equals one of those caps.
+  Estimates use the working model's cap as a monthly amount and do not scale
+  it by the reset window.
+  `conditionalLimits[].shareOfAllowance` (a fraction in `(0, 1]`) derives that
+  window as the fraction of the working model's cap; the stored `amount` must
+  equal the same fraction of `quotaDetail.amount`;
 - `dollar-allowance`, `credit-allowance` and `request-limit` need `amount` and
   `resetWindow`; `relative-limit` and `unknown` need `description`;
 - `monthly` may be `null` (a plan with no fixed price) but not negative.

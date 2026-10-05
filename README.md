@@ -255,6 +255,117 @@ date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
 
+## Catalog changes, October 5 2026
+
+Re-read from the providers' own pages on October 5. One new model, one new
+plan, long-context bands for the OpenAI models and for Grok Build 0.1, and two
+corrections. Gemini 4 Argon is not in this pass: it is not generally available.
+
+### Added: Claude Sonnet 5.5
+
+| | Claude Sonnet 5.5 |
+| --- | --- |
+| Provider | Anthropic |
+| Input / cached / output | $2 / $0.20 / $10 |
+| Context | 1M, 128K maximum output |
+| Index v4.3.2 | 56 (max) |
+
+Released September 28, 2026, at Sonnet 5's token rates. Cache reads are $0.20;
+5-minute cache writes are $2.50 and 1-hour writes are $4. Batch is 50% off, and
+US-only inference is 1.1x. Retirement is not sooner than September 28, 2027.
+
+It enters the model boards at **C** on daily use, easy coding, and writing, and
+at **B** on medium coding, hard coding, research, and innovation. No other
+model changes letter. The three Cursor plans list it, because Cursor's models
+page prices Sonnet 5.5 in the Other Models pool that Pro, Pro Plus, and Ultra
+include. Claude Pro and both Max plans list it too: claude.com/pricing marks
+Sonnet as included on Pro and Max, and the same page's current lineup is
+Sonnet 5.5.
+
+On the lower bars Sonnet 5 and Sonnet 5.5 cost the same, and an equal price
+breaks toward the earlier id, so Claude Pro's working model stays Sonnet 5 on
+daily use, easy coding, medium coding, and writing. Sonnet 5 scores 38 and
+misses the 45 bar, so on hard coding, research, and innovation Pro now qualifies
+and lands at **A** via Sonnet 5.5. Max's working model becomes Sonnet 5.5 on
+every lane, because it is cheaper than Opus 5.5 and clears every bar. Max's
+letters do not move.
+
+### Added: OpenCode Go Plus
+
+$40 a month, above the $10 floor. Same models and token prices as OpenCode Go,
+with higher per-model monthly caps. The docs page does not print a launch date
+(it says last updated October 3, 2026); Go Plus was added to those docs on
+September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its
+weekly limit is 50%. Capacity follows the selected working model's published
+monthly cap: GLM-5.3-Flash and Kimi K2.7 Code are $180, GLM-5.3 and DeepSeek
+V4.1 Flash are $120, and Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, Grok
+4.6, GPT-6 Luna, and GPT-5.6 Luna are $60. The $180 recorded on the quota is
+GLM-5.3-Flash's cap. Hard coding and research select GLM-5.3 ($120, so $24 / 5
+hours and $60 / week). Writing selects GPT-6 Luna ($60, so $12 / 5 hours and
+$30 / week). Kimi K3 is $60 here, against $15 on Go.
+
+$40 is over the $30 daily-use and easy-coding ceilings, so Go Plus is listed off
+those boards. It enters at **B** on medium coding, writing, hard coding,
+research, and innovation. Adding it recuts those curves: SuperGrok rises from B
+to A on medium coding and writing, and Cursor Pro Plus falls from B to C on the
+same two. On the three 45-bar lanes, GLM Coding Pro falls from B to C and GLM
+Coding Max from C to D.
+
+### Corrected: OpenCode Go includes Grok 4.7
+
+The Go docs list Grok 4.7, with a $15 monthly cap. It was missing from
+`opencode-go`. It does not become the working model on any lane: a cheaper
+model on the plan still clears each bar. OpenCode Go's letter does not move.
+
+### OpenAI long-context rates above 272K
+
+The pricing page prices prompts over 272K input tokens from a long-context
+column, and the model pages state the same rule for the whole request. The
+GPT-6 Astra note used to say the published rates apply across the full window.
+That was the opposite of the page, and it is gone.
+
+Standard long-context rates, read from the pricing table (input / cached /
+output):
+
+| Model | Long context |
+| --- | --- |
+| GPT-6 Astra | $20 / $2 / $75 |
+| GPT-6.1 Sol | $4 / $0.20 / $15 |
+| GPT-6 Luna | $0.20 / $0.02 / $0.75 |
+| GPT-5.6 Sol | $8 / $0.80 / $30 |
+
+GPT-6 Sol, GPT-5.6 Terra, and GPT-5.6 Luna are not in that long-context table.
+Their model pages state a multiplier only. The bands are derived from it, and
+the notes say so: GPT-6 Sol is 2x input and cache and 1.5x output, so $4 /
+$0.40 / $15. Terra and Luna say 2x input and 1.5x output and do not mention
+cache, so the band is $4 / $0.20 / $18 for Terra and $0.40 / $0.02 / $1.80 for
+Luna — input and output derived, cached left at the published short-context
+rate.
+
+No scenario sends more than 90K input tokens, so none of these bands changes a
+board.
+
+### GPT-5.6 Sol stays on its published rate
+
+OpenAI calls the $4 / $0.40 / $20 price promotional pricing available at least
+through November 21, 2026. The pricing page does not state a separate
+post-promotion standard rate, so the headline stays the only rate the page
+prints. The old note that called this a "standard rate reduced" was wrong about
+that, and now says it is promotional.
+
+### Corrected: Claude Haiku 4.5 context
+
+The model comparison lists 200K context and 64K maximum output. The catalog had
+1M and no output ceiling. Prices are unchanged at $1 / $0.10 / $5. Haiku 4.5 is
+still Active; retirement is not sooner than October 15, 2026. Its score of 15
+is below every bar, and 200K still holds every profile, so nothing moves.
+
+### Grok Build 0.1 long-context band
+
+The xAI pricing table prices prompts at or above 200K at $2 input / $0.40
+cached / $4 output. Base rates are unchanged at $1 / $0.20 / $2. Build 0.1 is
+unscored, and no profile reaches 200K, so the board does not move.
+
 ## Catalog changes, October 2 2026
 
 A freshness pass, driven by the new report at the end of `models:validate`

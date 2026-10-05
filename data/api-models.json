@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "updatedAt": "2026-09-30",
+  "updatedAt": "2026-10-05",
   "currency": "USD",
   "unit": "per-million-tokens",
   "capabilityIndex": {
@@ -19,9 +19,9 @@
       "cached": 1,
       "output": 50,
       "context": "1.05M",
-      "source": "https://developers.openai.com/api/docs/models/compare",
-      "verifiedAt": "2026-09-17",
-      "note": "OpenAI's frontier model, released 3 September 2026. Published rates apply across the full context window; maximum output is 128K tokens.",
+      "source": "https://developers.openai.com/api/docs/pricing",
+      "verifiedAt": "2026-10-05",
+      "note": "OpenAI's frontier model, released 3 September 2026. Maximum output is 128K tokens. Prompts with more than 272K input tokens use the standard long-context column on the pricing page: $20 input / $2 cached / $75 output for the whole request.",
       "capability": {
         "metrics": {
           "intelligence": 53
@@ -32,7 +32,15 @@
         "verifiedAt": "2026-09-22"
       },
       "contextTokens": 1050000,
-      "maxOutputTokens": 128000
+      "maxOutputTokens": 128000,
+      "rateBands": [
+        {
+          "input": 20,
+          "cached": 2,
+          "output": 75,
+          "threshold": 272001
+        }
+      ]
     },
     {
       "id": "gpt-5-6-sol",
@@ -42,9 +50,9 @@
       "cached": 0.4,
       "output": 20,
       "context": "1.05M",
-      "source": "https://developers.openai.com/api/docs/models/compare",
-      "verifiedAt": "2026-09-17",
-      "note": "Standard rate reduced to $4 input / $0.40 cached / $20 output; the catalog previously carried $5 / $0.50 / $30.",
+      "source": "https://developers.openai.com/api/docs/pricing",
+      "verifiedAt": "2026-10-05",
+      "note": "OpenAI labels the published $4 input / $0.40 cached / $20 output rate as promotional pricing available at least through November 21, 2026. The pricing page does not state a separate post-promotion standard rate, so that published rate stays the headline. Prompts above 272K input tokens use the pricing table's long-context column, $8 input / $0.80 cached / $30 output, for the whole request. Maximum output is 128K tokens.",
       "capability": {
         "metrics": {
           "intelligence": 47
@@ -54,7 +62,16 @@
         "source": "https://artificialanalysis.ai/models/gpt-5-6-sol",
         "verifiedAt": "2026-09-22"
       },
-      "contextTokens": 1050000
+      "contextTokens": 1050000,
+      "maxOutputTokens": 128000,
+      "rateBands": [
+        {
+          "input": 8,
+          "cached": 0.8,
+          "output": 30,
+          "threshold": 272001
+        }
+      ]
     },
     {
       "id": "gpt-5-6-terra",
@@ -64,9 +81,9 @@
       "cached": 0.2,
       "output": 12,
       "context": "1.05M",
-      "source": "https://developers.openai.com/api/docs/models/compare",
-      "verifiedAt": "2026-09-17",
-      "note": "Live comparison-page rate; some search snippets remain stale.",
+      "source": "https://developers.openai.com/api/docs/models/gpt-5.6-terra",
+      "verifiedAt": "2026-10-05",
+      "note": "Published short-context rate is $2 input / $0.20 cached / $12 output. The model page states that prompts with more than 272K input tokens are priced at 2x input and 1.5x output for the full request. The long-context input ($4) and output ($18) are derived from that multiplier applied to the published $2 / $12 rates. The model page does not state a long-context cached rate, so this band keeps the published cached rate of $0.20. Maximum output is 128K tokens.",
       "capability": {
         "metrics": {
           "intelligence": 42
@@ -76,7 +93,16 @@
         "source": "https://artificialanalysis.ai/models/gpt-5-6-terra",
         "verifiedAt": "2026-09-22"
       },
-      "contextTokens": 1050000
+      "contextTokens": 1050000,
+      "maxOutputTokens": 128000,
+      "rateBands": [
+        {
+          "input": 4,
+          "cached": 0.2,
+          "output": 18,
+          "threshold": 272001
+        }
+      ]
     },
     {
       "id": "gpt-5-6-luna",
@@ -86,9 +112,9 @@
       "cached": 0.02,
       "output": 1.2,
       "context": "1.05M",
-      "source": "https://developers.openai.com/api/docs/models/compare",
-      "verifiedAt": "2026-09-17",
-      "note": "Live comparison-page rate; some model-detail snippets remain stale.",
+      "source": "https://developers.openai.com/api/docs/models/gpt-5.6-luna",
+      "verifiedAt": "2026-10-05",
+      "note": "Published short-context rate is $0.20 input / $0.02 cached / $1.20 output. The model page states that prompts with more than 272K input tokens are priced at 2x input and 1.5x output for the full request. The long-context input ($0.40) and output ($1.80) are derived from that multiplier applied to the published $0.20 / $1.20 rates. The model page does not state a long-context cached rate, so this band keeps the published cached rate of $0.02. Maximum output is 128K tokens.",
       "capability": {
         "metrics": {
           "intelligence": 37
@@ -98,7 +124,16 @@
         "source": "https://artificialanalysis.ai/models/gpt-5-6-luna",
         "verifiedAt": "2026-09-22"
       },
-      "contextTokens": 1050000
+      "contextTokens": 1050000,
+      "maxOutputTokens": 128000,
+      "rateBands": [
+        {
+          "input": 0.4,
+          "cached": 0.02,
+          "output": 1.8,
+          "threshold": 272001
+        }
+      ]
     },
     {
       "id": "claude-opus-5",
@@ -173,10 +208,10 @@
       "input": 1,
       "cached": 0.1,
       "output": 5,
-      "context": "1M",
-      "source": "https://claude.com/pricing",
-      "verifiedAt": "2026-09-17",
-      "note": "High-speed, low-latency Claude model with 1M context.",
+      "context": "200K",
+      "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "verifiedAt": "2026-10-05",
+      "note": "Prices unchanged at $1 input / $0.10 cache read / $5 output. The Sonnet 5.5 model comparison lists a 200K context window and 64K maximum output (https://platform.claude.com/docs/en/models/sonnet-5-5/overview). Still Active; retirement is not sooner than October 15, 2026 (https://platform.claude.com/docs/en/about-claude/model-deprecations).",
       "capability": {
         "metrics": {
           "intelligence": 15
@@ -186,7 +221,8 @@
         "source": "https://artificialanalysis.ai/models/claude-4-5-haiku",
         "verifiedAt": "2026-09-22"
       },
-      "contextTokens": 1000000
+      "contextTokens": 200000,
+      "maxOutputTokens": 64000
     },
     {
       "id": "gemini-3-1-pro",
@@ -308,11 +344,19 @@
       "cached": 0.2,
       "output": 2,
       "context": "256K",
-      "source": "https://docs.x.ai/developers/models/grok-build-0.1",
-      "verifiedAt": "2026-09-17",
-      "note": "Agentic coding and tool-calling model.",
+      "source": "https://docs.x.ai/developers/pricing",
+      "verifiedAt": "2026-10-05",
+      "note": "Agentic coding and tool-calling model. Prompts at or above 200K tokens use $2 input, $0.40 cached input, and $4 output per million tokens for the whole request. Context window is 256K.",
       "capability": null,
-      "contextTokens": 256000
+      "contextTokens": 256000,
+      "rateBands": [
+        {
+          "input": 2,
+          "cached": 0.4,
+          "output": 4,
+          "threshold": 200000
+        }
+      ]
     },
     {
       "id": "deepseek-v4-pro",
@@ -608,9 +652,9 @@
       "context": "1.05M",
       "contextTokens": 1050000,
       "maxOutputTokens": 128000,
-      "source": "https://developers.openai.com/api/docs/models/compare",
-      "verifiedAt": "2026-09-28",
-      "note": "GPT-6 mid tier, built for complex coding and agentic work. Half GPT-5.6 Sol's price. Maximum output is 128K tokens.",
+      "source": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+      "verifiedAt": "2026-10-05",
+      "note": "GPT-6 mid tier, built for complex coding and agentic work. Half the published GPT-5.6 Sol price. Maximum output is 128K tokens. The model page states that prompts with more than 272K input tokens are priced at 2x input and cache rates and 1.5x output for the whole request. The long-context band ($4 input / $0.40 cached / $15 output) is derived from that multiplier applied to the published $2 / $0.20 / $10 rates. The pricing table does not list a separate long-context row for this model.",
       "capability": {
         "metrics": {
           "intelligence": 48
@@ -619,7 +663,15 @@
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/gpt-6-sol",
         "verifiedAt": "2026-09-28"
-      }
+      },
+      "rateBands": [
+        {
+          "input": 4,
+          "cached": 0.4,
+          "output": 15,
+          "threshold": 272001
+        }
+      ]
     },
     {
       "id": "gpt-6-luna",
@@ -631,9 +683,9 @@
       "context": "1.05M",
       "contextTokens": 1050000,
       "maxOutputTokens": 128000,
-      "source": "https://developers.openai.com/api/docs/models/compare",
-      "verifiedAt": "2026-09-28",
-      "note": "OpenAI's most efficient GPT-6 model, for focused, high-volume tasks. Maximum output is 128K tokens.",
+      "source": "https://developers.openai.com/api/docs/pricing",
+      "verifiedAt": "2026-10-05",
+      "note": "OpenAI's most efficient GPT-6 model, for focused, high-volume tasks. Maximum output is 128K tokens. Prompts with more than 272K input tokens use the standard long-context column: $0.20 input / $0.02 cached / $0.75 output for the whole request.",
       "capability": {
         "metrics": {
           "intelligence": 37
@@ -642,7 +694,15 @@
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/gpt-6-luna",
         "verifiedAt": "2026-09-28"
-      }
+      },
+      "rateBands": [
+        {
+          "input": 0.2,
+          "cached": 0.02,
+          "output": 0.75,
+          "threshold": 272001
+        }
+      ]
     },
     {
       "id": "gpt-6-1-sol",
@@ -654,9 +714,9 @@
       "context": "1.05M",
       "contextTokens": 1050000,
       "maxOutputTokens": 128000,
-      "source": "https://developers.openai.com/api/docs/models/compare",
-      "verifiedAt": "2026-09-30",
-      "note": "Newer Sol model, described by OpenAI as near-Astra performance for complex work at a lower cost. Same input and output rates as GPT-6 Sol with half the cached rate. GPT-6 Sol remains available. Maximum output is 128K tokens.",
+      "source": "https://developers.openai.com/api/docs/pricing",
+      "verifiedAt": "2026-10-05",
+      "note": "Newer Sol model, described by OpenAI as near-Astra performance for complex work at a lower cost. Same input and output rates as GPT-6 Sol with half the cached rate. GPT-6 Sol remains available. Maximum output is 128K tokens. Prompts with more than 272K input tokens use the standard long-context column: $4 input / $0.20 cached / $15 output for the whole request.",
       "capability": {
         "metrics": {
           "intelligence": 52
@@ -665,6 +725,37 @@
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/gpt-6-1-sol",
         "verifiedAt": "2026-09-30"
+      },
+      "rateBands": [
+        {
+          "input": 4,
+          "cached": 0.2,
+          "output": 15,
+          "threshold": 272001
+        }
+      ]
+    },
+    {
+      "id": "claude-sonnet-5-5",
+      "provider": "Anthropic",
+      "name": "Claude Sonnet 5.5",
+      "input": 2,
+      "cached": 0.2,
+      "output": 10,
+      "context": "1M",
+      "contextTokens": 1000000,
+      "maxOutputTokens": 128000,
+      "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "verifiedAt": "2026-10-05",
+      "note": "Released September 28, 2026. Cache reads are $0.20 per million tokens; 5-minute cache writes are $2.50 and 1-hour cache writes are $4. The Batch API is 50% off input and output. US-only inference is 1.1x. Retirement is not sooner than September 28, 2027. Maximum output is 128K tokens on the synchronous API.",
+      "capability": {
+        "metrics": {
+          "intelligence": 56
+        },
+        "indexVersion": "4.3.2",
+        "variant": "max",
+        "source": "https://artificialanalysis.ai/models/claude-sonnet-5-5",
+        "verifiedAt": "2026-10-05"
       }
     }
   ]

@@ -3,6 +3,7 @@
 import type { MetricKey, Model, Plan, Scenario, Tier } from "./catalog/types.js";
 import type { Placement, PlanCapacity } from "./domain/placement.js";
 import { scenarioTokens } from "./domain/eligibility.js";
+import { allowanceQuotaLabel, resolvedConditionalLimits } from "./domain/pricing.js";
 
 export const metricLabels: Record<MetricKey, string> = {
   intelligence: "Intelligence Index",
@@ -106,7 +107,15 @@ export function planQuota(plan: Plan, workingModel: Model | null) {
   if (plan.id === "chatgpt-go") return plan.quota;
   if (!workingModel) return plan.quota;
   const range = chatgptMessageRanges[plan.id]?.[workingModel.id];
-  return range ? `${range} ${workingModel.name} local messages / 5h` : plan.quota;
+  if (range) return `${range} ${workingModel.name} local messages / 5h`;
+  return allowanceQuotaLabel(plan, workingModel) ?? plan.quota;
+}
+
+// Shorter-window text for the selected model. A stored description names the
+// reference cap; this one follows the working model's allowance when the plan
+// publishes per-model caps.
+export function conditionalLimitSummary(plan: Plan, workingModel: Model | null) {
+  return resolvedConditionalLimits(plan, workingModel).map((limit) => limit.description).join("; ");
 }
 
 // A plan on the board has cleared the capability bar and is ranked on price.
