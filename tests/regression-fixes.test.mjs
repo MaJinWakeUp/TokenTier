@@ -622,7 +622,14 @@ test("F7: validation rejects contextTokens/context mismatch", () => {
 });
 
 test("F7: validation rejects note implying threshold pricing without rateBands", () => {
-  const badModel = { ...dataset.models[0], note: "Prompts at or above 200K use higher long-context rates." };
+  // The first catalog model now publishes rateBands, so the fixture has to
+  // drop them. Copying whichever record happens to lack bands would fail the
+  // next time that record gained a real band.
+  const badModel = {
+    ...dataset.models[0],
+    rateBands: undefined,
+    note: "Prompts at or above 200K use higher long-context rates.",
+  };
   assert.throws(
     () => validateModel(badModel),
     /note mentions long-context or threshold pricing but has no rateBands/,
