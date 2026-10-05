@@ -1,7 +1,7 @@
 // Token cost arithmetic and plan allowance conversion. Pure functions; every
 // dollar figure derives from the catalog's recorded rates.
 
-import type { Model, Plan, Quota, RateBand, UsageSettings } from "../catalog/types.js";
+import type { ConditionalLimit, Model, Plan, Quota, RateBand, UsageSettings } from "../catalog/types.js";
 
 // Select the applicable rate band for a given input token count. The default
 // band (no threshold) always exists as the top-level input/cached/output fields.
@@ -91,6 +91,62 @@ function modelForPlanCost(
   return fallbackModel ?? null;
 }
 
+function roundMoney(amount: number): number {
+  return Math.round(amount * 100) / 100;
+}
+
+function formatDollars(amount: number): string {
+  return Number.isInteger(amount) ? `$${amount}` : `$${amount.toFixed(2)}`;
+}
+
+function windowPhrase(resetWindow: ConditionalLimit["resetWindow"]): string {
+  if (resetWindow === "5h") return "5 hours";
+  if (resetWindow === "weekly") return "week";
+  return "month";
+}
+
+// The published monthly dollar cap for this model, when the plan lists one.
+// Absent means the plan-wide quotaDetail amount still applies.
+export function modelMonthlyAllowance(plan: Plan, model: Model | null | undefined): number | null {
+  if (!model || !plan.modelAllowances) return null;
+  const cap = plan.modelAllowances[model.id];
+  return cap === undefined ? null : cap;
+}
+
+// Shorter windows that are a published fraction of the working model's monthly
+// cap. The stored amount and description stay as the reference (quotaDetail)
+// figures for callers that have no selected model.
+export function resolvedConditionalLimits(
+  plan: Plan,
+  model: Model | null | undefined,
+): ConditionalLimit[] {
+  const limits = plan.conditionalLimits ?? [];
+  const cap = modelMonthlyAllowance(plan, model);
+  if (cap === null || !model) return limits;
+  return limits.map((limit) => {
+    if (limit.shareOfAllowance === undefined) return limit;
+    const amount = roundMoney(cap * limit.shareOfAllowance);
+    const percent = Math.round(limit.shareOfAllowance * 100);
+    const description = `${formatDollars(amount)} of ${model.name} usage per ${windowPhrase(limit.resetWindow)} (${percent}% of its ${formatDollars(cap)} monthly cap)`;
+    return { ...limit, amount, description };
+  });
+}
+
+// Published-quota line for a plan whose allowance depends on the working model.
+export function allowanceQuotaLabel(plan: Plan, model: Model): string | null {
+  const cap = modelMonthlyAllowance(plan, model);
+  if (cap === null) return null;
+  const windows = resolvedConditionalLimits(plan, model)
+    .filter((limit) => limit.shareOfAllowance !== undefined)
+    .map((limit) => `${formatDollars(limit.amount)}/${limit.resetWindow === "5h" ? "5h" : limit.resetWindow}`);
+  const suffix = windows.length > 0 ? ` (${windows.join(", ")})` : "";
+  return `${formatDollars(cap)}/month on ${model.name}${suffix}`;
+}
+
+function conditionalWindowLabel(plan: Plan, model: Model | null): string {
+  return `Multi-window cap: ${resolvedConditionalLimits(plan, model).map((limit) => limit.description).join(", ")}`;
+}
+
 // Compute credits consumed per call using the published credit formula. This is
 // independent of the model's API price: credits are charged by the provider's
 // own multipliers, not dollar-per-token rates.
@@ -155,7 +211,7 @@ export function planEstimate(
       // conditional so coverage never scores 100.
       const calls = monthlyCredits / cpc;
       const label = hasConditional
-        ? `Multi-window cap: ${plan.conditionalLimits!.map((l) => l.description).join(", ")}`
+        ? conditionalWindowLabel(plan, model)
         : `${quota.resetWindow} reset — monthly distribution unknown`;
       return {
         callsLow: 0,
@@ -189,7 +245,7 @@ export function planEstimate(
     const hasConditional = plan.conditionalLimits && plan.conditionalLimits.length > 0;
     if (quota.resetWindow !== "monthly" || hasConditional) {
       const label = hasConditional
-        ? `Multi-window cap: ${plan.conditionalLimits!.map((l) => l.description).join(", ")}`
+        ? conditionalWindowLabel(plan, model)
         : `${quota.resetWindow} reset — monthly distribution unknown`;
       return {
         callsLow: 0,
@@ -212,7 +268,9 @@ export function planEstimate(
   // quotaDetail is authoritative — includedApiValue is NOT used as a fallback
   // when quotaDetail is present but relative/unknown.
   if (quota?.kind === "dollar-allowance") {
-    const allowance = quota.amount;
+    // A per-model cap replaces the plan-wide amount. quotaDetail.amount stays
+    // the reference cap (one published model), not every model's allowance.
+    const allowance = modelMonthlyAllowance(plan, model) ?? quota.amount;
     const monthlyAllowance = allowance * (windowFactor[quota.resetWindow] ?? 1);
 
     // Period classification: only monthly resetWindow without conditionalLimits
@@ -231,7 +289,7 @@ export function planEstimate(
       }
       const calls = monthlyAllowance / referenceCost;
       const label = hasConditional
-        ? `Multi-window cap: ${plan.conditionalLimits!.map((l) => l.description).join(", ")}`
+        ? conditionalWindowLabel(plan, model)
         : `${quota.resetWindow} reset — monthly distribution unknown`;
       return {
         callsLow: 0,

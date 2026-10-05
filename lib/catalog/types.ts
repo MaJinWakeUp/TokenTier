@@ -72,6 +72,10 @@ export type ConditionalLimit = {
   amount: number;
   resetWindow: "5h" | "weekly" | "monthly";
   description: string;
+  // Fraction of the working model's monthly dollar cap. When set, estimates
+  // derive this window as shareOfAllowance × that cap. `amount` is the same
+  // fraction of quotaDetail.amount, used only when no per-model cap applies.
+  shareOfAllowance?: number;
 };
 
 // Per-call token profile. The cache share is the fraction of input billed at
@@ -143,6 +147,10 @@ export type Plan = {
   weeklyCredits?: number;
   // Keyed by model id: providers publish credit multipliers per model.
   creditMultipliers?: Record<string, [number, number, number]>;
+  // Keyed by model id: published monthly dollar cap for that model. A
+  // dollar-allowance estimate uses the working model's entry instead of the
+  // single quotaDetail amount.
+  modelAllowances?: Record<string, number>;
   cacheRatio?: number;
   // Structured access surfaces the plan provides (v3). Distinct from the soft
   // `apiIncluded` text field, which remains for human-readable notes.

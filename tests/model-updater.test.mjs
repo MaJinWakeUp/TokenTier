@@ -542,6 +542,8 @@ test("no plan claims implausible leverage over its own price", async () => {
         const [im, cm, om] = plan.creditMultipliers[model.id];
         const perCallCredits = (input * (1 - cacheRatio) * im + input * cacheRatio * cm + output * om) / 10_000;
         calls = (plan.weeklyCredits * 4.33) / perCallCredits;
+      } else if (plan.modelAllowances?.[model.id] !== undefined) {
+        calls = plan.modelAllowances[model.id] / perCall(model);
       } else if (plan.includedApiValue !== undefined) {
         calls = plan.includedApiValue / perCall(model);
       }

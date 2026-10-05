@@ -597,8 +597,8 @@
       "kind": "Subscription",
       "monthly": 40,
       "source": "https://opencode.ai/docs/go/",
-      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go docs page (last updated October 3, 2026) does not print a launch date; Go Plus was added to those docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. The recorded $180 monthly allowance is GLM-5.3-Flash's published cap, so a scenario that selects a model with a lower cap overstates that model's allowance. Other catalog-model monthly caps: Kimi K2.7 Code $180, GLM-5.3 $120, DeepSeek V4.1 Flash $120, and $60 for Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, Grok 4.6, GPT-6 Luna, and GPT-5.6 Luna.",
-      "quota": "Per-model monthly caps; GLM-5.3-Flash is $180, with 5-hour at 20% and weekly at 50%",
+      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go docs page (last updated October 3, 2026) does not print a launch date; Go Plus was added to those docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash $180, Kimi K2.7 Code $180, GLM-5.3 $120, DeepSeek V4.1 Flash $120, and $60 for Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, Grok 4.6, GPT-6 Luna, and GPT-5.6 Luna. The $180 on quotaDetail is GLM-5.3-Flash's cap.",
+      "quota": "Per-model monthly caps; 5-hour is 20% and weekly is 50% of the selected model's cap",
       "evidence": "Official quota",
       "confidence": "High",
       "apiIncluded": "Yes",
@@ -629,15 +629,30 @@
         "source": "https://opencode.ai/docs/go/",
         "verifiedAt": "2026-10-05"
       },
+      "modelAllowances": {
+        "grok-4-6": 60,
+        "grok-4-7": 60,
+        "gpt-5-6-luna": 60,
+        "glm-5-3-flash": 180,
+        "glm-5-3": 120,
+        "kimi-k3": 60,
+        "kimi-k2-7-code": 180,
+        "qwen-3-8-max": 60,
+        "deepseek-v4-pro": 60,
+        "deepseek-v4-1-flash": 120,
+        "gpt-6-luna": 60
+      },
       "conditionalLimits": [
         {
           "amount": 36,
           "resetWindow": "5h",
+          "shareOfAllowance": 0.2,
           "description": "$36 of GLM-5.3-Flash usage per 5 hours (20% of its $180 monthly cap)"
         },
         {
           "amount": 90,
           "resetWindow": "weekly",
+          "shareOfAllowance": 0.5,
           "description": "$90 of GLM-5.3-Flash usage per week (50% of its $180 monthly cap)"
         }
       ]

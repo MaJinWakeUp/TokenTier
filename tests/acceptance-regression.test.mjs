@@ -10,7 +10,7 @@ import {
   validatePlans,
   validateScenarios,
 } from "../scripts/update-models.mjs";
-import { callCost, creditsPerCall, planEstimate, planCoverageScore } from "../build/lib/domain/pricing.js";
+import { callCost, creditsPerCall, planEstimate, planCoverageScore, allowanceQuotaLabel } from "../build/lib/domain/pricing.js";
 import { recommend, costTiers } from "../build/lib/domain/recommend.js";
 import {
   modelPlacements,
@@ -307,6 +307,48 @@ test("AC4: OpenCode Go 5h+weekly caps make it conditional", () => {
   assert.equal(est.basis.kind, "conditional", "OpenCode Go must be conditional due to multi-window caps");
   const coverage = planCoverageScore(plan, settings, scenario.calls, wm, modelById.get(plan.modelIds[0]));
   assert.ok(coverage < 100, "Conditional plan must not have 100 coverage");
+  assert.equal(est.valueHigh, plan.quotaDetail.amount, "OpenCode Go keeps its plan-wide allowance");
+});
+
+test("Go Plus allowance follows the selected working model's published cap", () => {
+  const plan = planDoc.plans.find((p) => p.id === "opencode-go-plus");
+  assert.ok(plan, "Catalog must include OpenCode Go Plus");
+  const fallback = modelById.get(plan.modelIds[0]);
+
+  const estimateFor = (scenarioId) => {
+    const scenario = scenarioDoc.scenarios.find((s) => s.id === scenarioId);
+    const settings = { input: scenario.input, output: scenario.output, cacheRatio: scenario.cacheRatio };
+    const working = planWorkingModel(plan, scenario, settings, modelById);
+    const estimate = planEstimate(plan, settings, working, fallback);
+    return { working, estimate };
+  };
+
+  const medium = estimateFor("code-medium");
+  assert.equal(medium.working.id, "glm-5-3-flash");
+  assert.equal(medium.estimate.valueHigh, 180);
+  assert.equal(medium.estimate.callsLow, 0);
+  assert.match(medium.estimate.basis.label, /\$36 of GLM-5\.3-Flash usage per 5 hours \(20% of its \$180 monthly cap\)/);
+  assert.match(medium.estimate.basis.label, /\$90 of GLM-5\.3-Flash usage per week \(50% of its \$180 monthly cap\)/);
+  assert.equal(allowanceQuotaLabel(plan, medium.working), "$180/month on GLM-5.3-Flash ($36/5h, $90/weekly)");
+
+  const hard = estimateFor("code-hard");
+  assert.equal(hard.working.id, "glm-5-3");
+  assert.equal(hard.estimate.valueHigh, 120, "Hard coding must use GLM-5.3's $120 cap, not $180");
+  assert.match(hard.estimate.basis.label, /\$24 of GLM-5\.3 usage per 5 hours \(20% of its \$120 monthly cap\)/);
+  assert.match(hard.estimate.basis.label, /\$60 of GLM-5\.3 usage per week \(50% of its \$120 monthly cap\)/);
+  assert.equal(allowanceQuotaLabel(plan, hard.working), "$120/month on GLM-5.3 ($24/5h, $60/weekly)");
+
+  const research = estimateFor("research");
+  assert.equal(research.working.id, "glm-5-3");
+  assert.equal(research.estimate.valueHigh, 120);
+
+  const writing = estimateFor("writing");
+  assert.equal(writing.working.id, "gpt-6-luna");
+  assert.equal(writing.estimate.valueHigh, 60, "Writing must use GPT-6 Luna's $60 cap, not $180");
+  assert.match(writing.estimate.basis.label, /\$12 of GPT-6 Luna usage per 5 hours \(20% of its \$60 monthly cap\)/);
+  assert.match(writing.estimate.basis.label, /\$30 of GPT-6 Luna usage per week \(50% of its \$60 monthly cap\)/);
+  assert.equal(allowanceQuotaLabel(plan, writing.working), "$60/month on GPT-6 Luna ($12/5h, $30/weekly)");
+  assert.equal(writing.estimate.basis.kind, "conditional");
 });
 
 test("AC4: positive credits with zero API cost produces finite credit capacity", () => {

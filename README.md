@@ -296,9 +296,13 @@ $40 a month, above the $10 floor. Same models and token prices as OpenCode Go,
 with higher per-model monthly caps. The docs page does not print a launch date
 (it says last updated October 3, 2026); Go Plus was added to those docs on
 September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its
-weekly limit is 50%. The recorded allowance is GLM-5.3-Flash's published $180
-cap ($36 / 5 hours, $90 / week). Other catalog models on the plan publish
-different caps, called out in the note — Kimi K3 is $60, against $15 on Go.
+weekly limit is 50%. Capacity follows the selected working model's published
+monthly cap: GLM-5.3-Flash and Kimi K2.7 Code are $180, GLM-5.3 and DeepSeek
+V4.1 Flash are $120, and Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, Grok
+4.6, GPT-6 Luna, and GPT-5.6 Luna are $60. The $180 recorded on the quota is
+GLM-5.3-Flash's cap. Hard coding and research select GLM-5.3 ($120, so $24 / 5
+hours and $60 / week). Writing selects GPT-6 Luna ($60, so $12 / 5 hours and
+$30 / week). Kimi K3 is $60 here, against $15 on Go.
 
 $40 is over the $30 daily-use and easy-coding ceilings, so Go Plus is listed off
 those boards. It enters at **B** on medium coding, writing, hard coding,

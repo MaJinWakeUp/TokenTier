@@ -4,6 +4,7 @@ import { scenarioFor } from "@/lib/catalog";
 import type { Model, Plan } from "@/lib/catalog/types";
 import { capabilityOf } from "@/lib/domain/eligibility";
 import type { Decision } from "@/lib/domain/decision";
+import { resolvedConditionalLimits } from "@/lib/domain/pricing";
 import type { Objective, Workload } from "@/lib/domain/workload";
 import {
   estimatePresentation,
@@ -248,7 +249,7 @@ export function BestPath({
               <h3><button className="table-item-name-btn" type="button" onClick={() => onInspect(entry.plan)}>{entry.plan.name}</button></h3>
               <p>{monthlyPrice(entry.plan.monthly ?? 0)}/mo · {entry.workingModel?.name}</p>
               <p>{estimatePresentation(entry.estimate).calls}. {entry.plan.quota}</p>
-              <p>{entry.plan.evidence}. {entry.plan.conditionalLimits?.map((limit) => limit.description).join("; ")}</p>
+              <p>{entry.plan.evidence}. {resolvedConditionalLimits(entry.plan, entry.workingModel).map((limit) => limit.description).join("; ")}</p>
               <p>Confirm model-specific capacity and reset limits for your {workload.calls.toLocaleString()} monthly calls.</p>
               <a href={entry.plan.source} target="_blank" rel="noreferrer">Provider source</a>
             </article>)}

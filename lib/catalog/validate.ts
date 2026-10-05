@@ -66,11 +66,13 @@ const allowedPlanKeys = new Set([
   "conditionalLimits",
   "creditMultipliers",
   "includedApiValue",
+  "modelAllowances",
   "overageInput",
   "overageOutput",
   "quotaDetail",
   "weeklyCredits",
 ]);
+const allowedConditionalKeys = new Set(["amount", "description", "resetWindow", "shareOfAllowance"]);
 // A gate that admits almost nothing is a data error, not a strict standard.
 const minEligibleModelsPerScenario = 3;
 
@@ -707,6 +709,35 @@ export function validatePlans(document: unknown, dataset: ModelCatalogDoc): Plan
     if ("weeklyCredits" in record && !("creditMultipliers" in record)) {
       errors.push(`${location}.weeklyCredits requires creditMultipliers.`);
     }
+    if ("modelAllowances" in record) {
+      // A dollar cap published per model. Every model the plan offers needs one,
+      // or a scenario that selects the missing model would fall back to a
+      // different model's allowance.
+      const allowances = record.modelAllowances as Record<string, unknown>;
+      if (!isRecord(allowances)) {
+        errors.push(`${location}.modelAllowances must be an object keyed by model id.`);
+      } else {
+        for (const [id, amount] of Object.entries(allowances)) {
+          if (Array.isArray(record.modelIds) && !(record.modelIds as string[]).includes(id)) {
+            errors.push(`${location}.modelAllowances has "${id}", which the plan does not offer.`);
+          }
+          if (!Number.isFinite(amount) || (amount as number) <= 0) {
+            errors.push(`${location}.modelAllowances.${id} must be a positive finite number.`);
+          }
+        }
+        for (const id of Array.isArray(record.modelIds) ? (record.modelIds as string[]) : []) {
+          if (!(id in allowances)) {
+            errors.push(`${location}.modelAllowances is missing an allowance for ${id}.`);
+          }
+        }
+        const quota = isRecord(record.quotaDetail) ? record.quotaDetail : null;
+        if (!quota || quota.kind !== "dollar-allowance") {
+          errors.push(`${location}.modelAllowances requires a dollar-allowance quotaDetail.`);
+        } else if (Number.isFinite(quota.amount) && !Object.values(allowances).includes(quota.amount)) {
+          errors.push(`${location}.quotaDetail.amount must equal one published modelAllowances value.`);
+        }
+      }
+    }
 
     // Structured access surfaces (v3).
     if ("access" in record && record.access !== undefined) {
@@ -776,6 +807,10 @@ export function validatePlans(document: unknown, dataset: ModelCatalogDoc): Plan
             errors.push(`${location}.conditionalLimits[${i}] must be an object.`);
             continue;
           }
+          const extra = Object.keys(limit).filter((key) => !allowedConditionalKeys.has(key));
+          if (extra.length > 0) {
+            errors.push(`${location}.conditionalLimits[${i}] has unknown keys: ${extra.join(", ")}.`);
+          }
           if (!Number.isFinite(limit.amount) || (limit.amount as number) < 0) {
             errors.push(`${location}.conditionalLimits[${i}].amount must be a nonnegative finite number.`);
           }
@@ -784,6 +819,26 @@ export function validatePlans(document: unknown, dataset: ModelCatalogDoc): Plan
           }
           if (typeof limit.description !== "string" || (limit.description as string).length === 0) {
             errors.push(`${location}.conditionalLimits[${i}].description must be a nonempty string.`);
+          }
+          if ("shareOfAllowance" in limit) {
+            const share = limit.shareOfAllowance;
+            if (typeof share !== "number" || !Number.isFinite(share) || share <= 0 || share > 1) {
+              errors.push(`${location}.conditionalLimits[${i}].shareOfAllowance must be a fraction greater than 0 and at most 1.`);
+            } else if (!isRecord(record.modelAllowances)) {
+              errors.push(`${location}.conditionalLimits[${i}].shareOfAllowance requires modelAllowances.`);
+            } else {
+              const quota = isRecord(record.quotaDetail) ? record.quotaDetail : null;
+              const reference = quota?.kind === "dollar-allowance" ? quota.amount : undefined;
+              if (typeof reference !== "number" || !Number.isFinite(reference)) {
+                errors.push(`${location}.conditionalLimits[${i}].shareOfAllowance requires a dollar-allowance quotaDetail.`);
+              } else {
+                const derived = Math.round(share * reference * 100) / 100;
+                const stated = Math.round((limit.amount as number) * 100) / 100;
+                if (derived !== stated) {
+                  errors.push(`${location}.conditionalLimits[${i}].amount must equal shareOfAllowance × quotaDetail.amount (${derived}).`);
+                }
+              }
+            }
           }
         }
       }
