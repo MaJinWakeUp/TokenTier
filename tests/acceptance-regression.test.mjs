@@ -351,6 +351,21 @@ test("Go Plus allowance follows the selected working model's published cap", () 
   assert.equal(writing.estimate.basis.kind, "conditional");
 });
 
+test("a per-model allowance is already monthly and is not scaled by resetWindow", () => {
+  const plan = planDoc.plans.find((p) => p.id === "opencode-go-plus");
+  const model = modelById.get("glm-5-3");
+  const settings = { input: 1000, output: 1000, cacheRatio: 0 };
+  for (const resetWindow of ["weekly", "5h"]) {
+    const shifted = {
+      ...plan,
+      quotaDetail: { ...plan.quotaDetail, resetWindow },
+      conditionalLimits: [],
+    };
+    const estimate = planEstimate(shifted, settings, model, model);
+    assert.equal(estimate.valueHigh, 120, `${resetWindow} must not scale GLM-5.3's monthly cap`);
+  }
+});
+
 test("AC4: positive credits with zero API cost produces finite credit capacity", () => {
   const creditPlan = planDoc.plans.find((p) => p.quotaDetail?.kind === "credit-allowance");
   assert.ok(creditPlan, "Catalog must have a credit-allowance plan");

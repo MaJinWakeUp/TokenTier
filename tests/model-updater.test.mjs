@@ -452,6 +452,26 @@ test("requires credit multipliers for every model a credit plan offers", () => {
   );
 });
 
+test("rejects a per-model allowance unless the quota window is monthly", () => {
+  const catalog = gatedDataset();
+  const quota = (resetWindow) => ({
+    kind: "dollar-allowance",
+    amount: 60,
+    resetWindow,
+    source: "https://example.com/plans",
+    verifiedAt: today,
+  });
+  const modelAllowances = { "example-model": 60 };
+  for (const resetWindow of ["weekly", "5h"]) {
+    assert.throws(
+      () => validatePlans(planDocument([plan({ quotaDetail: quota(resetWindow), modelAllowances })]), catalog),
+      /modelAllowances requires quotaDetail.resetWindow "monthly"/,
+    );
+  }
+  const accepted = validatePlans(planDocument([plan({ quotaDetail: quota("monthly"), modelAllowances })]), catalog);
+  assert.equal(accepted.plans[0].modelAllowances["example-model"], 60);
+});
+
 test("rejects half-specified credit formulas and unknown plan enums", () => {
   const catalog = gatedDataset();
   assert.throws(

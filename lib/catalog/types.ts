@@ -147,9 +147,9 @@ export type Plan = {
   weeklyCredits?: number;
   // Keyed by model id: providers publish credit multipliers per model.
   creditMultipliers?: Record<string, [number, number, number]>;
-  // Keyed by model id: published monthly dollar cap for that model. A
-  // dollar-allowance estimate uses the working model's entry instead of the
-  // single quotaDetail amount.
+  // Keyed by model id: published monthly dollar cap for that model. Requires
+  // quotaDetail.resetWindow "monthly". The estimate uses the working model's
+  // entry as a monthly amount and does not scale it by the reset window.
   modelAllowances?: Record<string, number>;
   cacheRatio?: number;
   // Structured access surfaces the plan provides (v3). Distinct from the soft

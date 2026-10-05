@@ -733,6 +733,10 @@ export function validatePlans(document: unknown, dataset: ModelCatalogDoc): Plan
         const quota = isRecord(record.quotaDetail) ? record.quotaDetail : null;
         if (!quota || quota.kind !== "dollar-allowance") {
           errors.push(`${location}.modelAllowances requires a dollar-allowance quotaDetail.`);
+        } else if (quota.resetWindow !== "monthly") {
+          // Each entry is already a monthly cap. A weekly or 5-hour window would
+          // be scaled again by planEstimate's window factor.
+          errors.push(`${location}.modelAllowances requires quotaDetail.resetWindow "monthly".`);
         } else if (Number.isFinite(quota.amount) && !Object.values(allowances).includes(quota.amount)) {
           errors.push(`${location}.quotaDetail.amount must equal one published modelAllowances value.`);
         }

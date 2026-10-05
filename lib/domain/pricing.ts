@@ -270,8 +270,12 @@ export function planEstimate(
   if (quota?.kind === "dollar-allowance") {
     // A per-model cap replaces the plan-wide amount. quotaDetail.amount stays
     // the reference cap (one published model), not every model's allowance.
-    const allowance = modelMonthlyAllowance(plan, model) ?? quota.amount;
-    const monthlyAllowance = allowance * (windowFactor[quota.resetWindow] ?? 1);
+    // modelAllowances values are already monthly, so they are not scaled by
+    // resetWindow. A plan-wide amount still follows that window.
+    const perModel = modelMonthlyAllowance(plan, model);
+    const monthlyAllowance = perModel !== null
+      ? perModel
+      : quota.amount * (windowFactor[quota.resetWindow] ?? 1);
 
     // Period classification: only monthly resetWindow without conditionalLimits
     // can prove monthly sufficiency. Weekly/5h or multi-window plans are

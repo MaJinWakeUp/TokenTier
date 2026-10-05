@@ -106,8 +106,10 @@ Joins and pairings validation enforces:
   nonnegative — for **every** id in `modelIds`, and requires `weeklyCredits`;
   `weeklyCredits` likewise requires `creditMultipliers`;
 - `modelAllowances` is a positive monthly dollar cap for **every** id in
-  `modelIds`, and requires a `dollar-allowance` quotaDetail whose `amount`
-  equals one of those caps. Estimates use the working model's cap.
+  `modelIds`, and requires a `dollar-allowance` quotaDetail whose
+  `resetWindow` is `monthly` and whose `amount` equals one of those caps.
+  Estimates use the working model's cap as a monthly amount and do not scale
+  it by the reset window.
   `conditionalLimits[].shareOfAllowance` (a fraction in `(0, 1]`) derives that
   window as the fraction of the working model's cap; the stored `amount` must
   equal the same fraction of `quotaDetail.amount`;
