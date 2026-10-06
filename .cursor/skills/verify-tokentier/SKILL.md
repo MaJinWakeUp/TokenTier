@@ -23,7 +23,7 @@ Ready means that HTTP response, not a fixed sleep. The dev log is `$TOKENTIER_VE
 
 vinext allows one dev server per checkout. The lock is `.vinext/dev/lock.json`. If another server is already running, `launch` exits and names that server. Do not kill its pid, and do not drive its URL. Two verification runs cannot share this checkout. Browser profiles are separate per `TOKENTIER_VERIFY_DIR`, but the server is not.
 
-Node.js `>=22.13.0` is required, the same as the repo. Driving the page requires `google-chrome` on `PATH`, or `CHROME_PATH`.
+Node.js `>=22.13.0` is required, the same as the repo. Driving the page requires `google-chrome` on `PATH`, or `CHROME_PATH`. `doctor` identifies the listener with `lsof` when it is installed, and otherwise reads Linux `/proc`. Parent processes are read from `/proc` or `ps`. `stop` signals a pid only when `ps` still reports the start time and command recorded at launch, and a second `stop` does nothing.
 
 ## Doctor
 
@@ -107,7 +107,7 @@ Number formatting in aria text uses the browser locale. Chrome is started with `
 node .cursor/skills/verify-tokentier/scripts/verify.mjs stop
 ```
 
-`stop` sends `SIGTERM`, then `SIGKILL`, to the process groups of the dev server and Chrome that this run started. It deletes the Chrome profile. It does not delete `$TOKENTIER_VERIFY_DIR/evidence`. After `stop`, `state.json` has `"status": "stopped"` and `doctor` fails. Confirm the screenshot and snapshot are still in `evidence/` before treating the run as finished.
+`stop` signals the dev server and Chrome only when `ps` still reports the start time and command recorded at launch. It then deletes the Chrome profile. It does not delete `$TOKENTIER_VERIFY_DIR/evidence`. A second `stop` prints `already stopped` and does not signal anyone. After `stop`, `state.json` has `"status": "stopped"` and `doctor` fails. Confirm the screenshot and snapshot are still in `evidence/` before treating the run as finished.
 
 Do not kill a process by name. Do not stop a vinext pid that `launch` did not record.
 
