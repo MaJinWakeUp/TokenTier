@@ -25,7 +25,7 @@ Preconditions:
 - **Match.** Type `Haiku`. Run `node .cursor/skills/verify-tokentier/scripts/verify.mjs fill --label "Search api" --value "Haiku"`. The Price book text contains `Claude Haiku 4.5` and does not contain `GPT-6 Astra`. Run `node .cursor/skills/verify-tokentier/scripts/verify.mjs text --id prices`.
 - **Miss.** Replace the query with `zzznomatch`. Run `node .cursor/skills/verify-tokentier/scripts/verify.mjs fill --label "Search api" --value "zzznomatch"`. The Price book text contains `No entries match that search or provider filter.`
 - **Clear.** Empty the field. Run `node .cursor/skills/verify-tokentier/scripts/verify.mjs fill --label "Search api" --value ""`. The Price book text contains `GPT-6 Astra` again.
-- **Proof.** After the Haiku query, run `snapshot --path price-book/haiku.aria.txt` and `screenshot --path price-book/haiku.png`. The snapshot contains a searchbox named `Search api` and the screenshot shows `Claude Haiku 4.5`.
+- **Proof.** After the Haiku query, run `node .cursor/skills/verify-tokentier/scripts/verify.mjs snapshot --path price-book/haiku.aria.txt` and `node .cursor/skills/verify-tokentier/scripts/verify.mjs screenshot --path price-book/haiku.png`. The snapshot contains a searchbox named `Search api` and the screenshot shows `Claude Haiku 4.5`.
 
 ## Gotchas
 

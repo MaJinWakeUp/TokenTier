@@ -118,9 +118,27 @@ function processStamp(pid) {
 }
 
 function sameProcess(pid, stamp) {
-  if (!stamp || !pidAlive(pid)) return false;
+  if (!stamp?.startedAt || !pidAlive(pid)) return false;
   const current = processStamp(pid);
-  return Boolean(current && current.startedAt === stamp.startedAt && current.command === stamp.command);
+  // Start time identifies the process across exec. The command line can change
+  // when Bundler or npm replaces itself, so it is recorded but not compared.
+  return Boolean(current && current.startedAt === stamp.startedAt);
+}
+
+async function awaitProcessStamp(pid) {
+  const deadline = Date.now() + 2000;
+  while (Date.now() < deadline) {
+    const stamp = processStamp(pid);
+    if (stamp) return stamp;
+    if (!pidAlive(pid)) return null;
+    await delay(50);
+  }
+  return processStamp(pid);
+}
+
+function pathnameOf(url) {
+  const pathName = new URL(url).pathname || "/";
+  return pathName.endsWith("/") ? pathName : `${pathName}/`;
 }
 
 function shellQuote(value) {
@@ -315,7 +333,10 @@ async function ensureChrome(dir, state) {
   });
   child.unref();
   closeSync(logFd);
+  const chromeStamp = await awaitProcessStamp(child.pid);
+  if (!chromeStamp) fail(`Chrome exited before its process identity could be recorded. See ${path.join(dir, "chrome.log")}`);
   state.chromePid = child.pid;
+  state.chrome = chromeStamp;
   state.chromePort = chromePort;
   state.chromeProfile = profile;
   writeState(dir, state);
@@ -324,9 +345,7 @@ async function ensureChrome(dir, state) {
     try {
       const version = await fetch(`http://127.0.0.1:${chromePort}/json/version`);
       if (version.ok) {
-        state.chrome = processStamp(child.pid);
-        if (!state.chrome) fail("Chrome started but its process identity could not be recorded.");
-        writeState(dir, state);
+        if (!sameProcess(child.pid, state.chrome)) fail("Chrome identity changed before its debugging port opened.");
         return state;
       }
     } catch { /* chrome still starting */ }
@@ -433,6 +452,11 @@ async function launch(args) {
   });
   child.unref();
   closeSync(logFd);
+  const server = await awaitProcessStamp(child.pid);
+  if (!server) {
+    if (pidAlive(child.pid)) killGroup(child.pid);
+    fail("Dev server exited before its process identity could be recorded.");
+  }
   const state = {
     status: "running",
     runId,
@@ -440,6 +464,7 @@ async function launch(args) {
     pid: child.pid,
     port,
     url: `http://127.0.0.1:${port}`,
+    server,
     evidenceDir: path.join(dir, "evidence"),
     logPath: path.join(dir, "dev.log"),
     repoRoot,
@@ -461,9 +486,7 @@ async function launch(args) {
       const response = await fetch(`${state.url}/`, { redirect: "follow" });
       const body = await response.text();
       if (response.status === 200 && body.includes("TokenTier")) {
-        state.server = processStamp(child.pid);
-        if (!state.server) fail("Dev server is ready but its process identity could not be recorded.");
-        writeState(dir, state);
+        if (!sameProcess(child.pid, state.server)) fail("Dev server identity changed before it was ready.");
         console.error(`TokenTier ready at ${state.url}/`);
         console.error(`pid ${state.pid}`);
         console.error(`evidence ${state.evidenceDir}`);
@@ -491,8 +514,9 @@ async function doctor(args) {
   assertServerOwned(state);
   const response = await fetch(`${state.url}/`);
   const body = await response.text();
-  if (response.status !== 200 || !body.includes("TokenTier")) {
-    fail(`HTTP ${response.status} from ${state.url}/ did not look like TokenTier.`);
+  const title = titleOf(body);
+  if (response.status !== 200 || !body.includes("TokenTier") || !title.includes("TokenTier")) {
+    fail(`HTTP ${response.status} from ${state.url}/ did not look like TokenTier (title: ${title || "missing"}).`);
   }
   console.log(`status: running`);
   console.log(`url: ${state.url}/`);
@@ -500,7 +524,7 @@ async function doctor(args) {
   console.log(`port: ${state.port}`);
   console.log(`listener: owned`);
   console.log(`http: ${response.status}`);
-  console.log(`title: ${titleOf(body)}`);
+  console.log(`title: ${title}`);
   console.log(`dir: ${dir}`);
   console.log(`evidence: ${state.evidenceDir}`);
 }
@@ -540,12 +564,18 @@ async function openPage(args) {
   const targetPath = args.path || args._[1] || "/";
   await withPage(dir, async (session, state) => {
     const url = new URL(targetPath, `${state.url}/`).toString();
+    const expectedPath = pathnameOf(url);
     await session.send("Page.navigate", { url });
-    const deadline = Date.now() + 20000;
+    const deadline = Date.now() + 45000;
     while (Date.now() < deadline) {
-      const ready = await evaluate(session, "document.readyState === 'complete' && document.body && document.body.innerText.includes('TokenTier')");
+      const ready = await evaluate(session, `(() => {
+        const path = location.pathname.endsWith("/") ? location.pathname : location.pathname + "/";
+        return path === ${JSON.stringify(expectedPath)}
+          && document.body
+          && document.body.innerText.includes("TokenTier");
+      })()`);
       if (ready) {
-        console.log(url);
+        console.log(await evaluate(session, "location.href"));
         return;
       }
       await delay(200);

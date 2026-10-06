@@ -19,11 +19,11 @@ eval "$(node .cursor/skills/verify-tokentier/scripts/verify.mjs launch)"
 
 That starts `npm run dev -- --port <free> --hostname 127.0.0.1` on a port at or above `4173`, waits until `http://127.0.0.1:<port>/` returns HTTP 200 and a body that contains `TokenTier`, and prints `export TOKENTIER_VERIFY_DIR=...`. Pass `--port` only when a specific port is required. Pass `--dir` to choose the run directory; the default is `/tmp/tokentier-verify/<run-id>`.
 
-Ready means that HTTP response, not a fixed sleep. The dev log is `$TOKENTIER_VERIFY_DIR/dev.log`.
+Ready means that HTTP response, not a fixed sleep. The dev log is `$TOKENTIER_VERIFY_DIR/dev.log`. The server's start time is stored in `state.json` before that file says the run is running, so `stop` can clean up an interrupted launch. Chrome's start time is stored the same way, before its pid is published.
 
 vinext allows one dev server per checkout. The lock is `.vinext/dev/lock.json`. If another server is already running, `launch` exits and names that server. Do not kill its pid, and do not drive its URL. Two verification runs cannot share this checkout. Browser profiles are separate per `TOKENTIER_VERIFY_DIR`, but the server is not.
 
-Node.js `>=22.13.0` is required, the same as the repo. Driving the page requires `google-chrome` on `PATH`, or `CHROME_PATH`. `doctor` identifies the listener with `lsof` when it is installed, and otherwise reads Linux `/proc`. Parent processes are read from `/proc` or `ps`. `stop` signals a pid only when `ps` still reports the start time and command recorded at launch, and a second `stop` does nothing.
+Node.js `>=22.13.0` is required, the same as the repo. Driving the page requires `google-chrome` on `PATH`, or `CHROME_PATH`. `doctor` identifies the listener with `lsof` when it is installed, and otherwise reads Linux `/proc`. Parent processes are read from `/proc` or `ps`. `stop` signals a pid only when `ps` still reports the start time recorded at launch. That start time stays put if the process replaces itself. A second `stop` does nothing.
 
 ## Doctor
 
@@ -107,7 +107,7 @@ Number formatting in aria text uses the browser locale. Chrome is started with `
 node .cursor/skills/verify-tokentier/scripts/verify.mjs stop
 ```
 
-`stop` signals the dev server and Chrome only when `ps` still reports the start time and command recorded at launch. It then deletes the Chrome profile. It does not delete `$TOKENTIER_VERIFY_DIR/evidence`. A second `stop` prints `already stopped` and does not signal anyone. After `stop`, `state.json` has `"status": "stopped"` and `doctor` fails. Confirm the screenshot and snapshot are still in `evidence/` before treating the run as finished.
+`stop` signals the dev server and Chrome only when `ps` still reports the start time recorded at launch. It then deletes the Chrome profile. It does not delete `$TOKENTIER_VERIFY_DIR/evidence`. A second `stop` prints `already stopped` and does not signal anyone. After `stop`, `state.json` has `"status": "stopped"` and `doctor` fails. Confirm the screenshot and snapshot are still in `evidence/` before treating the run as finished.
 
 Do not kill a process by name. Do not stop a vinext pid that `launch` did not record.
 

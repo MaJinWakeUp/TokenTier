@@ -22,9 +22,9 @@ Preconditions:
 - Rankings has hydrated: `wait --url-includes "scenario=code-medium"` after `open /`.
 
 - **Default lane.** The API models button in `Tier list lane` is pressed. Run `node .cursor/skills/verify-tokentier/scripts/verify.mjs snapshot --path tier-lane/before.aria.txt`. The snapshot contains `pressed=true` on the button whose name starts with `API models` and `pressed=false` on the button whose name starts with `Plans`.
-- **Plans lane.** Choose Plans. Run `node .cursor/skills/verify-tokentier/scripts/verify.mjs click --role button --name "Plans" --group "Tier list lane"`. A new snapshot at `tier-lane/plans.aria.txt` shows `pressed=true` on the Plans button in that group.
+- **Plans lane.** Choose Plans. Run `node .cursor/skills/verify-tokentier/scripts/verify.mjs click --role button --name "Plans" --group "Tier list lane"`. Run `node .cursor/skills/verify-tokentier/scripts/verify.mjs snapshot --path tier-lane/plans.aria.txt`. It shows `pressed=true` on the Plans button in that group.
+- **Proof.** While Plans is still pressed, run `node .cursor/skills/verify-tokentier/scripts/verify.mjs screenshot --path tier-lane/plans.png`. The shot shows the Tier list heading and the Plans button active.
 - **Back to API models.** Run `node .cursor/skills/verify-tokentier/scripts/verify.mjs click --role button --name "API models" --group "Tier list lane"`. The API models button is pressed again.
-- **Proof.** Save `tier-lane/plans.png` with `screenshot --path tier-lane/plans.png` while Plans is pressed. The shot shows the Tier list heading and the Plans button active.
 
 ## Gotchas
 

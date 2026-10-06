@@ -24,7 +24,7 @@ Preconditions:
 - **Open.** Open the board. Run `node .cursor/skills/verify-tokentier/scripts/verify.mjs open /tier-list/`. The heading is present. Run `node .cursor/skills/verify-tokentier/scripts/verify.mjs wait --id rank-top-heading --text "Rank them your way."`.
 - **Title.** Type a title. Run `node .cursor/skills/verify-tokentier/scripts/verify.mjs fill --labeled "Board title" --value "Verification board"`. The status line says it was saved. Run `node .cursor/skills/verify-tokentier/scripts/verify.mjs wait --selector ".rank-status" --text "Saved in this browser."`. The stored record contains the title. Run `node .cursor/skills/verify-tokentier/scripts/verify.mjs storage --key tokentier.v1.boards`.
 - **Subject.** Switch to API models. Run `node .cursor/skills/verify-tokentier/scripts/verify.mjs click --role button --name "API models" --group "Rank subject"`. A snapshot shows that button `pressed=true`. The plans board title is not required to match the models board; each subject is stored separately.
-- **Proof.** Run `snapshot --path my-tier-list/title.aria.txt` and `screenshot --path my-tier-list/title.png` after the title save. The screenshot shows `Verification board` in the title field and `Saved in this browser.`
+- **Proof.** Run `node .cursor/skills/verify-tokentier/scripts/verify.mjs snapshot --path my-tier-list/title.aria.txt` and `node .cursor/skills/verify-tokentier/scripts/verify.mjs screenshot --path my-tier-list/title.png` after the title save. The screenshot shows `Verification board` in the title field and `Saved in this browser.`
 
 ## Gotchas
 
