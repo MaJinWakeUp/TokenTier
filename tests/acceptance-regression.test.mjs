@@ -309,6 +309,12 @@ test("Claude Max API credit counts only for a direct-API comparison", () => {
     const apiEstimate = planEstimate(plan, settings, working, fallback, "api");
     assert.equal(apiEstimate.basis.kind, "allowance", `${id} API credit is a monthly allowance`);
     assert.equal(apiEstimate.valueHigh, credit);
+    assert.equal(plan.apiCreditClaimAfterDays, 7, `${id} records the new-subscriber wait`);
+    assert.equal(
+      apiEstimate.basis.label,
+      "Included API credit, claimable after 7 days on the plan",
+      `${id} names the wait wherever the credit is counted`,
+    );
     assert.equal(apiEstimate.callsLow, apiEstimate.callsHigh);
     const appCoverage = planCoverageScore(plan, settings, scenario.calls, working, fallback);
     assert.equal(appCoverage, null, `${id} app coverage stays unproven`);
@@ -357,6 +363,16 @@ test("Claude Max API credit counts only for a direct-API comparison", () => {
     assert.equal(row.estimate.basis.kind, "unknown-quota", `${id} stays unproven on chat`);
     assert.equal(row.workingModel.id, "claude-sonnet-5-5", `${id} chat roster stays Sonnet 5.5`);
   }
+});
+
+test("an API-credit wait must be a whole number of days on a plan with a credit", () => {
+  const max = planDoc.plans.find((p) => p.id === "claude-max-5x");
+  const withPlans = (plan) => ({ ...planCatalog, plans: planCatalog.plans.map((p) => (p.id === plan.id ? plan : p)) });
+  assert.throws(() => validatePlans(withPlans({ ...max, apiCreditClaimAfterDays: 0 }), dataset), /apiCreditClaimAfterDays/);
+  assert.throws(() => validatePlans(withPlans({ ...max, apiCreditClaimAfterDays: 2.5 }), dataset), /apiCreditClaimAfterDays/);
+  const noCredit = { ...max };
+  delete noCredit.includedApiValue;
+  assert.throws(() => validatePlans(withPlans(noCredit), dataset), /apiCreditClaimAfterDays requires includedApiValue/);
 });
 
 test("AC4: OpenCode Go 5h+weekly caps make it conditional", () => {

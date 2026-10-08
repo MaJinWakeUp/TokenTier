@@ -368,7 +368,14 @@ export function planEstimate(
       callsHigh: calls,
       valueLow: plan.includedApiValue,
       valueHigh: plan.includedApiValue,
-      basis: { kind: "allowance", label: "Included API credit" },
+      basis: {
+        kind: "allowance",
+        // Every cycle's credit counts, but a new subscriber cannot claim the
+        // first one straight away. Say so wherever the credit is counted.
+        label: plan.apiCreditClaimAfterDays
+          ? `Included API credit, claimable after ${plan.apiCreditClaimAfterDays} days on the plan`
+          : "Included API credit",
+      },
     };
   }
 

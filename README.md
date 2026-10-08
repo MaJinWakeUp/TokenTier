@@ -359,7 +359,9 @@ prices match the headline; the Zen row also prints the launch sale.
 Max 5x now includes $100 of Claude API credits a billing cycle, and Max 20x
 includes $200. They cover the Claude API, Managed Agents, the Agent SDK, and
 playground. They do not cover Claude Code or extra usage in the apps. They
-arrive each cycle and expire with no rollover. Pro is not eligible.
+arrive each cycle and expire with no rollover. Pro is not eligible. A new
+subscriber can claim them only after 7 days on the plan, by linking a Claude
+Console organization.
 
 The figures are `includedApiValue` ($100 and $200) and `apiIncluded` reads
 "Scoped credits". Both plans list `api` alongside chat and the coding client.
@@ -370,6 +372,12 @@ Haiku 5.5. Hard coding still uses Sonnet 5.5, because Haiku misses that bar.
 Rankings, chat, and coding-client comparisons still use the Max app roster and
 the relative app limit, so the credit is not counted as coverage of Claude or
 Claude Code.
+
+The seven-day wait is `apiCreditClaimAfterDays: 7`. The comparison is of a
+typical month, and every cycle's credit arrives once the first is claimed, so
+the credit still counts as a monthly allowance. The estimate's label names the
+wait (*Included API credit, claimable after 7 days on the plan*), so a reader
+buying Max for the credit sees that the first week is not covered.
 
 ## Catalog changes, October 5 2026
 

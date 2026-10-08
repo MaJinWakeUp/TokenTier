@@ -158,7 +158,7 @@
       "kind": "Subscription",
       "monthly": 100,
       "source": "https://claude.com/pricing",
-      "note": "Designed for intensive research and long-context analysis. Each billing cycle includes $100 of Claude API credits for the Claude API, Claude Managed Agents, the Claude Agent SDK, and playground (https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers). The credits do not cover Claude Code or extra usage in the Claude apps, expire at the end of the cycle with no rollover, and are not this plan's chat or coding-client allowance. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Pro is not eligible.",
+      "note": "Designed for intensive research and long-context analysis. Each billing cycle includes $100 of Claude API credits for the Claude API, Claude Managed Agents, the Claude Agent SDK, and playground (https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers). The credits do not cover Claude Code or extra usage in the Claude apps, expire at the end of the cycle with no rollover, and are not this plan's chat or coding-client allowance. A new subscriber can claim them after 7 days on the plan, by linking a Claude Console organization; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Pro is not eligible.",
       "quota": "5x Pro allowance across Opus and Sonnet models",
       "evidence": "Official relative limit",
       "confidence": "Medium",
@@ -166,6 +166,7 @@
       "cacheRatio": 0.4,
       "verifiedAt": "2026-10-08",
       "includedApiValue": 100,
+      "apiCreditClaimAfterDays": 7,
       "modelIds": [
         "claude-opus-5",
         "claude-opus-5-5",
@@ -190,7 +191,7 @@
       "kind": "Subscription",
       "monthly": 200,
       "source": "https://claude.com/pricing",
-      "note": "Highest personal tier with maximum capacity and priority queues. Each billing cycle includes $200 of Claude API credits for the Claude API, Claude Managed Agents, the Claude Agent SDK, and playground (https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers). The credits do not cover Claude Code or extra usage in the Claude apps, expire at the end of the cycle with no rollover, and are not this plan's chat or coding-client allowance. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Pro is not eligible.",
+      "note": "Highest personal tier with maximum capacity and priority queues. Each billing cycle includes $200 of Claude API credits for the Claude API, Claude Managed Agents, the Claude Agent SDK, and playground (https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers). The credits do not cover Claude Code or extra usage in the Claude apps, expire at the end of the cycle with no rollover, and are not this plan's chat or coding-client allowance. A new subscriber can claim them after 7 days on the plan, by linking a Claude Console organization; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Pro is not eligible.",
       "quota": "20x Pro allowance and full context limits",
       "evidence": "Official relative limit",
       "confidence": "Medium",
@@ -198,6 +199,7 @@
       "cacheRatio": 0.45,
       "verifiedAt": "2026-10-08",
       "includedApiValue": 200,
+      "apiCreditClaimAfterDays": 7,
       "modelIds": [
         "claude-opus-5",
         "claude-opus-5-5",

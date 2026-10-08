@@ -62,6 +62,7 @@ const requiredPlanKeys = [
 const allowedPlanKeys = new Set([
   ...requiredPlanKeys,
   "access",
+  "apiCreditClaimAfterDays",
   "cacheRatio",
   "conditionalLimits",
   "creditMultipliers",
@@ -676,6 +677,14 @@ export function validatePlans(document: unknown, dataset: ModelCatalogDoc): Plan
     }
     if ("includedApiValue" in record && (!Number.isFinite(record.includedApiValue) || (record.includedApiValue as number) <= 0)) {
       errors.push(`${location}.includedApiValue must be a positive finite number.`);
+    }
+    if ("apiCreditClaimAfterDays" in record) {
+      if (!Number.isInteger(record.apiCreditClaimAfterDays) || (record.apiCreditClaimAfterDays as number) <= 0) {
+        errors.push(`${location}.apiCreditClaimAfterDays must be a positive whole number of days.`);
+      }
+      if (!("includedApiValue" in record)) {
+        errors.push(`${location}.apiCreditClaimAfterDays requires includedApiValue.`);
+      }
     }
     if ("weeklyCredits" in record && (!Number.isFinite(record.weeklyCredits) || (record.weeklyCredits as number) <= 0)) {
       errors.push(`${location}.weeklyCredits must be a positive finite number.`);
