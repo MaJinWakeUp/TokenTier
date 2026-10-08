@@ -170,8 +170,10 @@ export function modelPlacements(
 }
 
 // A plan is judged on the model a sensible user would reach for: the cheapest
-// one it offers that clears the scenario's bar and holds the work. Judging every
-// plan by one fixed model misstates both its capability and its capacity.
+// one it offers that clears the scenario's bar and holds the work. When the
+// plan publishes a different dollar cap per model, that choice is the eligible
+// model whose cap buys the most calls. Judging every plan by one fixed model
+// misstates both its capability and its capacity.
 //
 // For credit-allowance plans, the model selection uses credits per call (most
 // calls per credit budget), NOT the cheapest API rate. The credit formula is
@@ -192,6 +194,25 @@ export function planWorkingModel(
     // A model with unsupported pricing (NaN cost, F6) cannot be a working model.
     .filter((model) => !Number.isNaN(callCost(model, settings, plan.cacheRatio)));
   if (eligible.length === 0) return null;
+
+  // Per-model dollar caps: the cheapest API rate can be the short cap. Pick the
+  // eligible model whose published cap buys the most calls, so the card does
+  // not understate the plan. A zero call cost covers any volume.
+  if (plan.modelAllowances) {
+    const callsUnderCap = (model: Model) => {
+      const cap = plan.modelAllowances?.[model.id];
+      const cost = callCost(model, settings, plan.cacheRatio);
+      if (cap === undefined || !(cap > 0) || !Number.isFinite(cost) || cost < 0) return -1;
+      if (cost === 0) return Number.POSITIVE_INFINITY;
+      return cap / cost;
+    };
+    return [...eligible].sort((a, b) => {
+      const aCalls = callsUnderCap(a);
+      const bCalls = callsUnderCap(b);
+      if (aCalls !== bCalls) return aCalls > bCalls ? -1 : 1;
+      return a.id.localeCompare(b.id);
+    })[0];
+  }
 
   // Credit-allowance plans: select the model with the most credits per call
   // (cheapest in credit terms), not the cheapest API rate (F5).

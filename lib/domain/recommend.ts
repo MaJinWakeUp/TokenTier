@@ -96,6 +96,27 @@ function evaluateModel(
   };
 }
 
+// The Claude API credit can be spent on any Anthropic model the catalog prices,
+// not only the models included in the Max app. A shared dollar pool buys the
+// most calls on the cheapest model that clears the bar. Cost uses the
+// workload's cache share, not the app plan's cache behaviour.
+function anthropicApiCreditModel(
+  scenario: Scenario,
+  settings: UsageSettings,
+  modelById: Map<string, Model>,
+): Model | null {
+  const requiredTokens = settings.input + settings.output;
+  const eligible = [...modelById.values()].filter((model) =>
+    model.provider === "Anthropic"
+    && gateModel(model, scenario, requiredTokens, settings.output) === null
+    && !Number.isNaN(callCost(model, settings)),
+  );
+  if (eligible.length === 0) return null;
+  return eligible.sort(
+    (a, b) => callCost(a, settings) - callCost(b, settings) || a.id.localeCompare(b.id),
+  )[0];
+}
+
 function evaluatePlan(
   plan: Plan,
   scenario: Scenario,
@@ -105,7 +126,15 @@ function evaluatePlan(
   modelById: Map<string, Model>,
   access: AccessRequirement,
 ): PlanEvaluation {
-  const workingModel = planWorkingModel(plan, scenario, settings, modelById);
+  const scopedApiCredit = access === "api"
+    && plan.provider === "Anthropic"
+    && plan.includedApiValue !== undefined
+    && plan.includedApiValue > 0
+    && (plan.quotaDetail?.kind === "relative-limit" || plan.quotaDetail?.kind === "unknown");
+  const rosterModel = planWorkingModel(plan, scenario, settings, modelById);
+  const workingModel = scopedApiCredit
+    ? anthropicApiCreditModel(scenario, settings, modelById) ?? rosterModel
+    : rosterModel;
   const meetsBar = workingModel !== null;
   const fallback = modelById.get(plan.modelIds[0]) ?? null;
   // The API credit is scoped. It is the allowance only when the reader asked

@@ -349,7 +349,20 @@ export function planEstimate(
         basis: { kind: "free", label: "Free per-call cost" },
       };
     }
-    const calls = plan.includedApiValue / referenceCost;
+    // The plan's cacheRatio describes app reuse. A direct API caller set their
+    // own cache share on the workload, and that is the rate this credit buys.
+    const creditCost = callCost(model, settings);
+    if (Number.isNaN(creditCost)) return null;
+    if (!Number.isFinite(creditCost) || creditCost <= 0) {
+      return {
+        callsLow: Infinity,
+        callsHigh: Infinity,
+        valueLow: 0,
+        valueHigh: 0,
+        basis: { kind: "free", label: "Free per-call cost" },
+      };
+    }
+    const calls = plan.includedApiValue / creditCost;
     return {
       callsLow: calls,
       callsHigh: calls,

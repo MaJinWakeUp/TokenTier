@@ -325,13 +325,37 @@ test("Claude Max API credit counts only for a direct-API comparison", () => {
     budget: 200,
     access: "api",
   };
-  const apiPlans = recommend(catalog, scenario, workload, "cost").plans.evaluations.map((row) => row.plan.id);
-  assert.ok(apiPlans.includes("claude-max-5x"), "an API comparison lists Max 5x");
-  assert.ok(apiPlans.includes("claude-max-20x"), "an API comparison lists Max 20x");
+  const apiResult = recommend(catalog, scenario, workload, "cost").plans.evaluations;
+  const apiIds = apiResult.map((row) => row.plan.id);
+  assert.ok(apiIds.includes("claude-max-5x"), "an API comparison lists Max 5x");
+  assert.ok(apiIds.includes("claude-max-20x"), "an API comparison lists Max 20x");
+  const max5 = apiResult.find((row) => row.plan.id === "claude-max-5x");
+  const haiku = modelById.get("claude-haiku-5-5");
+  assert.equal(max5.workingModel.id, "claude-haiku-5-5", "the API credit is priced on Haiku, not the app roster");
+  assert.equal(
+    max5.estimate.callsHigh,
+    planEstimate(max5.plan, settings, haiku, haiku, "api").callsHigh,
+  );
+  assert.notEqual(
+    max5.estimate.callsHigh,
+    planEstimate(max5.plan, { ...settings, cacheRatio: max5.plan.cacheRatio }, haiku, haiku, "api").callsHigh,
+    "the API credit must not replace the workload cache share with the app plan's",
+  );
+  const hard = scenarioDoc.scenarios.find((entry) => entry.id === "code-hard");
+  const hardRow = recommend(catalog, hard, {
+    ...workload,
+    scenarioId: hard.id,
+    input: hard.input,
+    output: hard.output,
+    calls: hard.calls,
+    cacheRatio: hard.cacheRatio,
+  }, "cost").plans.evaluations.find((row) => row.plan.id === "claude-max-5x");
+  assert.equal(hardRow.workingModel.id, "claude-sonnet-5-5", "Haiku misses the hard-coding bar, so the credit uses Sonnet 5.5");
   const chatPlans = recommend(catalog, scenario, { ...workload, access: "chat-app" }, "cost").plans.evaluations;
   for (const id of ["claude-max-5x", "claude-max-20x"]) {
     const row = chatPlans.find((entry) => entry.plan.id === id);
     assert.equal(row.estimate.basis.kind, "unknown-quota", `${id} stays unproven on chat`);
+    assert.equal(row.workingModel.id, "claude-sonnet-5-5", `${id} chat roster stays Sonnet 5.5`);
   }
 });
 
@@ -364,17 +388,18 @@ test("OpenCode Go allowance follows the selected working model's published cap",
   };
 
   const daily = estimateFor("daily");
-  assert.equal(daily.working.id, "claude-haiku-5-5");
-  assert.equal(daily.estimate.valueHigh, 15, "Daily use must use Claude Haiku 5.5's $15 cap, not $60");
+  assert.equal(daily.working.id, "glm-5-3-flash");
+  assert.equal(daily.estimate.valueHigh, 60, "Daily use must use GLM-5.3-Flash's $60 cap, which buys more calls than Haiku's $15");
   assert.equal(daily.estimate.callsLow, 0);
-  assert.match(daily.estimate.basis.label, /\$3 of Claude Haiku 5\.5 usage per 5 hours \(20% of its \$15 monthly cap\)/);
-  assert.match(daily.estimate.basis.label, /\$7\.50 of Claude Haiku 5\.5 usage per week \(50% of its \$15 monthly cap\)/);
-  assert.equal(allowanceQuotaLabel(plan, daily.working), "$15/month on Claude Haiku 5.5 ($3/5h, $7.50/weekly)");
+  assert.match(daily.estimate.basis.label, /\$12 of GLM-5\.3-Flash usage per 5 hours \(20% of its \$60 monthly cap\)/);
+  assert.match(daily.estimate.basis.label, /\$30 of GLM-5\.3-Flash usage per week \(50% of its \$60 monthly cap\)/);
+  assert.equal(allowanceQuotaLabel(plan, daily.working), "$60/month on GLM-5.3-Flash ($12/5h, $30/weekly)");
   assert.equal(daily.estimate.basis.kind, "conditional");
 
   const medium = estimateFor("code-medium");
-  assert.equal(medium.working.id, "claude-haiku-5-5");
-  assert.equal(medium.estimate.valueHigh, 15);
+  assert.equal(medium.working.id, "glm-5-3-flash");
+  assert.equal(medium.estimate.valueHigh, 60);
+  assert.equal(Math.round(medium.estimate.callsHigh), 12245);
 });
 
 test("Go Plus allowance follows the selected working model's published cap", () => {
@@ -391,12 +416,12 @@ test("Go Plus allowance follows the selected working model's published cap", () 
   };
 
   const medium = estimateFor("code-medium");
-  assert.equal(medium.working.id, "claude-haiku-5-5");
-  assert.equal(medium.estimate.valueHigh, 60);
+  assert.equal(medium.working.id, "glm-5-3-flash");
+  assert.equal(medium.estimate.valueHigh, 180);
   assert.equal(medium.estimate.callsLow, 0);
-  assert.match(medium.estimate.basis.label, /\$12 of Claude Haiku 5\.5 usage per 5 hours \(20% of its \$60 monthly cap\)/);
-  assert.match(medium.estimate.basis.label, /\$30 of Claude Haiku 5\.5 usage per week \(50% of its \$60 monthly cap\)/);
-  assert.equal(allowanceQuotaLabel(plan, medium.working), "$60/month on Claude Haiku 5.5 ($12/5h, $30/weekly)");
+  assert.match(medium.estimate.basis.label, /\$36 of GLM-5\.3-Flash usage per 5 hours \(20% of its \$180 monthly cap\)/);
+  assert.match(medium.estimate.basis.label, /\$90 of GLM-5\.3-Flash usage per week \(50% of its \$180 monthly cap\)/);
+  assert.equal(allowanceQuotaLabel(plan, medium.working), "$180/month on GLM-5.3-Flash ($36/5h, $90/weekly)");
 
   const hard = estimateFor("code-hard");
   assert.equal(hard.working.id, "glm-5-3");
@@ -410,11 +435,11 @@ test("Go Plus allowance follows the selected working model's published cap", () 
   assert.equal(research.estimate.valueHigh, 120);
 
   const writing = estimateFor("writing");
-  assert.equal(writing.working.id, "claude-haiku-5-5");
-  assert.equal(writing.estimate.valueHigh, 60, "Writing must use Claude Haiku 5.5's $60 cap, not $180");
-  assert.match(writing.estimate.basis.label, /\$12 of Claude Haiku 5\.5 usage per 5 hours \(20% of its \$60 monthly cap\)/);
-  assert.match(writing.estimate.basis.label, /\$30 of Claude Haiku 5\.5 usage per week \(50% of its \$60 monthly cap\)/);
-  assert.equal(allowanceQuotaLabel(plan, writing.working), "$60/month on Claude Haiku 5.5 ($12/5h, $30/weekly)");
+  assert.equal(writing.working.id, "glm-5-3-flash");
+  assert.equal(writing.estimate.valueHigh, 180, "Writing must use GLM-5.3-Flash's $180 cap, which buys more calls than a $60 model");
+  assert.match(writing.estimate.basis.label, /\$36 of GLM-5\.3-Flash usage per 5 hours \(20% of its \$180 monthly cap\)/);
+  assert.match(writing.estimate.basis.label, /\$90 of GLM-5\.3-Flash usage per week \(50% of its \$180 monthly cap\)/);
+  assert.equal(allowanceQuotaLabel(plan, writing.working), "$180/month on GLM-5.3-Flash ($36/5h, $90/weekly)");
   assert.equal(writing.estimate.basis.kind, "conditional");
 });
 

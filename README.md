@@ -50,16 +50,18 @@ A subscription is access to a set of models, not to one model, so judging every
 plan by a single fixed reference misstates both what it can do and how far it
 goes. Each plan lists every model it includes, and each scenario picks the
 **cheapest model on the plan that clears that scenario's capability bar** and
-holds the workload's tokens. That model then supplies the plan's capability
-score, its capacity estimate and its tier, and the interface names it (`via
+holds the workload's tokens. A plan that publishes a different monthly dollar
+cap per model is the exception: it is judged on the eligible model whose cap
+buys the most calls. That model then supplies the plan's capability score, its
+capacity estimate and its tier, and the interface names it (`via
 GLM-5.3-Flash`) wherever a plan number is shown.
 
 The effect is largest where a plan spans a wide price range. OpenCode Go's
-daily-use card is Claude Haiku 5.5 at its published $15 cap, about 32,000
-calls. Hard coding misses both Haiku and GLM-5.3-Flash, so the plan is judged
-on GLM-5.3 at the same $15 cap, about 114 calls against a 1,500-call profile.
-The same subscription is generous for light work and short for heavy work.
-Judging it on one model hid both facts.
+daily-use card is GLM-5.3-Flash at its $60 cap, about 111,000 calls. Haiku is
+cheaper per call, but its $15 cap buys fewer of them. Hard coding misses
+Flash, so the plan is judged on GLM-5.3 at its $15 cap, about 114 calls
+against a 1,500-call profile. The same subscription is generous for light work
+and short for heavy work. Judging it on one model hid both facts.
 
 A plan whose models all fall below a scenario's bar is off that board, and the
 reason names its closest miss.
@@ -295,18 +297,18 @@ both Max tiers. That roster is unchanged here.
 Working models move; plan letters do not. Claude Pro's working model becomes
 Sonnet 5.5 on daily use, easy coding, medium coding, and writing, because the
 cache cut below makes 5.5 cheaper than Sonnet 5 whenever any input is cached.
-It was already Sonnet 5.5 on the 45-bar lanes. The three Cursor plans, OpenCode
-Go, Go Plus, and Zen switch to Haiku on every lane it clears.
+It was already Sonnet 5.5 on the 45-bar lanes. The three Cursor plans and
+OpenCode Zen switch to Haiku on every lane it clears.
 
-Go records a monthly cap for every model on its roster, the same way Go Plus
-does. Each model's 5-hour window is 20% of that cap and its weekly window is
-50%. GLM-5.3-Flash, Kimi K2.7 Code, and DeepSeek V4.1 Flash are $60; the other
-roster models, including Haiku, Grok 4.7, and GLM-5.3, are $15. The $60 stored
-on the quota is Flash's cap. Daily use, easy coding, medium coding, and
-writing select Haiku, so those cards show $15 ($3 per 5 hours, $7.50 per week)
-rather than $60. Hard coding and research still select GLM-5.3, at its
-published $15. Go Plus medium coding's allowance falls from Flash's $180 to
-Haiku's $60. Plan letters do not move.
+Go and Go Plus publish a different monthly cap per model, so they are judged
+on the eligible model whose cap buys the most calls. Each model's 5-hour
+window is 20% of that cap and its weekly window is 50%. On Go, GLM-5.3-Flash,
+Kimi K2.7 Code, and DeepSeek V4.1 Flash are $60; the other roster models,
+including Haiku, are $15. Daily use, easy coding, medium coding, and writing
+select Flash at $60 ($12 per 5 hours, $30 per week). Medium coding is about
+12,200 calls on Flash and about 3,900 on Haiku. Hard coding and research still
+select GLM-5.3 at $15. Go Plus selects Flash at $180 on those four lanes and
+GLM-5.3 at $120 on hard coding and research. Plan letters do not move.
 
 ### Cache read cut: Claude Sonnet 5.5
 
@@ -362,8 +364,12 @@ arrive each cycle and expire with no rollover. Pro is not eligible.
 The figures are `includedApiValue` ($100 and $200) and `apiIncluded` reads
 "Scoped credits". Both plans list `api` alongside chat and the coding client.
 The credit is the allowance only when the comparison asks for direct API
-access. Rankings, chat, and coding-client comparisons still use the relative
-app limit, so the credit is not counted as coverage of Claude or Claude Code.
+access, and that comparison prices it on the cheapest Anthropic model in the
+catalog that clears the bar, at the workload's own cache share. Daily use is
+Haiku 5.5. Hard coding still uses Sonnet 5.5, because Haiku misses that bar.
+Rankings, chat, and coding-client comparisons still use the Max app roster and
+the relative app limit, so the credit is not counted as coverage of Claude or
+Claude Code.
 
 ## Catalog changes, October 5 2026
 
