@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-10-05",
+  "updatedAt": "2026-10-08",
   "currency": "USD",
   "plans": [
     {
@@ -158,13 +158,13 @@
       "kind": "Subscription",
       "monthly": 100,
       "source": "https://claude.com/pricing",
-      "note": "Designed for intensive research and long-context analysis.",
+      "note": "Designed for intensive research and long-context analysis. Each billing cycle includes $100 of Claude API credits for the Claude API, Claude Managed Agents, the Claude Agent SDK, and playground (https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers). The credits do not cover Claude Code or extra usage in the Claude apps, expire at the end of the cycle with no rollover, and are not this plan's chat or coding-client allowance. Pro is not eligible.",
       "quota": "5x Pro allowance across Opus and Sonnet models",
       "evidence": "Official relative limit",
       "confidence": "Medium",
-      "apiIncluded": "Optional",
+      "apiIncluded": "Scoped credits",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-10-05",
+      "verifiedAt": "2026-10-08",
       "modelIds": [
         "claude-opus-5",
         "claude-opus-5-5",
@@ -178,7 +178,7 @@
         "kind": "relative-limit",
         "description": "5x Pro allowance across Opus and Sonnet models",
         "source": "https://claude.com/pricing",
-        "verifiedAt": "2026-08-21"
+        "verifiedAt": "2026-10-08"
       }
     },
     {
@@ -188,13 +188,13 @@
       "kind": "Subscription",
       "monthly": 200,
       "source": "https://claude.com/pricing",
-      "note": "Highest personal tier with maximum capacity and priority queues.",
+      "note": "Highest personal tier with maximum capacity and priority queues. Each billing cycle includes $200 of Claude API credits for the Claude API, Claude Managed Agents, the Claude Agent SDK, and playground (https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers). The credits do not cover Claude Code or extra usage in the Claude apps, expire at the end of the cycle with no rollover, and are not this plan's chat or coding-client allowance. Pro is not eligible.",
       "quota": "20x Pro allowance and full context limits",
       "evidence": "Official relative limit",
       "confidence": "Medium",
-      "apiIncluded": "Optional",
+      "apiIncluded": "Scoped credits",
       "cacheRatio": 0.45,
-      "verifiedAt": "2026-10-05",
+      "verifiedAt": "2026-10-08",
       "modelIds": [
         "claude-opus-5",
         "claude-opus-5-5",
@@ -208,7 +208,7 @@
         "kind": "relative-limit",
         "description": "20x Pro allowance and full context limits",
         "source": "https://claude.com/pricing",
-        "verifiedAt": "2026-08-21"
+        "verifiedAt": "2026-10-08"
       }
     },
     {
@@ -420,7 +420,7 @@
       "apiIncluded": "Editor pool",
       "includedApiValue": 20,
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-10-05",
+      "verifiedAt": "2026-10-08",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -430,6 +430,7 @@
         "claude-sonnet-5",
         "claude-sonnet-5-5",
         "claude-haiku-4-5",
+        "claude-haiku-5-5",
         "gemini-3-1-pro",
         "gemini-3-8-flash",
         "kimi-k3",
@@ -464,7 +465,7 @@
       "apiIncluded": "Editor pool",
       "includedApiValue": 70,
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-10-05",
+      "verifiedAt": "2026-10-08",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -474,6 +475,7 @@
         "claude-sonnet-5",
         "claude-sonnet-5-5",
         "claude-haiku-4-5",
+        "claude-haiku-5-5",
         "gemini-3-1-pro",
         "gemini-3-8-flash",
         "kimi-k3",
@@ -508,7 +510,7 @@
       "apiIncluded": "Editor pool",
       "includedApiValue": 400,
       "cacheRatio": 0.45,
-      "verifiedAt": "2026-10-05",
+      "verifiedAt": "2026-10-08",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -518,6 +520,7 @@
         "claude-sonnet-5",
         "claude-sonnet-5-5",
         "claude-haiku-4-5",
+        "claude-haiku-5-5",
         "gemini-3-1-pro",
         "gemini-3-8-flash",
         "kimi-k3",
@@ -545,13 +548,13 @@
       "kind": "Subscription",
       "monthly": 10,
       "source": "https://opencode.ai/docs/go/",
-      "note": "Usage is capped in dollars per model, not credits, and metered at the same per-token rates published for each model. The recorded $60 monthly allowance is the cap published for models such as GLM-5.3-Flash; 5-hour is 20% of a model's monthly cap and weekly is 50%. Grok 4.7 is included, with its own monthly cap of $15. API usage beyond the cap is not included.",
+      "note": "Usage is capped in dollars per model, not credits, and metered at the same per-token rates published for each model. The recorded $60 monthly allowance is the cap published for models such as GLM-5.3-Flash; 5-hour is 20% of a model's monthly cap and weekly is 50%. Grok 4.7 and Claude Haiku 5.5 are included, each with its own monthly cap of $15. API usage beyond the cap is not included.",
       "quota": "$12 of usage per 5 hours, $30 per week, $60 per month",
       "evidence": "Official quota",
       "confidence": "High",
       "apiIncluded": "Yes",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-10-05",
+      "verifiedAt": "2026-10-08",
       "includedApiValue": 60,
       "modelIds": [
         "grok-4-6",
@@ -564,7 +567,8 @@
         "qwen-3-8-max",
         "deepseek-v4-pro",
         "deepseek-v4-1-flash",
-        "gpt-6-luna"
+        "gpt-6-luna",
+        "claude-haiku-5-5"
       ],
       "access": [
         "coding-client",
@@ -575,7 +579,7 @@
         "amount": 60,
         "resetWindow": "monthly",
         "source": "https://opencode.ai/docs/go/",
-        "verifiedAt": "2026-10-05"
+        "verifiedAt": "2026-10-08"
       },
       "conditionalLimits": [
         {
@@ -597,13 +601,13 @@
       "kind": "Subscription",
       "monthly": 40,
       "source": "https://opencode.ai/docs/go/",
-      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go docs page (last updated October 3, 2026) does not print a launch date; Go Plus was added to those docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash $180, Kimi K2.7 Code $180, GLM-5.3 $120, DeepSeek V4.1 Flash $120, and $60 for Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, Grok 4.6, GPT-6 Luna, and GPT-5.6 Luna. The $180 on quotaDetail is GLM-5.3-Flash's cap.",
+      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go docs page does not print a launch date; Go Plus was added to those docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash $180, Kimi K2.7 Code $180, GLM-5.3 $120, DeepSeek V4.1 Flash $120, and $60 for Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, Grok 4.6, GPT-6 Luna, GPT-5.6 Luna, and Claude Haiku 5.5. The $180 on quotaDetail is GLM-5.3-Flash's cap.",
       "quota": "Per-model monthly caps; 5-hour is 20% and weekly is 50% of the selected model's cap",
       "evidence": "Official quota",
       "confidence": "High",
       "apiIncluded": "Yes",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-10-05",
+      "verifiedAt": "2026-10-08",
       "includedApiValue": 180,
       "modelIds": [
         "grok-4-6",
@@ -616,7 +620,8 @@
         "qwen-3-8-max",
         "deepseek-v4-pro",
         "deepseek-v4-1-flash",
-        "gpt-6-luna"
+        "gpt-6-luna",
+        "claude-haiku-5-5"
       ],
       "access": [
         "coding-client",
@@ -627,7 +632,7 @@
         "amount": 180,
         "resetWindow": "monthly",
         "source": "https://opencode.ai/docs/go/",
-        "verifiedAt": "2026-10-05"
+        "verifiedAt": "2026-10-08"
       },
       "modelAllowances": {
         "grok-4-6": 60,
@@ -640,7 +645,8 @@
         "qwen-3-8-max": 60,
         "deepseek-v4-pro": 60,
         "deepseek-v4-1-flash": 120,
-        "gpt-6-luna": 60
+        "gpt-6-luna": 60,
+        "claude-haiku-5-5": 60
       },
       "conditionalLimits": [
         {
@@ -669,7 +675,7 @@
       "evidence": "Price break-even",
       "confidence": "Low",
       "apiIncluded": "Yes",
-      "verifiedAt": "2026-10-02",
+      "verifiedAt": "2026-10-08",
       "modelIds": [
         "gpt-6-astra",
         "gpt-6-1-sol",
@@ -683,6 +689,7 @@
         "claude-opus-5",
         "claude-sonnet-5",
         "claude-haiku-4-5",
+        "claude-haiku-5-5",
         "gemini-3-8-flash",
         "gemini-3-1-pro",
         "grok-4-7",
@@ -693,6 +700,7 @@
         "qwen-3-8-max",
         "deepseek-v4-1-flash",
         "deepseek-v4-pro",
+        "mistral-large-4",
         "glm-5-3",
         "glm-5-3-flash",
         "kimi-k3",
@@ -705,7 +713,7 @@
         "kind": "unknown",
         "description": "Direct token pass-through with no monthly fee",
         "source": "https://opencode.ai/docs/zen/",
-        "verifiedAt": "2026-10-02"
+        "verifiedAt": "2026-10-08"
       }
     },
     {

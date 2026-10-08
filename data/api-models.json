@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "updatedAt": "2026-10-05",
+  "updatedAt": "2026-10-08",
   "currency": "USD",
   "unit": "per-million-tokens",
   "capabilityIndex": {
@@ -740,14 +740,14 @@
       "provider": "Anthropic",
       "name": "Claude Sonnet 5.5",
       "input": 2,
-      "cached": 0.2,
+      "cached": 0.1,
       "output": 10,
       "context": "1M",
       "contextTokens": 1000000,
       "maxOutputTokens": 128000,
       "source": "https://platform.claude.com/docs/en/about-claude/pricing",
-      "verifiedAt": "2026-10-05",
-      "note": "Released September 28, 2026. Cache reads are $0.20 per million tokens; 5-minute cache writes are $2.50 and 1-hour cache writes are $4. The Batch API is 50% off input and output. US-only inference is 1.1x. Retirement is not sooner than September 28, 2027. Maximum output is 128K tokens on the synchronous API.",
+      "verifiedAt": "2026-10-08",
+      "note": "Released September 28, 2026. Cache reads were cut from $0.20 to $0.10 per million tokens on October 7, 2026 (0.05x base input). 5-minute cache writes stay $2.50 and 1-hour cache writes stay $4. The Batch API is 50% off input and output. US-only inference is 1.1x. Retirement is not sooner than September 28, 2027. Maximum output is 128K tokens on the synchronous API.",
       "capability": {
         "metrics": {
           "intelligence": 56
@@ -756,6 +756,59 @@
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/claude-sonnet-5-5",
         "verifiedAt": "2026-10-05"
+      }
+    },
+    {
+      "id": "claude-haiku-5-5",
+      "provider": "Anthropic",
+      "name": "Claude Haiku 5.5",
+      "input": 0.1,
+      "cached": 0.01,
+      "output": 0.5,
+      "context": "1M",
+      "contextTokens": 1000000,
+      "maxOutputTokens": 128000,
+      "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "verifiedAt": "2026-10-08",
+      "note": "Released October 7, 2026. Prompts up to 100,000 tokens are $0.10 input / $0.01 cache read / $0.50 output; prompts over 100,000 tokens are $0.50 / $0.05 / $2.50 for the whole request. 5-minute cache writes are $0.125 below that line and $0.625 above it; 1-hour cache writes are $0.20 and $1. The Batch API is 50% off input and output. Synchronous maximum output is 128K tokens; the Message Batches API allows 300K with the output-300k-2026-03-24 beta header. Retirement is not sooner than October 7, 2027.",
+      "capability": {
+        "metrics": {
+          "intelligence": 43
+        },
+        "indexVersion": "4.3.2",
+        "variant": "max",
+        "source": "https://artificialanalysis.ai/models/claude-haiku-5-5",
+        "verifiedAt": "2026-10-08"
+      },
+      "rateBands": [
+        {
+          "input": 0.5,
+          "cached": 0.05,
+          "output": 2.5,
+          "threshold": 100001
+        }
+      ]
+    },
+    {
+      "id": "mistral-large-4",
+      "provider": "Mistral",
+      "name": "Mistral Large 4",
+      "input": 1.36,
+      "cached": 0.14,
+      "output": 4.18,
+      "context": "1M",
+      "contextTokens": 1000000,
+      "source": "https://docs.mistral.ai/models/mistral-large-4",
+      "verifiedAt": "2026-10-08",
+      "note": "Public Preview since October 6, 2026. Open-weight Mixture-of-Experts; the changelog says open weights are coming soon. Standard rate is $1.36 input / $0.14 cached / $4.18 output. A 2-week 50% launch sale ($0.68 input / $0.07 cached / $2.09 output) is on the model card and is not the headline. The changelog says the sale lasts two weeks from the October 6 release and does not print a calendar end date, so October 20, 2026 is derived as fourteen days after October 6.",
+      "capability": {
+        "metrics": {
+          "intelligence": 38
+        },
+        "indexVersion": "4.3.2",
+        "variant": "reasoning",
+        "source": "https://artificialanalysis.ai/models/mistral-large-4",
+        "verifiedAt": "2026-10-08"
       }
     }
   ]

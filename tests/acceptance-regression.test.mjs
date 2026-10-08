@@ -324,12 +324,12 @@ test("Go Plus allowance follows the selected working model's published cap", () 
   };
 
   const medium = estimateFor("code-medium");
-  assert.equal(medium.working.id, "glm-5-3-flash");
-  assert.equal(medium.estimate.valueHigh, 180);
+  assert.equal(medium.working.id, "claude-haiku-5-5");
+  assert.equal(medium.estimate.valueHigh, 60);
   assert.equal(medium.estimate.callsLow, 0);
-  assert.match(medium.estimate.basis.label, /\$36 of GLM-5\.3-Flash usage per 5 hours \(20% of its \$180 monthly cap\)/);
-  assert.match(medium.estimate.basis.label, /\$90 of GLM-5\.3-Flash usage per week \(50% of its \$180 monthly cap\)/);
-  assert.equal(allowanceQuotaLabel(plan, medium.working), "$180/month on GLM-5.3-Flash ($36/5h, $90/weekly)");
+  assert.match(medium.estimate.basis.label, /\$12 of Claude Haiku 5\.5 usage per 5 hours \(20% of its \$60 monthly cap\)/);
+  assert.match(medium.estimate.basis.label, /\$30 of Claude Haiku 5\.5 usage per week \(50% of its \$60 monthly cap\)/);
+  assert.equal(allowanceQuotaLabel(plan, medium.working), "$60/month on Claude Haiku 5.5 ($12/5h, $30/weekly)");
 
   const hard = estimateFor("code-hard");
   assert.equal(hard.working.id, "glm-5-3");
@@ -343,11 +343,11 @@ test("Go Plus allowance follows the selected working model's published cap", () 
   assert.equal(research.estimate.valueHigh, 120);
 
   const writing = estimateFor("writing");
-  assert.equal(writing.working.id, "gpt-6-luna");
-  assert.equal(writing.estimate.valueHigh, 60, "Writing must use GPT-6 Luna's $60 cap, not $180");
-  assert.match(writing.estimate.basis.label, /\$12 of GPT-6 Luna usage per 5 hours \(20% of its \$60 monthly cap\)/);
-  assert.match(writing.estimate.basis.label, /\$30 of GPT-6 Luna usage per week \(50% of its \$60 monthly cap\)/);
-  assert.equal(allowanceQuotaLabel(plan, writing.working), "$60/month on GPT-6 Luna ($12/5h, $30/weekly)");
+  assert.equal(writing.working.id, "claude-haiku-5-5");
+  assert.equal(writing.estimate.valueHigh, 60, "Writing must use Claude Haiku 5.5's $60 cap, not $180");
+  assert.match(writing.estimate.basis.label, /\$12 of Claude Haiku 5\.5 usage per 5 hours \(20% of its \$60 monthly cap\)/);
+  assert.match(writing.estimate.basis.label, /\$30 of Claude Haiku 5\.5 usage per week \(50% of its \$60 monthly cap\)/);
+  assert.equal(allowanceQuotaLabel(plan, writing.working), "$60/month on Claude Haiku 5.5 ($12/5h, $30/weekly)");
   assert.equal(writing.estimate.basis.kind, "conditional");
 });
 
