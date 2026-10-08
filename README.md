@@ -365,9 +365,12 @@ Console organization.
 
 The figures are `includedApiValue` ($100 and $200) and `apiIncluded` reads
 "Scoped credits". Both plans list `api` alongside chat and the coding client.
-The credit is the allowance only when the comparison asks for direct API
-access, and that comparison prices it on the cheapest Anthropic model in the
-catalog that clears the bar, at the workload's own cache share. Daily use is
+The credit is the allowance only when the comparison accepts direct API
+access: "API" or "any surface". Under "any surface" a Max plan is read both
+ways, on its app quota and on its credit, and the stronger reading is kept, so
+accepting more surfaces never makes it look worse than API-only. The API
+reading prices the credit on the cheapest Anthropic model in the catalog that
+clears the bar, at the workload's own cache share. Daily use is
 Haiku 5.5. Hard coding still uses Sonnet 5.5, because Haiku misses that bar.
 Rankings, chat, and coding-client comparisons still use the Max app roster and
 the relative app limit, so the credit is not counted as coverage of Claude or

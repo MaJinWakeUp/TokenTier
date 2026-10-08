@@ -365,6 +365,34 @@ test("Claude Max API credit counts only for a direct-API comparison", () => {
   }
 });
 
+test("Accepting any surface never reads a Max plan worse than API-only", () => {
+  const scenario = scenarioDoc.scenarios.find((s) => s.id === "code-easy");
+  const workload = {
+    scenarioId: scenario.id,
+    input: scenario.input,
+    output: scenario.output,
+    calls: 100_000,
+    cacheRatio: scenario.cacheRatio,
+    budget: 200,
+    access: "api",
+  };
+  const apiOnly = recommend(catalog, scenario, workload, "cost");
+  const anySurface = recommend(catalog, scenario, { ...workload, access: "any" }, "cost");
+  for (const id of ["claude-max-5x", "claude-max-20x"]) {
+    const api = apiOnly.plans.evaluations.find((row) => row.plan.id === id);
+    const any = anySurface.plans.evaluations.find((row) => row.plan.id === id);
+    assert.equal(any.coverage, api.coverage, `${id} keeps its API-credit coverage under "any"`);
+    assert.equal(any.workingModel.id, api.workingModel.id);
+    assert.match(any.estimate.basis.label, /Included API credit/);
+  }
+  assert.equal(apiOnly.plans.best?.plan.id, "claude-max-5x");
+  assert.equal(anySurface.plans.best?.plan.id, "claude-max-5x", "a looser surface must not pick a $200 plan over a $100 one");
+
+  // Where the app quota is the only surface asked for, the credit still does not count.
+  const chat = recommend(catalog, scenario, { ...workload, access: "chat-app" }, "cost");
+  assert.notEqual(chat.plans.best?.plan.id, "claude-max-5x");
+});
+
 test("an API-credit wait must be a whole number of days on a plan with a credit", () => {
   const max = planDoc.plans.find((p) => p.id === "claude-max-5x");
   const withPlans = (plan) => ({ ...planCatalog, plans: planCatalog.plans.map((p) => (p.id === plan.id ? plan : p)) });

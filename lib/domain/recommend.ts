@@ -117,6 +117,27 @@ function anthropicApiCreditModel(
   )[0];
 }
 
+// A monthly API credit next to a relative app limit (Claude Max). It counts
+// only where direct API use is acceptable.
+function hasScopedApiCredit(plan: Plan): boolean {
+  return plan.provider === "Anthropic"
+    && plan.includedApiValue !== undefined
+    && plan.includedApiValue > 0
+    && (plan.quotaDetail?.kind === "relative-limit" || plan.quotaDetail?.kind === "unknown");
+}
+
+// Whether `candidate` is a better reading of the same plan than `current`:
+// clears the bar, then more proven coverage, then more guaranteed calls.
+function betterEvaluation(current: PlanEvaluation, candidate: PlanEvaluation): PlanEvaluation {
+  if (candidate.eligible !== current.eligible) return candidate.eligible ? candidate : current;
+  const coverage = (row: PlanEvaluation) => row.coverage ?? -1;
+  if (coverage(candidate) !== coverage(current)) {
+    return coverage(candidate) > coverage(current) ? candidate : current;
+  }
+  const callsLow = (row: PlanEvaluation) => row.estimate?.callsLow ?? 0;
+  return callsLow(candidate) > callsLow(current) ? candidate : current;
+}
+
 function evaluatePlan(
   plan: Plan,
   scenario: Scenario,
@@ -126,20 +147,37 @@ function evaluatePlan(
   modelById: Map<string, Model>,
   access: AccessRequirement,
 ): PlanEvaluation {
-  const scopedApiCredit = access === "api"
-    && plan.provider === "Anthropic"
-    && plan.includedApiValue !== undefined
-    && plan.includedApiValue > 0
-    && (plan.quotaDetail?.kind === "relative-limit" || plan.quotaDetail?.kind === "unknown");
+  // The API credit is scoped. It counts when the reader asked for direct API
+  // access, and when they accept any surface, since the API is one of them.
+  // For "any", the plan is read both ways and the stronger reading is kept, so
+  // loosening the access requirement can never make a plan look worse.
+  if (access === "any" && hasScopedApiCredit(plan) && plan.access?.includes("api")) {
+    return betterEvaluation(
+      evaluatePlanOn(plan, scenario, settings, calls, budget, modelById, undefined),
+      evaluatePlanOn(plan, scenario, settings, calls, budget, modelById, "api"),
+    );
+  }
+  return evaluatePlanOn(plan, scenario, settings, calls, budget, modelById, access === "api" ? "api" : undefined);
+}
+
+// Evaluate a plan on one surface. `surface` is "api" only for the credit path;
+// otherwise the app quota and the app roster apply.
+function evaluatePlanOn(
+  plan: Plan,
+  scenario: Scenario,
+  settings: UsageSettings,
+  calls: number,
+  budget: number,
+  modelById: Map<string, Model>,
+  surface: "api" | undefined,
+): PlanEvaluation {
+  const scopedApiCredit = surface === "api" && hasScopedApiCredit(plan);
   const rosterModel = planWorkingModel(plan, scenario, settings, modelById);
   const workingModel = scopedApiCredit
     ? anthropicApiCreditModel(scenario, settings, modelById) ?? rosterModel
     : rosterModel;
   const meetsBar = workingModel !== null;
   const fallback = modelById.get(plan.modelIds[0]) ?? null;
-  // The API credit is scoped. It is the allowance only when the reader asked
-  // for direct API access. "Any surface" still uses the app quota.
-  const surface = access === "api" ? "api" : undefined;
   const estimate = planEstimate(plan, settings, workingModel, fallback, surface);
   const coverage = planCoverageScore(plan, settings, calls, workingModel, fallback, surface);
   const withinBudget = (plan.monthly ?? Infinity) <= budget;
