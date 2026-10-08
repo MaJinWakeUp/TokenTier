@@ -54,11 +54,12 @@ holds the workload's tokens. That model then supplies the plan's capability
 score, its capacity estimate and its tier, and the interface names it (`via
 GLM-5.3-Flash`) wherever a plan number is shown.
 
-The effect is largest where a plan spans a wide price range. OpenCode Go's $60
-monthly allowance buys about 111,000 daily-use calls on GLM-5.3-Flash, but for
-hard coding the 60 bar rules Flash out, forcing GLM-5.3 and leaving roughly 455
-calls against a 1,500-call profile — so the same plan is generous for light work
-and short for heavy work. Judging it on one model hid both facts.
+The effect is largest where a plan spans a wide price range. OpenCode Go's
+daily-use card is Claude Haiku 5.5 at its published $15 cap, about 32,000
+calls. Hard coding misses both Haiku and GLM-5.3-Flash, so the plan is judged
+on GLM-5.3 at the same $15 cap, about 114 calls against a 1,500-call profile.
+The same subscription is generous for light work and short for heavy work.
+Judging it on one model hid both facts.
 
 A plan whose models all fall below a scenario's bar is off that board, and the
 reason names its closest miss.
@@ -297,12 +298,15 @@ cache cut below makes 5.5 cheaper than Sonnet 5 whenever any input is cached.
 It was already Sonnet 5.5 on the 45-bar lanes. The three Cursor plans, OpenCode
 Go, Go Plus, and Zen switch to Haiku on every lane it clears.
 
-Go still records one $60 reference allowance, GLM-5.3-Flash's cap, and does not
-use per-model allowances. The card therefore still values Haiku at $60 while
-the Go page caps it at $15, the same shape as Grok 4.7. Go Plus does use
-per-model caps, so medium coding's allowance falls from GLM-5.3-Flash's $180
-to Haiku's $60. The letter stays **B**, because plan letters follow the
-subscription price. Hard coding and research still select GLM-5.3 at $120.
+Go records a monthly cap for every model on its roster, the same way Go Plus
+does. Each model's 5-hour window is 20% of that cap and its weekly window is
+50%. GLM-5.3-Flash, Kimi K2.7 Code, and DeepSeek V4.1 Flash are $60; the other
+roster models, including Haiku, Grok 4.7, and GLM-5.3, are $15. The $60 stored
+on the quota is Flash's cap. Daily use, easy coding, medium coding, and
+writing select Haiku, so those cards show $15 ($3 per 5 hours, $7.50 per week)
+rather than $60. Hard coding and research still select GLM-5.3, at its
+published $15. Go Plus medium coding's allowance falls from Flash's $180 to
+Haiku's $60. Plan letters do not move.
 
 ### Cache read cut: Claude Sonnet 5.5
 

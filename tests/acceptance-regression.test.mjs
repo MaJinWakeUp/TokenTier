@@ -307,7 +307,35 @@ test("AC4: OpenCode Go 5h+weekly caps make it conditional", () => {
   assert.equal(est.basis.kind, "conditional", "OpenCode Go must be conditional due to multi-window caps");
   const coverage = planCoverageScore(plan, settings, scenario.calls, wm, modelById.get(plan.modelIds[0]));
   assert.ok(coverage < 100, "Conditional plan must not have 100 coverage");
-  assert.equal(est.valueHigh, plan.quotaDetail.amount, "OpenCode Go keeps its plan-wide allowance");
+  assert.equal(wm.id, "glm-5-3");
+  assert.equal(est.valueHigh, 15, "Hard coding must use GLM-5.3's $15 cap, not the $60 reference");
+});
+
+test("OpenCode Go allowance follows the selected working model's published cap", () => {
+  const plan = planDoc.plans.find((p) => p.id === "opencode-go");
+  assert.ok(plan, "Catalog must include OpenCode Go");
+  const fallback = modelById.get(plan.modelIds[0]);
+
+  const estimateFor = (scenarioId) => {
+    const scenario = scenarioDoc.scenarios.find((s) => s.id === scenarioId);
+    const settings = { input: scenario.input, output: scenario.output, cacheRatio: scenario.cacheRatio };
+    const working = planWorkingModel(plan, scenario, settings, modelById);
+    const estimate = planEstimate(plan, settings, working, fallback);
+    return { working, estimate };
+  };
+
+  const daily = estimateFor("daily");
+  assert.equal(daily.working.id, "claude-haiku-5-5");
+  assert.equal(daily.estimate.valueHigh, 15, "Daily use must use Claude Haiku 5.5's $15 cap, not $60");
+  assert.equal(daily.estimate.callsLow, 0);
+  assert.match(daily.estimate.basis.label, /\$3 of Claude Haiku 5\.5 usage per 5 hours \(20% of its \$15 monthly cap\)/);
+  assert.match(daily.estimate.basis.label, /\$7\.50 of Claude Haiku 5\.5 usage per week \(50% of its \$15 monthly cap\)/);
+  assert.equal(allowanceQuotaLabel(plan, daily.working), "$15/month on Claude Haiku 5.5 ($3/5h, $7.50/weekly)");
+  assert.equal(daily.estimate.basis.kind, "conditional");
+
+  const medium = estimateFor("code-medium");
+  assert.equal(medium.working.id, "claude-haiku-5-5");
+  assert.equal(medium.estimate.valueHigh, 15);
 });
 
 test("Go Plus allowance follows the selected working model's published cap", () => {
