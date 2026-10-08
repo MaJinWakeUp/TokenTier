@@ -329,7 +329,8 @@ on hard coding, research, and innovation. It stays **B** on medium coding.
 | Context | 1M |
 | Index v4.3.2 | 38 (reasoning) |
 
-Public Preview since October 6, 2026. Open-weight Mixture-of-Experts; the
+Public Preview since October 6, 2026. The docs navigation publishes the card
+at `docs.mistral.ai/models/mistral-large-4-0`. Open-weight Mixture-of-Experts; the
 changelog says open weights are coming soon. The headline is the standard rate.
 A 2-week 50% launch sale ($0.68 / $0.07 / $2.09) is on the model card and is
 not the headline. The changelog says the sale lasts two weeks from October 6
@@ -358,12 +359,11 @@ includes $200. They cover the Claude API, Managed Agents, the Agent SDK, and
 playground. They do not cover Claude Code or extra usage in the apps. They
 arrive each cycle and expire with no rollover. Pro is not eligible.
 
-The figures are in the two plan notes, and `apiIncluded` now reads "Scoped
-credits". They are not `includedApiValue`. Both plans are still relative limits
-on chat and Claude Code, which is what the boards rank, and a dollar allowance
-would count a Console credit as proof those surfaces are covered. With a
-`quotaDetail` present, `includedApiValue` is not read, and leaving it there
-invited that misreading the last time these plans carried one.
+The figures are `includedApiValue` ($100 and $200) and `apiIncluded` reads
+"Scoped credits". Both plans list `api` alongside chat and the coding client.
+The credit is the allowance only when the comparison asks for direct API
+access. Rankings, chat, and coding-client comparisons still use the relative
+app limit, so the credit is not counted as coverage of Claude or Claude Code.
 
 ## Catalog changes, October 5 2026
 

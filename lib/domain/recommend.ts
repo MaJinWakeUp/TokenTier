@@ -103,12 +103,16 @@ function evaluatePlan(
   calls: number,
   budget: number,
   modelById: Map<string, Model>,
+  access: AccessRequirement,
 ): PlanEvaluation {
   const workingModel = planWorkingModel(plan, scenario, settings, modelById);
   const meetsBar = workingModel !== null;
   const fallback = modelById.get(plan.modelIds[0]) ?? null;
-  const estimate = planEstimate(plan, settings, workingModel, fallback);
-  const coverage = planCoverageScore(plan, settings, calls, workingModel, fallback);
+  // The API credit is scoped. It is the allowance only when the reader asked
+  // for direct API access. "Any surface" still uses the app quota.
+  const surface = access === "api" ? "api" : undefined;
+  const estimate = planEstimate(plan, settings, workingModel, fallback, surface);
+  const coverage = planCoverageScore(plan, settings, calls, workingModel, fallback, surface);
   const withinBudget = (plan.monthly ?? Infinity) <= budget;
 
   // Coverage classification:
@@ -201,7 +205,7 @@ export function recommend(
     .filter((plan) => plan.kind === "Subscription")
     .filter((plan) => planMatchesAccess(plan, workload.access))
     .map((plan) =>
-      evaluatePlan(plan, scenario, settings, workload.calls, workload.budget, catalog.modelById),
+      evaluatePlan(plan, scenario, settings, workload.calls, workload.budget, catalog.modelById, workload.access),
     );
 
   const bestApi = selectBestApi(apiEvaluations, objective, workload.budget);

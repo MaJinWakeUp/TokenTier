@@ -263,10 +263,9 @@ test("AC4: quotaDetail is authoritative over includedApiValue for relative-limit
   const scenario = scenarioDoc.scenarios.find((s) => s.id === "code-medium");
   const settings = { input: scenario.input, output: scenario.output, cacheRatio: 0.6 };
 
-  // A plan that still carries the pre-v3 includedApiValue alongside a
-  // relative-limit quotaDetail. The fixture is synthetic because no catalog
-  // plan has that shape any more, and the rule must not stop being tested the
-  // day the last one is cleaned up.
+  // Claude Max carries includedApiValue for its scoped API credit next to a
+  // relative-limit app quota. The default estimate must still ignore that
+  // credit. A direct-API comparison is the only path that reads it.
   const base = planDoc.plans.find((p) => p.quotaDetail?.kind === "relative-limit");
   assert.ok(base, "Catalog must have a relative-limit plan to model the fixture on");
   const legacy = { ...base, id: "fixture-legacy", includedApiValue: 100 };
@@ -293,6 +292,46 @@ test("AC4: quotaDetail is authoritative over includedApiValue for relative-limit
       modelById.get(plan.modelIds[0]),
     );
     assert.notEqual(estimate.basis.kind, "allowance", `${plan.id} must not be classified as a dollar allowance`);
+  }
+});
+
+test("Claude Max API credit counts only for a direct-API comparison", () => {
+  const scenario = scenarioDoc.scenarios.find((s) => s.id === "daily");
+  const settings = { input: scenario.input, output: scenario.output, cacheRatio: scenario.cacheRatio };
+  for (const [id, credit] of [["claude-max-5x", 100], ["claude-max-20x", 200]]) {
+    const plan = planDoc.plans.find((entry) => entry.id === id);
+    assert.ok(plan.access.includes("api"), `${id} exposes the API the credit covers`);
+    assert.equal(plan.includedApiValue, credit);
+    const working = planWorkingModel(plan, scenario, settings, modelById);
+    const fallback = modelById.get(plan.modelIds[0]);
+    const appEstimate = planEstimate(plan, settings, working, fallback);
+    assert.equal(appEstimate.basis.kind, "unknown-quota", `${id} app quota stays a relative limit`);
+    const apiEstimate = planEstimate(plan, settings, working, fallback, "api");
+    assert.equal(apiEstimate.basis.kind, "allowance", `${id} API credit is a monthly allowance`);
+    assert.equal(apiEstimate.valueHigh, credit);
+    assert.equal(apiEstimate.callsLow, apiEstimate.callsHigh);
+    const appCoverage = planCoverageScore(plan, settings, scenario.calls, working, fallback);
+    assert.equal(appCoverage, null, `${id} app coverage stays unproven`);
+    const apiCoverage = planCoverageScore(plan, settings, scenario.calls, working, fallback, "api");
+    assert.equal(apiCoverage, 100, `${id} API credit covers a daily-use month`);
+  }
+
+  const workload = {
+    scenarioId: scenario.id,
+    input: scenario.input,
+    output: scenario.output,
+    calls: scenario.calls,
+    cacheRatio: scenario.cacheRatio,
+    budget: 200,
+    access: "api",
+  };
+  const apiPlans = recommend(catalog, scenario, workload, "cost").plans.evaluations.map((row) => row.plan.id);
+  assert.ok(apiPlans.includes("claude-max-5x"), "an API comparison lists Max 5x");
+  assert.ok(apiPlans.includes("claude-max-20x"), "an API comparison lists Max 20x");
+  const chatPlans = recommend(catalog, scenario, { ...workload, access: "chat-app" }, "cost").plans.evaluations;
+  for (const id of ["claude-max-5x", "claude-max-20x"]) {
+    const row = chatPlans.find((entry) => entry.plan.id === id);
+    assert.equal(row.estimate.basis.kind, "unknown-quota", `${id} stays unproven on chat`);
   }
 });
 

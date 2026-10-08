@@ -1,7 +1,7 @@
 // Token cost arithmetic and plan allowance conversion. Pure functions; every
 // dollar figure derives from the catalog's recorded rates.
 
-import type { ConditionalLimit, Model, Plan, Quota, RateBand, UsageSettings } from "../catalog/types.js";
+import type { AccessSurface, ConditionalLimit, Model, Plan, Quota, RateBand, UsageSettings } from "../catalog/types.js";
 
 // Select the applicable rate band for a given input token count. The default
 // band (no threshold) always exists as the top-level input/cached/output fields.
@@ -176,6 +176,9 @@ export function planEstimate(
   settings: UsageSettings,
   workingModel?: Model | null,
   fallbackModel?: Model | null,
+  // Set only for a direct-API comparison. A scoped API credit must not be
+  // counted as coverage of chat or a coding client.
+  surface?: AccessSurface,
 ): PlanEstimate | null {
   const model = modelForPlanCost(plan, workingModel, fallbackModel);
   if (!model) return null;
@@ -327,6 +330,35 @@ export function planEstimate(
     };
   }
 
+  // A relative limit on the apps can sit next to a separate monthly API credit.
+  // That credit is includedApiValue, and it counts only when the comparison
+  // asked for the API surface. Chat and coding-client estimates keep the
+  // relative limit, or the credit would be treated as coverage of those apps.
+  if (
+    surface === "api"
+    && (quota?.kind === "relative-limit" || quota?.kind === "unknown")
+    && plan.includedApiValue !== undefined
+    && plan.includedApiValue > 0
+  ) {
+    if (!Number.isFinite(referenceCost) || referenceCost <= 0) {
+      return {
+        callsLow: Infinity,
+        callsHigh: Infinity,
+        valueLow: 0,
+        valueHigh: 0,
+        basis: { kind: "free", label: "Free per-call cost" },
+      };
+    }
+    const calls = plan.includedApiValue / referenceCost;
+    return {
+      callsLow: calls,
+      callsHigh: calls,
+      valueLow: plan.includedApiValue,
+      valueHigh: plan.includedApiValue,
+      basis: { kind: "allowance", label: "Included API credit" },
+    };
+  }
+
   // Relative-limit or unknown quota: quotaDetail is authoritative. Do NOT fall
   // back to includedApiValue — that is a legacy soft field that may conflate
   // a relative limit with a verified allowance. Return an unknown-quota basis
@@ -400,8 +432,9 @@ export function planCoverageScore(
   calls: number,
   workingModel?: Model | null,
   fallbackModel?: Model | null,
+  surface?: AccessSurface,
 ) {
-  const estimate = planEstimate(plan, settings, workingModel, fallbackModel);
+  const estimate = planEstimate(plan, settings, workingModel, fallbackModel, surface);
   if (!estimate) return null;
   // Only verified allowance (credits or included value) counts as coverage.
   // Break-even, conditional, and unknown do not prove the plan covers the
