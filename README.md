@@ -50,14 +50,17 @@ A subscription is access to a set of models, not to one model, so judging every
 plan by a single fixed reference misstates both what it can do and how far it
 goes. Each plan lists every model it includes, and each scenario picks the
 **cheapest model on the plan that clears that scenario's capability bar** and
-holds the workload's tokens. That model then supplies the plan's capability
-score, its capacity estimate and its tier, and the interface names it (`via
+holds the workload's tokens. A plan that publishes a different monthly dollar
+cap per model is the exception: it is judged on the eligible model whose cap
+buys the most calls. That model then supplies the plan's capability score, its
+capacity estimate and its tier, and the interface names it (`via
 GLM-5.3-Flash`) wherever a plan number is shown.
 
-The effect is largest where a plan spans a wide price range. OpenCode Go's $60
-monthly allowance buys about 111,000 daily-use calls on GLM-5.3-Flash, but for
-hard coding the 60 bar rules Flash out, forcing GLM-5.3 and leaving roughly 455
-calls against a 1,500-call profile — so the same plan is generous for light work
+The effect is largest where a plan spans a wide price range. OpenCode Go's
+daily-use card is GLM-5.3-Flash at its $60 cap, about 111,000 calls. Haiku is
+cheaper per call, but its $15 cap buys fewer of them. Hard coding misses
+Flash, so the plan is judged on GLM-5.3 at its $15 cap, about 114 calls
+against a 1,500-call profile. The same subscription is generous for light work
 and short for heavy work. Judging it on one model hid both facts.
 
 A plan whose models all fall below a scenario's bar is off that board, and the
@@ -254,6 +257,130 @@ tier lists, recommendations, cost list, price book, source links, and update
 date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
+
+## Catalog changes, October 8 2026
+
+Re-read from the providers' own pages on October 8. Two new models, a cache-read
+cut on Claude Sonnet 5.5, and monthly Claude API credits on both Max plans.
+Gemini 4 Argon stays out: it is not generally available. Step 5 Preview's
+limited-time free OpenCode Go access stays out.
+
+### Added: Claude Haiku 5.5
+
+| | Claude Haiku 5.5 |
+| --- | --- |
+| Provider | Anthropic |
+| Input / cached / output | $0.10 / $0.01 / $0.50 up to 100,000 tokens; $0.50 / $0.05 / $2.50 over that |
+| Context | 1M, 128K maximum output (300K on Batch, beta) |
+| Index v4.3.2 | 43 (max) |
+
+Released October 7, 2026. The second band starts at 100,001 tokens, so a prompt
+of exactly 100,000 stays on the base rate. 5-minute cache writes are $0.125
+and $0.625; 1-hour writes are $0.20 and $1. Batch is 50% off. Retirement is not
+sooner than October 7, 2027. Artificial Analysis publishes 43 for the max
+variant.
+
+The short-context rates match GPT-6 Luna. No scenario sends more than 90K input
+tokens, so the upper band prices nothing on the board. Haiku ties Luna and
+enters at **S** on daily use, easy coding, and writing. Luna scores 37 and
+misses the 38 bar, so on medium coding Haiku is a new cheapest model and enters
+at **S**. It scores 43 and misses the 45 bar, so hard coding, research, and
+innovation do not list it.
+
+Cursor's models page prices it in the Other Models pool, so Pro, Pro Plus, and
+Ultra list it. OpenCode Go lists it at a $15 monthly cap and Go Plus at $60.
+OpenCode Zen's price table matches both bands, so Zen lists it too. Claude Pro
+and both Max plans do not: Haiku 4.5 is not on those rosters, and this pass
+stays consistent. claude.com/pricing does mark Haiku as included on Pro and
+both Max tiers. That roster is unchanged here.
+
+Working models move; plan letters do not. Claude Pro's working model becomes
+Sonnet 5.5 on daily use, easy coding, medium coding, and writing, because the
+cache cut below makes 5.5 cheaper than Sonnet 5 whenever any input is cached.
+It was already Sonnet 5.5 on the 45-bar lanes. The three Cursor plans and
+OpenCode Zen switch to Haiku on every lane it clears.
+
+Go and Go Plus publish a different monthly cap per model, so they are judged
+on the eligible model whose cap buys the most calls. Each model's 5-hour
+window is 20% of that cap and its weekly window is 50%. On Go, GLM-5.3-Flash,
+Kimi K2.7 Code, and DeepSeek V4.1 Flash are $60; the other roster models,
+including Haiku, are $15. Daily use, easy coding, medium coding, and writing
+select Flash at $60 ($12 per 5 hours, $30 per week). Medium coding is about
+12,200 calls on Flash and about 3,900 on Haiku. Hard coding and research still
+select GLM-5.3 at $15. Go Plus selects Flash at $180 on those four lanes and
+GLM-5.3 at $120 on hard coding and research. Plan letters do not move.
+
+### Cache read cut: Claude Sonnet 5.5
+
+Cache reads go from $0.20 to $0.10 per million tokens. The Claude Platform
+release notes for October 7, 2026 state the cut, and the pricing page agrees.
+5-minute writes stay $2.50, 1-hour writes stay $4, and input and output stay
+$2 / $10. Cursor's models page already shows the $0.10 cache read. OpenCode
+Zen's price table still shows $0.20; the catalog follows Anthropic.
+
+The new rate ties Sonnet 5.5 with GPT-6.1 Sol on every scenario. It rises from
+**C** to **B** on daily use, easy coding, and writing, and from **B** to **A**
+on hard coding, research, and innovation. It stays **B** on medium coding.
+
+### Added: Mistral Large 4
+
+| | Mistral Large 4 |
+| --- | --- |
+| Provider | Mistral |
+| Input / cached / output | $1.36 / $0.14 / $4.18 |
+| Context | 1M |
+| Index v4.3.2 | 38 (reasoning) |
+
+Public Preview since October 6, 2026. The docs navigation publishes the card
+at `docs.mistral.ai/models/mistral-large-4-0`. Open-weight Mixture-of-Experts; the
+changelog says open weights are coming soon. The headline is the standard rate.
+A 2-week 50% launch sale ($0.68 / $0.07 / $2.09) is on the model card and is
+not the headline. The changelog says the sale lasts two weeks from October 6
+and does not print a calendar date, so October 20, 2026 in the note is derived
+as fourteen days after that release. Artificial Analysis scores the reasoning
+version at 38 and does not label a max effort. That page also calls the model
+Preview and lists a context window near 524K; the catalog uses Mistral's 1M.
+
+It clears every bar under 45 and misses the frontier bar. It enters at **A**
+on daily use, easy coding, medium coding, and writing. The new price group
+moves unchanged models:
+
+- Daily use and writing: Qwen3.8-Max falls from **A** to **B**.
+- Easy coding: Gemini 3.8 Flash falls from **A** to **B**.
+- Medium coding: Muse Spark 1.3 falls from **S** to **A**; Qwen3.8-Max and
+  Grok 4.5 fall from **A** to **B**; Claude Sonnet 5 and GPT-6 Sol fall from
+  **B** to **C**; GPT-5.6 Sol falls from **C** to **D**.
+
+No plan changes letter. OpenCode Zen lists Mistral Large 4 because its standard
+prices match the headline; the Zen row also prints the launch sale.
+
+### Claude Max API credits
+
+Max 5x now includes $100 of Claude API credits a billing cycle, and Max 20x
+includes $200. They cover the Claude API, Managed Agents, the Agent SDK, and
+playground. They do not cover Claude Code or extra usage in the apps. They
+arrive each cycle and expire with no rollover. Pro is not eligible. A new
+subscriber can claim them only after 7 days on the plan, by linking a Claude
+Console organization.
+
+The figures are `includedApiValue` ($100 and $200) and `apiIncluded` reads
+"Scoped credits". Both plans list `api` alongside chat and the coding client.
+The credit is the allowance only when the comparison accepts direct API
+access: "API" or "any surface". Under "any surface" a Max plan is read both
+ways, on its app quota and on its credit, and the stronger reading is kept, so
+accepting more surfaces never makes it look worse than API-only. The API
+reading prices the credit on the cheapest Anthropic model in the catalog that
+clears the bar, at the workload's own cache share. Daily use is
+Haiku 5.5. Hard coding still uses Sonnet 5.5, because Haiku misses that bar.
+Rankings, chat, and coding-client comparisons still use the Max app roster and
+the relative app limit, so the credit is not counted as coverage of Claude or
+Claude Code.
+
+The seven-day wait is `apiCreditClaimAfterDays: 7`. The comparison is of a
+typical month, and every cycle's credit arrives once the first is claimed, so
+the credit still counts as a monthly allowance. The estimate's label names the
+wait (*Included API credit, claimable after 7 days on the plan*), so a reader
+buying Max for the credit sees that the first week is not covered.
 
 ## Catalog changes, October 5 2026
 

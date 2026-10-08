@@ -144,6 +144,10 @@ export type Plan = {
   apiIncluded: string;
   verifiedAt: string;
   includedApiValue?: number;
+  // Days a new subscriber waits before the included API credit can be claimed.
+  // The estimate still counts the credit as a monthly allowance, because it
+  // arrives every cycle after that, but names the wait wherever it is counted.
+  apiCreditClaimAfterDays?: number;
   weeklyCredits?: number;
   // Keyed by model id: providers publish credit multipliers per model.
   creditMultipliers?: Record<string, [number, number, number]>;
