@@ -258,6 +258,24 @@ date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
 
+## Catalog changes, October 12 2026
+
+OpenCode Go and Go Plus raised the published monthly dollar cap for DeepSeek
+V4.1 Flash. Re-read from [opencode.ai/go](https://opencode.ai/go) on October 12
+(`docs/go` returned 404 that day).
+
+| Plan | `deepseek-v4-1-flash` |
+| --- | --- |
+| OpenCode Go | $60 → **$80** |
+| OpenCode Go Plus | $120 → **$160** |
+
+Notes on both plans now list Flash on its own line instead of the old $60 /
+$120 cohort with GLM-5.3-Flash and Kimi K2.7 Code (Go) or with GLM-5.3 (Go
+Plus). No other model allowances, roster entries, or Ultrafast / promo tiers
+were touched. Working models and plan letters do not move: GLM-5.3-Flash still
+buys the most calls on the light lanes, and GLM-5.3 still wins hard coding and
+research.
+
 ## Catalog changes, October 8 2026
 
 Re-read from the providers' own pages on October 8. Two new models, a cache-read
