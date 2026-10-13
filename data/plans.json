@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-10-08",
+  "updatedAt": "2026-10-12",
   "currency": "USD",
   "plans": [
     {
@@ -553,14 +553,14 @@
       "name": "OpenCode Go",
       "kind": "Subscription",
       "monthly": 10,
-      "source": "https://opencode.ai/docs/go/",
-      "note": "Usage is capped in dollars per model, not credits, and metered at the same per-token rates published for each model. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash, Kimi K2.7 Code, and DeepSeek V4.1 Flash are $60, and Grok 4.6, Grok 4.7, GPT-5.6 Luna, GLM-5.3, Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, GPT-6 Luna, and Claude Haiku 5.5 are $15. The $60 on quotaDetail is GLM-5.3-Flash's cap. API usage beyond the cap is not included.",
+      "source": "https://opencode.ai/go",
+      "note": "Usage is capped in dollars per model, not credits, and metered at the same per-token rates published for each model. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash and Kimi K2.7 Code are $60, DeepSeek V4.1 Flash is $80, and Grok 4.6, Grok 4.7, GPT-5.6 Luna, GLM-5.3, Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, GPT-6 Luna, and Claude Haiku 5.5 are $15. The $60 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/go on 2026-10-12 (docs/go was 404). API usage beyond the cap is not included.",
       "quota": "Per-model monthly caps; 5-hour is 20% and weekly is 50% of the selected model's cap",
       "evidence": "Official quota",
       "confidence": "High",
       "apiIncluded": "Yes",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-10-08",
+      "verifiedAt": "2026-10-12",
       "includedApiValue": 60,
       "modelIds": [
         "grok-4-6",
@@ -584,8 +584,8 @@
         "kind": "dollar-allowance",
         "amount": 60,
         "resetWindow": "monthly",
-        "source": "https://opencode.ai/docs/go/",
-        "verifiedAt": "2026-10-08"
+        "source": "https://opencode.ai/go",
+        "verifiedAt": "2026-10-12"
       },
       "modelAllowances": {
         "grok-4-6": 15,
@@ -597,7 +597,7 @@
         "kimi-k2-7-code": 60,
         "qwen-3-8-max": 15,
         "deepseek-v4-pro": 15,
-        "deepseek-v4-1-flash": 60,
+        "deepseek-v4-1-flash": 80,
         "gpt-6-luna": 15,
         "claude-haiku-5-5": 15
       },
@@ -622,14 +622,14 @@
       "name": "OpenCode Go Plus",
       "kind": "Subscription",
       "monthly": 40,
-      "source": "https://opencode.ai/docs/go/",
-      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go docs page does not print a launch date; Go Plus was added to those docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash $180, Kimi K2.7 Code $180, GLM-5.3 $120, DeepSeek V4.1 Flash $120, and $60 for Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, Grok 4.6, GPT-6 Luna, GPT-5.6 Luna, and Claude Haiku 5.5. The $180 on quotaDetail is GLM-5.3-Flash's cap.",
+      "source": "https://opencode.ai/go",
+      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go marketing page does not print a launch date; Go Plus was added to the former docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash $180, Kimi K2.7 Code $180, DeepSeek V4.1 Flash $160, GLM-5.3 $120, and $60 for Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, Grok 4.6, GPT-6 Luna, GPT-5.6 Luna, and Claude Haiku 5.5. The $180 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/go on 2026-10-12 (docs/go was 404).",
       "quota": "Per-model monthly caps; 5-hour is 20% and weekly is 50% of the selected model's cap",
       "evidence": "Official quota",
       "confidence": "High",
       "apiIncluded": "Yes",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-10-08",
+      "verifiedAt": "2026-10-12",
       "includedApiValue": 180,
       "modelIds": [
         "grok-4-6",
@@ -653,8 +653,8 @@
         "kind": "dollar-allowance",
         "amount": 180,
         "resetWindow": "monthly",
-        "source": "https://opencode.ai/docs/go/",
-        "verifiedAt": "2026-10-08"
+        "source": "https://opencode.ai/go",
+        "verifiedAt": "2026-10-12"
       },
       "modelAllowances": {
         "grok-4-6": 60,
@@ -666,7 +666,7 @@
         "kimi-k2-7-code": 180,
         "qwen-3-8-max": 60,
         "deepseek-v4-pro": 60,
-        "deepseek-v4-1-flash": 120,
+        "deepseek-v4-1-flash": 160,
         "gpt-6-luna": 60,
         "claude-haiku-5-5": 60
       },
