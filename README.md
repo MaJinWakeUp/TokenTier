@@ -270,7 +270,7 @@ new buyers. Plus at $8/mo stays out under the $10 subscription floor.
 | --- | --- |
 | Provider | Google |
 | Input / cached / output | $4 / $0.20 / $20 |
-| Context | 1M (1,048,576 tokens), 65,536 default max output |
+| Context | 1M (1,048,576 tokens); max output 1M (sync default 65,536; long decode up to context) |
 | Index v4.3.2 | 53 (high) |
 
 GA October 13, 2026. Standard rate from December 1, 2026 shown; an introductory
