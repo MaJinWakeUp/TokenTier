@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "updatedAt": "2026-10-08",
+  "updatedAt": "2026-10-15",
   "currency": "USD",
   "unit": "per-million-tokens",
   "capabilityIndex": {
@@ -809,6 +809,29 @@
         "variant": "reasoning",
         "source": "https://artificialanalysis.ai/models/mistral-large-4",
         "verifiedAt": "2026-10-08"
+      }
+    },
+    {
+      "id": "gemini-4-argon",
+      "provider": "Google",
+      "name": "Gemini 4 Argon",
+      "input": 4,
+      "cached": 0.2,
+      "output": 20,
+      "context": "1M",
+      "contextTokens": 1000000,
+      "maxOutputTokens": 65536,
+      "source": "https://ai.google.dev/gemini-api/docs/pricing",
+      "verifiedAt": "2026-10-15",
+      "note": "GA October 13, 2026. Standard rate from December 1, 2026 shown. An introductory rate of $2 input / $0.10 cached / $10 output runs through November 30, 2026. Implicit caching only (explicit caching not supported). One published rate applies across the full context window. Batch and Flex are 50% of standard; Priority is 1.8×. Context window is 1,048,576 tokens; default max output is 65,536 (extended decode up to 1,048,576). Sources: https://ai.google.dev/gemini-api/docs/pricing and https://ai.google.dev/gemini-api/docs/models/gemini-4-argon.",
+      "capability": {
+        "metrics": {
+          "intelligence": 53
+        },
+        "indexVersion": "4.3.2",
+        "variant": "high",
+        "source": "https://artificialanalysis.ai/models/gemini-4-argon",
+        "verifiedAt": "2026-10-15"
       }
     }
   ]
