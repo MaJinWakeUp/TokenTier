@@ -168,6 +168,10 @@ export function placementReason(placement: Placement, scenario: Scenario, metric
       return "No fixed monthly price to rank against.";
     case "over-cap":
       return `$${placement.monthly}/mo is above the $${placement.cap} ceiling this board uses for ${scenario.label.toLowerCase()}. Set your own budget in Recommend to price it anyway.`;
+    case "legacy":
+      return placement.replacedByName
+        ? `Legacy plan for existing subscribers only; new customers start on ${placement.replacedByName}.`
+        : "Legacy plan for existing subscribers only; not offered to new customers.";
     default:
       return `Not scored on the ${label}, so no tier is assigned.`;
   }

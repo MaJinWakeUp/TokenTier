@@ -126,7 +126,7 @@ export function RankingsView() {
           <div className="hero-stats-strip">
             <span><strong>{models.length}</strong> API models</span>
             <span className="dot-sep">·</span>
-            <span><strong>{plans.filter((plan) => plan.kind === "Subscription").length}</strong> subscriptions</span>
+            <span><strong>{plans.filter((plan) => plan.kind === "Subscription" && plan.availability !== "legacy").length}</strong> subscriptions</span>
             <span className="dot-sep">·</span>
             <span><strong>{scenarios.length}</strong> workload presets</span>
             <span className="dot-sep">·</span>

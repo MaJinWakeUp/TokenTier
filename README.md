@@ -261,8 +261,32 @@ that stale lock file, and retry.
 ## Catalog changes, October 15 2026
 
 Re-read from the providers' own pages on October 15. One new model, three new
-plans, and legacy markers on the Cursor and SuperGrok tiers they replace for
-new buyers. Plus at $8/mo stays out under the $10 subscription floor.
+plans, and a formal legacy status on the Cursor and SuperGrok tiers they
+replace for new buyers. Plus at $8/mo stays out under the $10 subscription
+floor.
+
+### Retired for new buyers: SuperGrok and legacy Cursor plans
+
+The X Subscription replaced SuperGrok and the personal Cursor plans for new
+customers. Those records stay in the catalog with `availability: "legacy"` and
+a `replacedBy` pointer so existing subscribers still see prices and quotas, but
+they are excluded from the new-buyer tier board and from Recommend.
+
+| Legacy plan | Monthly | Comparable X Subscription |
+| --- | --- | --- |
+| SuperGrok Lite | $10 | Premium ($30) |
+| SuperGrok | $30 | Premium ($30) |
+| SuperGrok Plus | $100 | Super ($100) |
+| SuperGrok Heavy | $300 | Ultra ($200) |
+| Cursor Pro | $20 | Premium ($30) |
+| Cursor Pro Plus | $60 | Super ($100) |
+| Cursor Ultra | $200 | Ultra ($200) |
+
+No Cursor Teams plans were in the catalog. Mapping and closed-to-new-customers
+status re-read from [Cursor pricing help](https://cursor.com/help/account-and-billing/pricing),
+[xAI X Subscription announcement](https://x.ai/news/x-subscription), and
+[xAI X Subscription pricing](https://docs.x.ai/x-subscription/pricing)
+(verified 2026-10-15).
 
 ### Added: Gemini 4 Argon
 
@@ -316,8 +340,9 @@ innovation. Working model is Grok 4.5 on the lower bars and Grok 4.7 once the
 bar reaches 45.
 
 Cursor Pro, Pro Plus, and Ultra, and the four SuperGrok tiers, stay in the
-catalog with a legacy note for existing subscribers. Their rosters and prices
-are unchanged aside from Gemini 4 Argon on the three Cursor plans.
+catalog as `availability: "legacy"` for existing subscribers (see the
+retirement table above). Their rosters and prices are unchanged aside from
+Gemini 4 Argon on the three Cursor plans.
 
 ### OpenCode Go docs citation
 

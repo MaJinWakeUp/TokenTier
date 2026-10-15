@@ -234,6 +234,10 @@ export function TierBoard({
                 <span className="gate-excluded-reason">
                   {placement.state === "over-cap"
                     ? `$${placement.monthly}/mo · above the $${placement.cap} ceiling for ${scenario.label.toLowerCase()}`
+                    : placement.state === "legacy"
+                    ? (placement.replacedByName
+                      ? `Legacy · existing subscribers only; new buyers: ${placement.replacedByName}`
+                      : "Legacy · existing subscribers only")
                     : placement.state === "unscored"
                     ? "No convertible quota and no price to rank"
                     : reasonFor(

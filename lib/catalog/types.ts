@@ -127,6 +127,11 @@ export type Model = {
   maxOutputTokens?: number;
 };
 
+// Whether a plan is still sold to new customers. Omitted means current.
+// Legacy plans stay in the catalog for existing subscribers but are kept off
+// the recommendation and the new-buyer tier board.
+export type PlanAvailability = "legacy";
+
 export type Plan = {
   id: string;
   provider: string;
@@ -143,6 +148,10 @@ export type Plan = {
   confidence: Confidence;
   apiIncluded: string;
   verifiedAt: string;
+  // Set only on plans closed to new customers. Requires `replacedBy`.
+  availability?: PlanAvailability;
+  // Catalog id of the comparable current plan a new buyer should evaluate.
+  replacedBy?: string;
   includedApiValue?: number;
   // Days a new subscriber waits before the included API credit can be claimed.
   // The estimate still counts the credit as a monthly allowance, because it

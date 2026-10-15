@@ -314,7 +314,7 @@
       "kind": "Subscription",
       "monthly": 10,
       "source": "https://grok.com/supergrok?referrer=pricing&target=supergroklite",
-      "note": "Legacy plan for existing subscribers only; new customers start on The X Subscription (https://x.ai/news/x-subscription, https://cursor.com/help/the-x-subscription/overview). Entry paid tier with Grok Imagine, longer chats, and a single agent slot. The $10 USD figure is the current web checkout price and may be billed differently by region. API usage is separate.",
+      "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Premium ($30). The X Subscription Premium includes the benefits of SuperGrok, Cursor Pro, and X Premium+ (https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing SuperGrok subscribers can keep this plan until they switch or cancel (https://cursor.com/help/account-and-billing/pricing). Entry paid tier with Grok Imagine, longer chats, and a single agent slot. The $10 USD figure is the current web checkout price and may be billed differently by region. API usage is separate.",
       "quota": "Reduced shared weekly product usage pool with pay-as-you-go overage",
       "evidence": "Official relative limit",
       "confidence": "Medium",
@@ -332,7 +332,9 @@
         "description": "Reduced shared weekly product usage pool with pay-as-you-go overage",
         "source": "https://grok.com/supergrok?referrer=pricing&target=supergroklite",
         "verifiedAt": "2026-10-15"
-      }
+      },
+      "availability": "legacy",
+      "replacedBy": "x-subscription-premium"
     },
     {
       "id": "grok-super",
@@ -341,7 +343,7 @@
       "kind": "Subscription",
       "monthly": 30,
       "source": "https://grok.com/supergrok",
-      "note": "Legacy plan for existing subscribers only; new customers start on The X Subscription (https://x.ai/news/x-subscription, https://cursor.com/help/the-x-subscription/overview). Card lists Grok Bot, everything in Lite, Expert mode at higher limits, HD 720p 30-second video, longer voice conversations and faster replies. xAI's pricing page names Grok 4.6 as the included model, which is what the roster reflects. No published figure converts to a call count. API usage is separate.",
+      "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Premium ($30). The X Subscription Premium includes the benefits of SuperGrok, Cursor Pro, and X Premium+ (https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing SuperGrok subscribers can keep this plan until they switch or cancel (https://cursor.com/help/account-and-billing/pricing). Card lists Grok Bot, everything in Lite, Expert mode at higher limits, HD 720p 30-second video, longer voice conversations and faster replies. xAI's pricing page names Grok 4.6 as the included model, which is what the roster reflects. No published figure converts to a call count. API usage is separate.",
       "quota": "5x longer conversations in Chat; best model in Expert mode with higher limits",
       "evidence": "Official relative limit",
       "confidence": "Medium",
@@ -359,7 +361,9 @@
         "description": "5x longer conversations in Chat; best model in Expert mode with higher limits",
         "source": "https://grok.com/supergrok",
         "verifiedAt": "2026-10-15"
-      }
+      },
+      "availability": "legacy",
+      "replacedBy": "x-subscription-premium"
     },
     {
       "id": "grok-super-plus",
@@ -368,7 +372,7 @@
       "kind": "Subscription",
       "monthly": 100,
       "source": "https://grok.com/supergrok",
-      "note": "Legacy plan for existing subscribers only; new customers start on The X Subscription (https://x.ai/news/x-subscription, https://cursor.com/help/the-x-subscription/overview). Everything in SuperGrok plus 1080p video, lightning-fast replies, priority access at peak times and early features. No published figure converts to a call count. API usage is separate.",
+      "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Super ($100) (https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing SuperGrok subscribers can keep this plan until they switch or cancel (https://cursor.com/help/account-and-billing/pricing). Everything in SuperGrok plus 1080p video, lightning-fast replies, priority access at peak times and early features. No published figure converts to a call count. API usage is separate.",
       "quota": "Significantly higher usage across Chat, Imagine, Voice and Build, with priority access at peak times",
       "evidence": "Official relative limit",
       "confidence": "Medium",
@@ -386,7 +390,9 @@
         "description": "Significantly higher usage across Chat, Imagine, Voice and Build, with priority access at peak times",
         "source": "https://grok.com/supergrok",
         "verifiedAt": "2026-10-15"
-      }
+      },
+      "availability": "legacy",
+      "replacedBy": "x-subscription-super"
     },
     {
       "id": "grok-super-heavy",
@@ -395,7 +401,7 @@
       "kind": "Subscription",
       "monthly": 300,
       "source": "https://grok.com/supergrok",
-      "note": "Legacy plan for existing subscribers only; new customers start on The X Subscription (https://x.ai/news/x-subscription, https://cursor.com/help/the-x-subscription/overview). Billed as a larger team of agents collaborating on an answer, and includes X Premium+ at no extra cost plus dedicated support. No published figure converts to a call count. API usage is separate.",
+      "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Ultra ($200), the top self-serve X Subscription tier (https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing SuperGrok subscribers can keep this plan until they switch or cancel (https://cursor.com/help/account-and-billing/pricing). Billed as a larger team of agents collaborating on an answer, and includes X Premium+ at no extra cost plus dedicated support. No published figure converts to a call count. API usage is separate.",
       "quota": "Everything in SuperGrok Plus, with the highest usage at the fastest speed",
       "evidence": "Official relative limit",
       "confidence": "Medium",
@@ -413,7 +419,9 @@
         "description": "Everything in SuperGrok Plus, with the highest usage at the fastest speed",
         "source": "https://grok.com/supergrok",
         "verifiedAt": "2026-10-15"
-      }
+      },
+      "availability": "legacy",
+      "replacedBy": "x-subscription-ultra"
     },
     {
       "id": "x-subscription-premium",
@@ -512,7 +520,7 @@
       "kind": "Subscription",
       "monthly": 20,
       "source": "https://cursor.com/docs/models-and-pricing",
-      "note": "Legacy plan for existing subscribers only; new customers start on The X Subscription (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $20 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
+      "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Premium ($30) (https://cursor.com/help/account-and-billing/pricing, https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing Cursor Pro subscribers keep this plan until they switch or cancel (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $20 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
       "quota": "$20 Other Models usage plus Cursor Models pool",
       "evidence": "Official credit",
       "confidence": "High",
@@ -549,7 +557,9 @@
         "resetWindow": "monthly",
         "source": "https://cursor.com/docs/models-and-pricing",
         "verifiedAt": "2026-10-15"
-      }
+      },
+      "availability": "legacy",
+      "replacedBy": "x-subscription-premium"
     },
     {
       "id": "cursor-pro-plus",
@@ -558,7 +568,7 @@
       "kind": "Subscription",
       "monthly": 60,
       "source": "https://cursor.com/docs/models-and-pricing",
-      "note": "Legacy plan for existing subscribers only; new customers start on The X Subscription (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $70 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
+      "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Super ($100) (https://cursor.com/help/account-and-billing/pricing, https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing Cursor Pro+ subscribers keep this plan until they switch or cancel (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $70 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
       "quota": "$70 Other Models usage plus Cursor Models pool",
       "evidence": "Official credit",
       "confidence": "High",
@@ -595,7 +605,9 @@
         "resetWindow": "monthly",
         "source": "https://cursor.com/docs/models-and-pricing",
         "verifiedAt": "2026-10-15"
-      }
+      },
+      "availability": "legacy",
+      "replacedBy": "x-subscription-super"
     },
     {
       "id": "cursor-ultra",
@@ -604,7 +616,7 @@
       "kind": "Subscription",
       "monthly": 200,
       "source": "https://cursor.com/docs/models-and-pricing",
-      "note": "Legacy plan for existing subscribers only; new customers start on The X Subscription (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $400 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
+      "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Ultra ($200) (https://cursor.com/help/account-and-billing/pricing, https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing Cursor Ultra subscribers keep this plan until they switch or cancel (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $400 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
       "quota": "$400 Other Models usage plus Cursor Models pool",
       "evidence": "Official credit",
       "confidence": "High",
@@ -641,7 +653,9 @@
         "resetWindow": "monthly",
         "source": "https://cursor.com/docs/models-and-pricing",
         "verifiedAt": "2026-10-15"
-      }
+      },
+      "availability": "legacy",
+      "replacedBy": "x-subscription-ultra"
     },
     {
       "id": "opencode-go",

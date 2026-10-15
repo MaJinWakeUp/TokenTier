@@ -55,9 +55,9 @@ Optional: `note`, `rateBands`, `unsupportedBeyond`.
 
 Required: `id`, `provider`, `name`, `kind`, `monthly`, `source`, `note`, `quota`,
 `evidence`, `confidence`, `apiIncluded`, `verifiedAt`, `modelIds`.
-Optional: `access`, `cacheRatio`, `conditionalLimits`, `creditMultipliers`,
-`includedApiValue`, `modelAllowances`, `overageInput`, `overageOutput`,
-`quotaDetail`, `weeklyCredits`.
+Optional: `access`, `availability`, `cacheRatio`, `conditionalLimits`,
+`creditMultipliers`, `includedApiValue`, `modelAllowances`, `overageInput`,
+`overageOutput`, `quotaDetail`, `replacedBy`, `weeklyCredits`.
 
 ```json
 {
@@ -93,6 +93,8 @@ Enumerations:
 - `confidence`: `High` | `Medium` | `Low`
 - `access`: any of `api`, `chat-app`, `coding-client` — a hard filter in
   Recommend, so list every surface the plan actually exposes and no others
+- `availability`: omit for current plans, or `legacy` when the plan is closed to
+  new customers but kept for existing subscribers. Requires `replacedBy`.
 - `quotaDetail.kind`: `dollar-allowance` | `credit-allowance` | `request-limit` |
   `relative-limit` | `unknown`
 - `resetWindow` (on `quotaDetail` and each `conditionalLimits` entry): `5h` |
@@ -102,6 +104,8 @@ Joins and pairings validation enforces:
 
 - every id in `modelIds` must exist in the model catalog, and the list must be
   nonempty with no duplicates;
+- `availability: "legacy"` and `replacedBy` are a pair — both or neither — and
+  `replacedBy` must name a current (non-legacy) plan in the same catalog;
 - `creditMultipliers` needs an entry — `[input, cached, output]`, all
   nonnegative — for **every** id in `modelIds`, and requires `weeklyCredits`;
   `weeklyCredits` likewise requires `creditMultipliers`;

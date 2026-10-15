@@ -250,6 +250,28 @@ test("the catalog stays in validated data files", async () => {
   assert.deepEqual(planById.get("grok-super").modelIds, ["grok-4-6"]);
   assert.match(planById.get("grok-super").note, /Grok 4\.6/, "the note says which model the roster reflects");
 
+  // SuperGrok and legacy Cursor personal plans are closed to new customers but
+  // kept for existing subscribers. No Cursor Teams plans were in the catalog.
+  const legacyPlans = {
+    "grok-super-lite": "x-subscription-premium",
+    "grok-super": "x-subscription-premium",
+    "grok-super-plus": "x-subscription-super",
+    "grok-super-heavy": "x-subscription-ultra",
+    "cursor-pro": "x-subscription-premium",
+    "cursor-pro-plus": "x-subscription-super",
+    "cursor-ultra": "x-subscription-ultra",
+  };
+  for (const [id, successor] of Object.entries(legacyPlans)) {
+    assert.equal(planById.get(id).availability, "legacy", `${id} is marked legacy`);
+    assert.equal(planById.get(id).replacedBy, successor, `${id} points at ${successor}`);
+    assert.match(planById.get(id).note, /Legacy plan for existing subscribers only/);
+    assert.match(planById.get(id).note, /x\.ai\/news\/x-subscription|docs\.x\.ai\/x-subscription|cursor\.com\/help\/account-and-billing\/pricing/);
+  }
+  for (const id of ["x-subscription-premium", "x-subscription-super", "x-subscription-ultra"]) {
+    assert.equal(planById.get(id).availability, undefined, `${id} stays current for new buyers`);
+  }
+  assert.ok(!planNames.some((name) => /teams/i.test(name)), "no Cursor Teams plans were in the catalog to retire");
+
   // Plans that pointed at a retired model were repointed, not left dangling.
   const modelIds = new Set(catalog.models.map((entry) => entry.id));
   for (const entry of planCatalog.plans) {
