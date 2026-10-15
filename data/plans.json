@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-10-12",
+  "updatedAt": "2026-10-15",
   "currency": "USD",
   "plans": [
     {
@@ -230,10 +230,11 @@
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.35,
-      "verifiedAt": "2026-09-03",
+      "verifiedAt": "2026-10-15",
       "modelIds": [
         "gemini-3-1-pro",
-        "gemini-3-8-flash"
+        "gemini-3-8-flash",
+        "gemini-4-argon"
       ],
       "access": [
         "chat-app",
@@ -243,7 +244,7 @@
         "kind": "relative-limit",
         "description": "4× Free Gemini limits with expanded Pro model and Deep Research access",
         "source": "https://gemini.google/us/subscriptions/",
-        "verifiedAt": "2026-09-03"
+        "verifiedAt": "2026-10-15"
       }
     },
     {
@@ -259,10 +260,11 @@
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-09-03",
+      "verifiedAt": "2026-10-15",
       "modelIds": [
         "gemini-3-1-pro",
-        "gemini-3-8-flash"
+        "gemini-3-8-flash",
+        "gemini-4-argon"
       ],
       "access": [
         "chat-app",
@@ -272,7 +274,7 @@
         "kind": "relative-limit",
         "description": "5× Google AI Pro limits; 10,000 Flow credits / month",
         "source": "https://gemini.google/us/subscriptions/",
-        "verifiedAt": "2026-09-03"
+        "verifiedAt": "2026-10-15"
       }
     },
     {
@@ -288,10 +290,11 @@
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.45,
-      "verifiedAt": "2026-09-03",
+      "verifiedAt": "2026-10-15",
       "modelIds": [
         "gemini-3-1-pro",
-        "gemini-3-8-flash"
+        "gemini-3-8-flash",
+        "gemini-4-argon"
       ],
       "access": [
         "chat-app",
@@ -301,7 +304,7 @@
         "kind": "relative-limit",
         "description": "20× Google AI Pro limits; 25,000 Flow credits / month",
         "source": "https://gemini.google/us/subscriptions/",
-        "verifiedAt": "2026-09-03"
+        "verifiedAt": "2026-10-15"
       }
     },
     {
@@ -311,13 +314,13 @@
       "kind": "Subscription",
       "monthly": 10,
       "source": "https://grok.com/supergrok?referrer=pricing&target=supergroklite",
-      "note": "Entry paid tier with Grok Imagine, longer chats, and a single agent slot. The $10 USD figure is the current web checkout price and may be billed differently by region. API usage is separate.",
+      "note": "Legacy plan for existing subscribers only; new customers start on The X Subscription (https://x.ai/news/x-subscription, https://cursor.com/help/the-x-subscription/overview). Entry paid tier with Grok Imagine, longer chats, and a single agent slot. The $10 USD figure is the current web checkout price and may be billed differently by region. API usage is separate.",
       "quota": "Reduced shared weekly product usage pool with pay-as-you-go overage",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.15,
-      "verifiedAt": "2026-08-21",
+      "verifiedAt": "2026-10-15",
       "modelIds": [
         "grok-4-6"
       ],
@@ -328,7 +331,7 @@
         "kind": "relative-limit",
         "description": "Reduced shared weekly product usage pool with pay-as-you-go overage",
         "source": "https://grok.com/supergrok?referrer=pricing&target=supergroklite",
-        "verifiedAt": "2026-08-21"
+        "verifiedAt": "2026-10-15"
       }
     },
     {
@@ -338,13 +341,13 @@
       "kind": "Subscription",
       "monthly": 30,
       "source": "https://grok.com/supergrok",
-      "note": "Card lists Grok Bot, everything in Lite, Expert mode at higher limits, HD 720p 30-second video, longer voice conversations and faster replies. xAI's pricing page names Grok 4.6 as the included model, which is what the roster reflects. No published figure converts to a call count. API usage is separate.",
+      "note": "Legacy plan for existing subscribers only; new customers start on The X Subscription (https://x.ai/news/x-subscription, https://cursor.com/help/the-x-subscription/overview). Card lists Grok Bot, everything in Lite, Expert mode at higher limits, HD 720p 30-second video, longer voice conversations and faster replies. xAI's pricing page names Grok 4.6 as the included model, which is what the roster reflects. No published figure converts to a call count. API usage is separate.",
       "quota": "5x longer conversations in Chat; best model in Expert mode with higher limits",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-10-02",
+      "verifiedAt": "2026-10-15",
       "modelIds": [
         "grok-4-6"
       ],
@@ -355,7 +358,7 @@
         "kind": "relative-limit",
         "description": "5x longer conversations in Chat; best model in Expert mode with higher limits",
         "source": "https://grok.com/supergrok",
-        "verifiedAt": "2026-10-02"
+        "verifiedAt": "2026-10-15"
       }
     },
     {
@@ -365,13 +368,13 @@
       "kind": "Subscription",
       "monthly": 100,
       "source": "https://grok.com/supergrok",
-      "note": "Everything in SuperGrok plus 1080p video, lightning-fast replies, priority access at peak times and early features. No published figure converts to a call count. API usage is separate.",
+      "note": "Legacy plan for existing subscribers only; new customers start on The X Subscription (https://x.ai/news/x-subscription, https://cursor.com/help/the-x-subscription/overview). Everything in SuperGrok plus 1080p video, lightning-fast replies, priority access at peak times and early features. No published figure converts to a call count. API usage is separate.",
       "quota": "Significantly higher usage across Chat, Imagine, Voice and Build, with priority access at peak times",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.3,
-      "verifiedAt": "2026-10-02",
+      "verifiedAt": "2026-10-15",
       "modelIds": [
         "grok-4-6"
       ],
@@ -382,7 +385,7 @@
         "kind": "relative-limit",
         "description": "Significantly higher usage across Chat, Imagine, Voice and Build, with priority access at peak times",
         "source": "https://grok.com/supergrok",
-        "verifiedAt": "2026-10-02"
+        "verifiedAt": "2026-10-15"
       }
     },
     {
@@ -392,13 +395,13 @@
       "kind": "Subscription",
       "monthly": 300,
       "source": "https://grok.com/supergrok",
-      "note": "Billed as a larger team of agents collaborating on an answer, and includes X Premium+ at no extra cost plus dedicated support. No published figure converts to a call count. API usage is separate.",
+      "note": "Legacy plan for existing subscribers only; new customers start on The X Subscription (https://x.ai/news/x-subscription, https://cursor.com/help/the-x-subscription/overview). Billed as a larger team of agents collaborating on an answer, and includes X Premium+ at no extra cost plus dedicated support. No published figure converts to a call count. API usage is separate.",
       "quota": "Everything in SuperGrok Plus, with the highest usage at the fastest speed",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.35,
-      "verifiedAt": "2026-10-02",
+      "verifiedAt": "2026-10-15",
       "modelIds": [
         "grok-4-6"
       ],
@@ -409,7 +412,97 @@
         "kind": "relative-limit",
         "description": "Everything in SuperGrok Plus, with the highest usage at the fastest speed",
         "source": "https://grok.com/supergrok",
-        "verifiedAt": "2026-10-02"
+        "verifiedAt": "2026-10-15"
+      }
+    },
+    {
+      "id": "x-subscription-premium",
+      "provider": "Cursor",
+      "name": "X Subscription Premium",
+      "kind": "Subscription",
+      "monthly": 30,
+      "source": "https://cursor.com/docs/models-and-pricing",
+      "note": "The X Subscription launched October 12, 2026 (Cursor + SpaceXSI / Grok + X). Premium is 4× the Plus weekly Cursor-models pool. Included models in the pool are Grok 4.7, Grok 4.6, Grok 4.5, and Composer 2.5 (Composer is Cursor-only and is not a separate API catalog row). Third-party models are not included; on Premium and above they bill at API list price from prepaid credit. Grok API access is available but billed separately and does not draw from the pool. Annual billing is $300/yr. Plus at $8/mo is under the catalog's $10 subscription floor and is omitted. Sources: https://x.ai/news/x-subscription, https://x.ai/pricing, https://cursor.com/pricing, https://cursor.com/docs/models-and-pricing, https://cursor.com/help/the-x-subscription/overview.",
+      "quota": "4× Plus weekly shared Cursor-models usage pool (Grok 4.7 / 4.6 / 4.5 and Composer 2.5)",
+      "evidence": "Official relative limit",
+      "confidence": "High",
+      "apiIncluded": "No",
+      "cacheRatio": 0.4,
+      "verifiedAt": "2026-10-15",
+      "modelIds": [
+        "grok-4-7",
+        "grok-4-6",
+        "grok-4-5"
+      ],
+      "access": [
+        "coding-client",
+        "chat-app"
+      ],
+      "quotaDetail": {
+        "kind": "relative-limit",
+        "description": "4× Plus weekly shared Cursor-models usage pool across Cursor, Grok apps, and Grok Bot",
+        "source": "https://cursor.com/docs/models-and-pricing",
+        "verifiedAt": "2026-10-15"
+      }
+    },
+    {
+      "id": "x-subscription-super",
+      "provider": "Cursor",
+      "name": "X Subscription Super",
+      "kind": "Subscription",
+      "monthly": 100,
+      "source": "https://cursor.com/docs/models-and-pricing",
+      "note": "The X Subscription launched October 12, 2026 (Cursor + SpaceXSI / Grok + X). Super is 15× the Plus weekly Cursor-models pool, with priority model access at peak times. Included models in the pool are Grok 4.7, Grok 4.6, Grok 4.5, and Composer 2.5 (Composer is Cursor-only and is not a separate API catalog row). Third-party models are not included; they bill at API list price from prepaid credit. Grok API access is billed separately and does not draw from the pool. Annual billing is $1,000/yr. Sources: https://x.ai/news/x-subscription, https://x.ai/pricing, https://cursor.com/pricing, https://cursor.com/docs/models-and-pricing, https://cursor.com/help/the-x-subscription/overview.",
+      "quota": "15× Plus weekly shared Cursor-models usage pool with priority access at peak times",
+      "evidence": "Official relative limit",
+      "confidence": "High",
+      "apiIncluded": "No",
+      "cacheRatio": 0.4,
+      "verifiedAt": "2026-10-15",
+      "modelIds": [
+        "grok-4-7",
+        "grok-4-6",
+        "grok-4-5"
+      ],
+      "access": [
+        "coding-client",
+        "chat-app"
+      ],
+      "quotaDetail": {
+        "kind": "relative-limit",
+        "description": "15× Plus weekly shared Cursor-models usage pool across Cursor, Grok apps, and Grok Bot, with priority access at peak times",
+        "source": "https://cursor.com/docs/models-and-pricing",
+        "verifiedAt": "2026-10-15"
+      }
+    },
+    {
+      "id": "x-subscription-ultra",
+      "provider": "Cursor",
+      "name": "X Subscription Ultra",
+      "kind": "Subscription",
+      "monthly": 200,
+      "source": "https://cursor.com/docs/models-and-pricing",
+      "note": "The X Subscription launched October 12, 2026 (Cursor + SpaceXSI / Grok + X). Ultra is 50× the Plus weekly Cursor-models pool, with earliest access to new products and models. Included models in the pool are Grok 4.7, Grok 4.6, Grok 4.5, and Composer 2.5 (Composer is Cursor-only and is not a separate API catalog row). Third-party models are not included; they bill at API list price from prepaid credit. Grok API access is billed separately and does not draw from the pool. Annual billing is $2,000/yr. Sources: https://x.ai/news/x-subscription, https://x.ai/pricing, https://cursor.com/pricing, https://cursor.com/docs/models-and-pricing, https://cursor.com/help/the-x-subscription/overview.",
+      "quota": "50× Plus weekly shared Cursor-models usage pool with earliest access",
+      "evidence": "Official relative limit",
+      "confidence": "High",
+      "apiIncluded": "No",
+      "cacheRatio": 0.45,
+      "verifiedAt": "2026-10-15",
+      "modelIds": [
+        "grok-4-7",
+        "grok-4-6",
+        "grok-4-5"
+      ],
+      "access": [
+        "coding-client",
+        "chat-app"
+      ],
+      "quotaDetail": {
+        "kind": "relative-limit",
+        "description": "50× Plus weekly shared Cursor-models usage pool across Cursor, Grok apps, and Grok Bot, with earliest access to new products and models",
+        "source": "https://cursor.com/docs/models-and-pricing",
+        "verifiedAt": "2026-10-15"
       }
     },
     {
@@ -419,14 +512,14 @@
       "kind": "Subscription",
       "monthly": 20,
       "source": "https://cursor.com/docs/models-and-pricing",
-      "note": "Includes a $20 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
+      "note": "Legacy plan for existing subscribers only; new customers start on The X Subscription (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $20 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
       "quota": "$20 Other Models usage plus Cursor Models pool",
       "evidence": "Official credit",
       "confidence": "High",
       "apiIncluded": "Editor pool",
       "includedApiValue": 20,
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-10-08",
+      "verifiedAt": "2026-10-15",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -439,6 +532,7 @@
         "claude-haiku-5-5",
         "gemini-3-1-pro",
         "gemini-3-8-flash",
+        "gemini-4-argon",
         "kimi-k3",
         "kimi-k2-7-code",
         "gpt-5-6-luna",
@@ -454,7 +548,7 @@
         "amount": 20,
         "resetWindow": "monthly",
         "source": "https://cursor.com/docs/models-and-pricing",
-        "verifiedAt": "2026-09-03"
+        "verifiedAt": "2026-10-15"
       }
     },
     {
@@ -464,14 +558,14 @@
       "kind": "Subscription",
       "monthly": 60,
       "source": "https://cursor.com/docs/models-and-pricing",
-      "note": "Includes a $70 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
+      "note": "Legacy plan for existing subscribers only; new customers start on The X Subscription (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $70 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
       "quota": "$70 Other Models usage plus Cursor Models pool",
       "evidence": "Official credit",
       "confidence": "High",
       "apiIncluded": "Editor pool",
       "includedApiValue": 70,
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-10-08",
+      "verifiedAt": "2026-10-15",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -484,6 +578,7 @@
         "claude-haiku-5-5",
         "gemini-3-1-pro",
         "gemini-3-8-flash",
+        "gemini-4-argon",
         "kimi-k3",
         "kimi-k2-7-code",
         "gpt-5-6-luna",
@@ -499,7 +594,7 @@
         "amount": 70,
         "resetWindow": "monthly",
         "source": "https://cursor.com/docs/models-and-pricing",
-        "verifiedAt": "2026-09-03"
+        "verifiedAt": "2026-10-15"
       }
     },
     {
@@ -509,14 +604,14 @@
       "kind": "Subscription",
       "monthly": 200,
       "source": "https://cursor.com/docs/models-and-pricing",
-      "note": "Includes a $400 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
+      "note": "Legacy plan for existing subscribers only; new customers start on The X Subscription (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $400 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
       "quota": "$400 Other Models usage plus Cursor Models pool",
       "evidence": "Official credit",
       "confidence": "High",
       "apiIncluded": "Editor pool",
       "includedApiValue": 400,
       "cacheRatio": 0.45,
-      "verifiedAt": "2026-10-08",
+      "verifiedAt": "2026-10-15",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -529,6 +624,7 @@
         "claude-haiku-5-5",
         "gemini-3-1-pro",
         "gemini-3-8-flash",
+        "gemini-4-argon",
         "kimi-k3",
         "kimi-k2-7-code",
         "gpt-5-6-luna",
@@ -544,7 +640,7 @@
         "amount": 400,
         "resetWindow": "monthly",
         "source": "https://cursor.com/docs/models-and-pricing",
-        "verifiedAt": "2026-09-03"
+        "verifiedAt": "2026-10-15"
       }
     },
     {
@@ -553,14 +649,14 @@
       "name": "OpenCode Go",
       "kind": "Subscription",
       "monthly": 10,
-      "source": "https://opencode.ai/go",
-      "note": "Usage is capped in dollars per model, not credits, and metered at the same per-token rates published for each model. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash and Kimi K2.7 Code are $60, DeepSeek V4.1 Flash is $80, and Grok 4.6, Grok 4.7, GPT-5.6 Luna, GLM-5.3, Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, GPT-6 Luna, and Claude Haiku 5.5 are $15. The $60 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/go on 2026-10-12 (docs/go was 404). API usage beyond the cap is not included.",
+      "source": "https://opencode.ai/docs/go/",
+      "note": "Usage is capped in dollars per model, not credits, and metered at the same per-token rates published for each model. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash and Kimi K2.7 Code are $60, DeepSeek V4.1 Flash is $80, and Grok 4.6, Grok 4.7, GPT-5.6 Luna, GLM-5.3, Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, GPT-6 Luna, and Claude Haiku 5.5 are $15. The $60 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-10-15. API usage beyond the cap is not included.",
       "quota": "Per-model monthly caps; 5-hour is 20% and weekly is 50% of the selected model's cap",
       "evidence": "Official quota",
       "confidence": "High",
       "apiIncluded": "Yes",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-10-12",
+      "verifiedAt": "2026-10-15",
       "includedApiValue": 60,
       "modelIds": [
         "grok-4-6",
@@ -584,8 +680,8 @@
         "kind": "dollar-allowance",
         "amount": 60,
         "resetWindow": "monthly",
-        "source": "https://opencode.ai/go",
-        "verifiedAt": "2026-10-12"
+        "source": "https://opencode.ai/docs/go/",
+        "verifiedAt": "2026-10-15"
       },
       "modelAllowances": {
         "grok-4-6": 15,
@@ -622,14 +718,14 @@
       "name": "OpenCode Go Plus",
       "kind": "Subscription",
       "monthly": 40,
-      "source": "https://opencode.ai/go",
-      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go marketing page does not print a launch date; Go Plus was added to the former docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash $180, Kimi K2.7 Code $180, DeepSeek V4.1 Flash $160, GLM-5.3 $120, and $60 for Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, Grok 4.6, GPT-6 Luna, GPT-5.6 Luna, and Claude Haiku 5.5. The $180 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/go on 2026-10-12 (docs/go was 404).",
+      "source": "https://opencode.ai/docs/go/",
+      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go marketing page does not print a launch date; Go Plus was added to the former docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash $180, Kimi K2.7 Code $180, DeepSeek V4.1 Flash $160, GLM-5.3 $120, and $60 for Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, Grok 4.6, GPT-6 Luna, GPT-5.6 Luna, and Claude Haiku 5.5. The $180 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-10-15.",
       "quota": "Per-model monthly caps; 5-hour is 20% and weekly is 50% of the selected model's cap",
       "evidence": "Official quota",
       "confidence": "High",
       "apiIncluded": "Yes",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-10-12",
+      "verifiedAt": "2026-10-15",
       "includedApiValue": 180,
       "modelIds": [
         "grok-4-6",
@@ -653,8 +749,8 @@
         "kind": "dollar-allowance",
         "amount": 180,
         "resetWindow": "monthly",
-        "source": "https://opencode.ai/go",
-        "verifiedAt": "2026-10-12"
+        "source": "https://opencode.ai/docs/go/",
+        "verifiedAt": "2026-10-15"
       },
       "modelAllowances": {
         "grok-4-6": 60,
@@ -697,7 +793,7 @@
       "evidence": "Price break-even",
       "confidence": "Low",
       "apiIncluded": "Yes",
-      "verifiedAt": "2026-10-08",
+      "verifiedAt": "2026-10-15",
       "modelIds": [
         "gpt-6-astra",
         "gpt-6-1-sol",
@@ -713,6 +809,7 @@
         "claude-haiku-4-5",
         "claude-haiku-5-5",
         "gemini-3-8-flash",
+        "gemini-4-argon",
         "gemini-3-1-pro",
         "grok-4-7",
         "grok-4-6",
@@ -735,7 +832,7 @@
         "kind": "unknown",
         "description": "Direct token pass-through with no monthly fee",
         "source": "https://opencode.ai/docs/zen/",
-        "verifiedAt": "2026-10-08"
+        "verifiedAt": "2026-10-15"
       }
     },
     {

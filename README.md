@@ -258,6 +258,72 @@ date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
 
+## Catalog changes, October 15 2026
+
+Re-read from the providers' own pages on October 15. One new model, three new
+plans, and legacy markers on the Cursor and SuperGrok tiers they replace for
+new buyers. Plus at $8/mo stays out under the $10 subscription floor.
+
+### Added: Gemini 4 Argon
+
+| | Gemini 4 Argon |
+| --- | --- |
+| Provider | Google |
+| Input / cached / output | $4 / $0.20 / $20 |
+| Context | 1M (1,048,576 tokens); max output 1M (sync default 65,536; long decode up to context) |
+| Index v4.3.2 | 53 (high) |
+
+GA October 13, 2026. Standard rate from December 1, 2026 shown; an introductory
+rate of $2 / $0.10 / $10 runs through November 30, 2026. Implicit caching only;
+one published rate across the full window; Batch and Flex are 50% of standard.
+Artificial Analysis publishes 53 for the high variant on index v4.3.2, matching
+the catalog.
+
+It enters the model boards at **C** on daily use, easy coding, medium coding,
+and writing, and at **B** on hard coding, research, and innovation. Cursor Pro,
+Pro Plus, and Ultra list it in the Other Models pool. OpenCode Zen's price table
+lists it. Google AI Pro and both Ultra tiers include it. OpenCode Go's
+"Gemini 4 Argon Contributor" rate is the invite-only contributor tier, not the
+standard model, so Go and Go Plus do not list it (same precedent as Muse Spark
+Contributor).
+
+### Added: The X Subscription (Premium, Super, Ultra)
+
+Cursor and SpaceXSI launched The X Subscription on October 12, 2026. New
+customers start here; existing Cursor Pro / Pro+ / Ultra and SuperGrok
+subscribers can keep those plans. Catalog entries:
+
+| Plan | Monthly | Annual | Included usage |
+| --- | --- | --- | --- |
+| X Subscription Premium | $30 | $300 | 4× Plus weekly Cursor-models pool |
+| X Subscription Super | $100 | $1,000 | 15× Plus weekly pool + priority at peak |
+| X Subscription Ultra | $200 | $2,000 | 50× Plus weekly pool + earliest access |
+
+One weekly pool covers Grok 4.7, Grok 4.6, Grok 4.5, and Composer 2.5 across
+Cursor, Grok apps, and Grok Bot. Third-party models are not included; on
+Premium and above they bill at API list price from prepaid credit. Grok API
+access is billed separately and does not draw from the pool. Composer 2.5 is
+named in the plan notes but is not a separate API catalog row (Cursor-only
+overage rates). Plus at $8/mo is under the floor and is omitted.
+
+The weekly pool is a relative limit, so capacity stays **unproven** on every
+board. Premium enters at **D** on daily use and easy coding (under the $30
+ceiling), **A** on medium coding, writing, hard coding, research, and
+innovation. Super is over the $30 daily/easy ceilings and enters at **D** on
+medium coding and writing, **C** on the three 45-bar lanes. Ultra is over the
+$100 medium/writing ceilings and enters at **D** on hard coding, research, and
+innovation. Working model is Grok 4.5 on the lower bars and Grok 4.7 once the
+bar reaches 45.
+
+Cursor Pro, Pro Plus, and Ultra, and the four SuperGrok tiers, stay in the
+catalog with a legacy note for existing subscribers. Their rosters and prices
+are unchanged aside from Gemini 4 Argon on the three Cursor plans.
+
+### OpenCode Go docs citation
+
+`docs/go` is back (HTTP 200). OpenCode Go and Go Plus now cite
+https://opencode.ai/docs/go/ again. Flash caps of $80 / $160 are unchanged.
+
 ## Catalog changes, October 12 2026
 
 OpenCode Go and Go Plus raised the published monthly dollar cap for DeepSeek
