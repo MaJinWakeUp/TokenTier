@@ -38,7 +38,15 @@ export type Placement =
   // Priced above what this kind of work is worth paying for. The plan is real
   // and may well clear the bar; it is simply out of scope for this board.
   | { state: "over-cap"; monthly: number; cap: number }
+  // Closed to new customers. Kept in the catalog for existing subscribers, but
+  // not ranked against plans a new buyer can still purchase.
+  | { state: "legacy"; replacedBy?: string; replacedByName?: string }
   | { state: "unscored" };
+
+/** True when the plan is still sold to new customers (availability omitted). */
+export function isCurrentPlan(plan: Plan): boolean {
+  return plan.availability !== "legacy";
+}
 
 export const noPlacement: Placement = unscored as Placement;
 
@@ -269,6 +277,20 @@ export function planPlacements(
   const eligible: Array<{ id: string; index: number; monthly: number; capacity: PlanCapacity }> = [];
 
   for (const plan of plans) {
+    // Legacy plans stay in the catalog for existing subscribers, but the board
+    // answers what a new buyer can purchase, so they are listed with that
+    // reason rather than ranked against current offers.
+    if (!isCurrentPlan(plan)) {
+      const successor = plan.replacedBy
+        ? plans.find((entry) => entry.id === plan.replacedBy)
+        : undefined;
+      placed.set(plan.id, {
+        state: "legacy",
+        replacedBy: plan.replacedBy,
+        replacedByName: successor?.name,
+      });
+      continue;
+    }
     const model = planWorkingModel(plan, scenario, settings, modelById);
     if (!model) {
       placed.set(plan.id, planRejection(plan, scenario, settings, modelById));

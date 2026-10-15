@@ -270,6 +270,8 @@ export function recommend(
 
   const planEvaluations = catalog.plans
     .filter((plan) => plan.kind === "Subscription")
+    // Legacy plans are for existing subscribers; Recommend answers for a new buyer.
+    .filter((plan) => plan.availability !== "legacy")
     .filter((plan) => planMatchesAccess(plan, workload.access))
     .map((plan) =>
       evaluatePlan(plan, scenario, settings, workload.calls, workload.budget, catalog.modelById, workload.access),

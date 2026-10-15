@@ -873,6 +873,7 @@ test("AC9: no plan above the ceiling is ranked, and each is told why", () => {
     for (const [id, placement] of placements) {
       const plan = planDoc.plans.find((p) => p.id === id);
       if (placement.state === "tier") {
+        assert.ok(plan.availability !== "legacy", `${scenario.id}/${id}: legacy plans are not ranked`);
         assert.ok(plan.monthly <= scenario.planPriceCap, `${scenario.id}/${id}: $${plan.monthly} is within the $${scenario.planPriceCap} ceiling`);
       }
       if (placement.state === "over-cap") {
@@ -880,16 +881,50 @@ test("AC9: no plan above the ceiling is ranked, and each is told why", () => {
         assert.equal(placement.cap, scenario.planPriceCap, `${scenario.id}/${id}: the placement names the ceiling it failed`);
         assert.equal(placement.monthly, plan.monthly, `${scenario.id}/${id}: and the price that failed it`);
       }
+      if (placement.state === "legacy") {
+        assert.equal(plan.availability, "legacy", `${scenario.id}/${id}: legacy placement matches the record`);
+        assert.equal(placement.replacedBy, plan.replacedBy, `${scenario.id}/${id}: placement names the successor`);
+      }
     }
   }
 });
 
+test("AC9: legacy plans stay in the catalog but leave new-buyer recommend", () => {
+  const legacy = planDoc.plans.filter((plan) => plan.availability === "legacy");
+  assert.ok(legacy.length >= 7, "SuperGrok and Cursor personal plans are marked legacy");
+  for (const plan of legacy) {
+    assert.ok(plan.replacedBy, `${plan.id} names a successor`);
+    const successor = planDoc.plans.find((entry) => entry.id === plan.replacedBy);
+    assert.ok(successor, `${plan.id}.replacedBy exists`);
+    assert.notEqual(successor.availability, "legacy", `${plan.id}.replacedBy is a current plan`);
+  }
+
+  const scenario = scenarioDoc.scenarios.find((s) => s.id === "code-medium");
+  const evaluated = recommend(catalog, scenario, {
+    scenarioId: scenario.id,
+    input: scenario.input,
+    output: scenario.output,
+    calls: scenario.calls,
+    cacheRatio: scenario.cacheRatio,
+    budget: 1000,
+    access: "any",
+  }, "cost").plans.evaluations;
+  for (const plan of legacy) {
+    assert.ok(
+      !evaluated.some((entry) => entry.plan.id === plan.id),
+      `${plan.id} is not evaluated for a new-buyer recommendation`,
+    );
+  }
+});
+
 test("AC9: the ceiling bounds the board, never the recommendation", () => {
-  // Recommend uses the reader's own budget. A $300 plan must still be reachable
-  // there for someone who says they will spend $300.
+  // Recommend uses the reader's own budget. A current plan above the board
+  // ceiling must still be reachable for someone who says they will spend that.
   const scenario = scenarioDoc.scenarios.find((s) => s.id === "daily");
-  const dear = planDoc.plans.find((p) => p.monthly !== null && p.monthly > scenario.planPriceCap);
-  assert.ok(dear, "the catalog has a plan above the daily ceiling");
+  const dear = planDoc.plans.find(
+    (p) => p.availability !== "legacy" && p.monthly !== null && p.monthly > scenario.planPriceCap,
+  );
+  assert.ok(dear, "the catalog has a current plan above the daily ceiling");
 
   const evaluated = recommend(catalog, scenario, {
     scenarioId: scenario.id,

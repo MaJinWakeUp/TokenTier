@@ -63,6 +63,7 @@ const allowedPlanKeys = new Set([
   ...requiredPlanKeys,
   "access",
   "apiCreditClaimAfterDays",
+  "availability",
   "cacheRatio",
   "conditionalLimits",
   "creditMultipliers",
@@ -71,8 +72,10 @@ const allowedPlanKeys = new Set([
   "overageInput",
   "overageOutput",
   "quotaDetail",
+  "replacedBy",
   "weeklyCredits",
 ]);
+const planAvailabilityValues = new Set(["legacy"]);
 const allowedConditionalKeys = new Set(["amount", "description", "resetWindow", "shareOfAllowance"]);
 // A gate that admits almost nothing is a data error, not a strict standard.
 const minEligibleModelsPerScenario = 3;
@@ -672,6 +675,24 @@ export function validatePlans(document: unknown, dataset: ModelCatalogDoc): Plan
       errors.push(`${location}.verifiedAt cannot be later than the current local date.`);
     }
 
+    // Legacy plans stay listed for existing subscribers but are excluded from
+    // new-buyer boards and recommendations. availability and replacedBy are a
+    // pair: either both are present, or neither is.
+    const hasAvailability = "availability" in record;
+    const hasReplacedBy = "replacedBy" in record;
+    if (hasAvailability !== hasReplacedBy) {
+      errors.push(`${location} must set both availability and replacedBy, or neither.`);
+    } else if (hasAvailability) {
+      if (!planAvailabilityValues.has(record.availability as string)) {
+        errors.push(`${location}.availability must be one of: ${[...planAvailabilityValues].join(", ")}.`);
+      }
+      if (typeof record.replacedBy !== "string" || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(record.replacedBy)) {
+        errors.push(`${location}.replacedBy must be a lowercase plan slug.`);
+      } else if (record.replacedBy === record.id) {
+        errors.push(`${location}.replacedBy cannot point at the plan itself.`);
+      }
+    }
+
     if ("cacheRatio" in record && (!Number.isFinite(record.cacheRatio) || (record.cacheRatio as number) < 0 || (record.cacheRatio as number) > 1)) {
       errors.push(`${location}.cacheRatio must be a fraction between 0 and 1.`);
     }
@@ -855,6 +876,24 @@ export function validatePlans(document: unknown, dataset: ModelCatalogDoc): Plan
           }
         }
       }
+    }
+  }
+
+  // replacedBy is checked after the loop so every plan id is known, and so a
+  // legacy plan cannot name another legacy plan as the new-buyer successor.
+  const planById = new Map(
+    (document.plans as Record<string, unknown>[])
+      .filter((plan) => isRecord(plan) && typeof plan.id === "string")
+      .map((plan) => [plan.id as string, plan]),
+  );
+  for (const plan of document.plans as Record<string, unknown>[]) {
+    if (!isRecord(plan) || typeof plan.id !== "string" || typeof plan.replacedBy !== "string") continue;
+    const location = `plan ${plan.id}`;
+    const successor = planById.get(plan.replacedBy);
+    if (!successor) {
+      errors.push(`${location}.replacedBy "${plan.replacedBy}" is not in the plan catalog.`);
+    } else if (successor.availability === "legacy") {
+      errors.push(`${location}.replacedBy "${plan.replacedBy}" must point at a current plan, not another legacy plan.`);
     }
   }
 

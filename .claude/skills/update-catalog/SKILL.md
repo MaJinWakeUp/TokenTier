@@ -137,6 +137,13 @@ dangling reference if you forget.
 **Plans and scenarios** are hand edits. Bump the file's own `updatedAt` when you
 touch `plans.json`.
 
+Retiring a plan that still serves existing subscribers (but is closed to new
+customers) is also a hand edit: set `availability: "legacy"` and `replacedBy` to
+the comparable current plan id, keep the roster and prices, and say so in
+`note` with the official source URLs. Validation rejects a dangling or
+legacy-to-legacy `replacedBy`. Legacy plans stay out of the new-buyer tier
+board and Recommend; they remain in the price book and personal tier list.
+
 ### 3. Validate
 
 ```bash

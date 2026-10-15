@@ -420,6 +420,18 @@ export function PriceBook({
                           </div>
                           <div className="model-cell-sub">
                             <small>{plan.provider}</small>
+                            {plan.availability === "legacy" && (
+                              <small
+                                className="estimate-detail"
+                                title={
+                                  plan.replacedBy
+                                    ? `New buyers: see ${plans.find((entry) => entry.id === plan.replacedBy)?.name ?? plan.replacedBy}`
+                                    : undefined
+                                }
+                              >
+                                Legacy
+                              </small>
+                            )}
                             {lag > 0 && <StaleMark verifiedAt={plan.verifiedAt} lag={lag} />}
                             <details className="row-note"><summary>Note</summary><p>{plan.note}</p></details>
                           </div>
