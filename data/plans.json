@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-10-15",
+  "updatedAt": "2026-10-19",
   "currency": "USD",
   "plans": [
     {
@@ -520,14 +520,14 @@
       "kind": "Subscription",
       "monthly": 20,
       "source": "https://cursor.com/docs/models-and-pricing",
-      "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Premium ($30) (https://cursor.com/help/account-and-billing/pricing, https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing Cursor Pro subscribers keep this plan until they switch or cancel (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $20 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
+      "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Premium ($30) (https://cursor.com/help/account-and-billing/pricing, https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing Cursor Pro subscribers keep this plan until they switch or cancel (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $20 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit. Muse Wonder is on the Other Models table at API list price (https://cursor.com/docs/models-and-pricing).",
       "quota": "$20 Other Models usage plus Cursor Models pool",
       "evidence": "Official credit",
       "confidence": "High",
       "apiIncluded": "Editor pool",
       "includedApiValue": 20,
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-10-15",
+      "verifiedAt": "2026-10-19",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -546,7 +546,8 @@
         "gpt-5-6-luna",
         "gpt-5-6-terra",
         "gpt-5-6-sol",
-        "claude-opus-5-5"
+        "claude-opus-5-5",
+        "meta-muse-wonder-1-0"
       ],
       "access": [
         "coding-client"
@@ -568,14 +569,14 @@
       "kind": "Subscription",
       "monthly": 60,
       "source": "https://cursor.com/docs/models-and-pricing",
-      "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Super ($100) (https://cursor.com/help/account-and-billing/pricing, https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing Cursor Pro+ subscribers keep this plan until they switch or cancel (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $70 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
+      "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Super ($100) (https://cursor.com/help/account-and-billing/pricing, https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing Cursor Pro+ subscribers keep this plan until they switch or cancel (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $70 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit. Muse Wonder is on the Other Models table at API list price (https://cursor.com/docs/models-and-pricing).",
       "quota": "$70 Other Models usage plus Cursor Models pool",
       "evidence": "Official credit",
       "confidence": "High",
       "apiIncluded": "Editor pool",
       "includedApiValue": 70,
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-10-15",
+      "verifiedAt": "2026-10-19",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -594,7 +595,8 @@
         "gpt-5-6-luna",
         "gpt-5-6-terra",
         "gpt-5-6-sol",
-        "claude-opus-5-5"
+        "claude-opus-5-5",
+        "meta-muse-wonder-1-0"
       ],
       "access": [
         "coding-client"
@@ -616,14 +618,14 @@
       "kind": "Subscription",
       "monthly": 200,
       "source": "https://cursor.com/docs/models-and-pricing",
-      "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Ultra ($200) (https://cursor.com/help/account-and-billing/pricing, https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing Cursor Ultra subscribers keep this plan until they switch or cancel (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $400 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
+      "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Ultra ($200) (https://cursor.com/help/account-and-billing/pricing, https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing Cursor Ultra subscribers keep this plan until they switch or cancel (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $400 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit. Muse Wonder is on the Other Models table at API list price (https://cursor.com/docs/models-and-pricing).",
       "quota": "$400 Other Models usage plus Cursor Models pool",
       "evidence": "Official credit",
       "confidence": "High",
       "apiIncluded": "Editor pool",
       "includedApiValue": 400,
       "cacheRatio": 0.45,
-      "verifiedAt": "2026-10-15",
+      "verifiedAt": "2026-10-19",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -642,7 +644,8 @@
         "gpt-5-6-luna",
         "gpt-5-6-terra",
         "gpt-5-6-sol",
-        "claude-opus-5-5"
+        "claude-opus-5-5",
+        "meta-muse-wonder-1-0"
       ],
       "access": [
         "coding-client"
@@ -664,16 +667,15 @@
       "kind": "Subscription",
       "monthly": 10,
       "source": "https://opencode.ai/docs/go/",
-      "note": "Usage is capped in dollars per model, not credits, and metered at the same per-token rates published for each model. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash and Kimi K2.7 Code are $60, DeepSeek V4.1 Flash is $80, and Grok 4.6, Grok 4.7, GPT-5.6 Luna, GLM-5.3, Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, GPT-6 Luna, and Claude Haiku 5.5 are $15. The $60 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-10-15. API usage beyond the cap is not included.",
+      "note": "Usage is capped in dollars per model, not credits, and metered at the same per-token rates published for each model. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash and Kimi K2.7 Code are $60, DeepSeek V4.1 Flash is $80, and Grok 4.7, GPT-5.6 Luna, GLM-5.3, Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, GPT-6 Luna, Claude Haiku 5.5, and Step 5 Preview are $15. Step 5 Preview's standard cap is $15; the Go table marks a limited-time 4× multiplier that currently shows $60, with no end date, and that promotional cap is not stored here. Grok 4.6 is no longer on the Go model list. The $60 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-10-19. API usage beyond the cap is not included.",
       "quota": "Per-model monthly caps; 5-hour is 20% and weekly is 50% of the selected model's cap",
       "evidence": "Official quota",
       "confidence": "High",
       "apiIncluded": "Yes",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-10-15",
+      "verifiedAt": "2026-10-19",
       "includedApiValue": 60,
       "modelIds": [
-        "grok-4-6",
         "grok-4-7",
         "gpt-5-6-luna",
         "glm-5-3-flash",
@@ -684,7 +686,8 @@
         "deepseek-v4-pro",
         "deepseek-v4-1-flash",
         "gpt-6-luna",
-        "claude-haiku-5-5"
+        "claude-haiku-5-5",
+        "step-5-preview"
       ],
       "access": [
         "coding-client",
@@ -695,10 +698,9 @@
         "amount": 60,
         "resetWindow": "monthly",
         "source": "https://opencode.ai/docs/go/",
-        "verifiedAt": "2026-10-15"
+        "verifiedAt": "2026-10-19"
       },
       "modelAllowances": {
-        "grok-4-6": 15,
         "grok-4-7": 15,
         "gpt-5-6-luna": 15,
         "glm-5-3-flash": 60,
@@ -709,7 +711,8 @@
         "deepseek-v4-pro": 15,
         "deepseek-v4-1-flash": 80,
         "gpt-6-luna": 15,
-        "claude-haiku-5-5": 15
+        "claude-haiku-5-5": 15,
+        "step-5-preview": 15
       },
       "conditionalLimits": [
         {
@@ -733,16 +736,15 @@
       "kind": "Subscription",
       "monthly": 40,
       "source": "https://opencode.ai/docs/go/",
-      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go marketing page does not print a launch date; Go Plus was added to the former docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash $180, Kimi K2.7 Code $180, DeepSeek V4.1 Flash $160, GLM-5.3 $120, and $60 for Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, Grok 4.6, GPT-6 Luna, GPT-5.6 Luna, and Claude Haiku 5.5. The $180 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-10-15.",
+      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go marketing page does not print a launch date; Go Plus was added to the former docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash $180, Kimi K2.7 Code $180, DeepSeek V4.1 Flash $160, GLM-5.3 $120, and $60 for Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, GPT-6 Luna, GPT-5.6 Luna, Claude Haiku 5.5, and Step 5 Preview. Step 5 Preview's standard cap is $60; the Go Plus table marks a limited-time 4× multiplier that currently shows $240, with no end date, and that promotional cap is not stored here. Grok 4.6 is no longer on the Go Plus model list. The $180 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-10-19.",
       "quota": "Per-model monthly caps; 5-hour is 20% and weekly is 50% of the selected model's cap",
       "evidence": "Official quota",
       "confidence": "High",
       "apiIncluded": "Yes",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-10-15",
+      "verifiedAt": "2026-10-19",
       "includedApiValue": 180,
       "modelIds": [
-        "grok-4-6",
         "grok-4-7",
         "gpt-5-6-luna",
         "glm-5-3-flash",
@@ -753,7 +755,8 @@
         "deepseek-v4-pro",
         "deepseek-v4-1-flash",
         "gpt-6-luna",
-        "claude-haiku-5-5"
+        "claude-haiku-5-5",
+        "step-5-preview"
       ],
       "access": [
         "coding-client",
@@ -764,10 +767,9 @@
         "amount": 180,
         "resetWindow": "monthly",
         "source": "https://opencode.ai/docs/go/",
-        "verifiedAt": "2026-10-15"
+        "verifiedAt": "2026-10-19"
       },
       "modelAllowances": {
-        "grok-4-6": 60,
         "grok-4-7": 60,
         "gpt-5-6-luna": 60,
         "glm-5-3-flash": 180,
@@ -778,7 +780,8 @@
         "deepseek-v4-pro": 60,
         "deepseek-v4-1-flash": 160,
         "gpt-6-luna": 60,
-        "claude-haiku-5-5": 60
+        "claude-haiku-5-5": 60,
+        "step-5-preview": 60
       },
       "conditionalLimits": [
         {
