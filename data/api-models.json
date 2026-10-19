@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "updatedAt": "2026-10-15",
+  "updatedAt": "2026-10-19",
   "currency": "USD",
   "unit": "per-million-tokens",
   "capabilityIndex": {
@@ -602,13 +602,13 @@
       "provider": "StepFun",
       "name": "Step 5 Preview",
       "input": 1,
-      "cached": 0.05,
+      "cached": 0.1,
       "output": 2.7,
       "context": "1M",
       "contextTokens": 1000000,
       "source": "https://platform.stepfun.ai/docs/en/guides/pricing/details",
-      "verifiedAt": "2026-09-22",
-      "note": "StepFun's flagship agentic model, released 18 September 2026. Sparse mixture-of-experts with text, image and video input. Maximum output is 64K tokens, and output tokens include the reasoning trace. The cache-miss input price covers writing new content to the cache.",
+      "verifiedAt": "2026-10-19",
+      "note": "StepFun's flagship agentic model, released 18 September 2026. Sparse mixture-of-experts with text, image and video input. Re-read October 19, 2026 from the pricing page: $1 input, $0.10 cache hit, and $2.70 output per million tokens. Maximum output is 64K tokens, and output tokens include the reasoning trace. The cache-miss input price covers writing new content to the cache.",
       "capability": {
         "metrics": {
           "intelligence": 44
@@ -832,6 +832,49 @@
         "variant": "high",
         "source": "https://artificialanalysis.ai/models/gemini-4-argon",
         "verifiedAt": "2026-10-15"
+      }
+    },
+    {
+      "id": "meta-muse-wonder-1-0",
+      "provider": "Meta",
+      "name": "Muse Wonder",
+      "input": 4,
+      "cached": 0.2,
+      "output": 20,
+      "context": "1.048576M",
+      "contextTokens": 1048576,
+      "source": "https://dev.meta.ai/docs/pricing-rate-limits",
+      "verifiedAt": "2026-10-19",
+      "note": "Announced October 12, 2026. API id `muse-wonder-1.0`. Standard mode only on Model API; Contributor mode is not available for Muse Wonder on Model API. One published rate applies across the full window. The models page states a 1,048,576-token context window, recorded as 1.048576M. Muse Wonder Full is available only with a Muse Code subscription and has no public API price, so it is not listed. Muse Code High Usage ($15), Power Usage ($50), and Maximum Usage ($200) include Muse Wonder; Everyday Usage is $5 and stays under the catalog floor (https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription). The separate Muse agent Power ($20) and Maximum ($100) plans name a weekly token allowance and do not name this model (https://www.meta.com/help/subscriptions/1021145227643680/). Meta One plan pages describe consumer AI usage and do not name it (https://www.meta.com/meta-one-plans/).",
+      "capability": {
+        "metrics": {
+          "intelligence": 52
+        },
+        "indexVersion": "4.3.2",
+        "variant": "max",
+        "source": "https://artificialanalysis.ai/models/muse-wonder",
+        "verifiedAt": "2026-10-19"
+      }
+    },
+    {
+      "id": "minimax-m3-1-flash",
+      "provider": "MiniMax",
+      "name": "MiniMax M3.1 Flash",
+      "input": 0.15,
+      "cached": 0.015,
+      "output": 0.6,
+      "context": "1M",
+      "contextTokens": 1000000,
+      "source": "https://platform.minimax.io/docs/pricing/overview",
+      "verifiedAt": "2026-10-19",
+      "note": "GA October 19, 2026. API id `MiniMax-M3.1-Flash`. Early anonymous serving was Space Bunny. Thinking depth is tunable through effort (`low`, `medium`, `high`, `xhigh`, `max`; default `max`). Multimodal: text, image, and video input. The model guide states a 1,000,000-token context window. Prompt-cache reads are $0.015 per million tokens.",
+      "capability": {
+        "metrics": {
+          "intelligence": 42
+        },
+        "indexVersion": "4.3.2",
+        "source": "https://artificialanalysis.ai/models/minimax-m3-1-flash",
+        "verifiedAt": "2026-10-19"
       }
     }
   ]

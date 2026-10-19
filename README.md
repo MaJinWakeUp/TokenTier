@@ -258,6 +258,187 @@ date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
 
+## Catalog changes, October 19 2026
+
+Re-read from the providers' own pages on October 19. Two new models, three Muse
+Code plans, three M Plan tiers, a cache-hit correction on Step 5 Preview, and
+two OpenCode Go roster edits. Mistral Medium 3.5, Mistral Small 4, Qwen3.8-Flash, Qwen3.7-Plus, MiniMax
+M3, and Gemini 3.1 Flash-Lite stay out. So do free and stealth promos, separate
+Ultrafast / Fast / Priority rows, Contributor variants, and Muse Wonder Full.
+Muse Code Everyday Usage is $5/month and stays under the $10 floor.
+
+### Added: Muse Wonder
+
+| | Muse Wonder |
+| --- | --- |
+| Provider | Meta |
+| Input / cached / output | $4 / $0.20 / $20 |
+| Context | 1.048576M (1,048,576 tokens) |
+| Index v4.3.2 | 52 (max) |
+
+Announced October 12, 2026. API id `muse-wonder-1.0`. Standard mode only on
+Model API; Contributor mode is not available for Muse Wonder there. The pricing
+page publishes one rate for the whole window. The models page states a
+1,048,576-token context window, recorded as `1.048576M` so eligibility uses
+that count. Muse Wonder Full is available only with a Muse Code subscription
+and has no public API price, so it is not a row. Artificial Analysis publishes 52 for
+the max variant on index v4.3.2.
+
+It prices identically to Claude Opus 5.5 and Gemini 4 Argon, so it joins their
+letter: **C** on daily use, easy coding, medium coding, and writing, and **B**
+on hard coding, research, and innovation. The same price does not add a price
+group, so no other model changes letter because of it.
+
+Cursor's model page confirms Muse Wonder is a third-party model. On legacy Pro,
+Pro Plus, and Ultra it draws from the Other Models pool at API list price, so
+those three plans keep `meta-muse-wonder-1-0`. The X Subscription models page
+says third-party models are not in the included weekly pool; Premium and above
+bill them from prepaid credit, so Premium, Super, and Ultra stay on Grok.
+OpenCode Go lists Muse Spark Contributor, not this standard model. Meta One
+plan pages describe consumer AI usage and do not name Muse Wonder, so Meta One
+Premium stays on the inferred Muse Spark 1.3 roster. The separate Muse agent
+Power ($20) and Maximum ($100) plans publish a weekly token allowance and do
+not name Muse Wonder or Muse Spark, so they are not added.
+
+At a tie, `claude-opus-5-5` sorts ahead of `meta-muse-wonder-1-0`, and cheaper
+models already win the lanes Muse Wonder clears. It is not the working model on
+any Cursor plan, and those cards do not change.
+
+### Added: Muse Code High, Power, and Maximum
+
+Meta's Muse Code help page and product page publish four subscriptions.
+Everyday Usage is $5/month and stays out. The other three are new rows:
+provider Meta, official relative limits, and a CLI-only key.
+
+| Plan | Monthly | Included usage |
+| --- | --- | --- |
+| Muse Code High Usage | $15 | Everything in Everyday Usage, at 5×. Everyday is 10-50 prompts every 5 hours |
+| Muse Code Power Usage | $50 | Everything in High Usage, plus Muse Wonder Full, at 20× Everyday Usage |
+| Muse Code Maximum Usage | $200 | Everything in Power Usage, at 80× Everyday Usage |
+
+Each roster is Muse Spark 1.3 and Muse Wonder. Spark 1.2 is on every Muse Code
+plan and is not a catalog row. Muse Wonder Full has no public API price.
+Contributor mode is the default and can be turned off; the pages do not publish
+a separate Standard-mode prompt count. The 10-50 range stays as published and
+is not multiplied into a stored call count. Sources:
+[What is a Muse Code subscription?](https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription),
+[Muse Code](https://dev.meta.ai/products/muse-code),
+[Subscriptions](https://dev.meta.ai/docs/muse-code/subscriptions), and
+[Models](https://dev.meta.ai/docs/models).
+
+Muse Spark 1.3 scores 48 and is cheaper than Muse Wonder, and it clears every
+bar, so the working model on all three plans is Muse Spark 1.3 on every lane.
+
+One new price group under each cap moves plan letters:
+
+- Daily use and easy coding (cap $30; Power and Maximum are over the cap): High
+  Usage enters at **S**. GLM Coding Lite falls from **S** to **A**. Kimi
+  Moderato falls from **A** to **B**.
+- Medium coding and writing (cap $100; Maximum is over the cap): High Usage
+  enters at **S**. Kimi Moderato falls from **S** to **A**. Power Usage enters
+  at **C**.
+- Hard coding, research, and innovation (cap $200): High Usage enters at **S**.
+  Google AI Pro and Meta One Premium fall from **S** to **A**. Power Usage
+  enters at **B**. Google AI Ultra (5x) falls from **B** to **C**. Maximum
+  Usage joins the existing $200 group at **D**.
+
+Kimi Moderato is absent from the 45-bar boards because Kimi K3 scores 44.
+
+### Added: MiniMax M3.1 Flash
+
+| | MiniMax M3.1 Flash |
+| --- | --- |
+| Provider | MiniMax |
+| Input / cached / output | $0.15 / $0.015 / $0.60 |
+| Context | 1M (1,000,000 tokens) |
+| Index v4.3.2 | 42 |
+
+GA October 19, 2026. API id `MiniMax-M3.1-Flash`. Early anonymous serving was
+Space Bunny. Thinking depth is tunable through effort, and the model takes
+text, image, and video input. The pricing overview publishes one rate.
+Artificial Analysis publishes 42 on index v4.3.2 and does not label an effort
+variant, so the record has no `variant`.
+
+It clears every bar under 45 and misses the frontier bar. It enters at **S**
+on daily use, easy coding, medium coding, and writing.
+
+MiniMax is a new provider, and `rendered-html` requires an orb colour per
+provider, so `app/globals.css` gained one. The colour is a chosen swatch picked
+for distinctness, not a brand asset.
+
+OpenCode Go lists "MiniMax M3.1 Flash Free", a limited-time free row. That row
+is not this paid model, and Go and Go Plus do not list it.
+
+One new price group moves the quintile cuts on the lanes it enters:
+
+- Daily use, easy coding, and writing: Step 5 Preview falls from **S** to **A**.
+  Claude Sonnet 5.5 and GPT-6.1 Sol fall from **B** to **C**.
+- Medium coding: no existing model changes letter. Step 5 Preview stays **S**.
+- Hard coding, research, and innovation: MiniMax misses the 45 bar, so those
+  lanes do not move.
+
+### Added: M Plan Go, Explore, and Build
+
+The current new-buyer subscription is M Plan, not the retired Token Plan names.
+[M Plan overview](https://platform.minimax.io/docs/m-plan/intro) lists Go,
+Explore, and Build, and every tier includes MiniMax-M3.1-Flash for text.
+[The monthly offer page](https://platform.minimax.io/docs/m-plan/monthly-offer)
+publishes the regular prices. A 50% first-month discount dated through October
+14 stays out of the stored price. Annual billing (10 months for 12) is noted
+and is not the monthly headline.
+
+| Plan | Monthly | Included text usage |
+| --- | --- | --- |
+| M Plan Go | $22 | Baseline; 5-hour and weekly windows |
+| M Plan Explore | $55 | 3× Go |
+| M Plan Build | $132 | 7.5× Go |
+
+No page publishes a numeric token allowance, so the quotas stay relative.
+Explore and Build also include the H3 video model, which is not a catalog text
+row. The Subscription Key covers MiniMax Code and other tools; a pay-as-you-go
+API key is a separate bill. Token Plan Plus, Max, and Ultra are closed to new
+purchases. The [subscriber notice](https://platform.minimax.io/docs/m-plan/token-plan-notice)
+maps them onto M Plan and does not publish their dollar prices, so they are
+not rows.
+
+M3.1 Flash scores 42. It clears every bar under 45 and misses the frontier
+bar, so Go and Explore are ranked on the lanes it clears and Build is over
+the $100 cap on those lanes. Hard coding, research, and innovation do not
+rank any M Plan tier.
+
+- Daily use and easy coding: Go enters at **C**. Kimi Moderato rises from **B** to **A**.
+- Medium coding and writing: Go enters at **A**. Explore enters at **C**. Kimi Moderato rises from **A** to **S**. Kimi Allegro falls from **C** to **D**.
+
+### Cache hit correction: Step 5 Preview
+
+Cache hits go from $0.05 to $0.10 per million tokens. Input stays $1 and output
+stays $2.70, re-read from the StepFun pricing page on October 19. The previous
+$0.05 figure is not on that page.
+
+The correction is small. On daily use the per-call cost moves from about
+$0.003105 to $0.003120, and Step 5 stays between DeepSeek V4.1 Flash and
+DeepSeek V4 Pro on every lane it clears. The S-to-A drops above come from the
+new MiniMax price group.
+
+### OpenCode Go roster
+
+[opencode.ai/docs/go](https://opencode.ai/docs/go/) now lists paid Step 5 Preview and no
+longer lists Grok 4.6. Go and Go Plus gain `step-5-preview` and drop
+`grok-4-6` from `modelIds` and `modelAllowances`. The Grok 4.6 API row stays.
+Cursor, the X Subscription, SuperGrok, and OpenCode Zen still list it.
+
+The Go table prints Step 5 Preview's monthly cap as ~~$15~~ **$60** on Go and
+~~$60~~ **$240** on Go Plus, marked "4× · Limited time", and does not print an
+end date. The stored caps are the standard ones, $15 and $60. A temporary
+multiplier is not the headline number, so the current 4× figures stay in the
+plan notes.
+
+Step 5 scores 44 and misses the 45 bar. On every lane it clears, GLM-5.3-Flash's
+cap still buys more calls than Step 5's standard cap. Grok 4.6 was not the
+working model on either plan. OpenCode Go and Go Plus keep the same working
+models and the same letters: Flash on the light lanes, GLM-5.3 on hard coding
+and research.
+
 ## Catalog changes, October 15 2026
 
 Re-read from the providers' own pages on October 15. One new model, three new

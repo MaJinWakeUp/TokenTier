@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-10-15",
+  "updatedAt": "2026-10-19",
   "currency": "USD",
   "plans": [
     {
@@ -520,14 +520,14 @@
       "kind": "Subscription",
       "monthly": 20,
       "source": "https://cursor.com/docs/models-and-pricing",
-      "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Premium ($30) (https://cursor.com/help/account-and-billing/pricing, https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing Cursor Pro subscribers keep this plan until they switch or cancel (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $20 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
+      "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Premium ($30) (https://cursor.com/help/account-and-billing/pricing, https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing Cursor Pro subscribers keep this plan until they switch or cancel (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $20 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit. Muse Wonder draws from the Other Models pool at API list price (https://cursor.com/docs/models/muse-wonder). The X Subscription does not include third-party models; Premium and above bill them from prepaid credit (https://cursor.com/docs/models-and-pricing, https://cursor.com/docs/account/pricing/legacy-cursor-plans).",
       "quota": "$20 Other Models usage plus Cursor Models pool",
       "evidence": "Official credit",
       "confidence": "High",
       "apiIncluded": "Editor pool",
       "includedApiValue": 20,
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-10-15",
+      "verifiedAt": "2026-10-19",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -546,7 +546,8 @@
         "gpt-5-6-luna",
         "gpt-5-6-terra",
         "gpt-5-6-sol",
-        "claude-opus-5-5"
+        "claude-opus-5-5",
+        "meta-muse-wonder-1-0"
       ],
       "access": [
         "coding-client"
@@ -568,14 +569,14 @@
       "kind": "Subscription",
       "monthly": 60,
       "source": "https://cursor.com/docs/models-and-pricing",
-      "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Super ($100) (https://cursor.com/help/account-and-billing/pricing, https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing Cursor Pro+ subscribers keep this plan until they switch or cancel (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $70 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
+      "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Super ($100) (https://cursor.com/help/account-and-billing/pricing, https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing Cursor Pro+ subscribers keep this plan until they switch or cancel (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $70 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit. Muse Wonder draws from the Other Models pool at API list price (https://cursor.com/docs/models/muse-wonder). The X Subscription does not include third-party models; Premium and above bill them from prepaid credit (https://cursor.com/docs/models-and-pricing, https://cursor.com/docs/account/pricing/legacy-cursor-plans).",
       "quota": "$70 Other Models usage plus Cursor Models pool",
       "evidence": "Official credit",
       "confidence": "High",
       "apiIncluded": "Editor pool",
       "includedApiValue": 70,
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-10-15",
+      "verifiedAt": "2026-10-19",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -594,7 +595,8 @@
         "gpt-5-6-luna",
         "gpt-5-6-terra",
         "gpt-5-6-sol",
-        "claude-opus-5-5"
+        "claude-opus-5-5",
+        "meta-muse-wonder-1-0"
       ],
       "access": [
         "coding-client"
@@ -616,14 +618,14 @@
       "kind": "Subscription",
       "monthly": 200,
       "source": "https://cursor.com/docs/models-and-pricing",
-      "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Ultra ($200) (https://cursor.com/help/account-and-billing/pricing, https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing Cursor Ultra subscribers keep this plan until they switch or cancel (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $400 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit.",
+      "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Ultra ($200) (https://cursor.com/help/account-and-billing/pricing, https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing Cursor Ultra subscribers keep this plan until they switch or cancel (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $400 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit. Muse Wonder draws from the Other Models pool at API list price (https://cursor.com/docs/models/muse-wonder). The X Subscription does not include third-party models; Premium and above bill them from prepaid credit (https://cursor.com/docs/models-and-pricing, https://cursor.com/docs/account/pricing/legacy-cursor-plans).",
       "quota": "$400 Other Models usage plus Cursor Models pool",
       "evidence": "Official credit",
       "confidence": "High",
       "apiIncluded": "Editor pool",
       "includedApiValue": 400,
       "cacheRatio": 0.45,
-      "verifiedAt": "2026-10-15",
+      "verifiedAt": "2026-10-19",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -642,7 +644,8 @@
         "gpt-5-6-luna",
         "gpt-5-6-terra",
         "gpt-5-6-sol",
-        "claude-opus-5-5"
+        "claude-opus-5-5",
+        "meta-muse-wonder-1-0"
       ],
       "access": [
         "coding-client"
@@ -664,16 +667,15 @@
       "kind": "Subscription",
       "monthly": 10,
       "source": "https://opencode.ai/docs/go/",
-      "note": "Usage is capped in dollars per model, not credits, and metered at the same per-token rates published for each model. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash and Kimi K2.7 Code are $60, DeepSeek V4.1 Flash is $80, and Grok 4.6, Grok 4.7, GPT-5.6 Luna, GLM-5.3, Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, GPT-6 Luna, and Claude Haiku 5.5 are $15. The $60 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-10-15. API usage beyond the cap is not included.",
+      "note": "Usage is capped in dollars per model, not credits, and metered at the same per-token rates published for each model. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash and Kimi K2.7 Code are $60, DeepSeek V4.1 Flash is $80, and Grok 4.7, GPT-5.6 Luna, GLM-5.3, Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, GPT-6 Luna, Claude Haiku 5.5, and Step 5 Preview are $15. Step 5 Preview's standard cap is $15; the Go table marks a limited-time 4× multiplier that currently shows $60, with no end date, and that promotional cap is not stored here. Grok 4.6 is no longer on the Go model list. The $60 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-10-19. API usage beyond the cap is not included.",
       "quota": "Per-model monthly caps; 5-hour is 20% and weekly is 50% of the selected model's cap",
       "evidence": "Official quota",
       "confidence": "High",
       "apiIncluded": "Yes",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-10-15",
+      "verifiedAt": "2026-10-19",
       "includedApiValue": 60,
       "modelIds": [
-        "grok-4-6",
         "grok-4-7",
         "gpt-5-6-luna",
         "glm-5-3-flash",
@@ -684,7 +686,8 @@
         "deepseek-v4-pro",
         "deepseek-v4-1-flash",
         "gpt-6-luna",
-        "claude-haiku-5-5"
+        "claude-haiku-5-5",
+        "step-5-preview"
       ],
       "access": [
         "coding-client",
@@ -695,10 +698,9 @@
         "amount": 60,
         "resetWindow": "monthly",
         "source": "https://opencode.ai/docs/go/",
-        "verifiedAt": "2026-10-15"
+        "verifiedAt": "2026-10-19"
       },
       "modelAllowances": {
-        "grok-4-6": 15,
         "grok-4-7": 15,
         "gpt-5-6-luna": 15,
         "glm-5-3-flash": 60,
@@ -709,7 +711,8 @@
         "deepseek-v4-pro": 15,
         "deepseek-v4-1-flash": 80,
         "gpt-6-luna": 15,
-        "claude-haiku-5-5": 15
+        "claude-haiku-5-5": 15,
+        "step-5-preview": 15
       },
       "conditionalLimits": [
         {
@@ -733,16 +736,15 @@
       "kind": "Subscription",
       "monthly": 40,
       "source": "https://opencode.ai/docs/go/",
-      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go marketing page does not print a launch date; Go Plus was added to the former docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash $180, Kimi K2.7 Code $180, DeepSeek V4.1 Flash $160, GLM-5.3 $120, and $60 for Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, Grok 4.6, GPT-6 Luna, GPT-5.6 Luna, and Claude Haiku 5.5. The $180 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-10-15.",
+      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go marketing page does not print a launch date; Go Plus was added to the former docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash $180, Kimi K2.7 Code $180, DeepSeek V4.1 Flash $160, GLM-5.3 $120, and $60 for Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, GPT-6 Luna, GPT-5.6 Luna, Claude Haiku 5.5, and Step 5 Preview. Step 5 Preview's standard cap is $60; the Go Plus table marks a limited-time 4× multiplier that currently shows $240, with no end date, and that promotional cap is not stored here. Grok 4.6 is no longer on the Go Plus model list. The $180 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-10-19.",
       "quota": "Per-model monthly caps; 5-hour is 20% and weekly is 50% of the selected model's cap",
       "evidence": "Official quota",
       "confidence": "High",
       "apiIncluded": "Yes",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-10-15",
+      "verifiedAt": "2026-10-19",
       "includedApiValue": 180,
       "modelIds": [
-        "grok-4-6",
         "grok-4-7",
         "gpt-5-6-luna",
         "glm-5-3-flash",
@@ -753,7 +755,8 @@
         "deepseek-v4-pro",
         "deepseek-v4-1-flash",
         "gpt-6-luna",
-        "claude-haiku-5-5"
+        "claude-haiku-5-5",
+        "step-5-preview"
       ],
       "access": [
         "coding-client",
@@ -764,10 +767,9 @@
         "amount": 180,
         "resetWindow": "monthly",
         "source": "https://opencode.ai/docs/go/",
-        "verifiedAt": "2026-10-15"
+        "verifiedAt": "2026-10-19"
       },
       "modelAllowances": {
-        "grok-4-6": 60,
         "grok-4-7": 60,
         "gpt-5-6-luna": 60,
         "glm-5-3-flash": 180,
@@ -778,7 +780,8 @@
         "deepseek-v4-pro": 60,
         "deepseek-v4-1-flash": 160,
         "gpt-6-luna": 60,
-        "claude-haiku-5-5": 60
+        "claude-haiku-5-5": 60,
+        "step-5-preview": 60
       },
       "conditionalLimits": [
         {
@@ -1029,6 +1032,87 @@
       }
     },
     {
+      "id": "muse-code-high",
+      "provider": "Meta",
+      "name": "Muse Code High Usage",
+      "kind": "Subscription",
+      "monthly": 15,
+      "source": "https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription",
+      "note": "High Usage is $15/month and includes everything in Everyday Usage: Muse Spark, Muse Wonder, and Muse Image, at 5× Everyday Usage. Everyday Usage is 10-50 prompts every 5 hours and costs $5/month, under the catalog floor, so it is not a row. Prices and the model list are on https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription and https://dev.meta.ai/products/muse-code; the plan matrix is also at https://dev.meta.ai/docs/muse-code/subscriptions. Muse Spark 1.3 and Muse Spark 1.2 are on every Muse Code plan (https://dev.meta.ai/docs/models); 1.2 is not a catalog row, so the roster is Muse Spark 1.3 plus Muse Wonder. Contributor mode is the default and can be turned off; the page does not publish a separate Standard-mode prompt count. The subscription key works only in the Muse Code CLI; other API keys are pay-as-you-go. Muse Wonder is unavailable in South Korea.",
+      "quota": "5× Everyday Usage; Everyday is 10-50 prompts every 5 hours",
+      "evidence": "Official relative limit",
+      "confidence": "Medium",
+      "apiIncluded": "No",
+      "verifiedAt": "2026-10-19",
+      "modelIds": [
+        "meta-muse-spark-1-3",
+        "meta-muse-wonder-1-0"
+      ],
+      "access": [
+        "coding-client"
+      ],
+      "quotaDetail": {
+        "kind": "relative-limit",
+        "description": "5× Everyday Usage; Everyday is 10-50 prompts every 5 hours",
+        "source": "https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription",
+        "verifiedAt": "2026-10-19"
+      }
+    },
+    {
+      "id": "muse-code-power",
+      "provider": "Meta",
+      "name": "Muse Code Power Usage",
+      "kind": "Subscription",
+      "monthly": 50,
+      "source": "https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription",
+      "note": "Power Usage is $50/month. It includes everything in High Usage, plus Muse Wonder Full, at 20× Everyday Usage, with early access to new features and higher file uploads. Everyday Usage is 10-50 prompts every 5 hours. Muse Wonder Full has no public API price, so it is not a catalog row. Prices and the model list: https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription and https://dev.meta.ai/products/muse-code. Plan matrix: https://dev.meta.ai/docs/muse-code/subscriptions. Availability: https://dev.meta.ai/docs/models. Muse Spark 1.2 is on every Muse Code plan and is not a catalog row; the roster is Muse Spark 1.3 plus Muse Wonder. Contributor mode is the default and can be turned off; no separate Standard-mode prompt count is published. The subscription key works only in the Muse Code CLI; other API keys are pay-as-you-go. Muse Wonder and Muse Wonder Full are unavailable in South Korea.",
+      "quota": "20× Everyday Usage, including Muse Wonder Full; Everyday is 10-50 prompts every 5 hours",
+      "evidence": "Official relative limit",
+      "confidence": "Medium",
+      "apiIncluded": "No",
+      "verifiedAt": "2026-10-19",
+      "modelIds": [
+        "meta-muse-spark-1-3",
+        "meta-muse-wonder-1-0"
+      ],
+      "access": [
+        "coding-client"
+      ],
+      "quotaDetail": {
+        "kind": "relative-limit",
+        "description": "20× Everyday Usage, including Muse Wonder Full; Everyday is 10-50 prompts every 5 hours",
+        "source": "https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription",
+        "verifiedAt": "2026-10-19"
+      }
+    },
+    {
+      "id": "muse-code-maximum",
+      "provider": "Meta",
+      "name": "Muse Code Maximum Usage",
+      "kind": "Subscription",
+      "monthly": 200,
+      "source": "https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription",
+      "note": "Maximum Usage is $200/month. It includes everything in Power Usage, including Muse Wonder Full, at 80× Everyday Usage. Everyday Usage is 10-50 prompts every 5 hours. Muse Wonder Full has no public API price, so it is not a catalog row. Prices and the model list: https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription and https://dev.meta.ai/products/muse-code. Plan matrix: https://dev.meta.ai/docs/muse-code/subscriptions. Availability: https://dev.meta.ai/docs/models. Muse Spark 1.2 is on every Muse Code plan and is not a catalog row; the roster is Muse Spark 1.3 plus Muse Wonder. Contributor mode is the default and can be turned off; no separate Standard-mode prompt count is published. The subscription key works only in the Muse Code CLI; other API keys are pay-as-you-go. On Maximum Usage, hitting the limit means waiting for the refresh rather than upgrading. Muse Wonder and Muse Wonder Full are unavailable in South Korea.",
+      "quota": "80× Everyday Usage, including Muse Wonder Full; Everyday is 10-50 prompts every 5 hours",
+      "evidence": "Official relative limit",
+      "confidence": "Medium",
+      "apiIncluded": "No",
+      "verifiedAt": "2026-10-19",
+      "modelIds": [
+        "meta-muse-spark-1-3",
+        "meta-muse-wonder-1-0"
+      ],
+      "access": [
+        "coding-client"
+      ],
+      "quotaDetail": {
+        "kind": "relative-limit",
+        "description": "80× Everyday Usage, including Muse Wonder Full; Everyday is 10-50 prompts every 5 hours",
+        "source": "https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription",
+        "verifiedAt": "2026-10-19"
+      }
+    },
+    {
       "id": "kimi-moderato",
       "provider": "Kimi",
       "name": "Kimi Moderato",
@@ -1138,6 +1222,87 @@
         "description": "720 Agent credits; 30× Kimi Code credits; 24,000 database calls",
         "source": "https://www.kimi.ai/help/membership/membership-pricing",
         "verifiedAt": "2026-10-02"
+      }
+    },
+    {
+      "id": "minimax-m-plan-go",
+      "provider": "MiniMax",
+      "name": "M Plan Go",
+      "kind": "Subscription",
+      "monthly": 22,
+      "source": "https://platform.minimax.io/docs/m-plan/monthly-offer",
+      "note": "Regular monthly price is $22. The offer page dates a 50% first-month discount through October 14; that introductory price is not stored. Annual billing is 10 months for 12 and is not the monthly headline. Every M Plan tier includes MiniMax-M3.1-Flash for text. Go does not include the H3 video model (https://platform.minimax.io/docs/m-plan/intro). Usage is the Go baseline, with a 5-hour window and a weekly window, and no numeric token allowance is published (https://platform.minimax.io/docs/m-plan/faq, https://platform.minimax.io/docs/m-plan/usage-rules). The Subscription Key draws included usage in MiniMax Code and in other tools, and API endpoints priced pay-as-you-go deduct from that included usage. A separate pay-as-you-go API key bills the account balance. Token Plan is closed to new purchases; Plus can move to Go, Explore, or Build, and the notice does not publish Token Plan dollar prices (https://platform.minimax.io/docs/m-plan/token-plan-notice).",
+      "quota": "Baseline M Plan usage; 5-hour and weekly windows; no numeric allowance published",
+      "evidence": "Official relative limit",
+      "confidence": "Medium",
+      "apiIncluded": "Yes",
+      "verifiedAt": "2026-10-19",
+      "modelIds": [
+        "minimax-m3-1-flash"
+      ],
+      "access": [
+        "coding-client",
+        "api"
+      ],
+      "quotaDetail": {
+        "kind": "relative-limit",
+        "description": "Baseline M Plan usage; 5-hour and weekly windows; no numeric allowance published",
+        "source": "https://platform.minimax.io/docs/m-plan/intro",
+        "verifiedAt": "2026-10-19"
+      }
+    },
+    {
+      "id": "minimax-m-plan-explore",
+      "provider": "MiniMax",
+      "name": "M Plan Explore",
+      "kind": "Subscription",
+      "monthly": 55,
+      "source": "https://platform.minimax.io/docs/m-plan/monthly-offer",
+      "note": "Regular monthly price is $55, published as 3× Go usage. The offer page dates a 50% first-month discount through October 14; that introductory price is not stored. Annual billing is 10 months for 12 and is not the monthly headline. Text access is MiniMax-M3.1-Flash. Explore also includes the H3 video model, which is not a catalog text row (https://platform.minimax.io/docs/m-plan/intro). A 5-hour window and a weekly window apply to non-video use; video is weekly only. No numeric token allowance is published (https://platform.minimax.io/docs/m-plan/faq, https://platform.minimax.io/docs/m-plan/usage-rules). The Subscription Key draws included usage in MiniMax Code and in other tools. A separate pay-as-you-go API key bills the account balance. Token Plan Max can move to Explore or Build; Token Plan is closed to new purchases and the notice does not publish its dollar prices (https://platform.minimax.io/docs/m-plan/token-plan-notice).",
+      "quota": "3× Go usage; 5-hour and weekly windows; no numeric Go allowance published",
+      "evidence": "Official relative limit",
+      "confidence": "Medium",
+      "apiIncluded": "Yes",
+      "verifiedAt": "2026-10-19",
+      "modelIds": [
+        "minimax-m3-1-flash"
+      ],
+      "access": [
+        "coding-client",
+        "api"
+      ],
+      "quotaDetail": {
+        "kind": "relative-limit",
+        "description": "3× Go usage; 5-hour and weekly windows; no numeric Go allowance published",
+        "source": "https://platform.minimax.io/docs/m-plan/intro",
+        "verifiedAt": "2026-10-19"
+      }
+    },
+    {
+      "id": "minimax-m-plan-build",
+      "provider": "MiniMax",
+      "name": "M Plan Build",
+      "kind": "Subscription",
+      "monthly": 132,
+      "source": "https://platform.minimax.io/docs/m-plan/monthly-offer",
+      "note": "Regular monthly price is $132, published as 7.5× Go usage. The offer page dates a 50% first-month discount through October 14; that introductory price is not stored. Annual billing is 10 months for 12 and is not the monthly headline. Text access is MiniMax-M3.1-Flash. Build also includes the H3 video model, which is not a catalog text row (https://platform.minimax.io/docs/m-plan/intro). A 5-hour window and a weekly window apply to non-video use; video is weekly only. No numeric token allowance is published (https://platform.minimax.io/docs/m-plan/faq, https://platform.minimax.io/docs/m-plan/usage-rules). The Subscription Key draws included usage in MiniMax Code and in other tools. A separate pay-as-you-go API key bills the account balance. Token Plan Ultra can move to Build; Token Plan is closed to new purchases and the notice does not publish its dollar prices (https://platform.minimax.io/docs/m-plan/token-plan-notice).",
+      "quota": "7.5× Go usage; 5-hour and weekly windows; no numeric Go allowance published",
+      "evidence": "Official relative limit",
+      "confidence": "Medium",
+      "apiIncluded": "Yes",
+      "verifiedAt": "2026-10-19",
+      "modelIds": [
+        "minimax-m3-1-flash"
+      ],
+      "access": [
+        "coding-client",
+        "api"
+      ],
+      "quotaDetail": {
+        "kind": "relative-limit",
+        "description": "7.5× Go usage; 5-hour and weekly windows; no numeric Go allowance published",
+        "source": "https://platform.minimax.io/docs/m-plan/intro",
+        "verifiedAt": "2026-10-19"
       }
     }
   ]
