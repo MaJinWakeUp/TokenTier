@@ -261,8 +261,8 @@ that stale lock file, and retry.
 ## Catalog changes, October 19 2026
 
 Re-read from the providers' own pages on October 19. Two new models, three Muse
-Code plans, a cache-hit correction on Step 5 Preview, and two OpenCode Go roster
-edits. Mistral Medium 3.5, Mistral Small 4, Qwen3.8-Flash, Qwen3.7-Plus, MiniMax
+Code plans, three M Plan tiers, a cache-hit correction on Step 5 Preview, and
+two OpenCode Go roster edits. Mistral Medium 3.5, Mistral Small 4, Qwen3.8-Flash, Qwen3.7-Plus, MiniMax
 M3, and Gemini 3.1 Flash-Lite stay out. So do free and stealth promos, separate
 Ultrafast / Fast / Priority rows, Contributor variants, and Muse Wonder Full.
 Muse Code Everyday Usage is $5/month and stays under the $10 floor.
@@ -273,16 +273,15 @@ Muse Code Everyday Usage is $5/month and stays under the $10 floor.
 | --- | --- |
 | Provider | Meta |
 | Input / cached / output | $4 / $0.20 / $20 |
-| Context | 1M (published window 1,048,576 tokens) |
+| Context | 1.048576M (1,048,576 tokens) |
 | Index v4.3.2 | 52 (max) |
 
 Announced October 12, 2026. API id `muse-wonder-1.0`. Standard mode only on
 Model API; Contributor mode is not available for Muse Wonder there. The pricing
 page publishes one rate for the whole window. The models page states a
-1,048,576-token context window. The catalog's `1M` count is 1,000,000 tokens,
-the same recording used for Gemini 4 Argon, and the exact figure is in the
-note. Muse Wonder Full is available only with a Muse Code subscription and has
-no public API price, so it is not a row. Artificial Analysis publishes 52 for
+1,048,576-token context window, recorded as `1.048576M` so eligibility uses
+that count. Muse Wonder Full is available only with a Muse Code subscription
+and has no public API price, so it is not a row. Artificial Analysis publishes 52 for
 the max variant on index v4.3.2.
 
 It prices identically to Claude Opus 5.5 and Gemini 4 Argon, so it joins their
@@ -368,8 +367,7 @@ provider, so `app/globals.css` gained one. The colour is a chosen swatch picked
 for distinctness, not a brand asset.
 
 OpenCode Go lists "MiniMax M3.1 Flash Free", a limited-time free row. That row
-is not this paid model, and Go and Go Plus do not list it. No plan in the
-catalog documents the paid model, so it is on no roster.
+is not this paid model, and Go and Go Plus do not list it.
 
 One new price group moves the quintile cuts on the lanes it enters:
 
@@ -378,6 +376,38 @@ One new price group moves the quintile cuts on the lanes it enters:
 - Medium coding: no existing model changes letter. Step 5 Preview stays **S**.
 - Hard coding, research, and innovation: MiniMax misses the 45 bar, so those
   lanes do not move.
+
+### Added: M Plan Go, Explore, and Build
+
+The current new-buyer subscription is M Plan, not the retired Token Plan names.
+[M Plan overview](https://platform.minimax.io/docs/m-plan/intro) lists Go,
+Explore, and Build, and every tier includes MiniMax-M3.1-Flash for text.
+[The monthly offer page](https://platform.minimax.io/docs/m-plan/monthly-offer)
+publishes the regular prices. A 50% first-month discount dated through October
+14 stays out of the stored price. Annual billing (10 months for 12) is noted
+and is not the monthly headline.
+
+| Plan | Monthly | Included text usage |
+| --- | --- | --- |
+| M Plan Go | $22 | Baseline; 5-hour and weekly windows |
+| M Plan Explore | $55 | 3× Go |
+| M Plan Build | $132 | 7.5× Go |
+
+No page publishes a numeric token allowance, so the quotas stay relative.
+Explore and Build also include the H3 video model, which is not a catalog text
+row. The Subscription Key covers MiniMax Code and other tools; a pay-as-you-go
+API key is a separate bill. Token Plan Plus, Max, and Ultra are closed to new
+purchases. The [subscriber notice](https://platform.minimax.io/docs/m-plan/token-plan-notice)
+maps them onto M Plan and does not publish their dollar prices, so they are
+not rows.
+
+M3.1 Flash scores 42. It clears every bar under 45 and misses the frontier
+bar, so Go and Explore are ranked on the lanes it clears and Build is over
+the $100 cap on those lanes. Hard coding, research, and innovation do not
+rank any M Plan tier.
+
+- Daily use and easy coding: Go enters at **C**. Kimi Moderato rises from **B** to **A**.
+- Medium coding and writing: Go enters at **A**. Explore enters at **C**. Kimi Moderato rises from **A** to **S**. Kimi Allegro falls from **C** to **D**.
 
 ### Cache hit correction: Step 5 Preview
 

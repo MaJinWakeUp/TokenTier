@@ -841,11 +841,11 @@
       "input": 4,
       "cached": 0.2,
       "output": 20,
-      "context": "1M",
-      "contextTokens": 1000000,
+      "context": "1.048576M",
+      "contextTokens": 1048576,
       "source": "https://dev.meta.ai/docs/pricing-rate-limits",
       "verifiedAt": "2026-10-19",
-      "note": "Announced October 12, 2026. API id `muse-wonder-1.0`. Standard mode only on Model API; Contributor mode is not available for Muse Wonder on Model API. One published rate applies across the full window. The models page states a 1,048,576-token context window, recorded here as 1M. Muse Wonder Full is available only with a Muse Code subscription and has no public API price, so it is not listed. Muse Code High Usage ($15), Power Usage ($50), and Maximum Usage ($200) include Muse Wonder; Everyday Usage is $5 and stays under the catalog floor (https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription). The separate Muse agent Power ($20) and Maximum ($100) plans name a weekly token allowance and do not name this model (https://www.meta.com/help/subscriptions/1021145227643680/). Meta One plan pages describe consumer AI usage and do not name it (https://www.meta.com/meta-one-plans/).",
+      "note": "Announced October 12, 2026. API id `muse-wonder-1.0`. Standard mode only on Model API; Contributor mode is not available for Muse Wonder on Model API. One published rate applies across the full window. The models page states a 1,048,576-token context window, recorded as 1.048576M. Muse Wonder Full is available only with a Muse Code subscription and has no public API price, so it is not listed. Muse Code High Usage ($15), Power Usage ($50), and Maximum Usage ($200) include Muse Wonder; Everyday Usage is $5 and stays under the catalog floor (https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription). The separate Muse agent Power ($20) and Maximum ($100) plans name a weekly token allowance and do not name this model (https://www.meta.com/help/subscriptions/1021145227643680/). Meta One plan pages describe consumer AI usage and do not name it (https://www.meta.com/meta-one-plans/).",
       "capability": {
         "metrics": {
           "intelligence": 52

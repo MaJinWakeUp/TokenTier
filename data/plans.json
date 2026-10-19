@@ -1223,6 +1223,87 @@
         "source": "https://www.kimi.ai/help/membership/membership-pricing",
         "verifiedAt": "2026-10-02"
       }
+    },
+    {
+      "id": "minimax-m-plan-go",
+      "provider": "MiniMax",
+      "name": "M Plan Go",
+      "kind": "Subscription",
+      "monthly": 22,
+      "source": "https://platform.minimax.io/docs/m-plan/monthly-offer",
+      "note": "Regular monthly price is $22. The offer page dates a 50% first-month discount through October 14; that introductory price is not stored. Annual billing is 10 months for 12 and is not the monthly headline. Every M Plan tier includes MiniMax-M3.1-Flash for text. Go does not include the H3 video model (https://platform.minimax.io/docs/m-plan/intro). Usage is the Go baseline, with a 5-hour window and a weekly window, and no numeric token allowance is published (https://platform.minimax.io/docs/m-plan/faq, https://platform.minimax.io/docs/m-plan/usage-rules). The Subscription Key draws included usage in MiniMax Code and in other tools, and API endpoints priced pay-as-you-go deduct from that included usage. A separate pay-as-you-go API key bills the account balance. Token Plan is closed to new purchases; Plus can move to Go, Explore, or Build, and the notice does not publish Token Plan dollar prices (https://platform.minimax.io/docs/m-plan/token-plan-notice).",
+      "quota": "Baseline M Plan usage; 5-hour and weekly windows; no numeric allowance published",
+      "evidence": "Official relative limit",
+      "confidence": "Medium",
+      "apiIncluded": "Yes",
+      "verifiedAt": "2026-10-19",
+      "modelIds": [
+        "minimax-m3-1-flash"
+      ],
+      "access": [
+        "coding-client",
+        "api"
+      ],
+      "quotaDetail": {
+        "kind": "relative-limit",
+        "description": "Baseline M Plan usage; 5-hour and weekly windows; no numeric allowance published",
+        "source": "https://platform.minimax.io/docs/m-plan/intro",
+        "verifiedAt": "2026-10-19"
+      }
+    },
+    {
+      "id": "minimax-m-plan-explore",
+      "provider": "MiniMax",
+      "name": "M Plan Explore",
+      "kind": "Subscription",
+      "monthly": 55,
+      "source": "https://platform.minimax.io/docs/m-plan/monthly-offer",
+      "note": "Regular monthly price is $55, published as 3× Go usage. The offer page dates a 50% first-month discount through October 14; that introductory price is not stored. Annual billing is 10 months for 12 and is not the monthly headline. Text access is MiniMax-M3.1-Flash. Explore also includes the H3 video model, which is not a catalog text row (https://platform.minimax.io/docs/m-plan/intro). A 5-hour window and a weekly window apply to non-video use; video is weekly only. No numeric token allowance is published (https://platform.minimax.io/docs/m-plan/faq, https://platform.minimax.io/docs/m-plan/usage-rules). The Subscription Key draws included usage in MiniMax Code and in other tools. A separate pay-as-you-go API key bills the account balance. Token Plan Max can move to Explore or Build; Token Plan is closed to new purchases and the notice does not publish its dollar prices (https://platform.minimax.io/docs/m-plan/token-plan-notice).",
+      "quota": "3× Go usage; 5-hour and weekly windows; no numeric Go allowance published",
+      "evidence": "Official relative limit",
+      "confidence": "Medium",
+      "apiIncluded": "Yes",
+      "verifiedAt": "2026-10-19",
+      "modelIds": [
+        "minimax-m3-1-flash"
+      ],
+      "access": [
+        "coding-client",
+        "api"
+      ],
+      "quotaDetail": {
+        "kind": "relative-limit",
+        "description": "3× Go usage; 5-hour and weekly windows; no numeric Go allowance published",
+        "source": "https://platform.minimax.io/docs/m-plan/intro",
+        "verifiedAt": "2026-10-19"
+      }
+    },
+    {
+      "id": "minimax-m-plan-build",
+      "provider": "MiniMax",
+      "name": "M Plan Build",
+      "kind": "Subscription",
+      "monthly": 132,
+      "source": "https://platform.minimax.io/docs/m-plan/monthly-offer",
+      "note": "Regular monthly price is $132, published as 7.5× Go usage. The offer page dates a 50% first-month discount through October 14; that introductory price is not stored. Annual billing is 10 months for 12 and is not the monthly headline. Text access is MiniMax-M3.1-Flash. Build also includes the H3 video model, which is not a catalog text row (https://platform.minimax.io/docs/m-plan/intro). A 5-hour window and a weekly window apply to non-video use; video is weekly only. No numeric token allowance is published (https://platform.minimax.io/docs/m-plan/faq, https://platform.minimax.io/docs/m-plan/usage-rules). The Subscription Key draws included usage in MiniMax Code and in other tools. A separate pay-as-you-go API key bills the account balance. Token Plan Ultra can move to Build; Token Plan is closed to new purchases and the notice does not publish its dollar prices (https://platform.minimax.io/docs/m-plan/token-plan-notice).",
+      "quota": "7.5× Go usage; 5-hour and weekly windows; no numeric Go allowance published",
+      "evidence": "Official relative limit",
+      "confidence": "Medium",
+      "apiIncluded": "Yes",
+      "verifiedAt": "2026-10-19",
+      "modelIds": [
+        "minimax-m3-1-flash"
+      ],
+      "access": [
+        "coding-client",
+        "api"
+      ],
+      "quotaDetail": {
+        "kind": "relative-limit",
+        "description": "7.5× Go usage; 5-hour and weekly windows; no numeric Go allowance published",
+        "source": "https://platform.minimax.io/docs/m-plan/intro",
+        "verifiedAt": "2026-10-19"
+      }
     }
   ]
 }
