@@ -9,7 +9,7 @@ The skill directories in `.agents/skills/` are copied without changes from
 | Skill | Why it is here |
 | --- | --- |
 | `blast-radius/` | Requested. Finds what a change could break outside the diff and proves the one fact that makes it safe. |
-| `principle-prove-it-works/` | Requested. Before calling work done, check the real result instead of a proxy. Agents load it automatically (`user-invocable: false`). |
+| `principle-prove-it-works/` | Requested. Before calling work done, check the real result instead of a proxy. `user-invocable: false` only hides it from the `/` menu and doesn't load it automatically, so the repo's `AGENTS.md` (imported by `CLAUDE.md`) states the rule in every session and points to this skill. |
 | `why/` | Needed by `blast-radius`. Its step 1 runs `why` step 2 to collect PR and commit history, and its step 4 uses the citation rules from `why`. |
 | `how/` | The companion skill that `blast-radius` and `why` refer to for "what does this code do" questions. |
 | `unslop/` | Needed by `blast-radius`, which says to write its report through `unslop`. |
