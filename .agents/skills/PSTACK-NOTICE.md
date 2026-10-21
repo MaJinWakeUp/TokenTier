@@ -1,6 +1,6 @@
 # Third-party skills from pstack-claude
 
-These skill directories are copied without changes from
+The skill directories in `.agents/skills/` are copied without changes from
 [michael-denyer/pstack-claude](https://github.com/michael-denyer/pstack-claude),
 `plugins/pstack/skills/`, at commit
 [`d56fdb0`](https://github.com/michael-denyer/pstack-claude/tree/d56fdb02770f53a42e5101e3dd9daa4f96dde92c/plugins/pstack/skills)
@@ -14,7 +14,8 @@ These skill directories are copied without changes from
 | `how/` | The companion skill that `blast-radius` and `why` refer to for "what does this code do" questions. |
 | `unslop/` | Needed by `blast-radius`, which says to write its report through `unslop`. |
 
-`update-catalog/` is TokenTier's own skill and is not part of this notice.
+`.claude/skills/update-catalog/` is TokenTier's own skill and is not part of
+this notice.
 
 ## License
 
