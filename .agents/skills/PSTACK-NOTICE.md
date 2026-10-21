@@ -13,6 +13,12 @@ The skill directories in `.agents/skills/` are copied without changes from
 | `why/` | Needed by `blast-radius`. Its step 1 runs `why` step 2 to collect PR and commit history, and its step 4 uses the citation rules from `why`. |
 | `how/` | The companion skill that `blast-radius` and `why` refer to for "what does this code do" questions. |
 | `unslop/` | Needed by `blast-radius`, which says to write its report through `unslop`. |
+| `poteto-mode/references/` | Not a skill (there is no `SKILL.md`). Holds only `codex-tools.md`, `copilot-tools.md`, and `muse-tools.md`, the platform mappings that `how` and `why` tell Codex, Copilot, and Muse to read first. Codex reads `.agents/skills/` directly. |
+
+Claude Code only finds project skills in `.claude/skills/`, so each directory
+above has a relative symlink there (`.claude/skills/<name> ->
+../../.agents/skills/<name>`). The `poteto-mode` symlink makes `../poteto-mode/`
+links resolve from the symlinked copies too.
 
 `.claude/skills/update-catalog/` is TokenTier's own skill and is not part of
 this notice.
@@ -32,14 +38,17 @@ This repository's own `LICENSE` file does not cover these files.
 These skills come from a larger plugin, so some of their references point to
 skills that are not copied here. The skills still work without them:
 
-- **`poteto-mode`** is not included. It runs the whole pstack workflow: about 60
-  other skills, a plugin-registered `pstack:poteto-agent` subagent, hooks, and
-  Bun/TypeScript scripts. All of that needs the full plugin, so a repo-level copy
-  would fail. `how` and `why` mention it only in two places. The first is a set of
-  links to tool mappings for Codex, Copilot, and Muse, which Claude Code does not
-  need. The second is a pointer to its section on choosing a reasoning level for
-  subagents. When that pointer can't be followed, the subagent runs at the
-  session's reasoning level.
+- **The `poteto-mode` skill** is not included, only its three platform mappings.
+  It runs the whole pstack workflow: about 60 other skills, a plugin-registered
+  `pstack:poteto-agent` subagent, hooks, and Bun/TypeScript scripts. All of that
+  needs the full plugin, so a repo-level copy would fail. `how` and `why` also
+  point to its section on choosing a reasoning level for subagents. When that
+  pointer can't be followed, the subagent runs at the session's reasoning level.
+  The mappings link to plugin-only files that are not copied here: poteto-mode's
+  `SKILL.md` (Subagents and Non-negotiables sections), `setup-pstack/`,
+  `playbooks/authoring-a-skill.md`, and `resume-storage.md`. Those cover the
+  driver policy, hooks, scripts, and setup of the full plugin. The `how` and
+  `why` rows in each mapping don't depend on them.
 - **`arena`** (`blast-radius` step 6) and **`show-me-your-work`**
   (`principle-prove-it-works`) are only needed for large changes and are not
   included. If you need them, install the full plugin.
