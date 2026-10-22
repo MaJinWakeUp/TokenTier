@@ -258,6 +258,76 @@ date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
 
+## Catalog changes, October 22 2026
+
+Re-read from the providers' own pages on October 22. Four current Kimi plans
+replace four legacy names at the same monthly prices. OpenCode Zen gains two
+models already in the catalog. Mistral Large 4's launch sale is gone from the
+model card. OpenCode Go's Step 5 Preview caps are the standard ones. No model
+row is removed, and no model price changes.
+
+### Kimi Plus, Pro, Max, and Ultra
+
+[Membership plans overview](https://www.kimi.ai/help/membership/membership-overview)
+lists the current international plans. Annual totals stay in the notes.
+
+| Plan | Monthly | Annual total | Agent credits | Parallel Agent tasks |
+| --- | --- | --- | --- | --- |
+| Kimi Plus | $19 | $180 | Baseline | 2 |
+| Kimi Pro | $39 | $372 | 2× | 2 |
+| Kimi Max | $99 | $948 | 5× | 4 |
+| Kimi Ultra | $199 | $1,908 | 10× | 4 |
+
+Pro and above include Goal Mode and a dedicated Kimi Claw. Every new plan
+includes Kimi Code with a rolling 5-hour limit and no weekly limit. Each roster
+is `kimi-k3`. Evidence, confidence, and cache ratios follow the legacy row at
+the same monthly price.
+
+[Pricing details](https://www.kimi.ai/help/membership/membership-pricing) says
+Moderato, Allegretto, Allegro, and Vivace are legacy plans.
+[Credit update and usage rules](https://www.kimi.ai/help/membership/update-rules)
+says those plans keep the weekly Kimi Code limit. They stay in the catalog
+with `availability: "legacy"`, the same prices and rosters, and `replacedBy`
+pointing at Plus, Pro, Max, and Ultra.
+
+The new plans cost the same as the names they replace, and they offer the same
+model, so every current price group is unchanged. No plan and no model changes
+letter. Plus holds the letter Moderato held: **A** on daily use and easy
+coding, **S** on medium coding and writing. Pro holds **B** and Max holds **D**
+on medium coding and writing. Kimi K3 scores 44, so none of the four is ranked
+on hard coding, research, or innovation. Pro, Max, and Ultra are over the $30
+cap on daily use and easy coding. Ultra is over the $100 cap on medium coding
+and writing.
+
+### OpenCode Zen roster
+
+[opencode.ai/docs/zen](https://opencode.ai/docs/zen/) lists Claude Sonnet 5.5 and
+Muse Wonder 1.0. `opencode-zen` gains `claude-sonnet-5-5` and
+`meta-muse-wonder-1-0`. No model row changes. Zen has no monthly price, and
+cheaper models already on the roster still win every lane, so its working
+model does not change.
+
+### Mistral Large 4 sale ended
+
+[The model card](https://docs.mistral.ai/models/mistral-large-4-0) shows only
+$1.36 input / $0.14 cached / $4.18 output. The stored rates were already those
+figures. The note no longer describes a live launch sale. No model letter moves.
+
+### OpenCode Go Step 5 caps
+
+[opencode.ai/docs/go](https://opencode.ai/docs/go/) shows Step 5 Preview at the
+standard $15 on Go and $60 on Go Plus. The notes no longer describe a
+limited-time 4× cap of $60 / $240. Allowances stay $15 and $60. Working models
+and plan letters do not move.
+
+### Claude Haiku 4.5
+
+The [models overview](https://platform.claude.com/docs/en/about-claude/models/overview)
+lists Claude Haiku 4.5 among Legacy models that remain available. The
+[deprecations table](https://platform.claude.com/docs/en/about-claude/model-deprecations)
+lists `claude-haiku-4-5-20251001` as Active, with retirement not sooner than
+October 15, 2026. The row stays.
+
 ## Catalog changes, October 19 2026
 
 Re-read from the providers' own pages on October 19. Two new models, three Muse

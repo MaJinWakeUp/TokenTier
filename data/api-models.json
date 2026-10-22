@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "updatedAt": "2026-10-19",
+  "updatedAt": "2026-10-22",
   "currency": "USD",
   "unit": "per-million-tokens",
   "capabilityIndex": {
@@ -210,8 +210,8 @@
       "output": 5,
       "context": "200K",
       "source": "https://platform.claude.com/docs/en/about-claude/pricing",
-      "verifiedAt": "2026-10-05",
-      "note": "Prices unchanged at $1 input / $0.10 cache read / $5 output. The Sonnet 5.5 model comparison lists a 200K context window and 64K maximum output (https://platform.claude.com/docs/en/models/sonnet-5-5/overview). Still Active; retirement is not sooner than October 15, 2026 (https://platform.claude.com/docs/en/about-claude/model-deprecations).",
+      "verifiedAt": "2026-10-22",
+      "note": "Prices unchanged at $1 input / $0.10 cache read / $5 output. The Sonnet 5.5 model comparison lists a 200K context window and 64K maximum output (https://platform.claude.com/docs/en/models/sonnet-5-5/overview). The models overview lists Claude Haiku 4.5 among Legacy models that remain available (https://platform.claude.com/docs/en/about-claude/models/overview). The deprecations table lists claude-haiku-4-5-20251001 as Active, with retirement not sooner than October 15, 2026 (https://platform.claude.com/docs/en/about-claude/model-deprecations).",
       "capability": {
         "metrics": {
           "intelligence": 15
@@ -799,8 +799,8 @@
       "context": "1M",
       "contextTokens": 1000000,
       "source": "https://docs.mistral.ai/models/mistral-large-4-0",
-      "verifiedAt": "2026-10-08",
-      "note": "Public Preview since October 6, 2026. Open-weight Mixture-of-Experts; the changelog says open weights are coming soon. Standard rate is $1.36 input / $0.14 cached / $4.18 output. A 2-week 50% launch sale ($0.68 input / $0.07 cached / $2.09 output) is on the model card and is not the headline. The changelog says the sale lasts two weeks from the October 6 release and does not print a calendar end date, so October 20, 2026 is derived as fourteen days after October 6.",
+      "verifiedAt": "2026-10-22",
+      "note": "Public Preview since October 6, 2026. Open-weight Mixture-of-Experts. The model card shows only the standard rate, $1.36 input / $0.14 cached / $4.18 output. The earlier 2-week 50% launch sale is no longer on the page (https://docs.mistral.ai/models/mistral-large-4-0).",
       "capability": {
         "metrics": {
           "intelligence": 38
