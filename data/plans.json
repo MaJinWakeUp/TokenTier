@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-10-19",
+  "updatedAt": "2026-10-22",
   "currency": "USD",
   "plans": [
     {
@@ -667,13 +667,13 @@
       "kind": "Subscription",
       "monthly": 10,
       "source": "https://opencode.ai/docs/go/",
-      "note": "Usage is capped in dollars per model, not credits, and metered at the same per-token rates published for each model. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash and Kimi K2.7 Code are $60, DeepSeek V4.1 Flash is $80, and Grok 4.7, GPT-5.6 Luna, GLM-5.3, Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, GPT-6 Luna, Claude Haiku 5.5, and Step 5 Preview are $15. Step 5 Preview's standard cap is $15; the Go table marks a limited-time 4× multiplier that currently shows $60, with no end date, and that promotional cap is not stored here. Grok 4.6 is no longer on the Go model list. The $60 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-10-19. API usage beyond the cap is not included.",
+      "note": "Usage is capped in dollars per model, not credits, and metered at the same per-token rates published for each model. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash and Kimi K2.7 Code are $60, DeepSeek V4.1 Flash is $80, and Grok 4.7, GPT-5.6 Luna, GLM-5.3, Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, GPT-6 Luna, Claude Haiku 5.5, and Step 5 Preview are $15. Grok 4.6 is no longer on the Go model list. The $60 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-10-22; Step 5 Preview's table shows the standard $15. API usage beyond the cap is not included.",
       "quota": "Per-model monthly caps; 5-hour is 20% and weekly is 50% of the selected model's cap",
       "evidence": "Official quota",
       "confidence": "High",
       "apiIncluded": "Yes",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-10-19",
+      "verifiedAt": "2026-10-22",
       "includedApiValue": 60,
       "modelIds": [
         "grok-4-7",
@@ -698,7 +698,7 @@
         "amount": 60,
         "resetWindow": "monthly",
         "source": "https://opencode.ai/docs/go/",
-        "verifiedAt": "2026-10-19"
+        "verifiedAt": "2026-10-22"
       },
       "modelAllowances": {
         "grok-4-7": 15,
@@ -736,13 +736,13 @@
       "kind": "Subscription",
       "monthly": 40,
       "source": "https://opencode.ai/docs/go/",
-      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go marketing page does not print a launch date; Go Plus was added to the former docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash $180, Kimi K2.7 Code $180, DeepSeek V4.1 Flash $160, GLM-5.3 $120, and $60 for Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, GPT-6 Luna, GPT-5.6 Luna, Claude Haiku 5.5, and Step 5 Preview. Step 5 Preview's standard cap is $60; the Go Plus table marks a limited-time 4× multiplier that currently shows $240, with no end date, and that promotional cap is not stored here. Grok 4.6 is no longer on the Go Plus model list. The $180 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-10-19.",
+      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go marketing page does not print a launch date; Go Plus was added to the former docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash $180, Kimi K2.7 Code $180, DeepSeek V4.1 Flash $160, GLM-5.3 $120, and $60 for Kimi K3, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, GPT-6 Luna, GPT-5.6 Luna, Claude Haiku 5.5, and Step 5 Preview. Grok 4.6 is no longer on the Go Plus model list. The $180 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-10-22; Step 5 Preview's table shows the standard $60.",
       "quota": "Per-model monthly caps; 5-hour is 20% and weekly is 50% of the selected model's cap",
       "evidence": "Official quota",
       "confidence": "High",
       "apiIncluded": "Yes",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-10-19",
+      "verifiedAt": "2026-10-22",
       "includedApiValue": 180,
       "modelIds": [
         "grok-4-7",
@@ -767,7 +767,7 @@
         "amount": 180,
         "resetWindow": "monthly",
         "source": "https://opencode.ai/docs/go/",
-        "verifiedAt": "2026-10-19"
+        "verifiedAt": "2026-10-22"
       },
       "modelAllowances": {
         "grok-4-7": 60,
@@ -810,7 +810,7 @@
       "evidence": "Price break-even",
       "confidence": "Low",
       "apiIncluded": "Yes",
-      "verifiedAt": "2026-10-15",
+      "verifiedAt": "2026-10-22",
       "modelIds": [
         "gpt-6-astra",
         "gpt-6-1-sol",
@@ -822,6 +822,7 @@
         "claude-fable-5-1",
         "claude-opus-5-5",
         "claude-opus-5",
+        "claude-sonnet-5-5",
         "claude-sonnet-5",
         "claude-haiku-4-5",
         "claude-haiku-5-5",
@@ -833,6 +834,7 @@
         "grok-4-5",
         "grok-build-0-1",
         "meta-muse-spark-1-3",
+        "meta-muse-wonder-1-0",
         "qwen-3-8-max",
         "deepseek-v4-1-flash",
         "deepseek-v4-pro",
@@ -849,7 +851,7 @@
         "kind": "unknown",
         "description": "Direct token pass-through with no monthly fee",
         "source": "https://opencode.ai/docs/zen/",
-        "verifiedAt": "2026-10-15"
+        "verifiedAt": "2026-10-22"
       }
     },
     {
@@ -1113,19 +1115,131 @@
       }
     },
     {
+      "id": "kimi-plus",
+      "provider": "Kimi",
+      "name": "Kimi Plus",
+      "kind": "Subscription",
+      "monthly": 19,
+      "source": "https://www.kimi.ai/help/membership/membership-overview",
+      "note": "Annual billing is $180/year ($15/month equivalent) and is not the monthly headline. The overview lists Plus as more Agent credits, the baseline that Pro lists as 2×, with 2 parallel Agent tasks. Goal Mode and a dedicated Kimi Claw are not included. Kimi Code has a rolling 5-hour limit and no weekly limit. Membership features share one credit pool. https://www.kimi.ai/help/membership/membership-overview",
+      "quota": "Baseline Agent credits; 2 parallel Agent tasks; rolling 5-hour Kimi Code limit and no weekly limit",
+      "evidence": "Official relative limit",
+      "confidence": "High",
+      "apiIncluded": "No",
+      "cacheRatio": 0.25,
+      "verifiedAt": "2026-10-22",
+      "modelIds": [
+        "kimi-k3"
+      ],
+      "access": [
+        "chat-app",
+        "coding-client"
+      ],
+      "quotaDetail": {
+        "kind": "relative-limit",
+        "description": "Baseline Agent credits; 2 parallel Agent tasks; rolling 5-hour Kimi Code limit and no weekly limit",
+        "source": "https://www.kimi.ai/help/membership/membership-overview",
+        "verifiedAt": "2026-10-22"
+      }
+    },
+    {
+      "id": "kimi-pro",
+      "provider": "Kimi",
+      "name": "Kimi Pro",
+      "kind": "Subscription",
+      "monthly": 39,
+      "source": "https://www.kimi.ai/help/membership/membership-overview",
+      "note": "Annual billing is $372/year ($31/month equivalent) and is not the monthly headline. The overview lists 2× Agent credits, 2 parallel Agent tasks, Goal Mode, and a dedicated Kimi Claw. Kimi Code has a rolling 5-hour limit and no weekly limit. Membership features share one credit pool. https://www.kimi.ai/help/membership/membership-overview",
+      "quota": "2× Agent credits; 2 parallel Agent tasks; Goal Mode and a dedicated Kimi Claw; rolling 5-hour Kimi Code limit and no weekly limit",
+      "evidence": "Official relative limit",
+      "confidence": "High",
+      "apiIncluded": "No",
+      "cacheRatio": 0.25,
+      "verifiedAt": "2026-10-22",
+      "modelIds": [
+        "kimi-k3"
+      ],
+      "access": [
+        "chat-app",
+        "coding-client"
+      ],
+      "quotaDetail": {
+        "kind": "relative-limit",
+        "description": "2× Agent credits; 2 parallel Agent tasks; Goal Mode and a dedicated Kimi Claw; rolling 5-hour Kimi Code limit and no weekly limit",
+        "source": "https://www.kimi.ai/help/membership/membership-overview",
+        "verifiedAt": "2026-10-22"
+      }
+    },
+    {
+      "id": "kimi-max",
+      "provider": "Kimi",
+      "name": "Kimi Max",
+      "kind": "Subscription",
+      "monthly": 99,
+      "source": "https://www.kimi.ai/help/membership/membership-overview",
+      "note": "Annual billing is $948/year ($79/month equivalent) and is not the monthly headline. The overview lists 5× Agent credits, 4 parallel Agent tasks, Goal Mode, and a dedicated Kimi Claw. Kimi Code has a rolling 5-hour limit and no weekly limit. Membership features share one credit pool. https://www.kimi.ai/help/membership/membership-overview",
+      "quota": "5× Agent credits; 4 parallel Agent tasks; Goal Mode and a dedicated Kimi Claw; rolling 5-hour Kimi Code limit and no weekly limit",
+      "evidence": "Official relative limit",
+      "confidence": "High",
+      "apiIncluded": "No",
+      "cacheRatio": 0.3,
+      "verifiedAt": "2026-10-22",
+      "modelIds": [
+        "kimi-k3"
+      ],
+      "access": [
+        "chat-app",
+        "coding-client"
+      ],
+      "quotaDetail": {
+        "kind": "relative-limit",
+        "description": "5× Agent credits; 4 parallel Agent tasks; Goal Mode and a dedicated Kimi Claw; rolling 5-hour Kimi Code limit and no weekly limit",
+        "source": "https://www.kimi.ai/help/membership/membership-overview",
+        "verifiedAt": "2026-10-22"
+      }
+    },
+    {
+      "id": "kimi-ultra",
+      "provider": "Kimi",
+      "name": "Kimi Ultra",
+      "kind": "Subscription",
+      "monthly": 199,
+      "source": "https://www.kimi.ai/help/membership/membership-overview",
+      "note": "Annual billing is $1,908/year ($159/month equivalent) and is not the monthly headline. The overview lists 10× Agent credits, 4 parallel Agent tasks, Goal Mode, and a dedicated Kimi Claw. Kimi Code has a rolling 5-hour limit and no weekly limit. Membership features share one credit pool. https://www.kimi.ai/help/membership/membership-overview",
+      "quota": "10× Agent credits; 4 parallel Agent tasks; Goal Mode and a dedicated Kimi Claw; rolling 5-hour Kimi Code limit and no weekly limit",
+      "evidence": "Official relative limit",
+      "confidence": "High",
+      "apiIncluded": "No",
+      "cacheRatio": 0.35,
+      "verifiedAt": "2026-10-22",
+      "modelIds": [
+        "kimi-k3"
+      ],
+      "access": [
+        "chat-app",
+        "coding-client"
+      ],
+      "quotaDetail": {
+        "kind": "relative-limit",
+        "description": "10× Agent credits; 4 parallel Agent tasks; Goal Mode and a dedicated Kimi Claw; rolling 5-hour Kimi Code limit and no weekly limit",
+        "source": "https://www.kimi.ai/help/membership/membership-overview",
+        "verifiedAt": "2026-10-22"
+      }
+    },
+    {
       "id": "kimi-moderato",
       "provider": "Kimi",
       "name": "Kimi Moderato",
       "kind": "Subscription",
       "monthly": 19,
       "source": "https://www.kimi.ai/help/membership/membership-pricing",
-      "note": "Shared Kimi membership pool; task counts are vendor estimates based on typical token use and are not API calls.",
+      "note": "Shared Kimi membership pool; task counts are vendor estimates based on typical token use and are not API calls. Legacy plan for existing subscribers. Moderato, Allegretto, Allegro, and Vivace are legacy plans (https://www.kimi.ai/help/membership/membership-pricing). Legacy plans keep the weekly Kimi Code limit in addition to the rolling 5-hour limit (https://www.kimi.ai/help/membership/update-rules). Comparable current plan: Kimi Plus.",
       "quota": "60 Agent credits; 1× Kimi Code credits; 2,000 database calls",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.25,
-      "verifiedAt": "2026-10-02",
+      "verifiedAt": "2026-10-22",
       "modelIds": [
         "kimi-k3"
       ],
@@ -1138,7 +1252,9 @@
         "description": "60 Agent credits; 1× Kimi Code credits; 2,000 database calls",
         "source": "https://www.kimi.ai/help/membership/membership-pricing",
         "verifiedAt": "2026-10-02"
-      }
+      },
+      "availability": "legacy",
+      "replacedBy": "kimi-plus"
     },
     {
       "id": "kimi-allegretto",
@@ -1147,13 +1263,13 @@
       "kind": "Subscription",
       "monthly": 39,
       "source": "https://www.kimi.ai/help/membership/membership-pricing",
-      "note": "Shared Kimi membership pool with Kimi Claw. Task counts are vendor estimates, not API-call guarantees.",
+      "note": "Shared Kimi membership pool with Kimi Claw. Task counts are vendor estimates, not API-call guarantees. Legacy plan for existing subscribers. Moderato, Allegretto, Allegro, and Vivace are legacy plans (https://www.kimi.ai/help/membership/membership-pricing). Legacy plans keep the weekly Kimi Code limit in addition to the rolling 5-hour limit (https://www.kimi.ai/help/membership/update-rules). Comparable current plan: Kimi Pro.",
       "quota": "150 Agent credits; 5× Kimi Code credits; 5,000 database calls",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.25,
-      "verifiedAt": "2026-10-02",
+      "verifiedAt": "2026-10-22",
       "modelIds": [
         "kimi-k3"
       ],
@@ -1166,7 +1282,9 @@
         "description": "150 Agent credits; 5× Kimi Code credits; 5,000 database calls",
         "source": "https://www.kimi.ai/help/membership/membership-pricing",
         "verifiedAt": "2026-10-02"
-      }
+      },
+      "availability": "legacy",
+      "replacedBy": "kimi-pro"
     },
     {
       "id": "kimi-allegro",
@@ -1175,13 +1293,15 @@
       "kind": "Subscription",
       "monthly": 99,
       "source": "https://www.kimi.ai/help/membership/membership-pricing",
-      "note": "Larger shared Kimi membership pool with four concurrent Agent tasks. Task counts are estimates, not API calls.",
+      "note": "Larger shared Kimi membership pool with four concurrent Agent tasks. Task counts are estimates, not API calls. Legacy plan for existing subscribers. Moderato, Allegretto, Allegro, and Vivace are legacy plans (https://www.kimi.ai/help/membership/membership-pricing). Legacy plans keep the weekly Kimi Code limit in addition to the rolling 5-hour limit (https://www.kimi.ai/help/membership/update-rules). Comparable current plan: Kimi Max.",
       "quota": "360 Agent credits; 15× Kimi Code credits; 12,000 database calls",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.3,
-      "verifiedAt": "2026-10-02",
+      "verifiedAt": "2026-10-22",
+      "availability": "legacy",
+      "replacedBy": "kimi-max",
       "modelIds": [
         "kimi-k3"
       ],
@@ -1203,13 +1323,15 @@
       "kind": "Subscription",
       "monthly": 199,
       "source": "https://www.kimi.ai/help/membership/membership-pricing",
-      "note": "Kimi's highest membership pool and concurrency. Task counts are vendor estimates, not API-call guarantees.",
+      "note": "Kimi's highest membership pool and concurrency. Task counts are vendor estimates, not API-call guarantees. Legacy plan for existing subscribers. Moderato, Allegretto, Allegro, and Vivace are legacy plans (https://www.kimi.ai/help/membership/membership-pricing). Legacy plans keep the weekly Kimi Code limit in addition to the rolling 5-hour limit (https://www.kimi.ai/help/membership/update-rules). Comparable current plan: Kimi Ultra.",
       "quota": "720 Agent credits; 30× Kimi Code credits; 24,000 database calls",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.35,
-      "verifiedAt": "2026-10-02",
+      "verifiedAt": "2026-10-22",
+      "availability": "legacy",
+      "replacedBy": "kimi-ultra",
       "modelIds": [
         "kimi-k3"
       ],
