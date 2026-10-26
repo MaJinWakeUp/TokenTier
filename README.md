@@ -269,10 +269,12 @@ plan price changes.
 
 [Chat pricing](https://platform.kimi.ai/docs/pricing/chat) lists `kimi-k3.1-pro`
 at $2.00 input / $0.20 cached input / $10.00 output per million tokens, one
-rate across a 1,048,576-token window, recorded as 1.048576M. Cache writes are
-$2 per million tokens for a 5-minute TTL and $4 per million tokens for a
-1-hour TTL. The catalog has no cache-write field, so those rates stay in the
-note. Released October 23, 2026.
+rate across a 1,048,576-token window, recorded as 1.048576M. Kimi bills cache
+misses, cache writes, and cache hits as separate slices of the same input
+tokens. The default 5-minute cache write is $2 per million tokens, the same
+as input, and the caching guide says that write was already included in the
+input price, so the stored rates cover it. The optional 1-hour write is $4
+per million tokens and stays in the note. Released October 23, 2026.
 [The quickstart](https://platform.kimi.ai/docs/guide/kimi-k3-1-pro-quickstart)
 and [the launch post](https://www.kimi.ai/blog/kimi-k3-1-pro) name the same
 model. [Artificial Analysis](https://artificialanalysis.ai/models/kimi-k3-1-pro)
