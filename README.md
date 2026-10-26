@@ -314,6 +314,29 @@ series models are planned to retire by the end of December 2026. The row
 stays, with that note. OpenCode Go, Go Plus, and Zen still list it. The score
 is 26, so the row stays off every scenario board. No letter moves.
 
+### Kimi membership rosters
+
+[The launch post](https://www.kimi.ai/blog/kimi-k3-1-pro) says Kimi K3.1 Pro is
+available on Kimi.ai, Kimi Work, and Kimi Code.
+[The Kimi Code membership table](https://www.kimi.com/code/docs/en/kimi-code/membership.html)
+gives Plus and above K3.1 Pro access, and Pro and above the 1M context
+window. Plus, Pro, Max, and Ultra list `kimi-k3` and `kimi-k3-1-pro`. The
+catalog has one published model, so Plus carries that same row.
+
+The same table gives Moderato and above K3.1 Pro access. A plan roster lists
+every model its own page includes, so Moderato, Allegretto, Allegro, and
+Vivace gain `kimi-k3-1-pro` as well. Those four stay legacy and stay off the
+new-buyer board.
+
+K3 scores 44 and misses the 45 bar. K3.1 Pro scores 55 and is the cheaper of
+the two rates, so it is the working model on every lane these plans offer. On
+hard coding, research, and innovation the four current plans enter the board
+at their existing monthly prices and take that price group's letter: Plus
+**S**, Pro **A**, Max **C**, Ultra **D**. Every other plan's letter stays
+put. Daily use, easy coding, medium coding, and writing already included
+these plans, and those letters stay put. The quota remains a relative limit,
+so the new letters have unproven capacity.
+
 ## Catalog changes, October 22 2026
 
 Re-read from the providers' own pages on October 22. Four current Kimi plans

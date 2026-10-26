@@ -1133,15 +1133,16 @@
       "kind": "Subscription",
       "monthly": 19,
       "source": "https://www.kimi.ai/help/membership/membership-overview",
-      "note": "Annual billing is $180/year ($15/month equivalent) and is not the monthly headline. The overview lists Plus as more Agent credits, the baseline that Pro lists as 2×, with 2 parallel Agent tasks. Goal Mode and a dedicated Kimi Claw are not included. Kimi Code has a rolling 5-hour limit and no weekly limit. Membership features share one credit pool. https://www.kimi.ai/help/membership/membership-overview",
+      "note": "Annual billing is $180/year ($15/month equivalent) and is not the monthly headline. The overview lists Plus as more Agent credits, the baseline that Pro lists as 2×, with 2 parallel Agent tasks. Goal Mode and a dedicated Kimi Claw are not included. Kimi Code has a rolling 5-hour limit and no weekly limit. Membership features share one credit pool. https://www.kimi.ai/help/membership/membership-overview The launch post says Kimi K3.1 Pro is available on Kimi.ai, Kimi Work, and Kimi Code (https://www.kimi.ai/blog/kimi-k3-1-pro). The Kimi Code membership table gives Plus and above K3.1 Pro access, and Pro and above the 1M context window (https://www.kimi.com/code/docs/en/kimi-code/membership.html).",
       "quota": "Baseline Agent credits; 2 parallel Agent tasks; rolling 5-hour Kimi Code limit and no weekly limit",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.25,
-      "verifiedAt": "2026-10-22",
+      "verifiedAt": "2026-10-26",
       "modelIds": [
-        "kimi-k3"
+        "kimi-k3",
+        "kimi-k3-1-pro"
       ],
       "access": [
         "chat-app",
@@ -1161,15 +1162,16 @@
       "kind": "Subscription",
       "monthly": 39,
       "source": "https://www.kimi.ai/help/membership/membership-overview",
-      "note": "Annual billing is $372/year ($31/month equivalent) and is not the monthly headline. The overview lists 2× Agent credits, 2 parallel Agent tasks, Goal Mode, and a dedicated Kimi Claw. Kimi Code has a rolling 5-hour limit and no weekly limit. Membership features share one credit pool. https://www.kimi.ai/help/membership/membership-overview",
+      "note": "Annual billing is $372/year ($31/month equivalent) and is not the monthly headline. The overview lists 2× Agent credits, 2 parallel Agent tasks, Goal Mode, and a dedicated Kimi Claw. Kimi Code has a rolling 5-hour limit and no weekly limit. Membership features share one credit pool. https://www.kimi.ai/help/membership/membership-overview The launch post says Kimi K3.1 Pro is available on Kimi.ai, Kimi Work, and Kimi Code (https://www.kimi.ai/blog/kimi-k3-1-pro). The Kimi Code membership table gives Plus and above K3.1 Pro access, and Pro and above the 1M context window (https://www.kimi.com/code/docs/en/kimi-code/membership.html).",
       "quota": "2× Agent credits; 2 parallel Agent tasks; Goal Mode and a dedicated Kimi Claw; rolling 5-hour Kimi Code limit and no weekly limit",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.25,
-      "verifiedAt": "2026-10-22",
+      "verifiedAt": "2026-10-26",
       "modelIds": [
-        "kimi-k3"
+        "kimi-k3",
+        "kimi-k3-1-pro"
       ],
       "access": [
         "chat-app",
@@ -1189,15 +1191,16 @@
       "kind": "Subscription",
       "monthly": 99,
       "source": "https://www.kimi.ai/help/membership/membership-overview",
-      "note": "Annual billing is $948/year ($79/month equivalent) and is not the monthly headline. The overview lists 5× Agent credits, 4 parallel Agent tasks, Goal Mode, and a dedicated Kimi Claw. Kimi Code has a rolling 5-hour limit and no weekly limit. Membership features share one credit pool. https://www.kimi.ai/help/membership/membership-overview",
+      "note": "Annual billing is $948/year ($79/month equivalent) and is not the monthly headline. The overview lists 5× Agent credits, 4 parallel Agent tasks, Goal Mode, and a dedicated Kimi Claw. Kimi Code has a rolling 5-hour limit and no weekly limit. Membership features share one credit pool. https://www.kimi.ai/help/membership/membership-overview The launch post says Kimi K3.1 Pro is available on Kimi.ai, Kimi Work, and Kimi Code (https://www.kimi.ai/blog/kimi-k3-1-pro). The Kimi Code membership table gives Plus and above K3.1 Pro access, and Pro and above the 1M context window (https://www.kimi.com/code/docs/en/kimi-code/membership.html).",
       "quota": "5× Agent credits; 4 parallel Agent tasks; Goal Mode and a dedicated Kimi Claw; rolling 5-hour Kimi Code limit and no weekly limit",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.3,
-      "verifiedAt": "2026-10-22",
+      "verifiedAt": "2026-10-26",
       "modelIds": [
-        "kimi-k3"
+        "kimi-k3",
+        "kimi-k3-1-pro"
       ],
       "access": [
         "chat-app",
@@ -1217,15 +1220,16 @@
       "kind": "Subscription",
       "monthly": 199,
       "source": "https://www.kimi.ai/help/membership/membership-overview",
-      "note": "Annual billing is $1,908/year ($159/month equivalent) and is not the monthly headline. The overview lists 10× Agent credits, 4 parallel Agent tasks, Goal Mode, and a dedicated Kimi Claw. Kimi Code has a rolling 5-hour limit and no weekly limit. Membership features share one credit pool. https://www.kimi.ai/help/membership/membership-overview",
+      "note": "Annual billing is $1,908/year ($159/month equivalent) and is not the monthly headline. The overview lists 10× Agent credits, 4 parallel Agent tasks, Goal Mode, and a dedicated Kimi Claw. Kimi Code has a rolling 5-hour limit and no weekly limit. Membership features share one credit pool. https://www.kimi.ai/help/membership/membership-overview The launch post says Kimi K3.1 Pro is available on Kimi.ai, Kimi Work, and Kimi Code (https://www.kimi.ai/blog/kimi-k3-1-pro). The Kimi Code membership table gives Plus and above K3.1 Pro access, and Pro and above the 1M context window (https://www.kimi.com/code/docs/en/kimi-code/membership.html).",
       "quota": "10× Agent credits; 4 parallel Agent tasks; Goal Mode and a dedicated Kimi Claw; rolling 5-hour Kimi Code limit and no weekly limit",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.35,
-      "verifiedAt": "2026-10-22",
+      "verifiedAt": "2026-10-26",
       "modelIds": [
-        "kimi-k3"
+        "kimi-k3",
+        "kimi-k3-1-pro"
       ],
       "access": [
         "chat-app",
@@ -1245,15 +1249,16 @@
       "kind": "Subscription",
       "monthly": 19,
       "source": "https://www.kimi.ai/help/membership/membership-pricing",
-      "note": "Shared Kimi membership pool; task counts are vendor estimates based on typical token use and are not API calls. Legacy plan for existing subscribers. Moderato, Allegretto, Allegro, and Vivace are legacy plans (https://www.kimi.ai/help/membership/membership-pricing). Legacy plans keep the weekly Kimi Code limit in addition to the rolling 5-hour limit (https://www.kimi.ai/help/membership/update-rules). Comparable current plan: Kimi Plus.",
+      "note": "Shared Kimi membership pool; task counts are vendor estimates based on typical token use and are not API calls. Legacy plan for existing subscribers. Moderato, Allegretto, Allegro, and Vivace are legacy plans (https://www.kimi.ai/help/membership/membership-pricing). Legacy plans keep the weekly Kimi Code limit in addition to the rolling 5-hour limit (https://www.kimi.ai/help/membership/update-rules). Comparable current plan: Kimi Plus. The Kimi Code membership table gives Moderato and above K3.1 Pro access, and Allegretto and above the 1M context window (https://www.kimi.com/code/docs/en/kimi-code/membership.html). The launch post says Kimi K3.1 Pro is available on Kimi.ai, Kimi Work, and Kimi Code (https://www.kimi.ai/blog/kimi-k3-1-pro).",
       "quota": "60 Agent credits; 1× Kimi Code credits; 2,000 database calls",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.25,
-      "verifiedAt": "2026-10-22",
+      "verifiedAt": "2026-10-26",
       "modelIds": [
-        "kimi-k3"
+        "kimi-k3",
+        "kimi-k3-1-pro"
       ],
       "access": [
         "chat-app",
@@ -1275,15 +1280,16 @@
       "kind": "Subscription",
       "monthly": 39,
       "source": "https://www.kimi.ai/help/membership/membership-pricing",
-      "note": "Shared Kimi membership pool with Kimi Claw. Task counts are vendor estimates, not API-call guarantees. Legacy plan for existing subscribers. Moderato, Allegretto, Allegro, and Vivace are legacy plans (https://www.kimi.ai/help/membership/membership-pricing). Legacy plans keep the weekly Kimi Code limit in addition to the rolling 5-hour limit (https://www.kimi.ai/help/membership/update-rules). Comparable current plan: Kimi Pro.",
+      "note": "Shared Kimi membership pool with Kimi Claw. Task counts are vendor estimates, not API-call guarantees. Legacy plan for existing subscribers. Moderato, Allegretto, Allegro, and Vivace are legacy plans (https://www.kimi.ai/help/membership/membership-pricing). Legacy plans keep the weekly Kimi Code limit in addition to the rolling 5-hour limit (https://www.kimi.ai/help/membership/update-rules). Comparable current plan: Kimi Pro. The Kimi Code membership table gives Moderato and above K3.1 Pro access, and Allegretto and above the 1M context window (https://www.kimi.com/code/docs/en/kimi-code/membership.html). The launch post says Kimi K3.1 Pro is available on Kimi.ai, Kimi Work, and Kimi Code (https://www.kimi.ai/blog/kimi-k3-1-pro).",
       "quota": "150 Agent credits; 5× Kimi Code credits; 5,000 database calls",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.25,
-      "verifiedAt": "2026-10-22",
+      "verifiedAt": "2026-10-26",
       "modelIds": [
-        "kimi-k3"
+        "kimi-k3",
+        "kimi-k3-1-pro"
       ],
       "access": [
         "chat-app",
@@ -1305,17 +1311,18 @@
       "kind": "Subscription",
       "monthly": 99,
       "source": "https://www.kimi.ai/help/membership/membership-pricing",
-      "note": "Larger shared Kimi membership pool with four concurrent Agent tasks. Task counts are estimates, not API calls. Legacy plan for existing subscribers. Moderato, Allegretto, Allegro, and Vivace are legacy plans (https://www.kimi.ai/help/membership/membership-pricing). Legacy plans keep the weekly Kimi Code limit in addition to the rolling 5-hour limit (https://www.kimi.ai/help/membership/update-rules). Comparable current plan: Kimi Max.",
+      "note": "Larger shared Kimi membership pool with four concurrent Agent tasks. Task counts are estimates, not API calls. Legacy plan for existing subscribers. Moderato, Allegretto, Allegro, and Vivace are legacy plans (https://www.kimi.ai/help/membership/membership-pricing). Legacy plans keep the weekly Kimi Code limit in addition to the rolling 5-hour limit (https://www.kimi.ai/help/membership/update-rules). Comparable current plan: Kimi Max. The Kimi Code membership table gives Moderato and above K3.1 Pro access, and Allegretto and above the 1M context window (https://www.kimi.com/code/docs/en/kimi-code/membership.html). The launch post says Kimi K3.1 Pro is available on Kimi.ai, Kimi Work, and Kimi Code (https://www.kimi.ai/blog/kimi-k3-1-pro).",
       "quota": "360 Agent credits; 15× Kimi Code credits; 12,000 database calls",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.3,
-      "verifiedAt": "2026-10-22",
+      "verifiedAt": "2026-10-26",
       "availability": "legacy",
       "replacedBy": "kimi-max",
       "modelIds": [
-        "kimi-k3"
+        "kimi-k3",
+        "kimi-k3-1-pro"
       ],
       "access": [
         "chat-app",
@@ -1335,17 +1342,18 @@
       "kind": "Subscription",
       "monthly": 199,
       "source": "https://www.kimi.ai/help/membership/membership-pricing",
-      "note": "Kimi's highest membership pool and concurrency. Task counts are vendor estimates, not API-call guarantees. Legacy plan for existing subscribers. Moderato, Allegretto, Allegro, and Vivace are legacy plans (https://www.kimi.ai/help/membership/membership-pricing). Legacy plans keep the weekly Kimi Code limit in addition to the rolling 5-hour limit (https://www.kimi.ai/help/membership/update-rules). Comparable current plan: Kimi Ultra.",
+      "note": "Kimi's highest membership pool and concurrency. Task counts are vendor estimates, not API-call guarantees. Legacy plan for existing subscribers. Moderato, Allegretto, Allegro, and Vivace are legacy plans (https://www.kimi.ai/help/membership/membership-pricing). Legacy plans keep the weekly Kimi Code limit in addition to the rolling 5-hour limit (https://www.kimi.ai/help/membership/update-rules). Comparable current plan: Kimi Ultra. The Kimi Code membership table gives Moderato and above K3.1 Pro access, and Allegretto and above the 1M context window (https://www.kimi.com/code/docs/en/kimi-code/membership.html). The launch post says Kimi K3.1 Pro is available on Kimi.ai, Kimi Work, and Kimi Code (https://www.kimi.ai/blog/kimi-k3-1-pro).",
       "quota": "720 Agent credits; 30× Kimi Code credits; 24,000 database calls",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.35,
-      "verifiedAt": "2026-10-22",
+      "verifiedAt": "2026-10-26",
       "availability": "legacy",
       "replacedBy": "kimi-ultra",
       "modelIds": [
-        "kimi-k3"
+        "kimi-k3",
+        "kimi-k3-1-pro"
       ],
       "access": [
         "chat-app",
