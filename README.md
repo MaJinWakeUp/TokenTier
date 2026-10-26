@@ -320,24 +320,21 @@ is 26, so the row stays off every scenario board. No letter moves.
 
 [The launch post](https://www.kimi.ai/blog/kimi-k3-1-pro) says Kimi K3.1 Pro is
 available on Kimi.ai, Kimi Work, and Kimi Code.
-[The Kimi Code membership table](https://www.kimi.com/code/docs/en/kimi-code/membership.html)
-gives Plus and above K3.1 Pro access, and Pro and above the 1M context
-window. Plus, Pro, Max, and Ultra list `kimi-k3` and `kimi-k3-1-pro`. The
-catalog has one published model, so Plus carries that same row.
+[The Kimi Code models page](https://www.kimi.com/code/docs/en/kimi-code/models)
+gives Plus and Moderato access to `k3.1-pro` and publishes the 1,048,576-token
+window for Pro and Allegretto and above. It does not publish Plus's or
+Moderato's token count. The catalog has one K3.1 Pro row, and that row is the
+1,048,576-token model, so Plus and Moderato do not list it. Pro, Max, Ultra,
+Allegretto, Allegro, and Vivace do. Moderato, Allegretto, Allegro, and Vivace
+stay legacy and stay off the new-buyer board.
 
-The same table gives Moderato and above K3.1 Pro access. A plan roster lists
-every model its own page includes, so Moderato, Allegretto, Allegro, and
-Vivace gain `kimi-k3-1-pro` as well. Those four stay legacy and stay off the
-new-buyer board.
-
-K3 scores 44 and misses the 45 bar. K3.1 Pro scores 55 and is the cheaper of
-the two rates, so it is the working model on every lane these plans offer. On
-hard coding, research, and innovation the four current plans enter the board
-at their existing monthly prices and take that price group's letter: Plus
-**S**, Pro **A**, Max **C**, Ultra **D**. Every other plan's letter stays
-put. Daily use, easy coding, medium coding, and writing already included
-these plans, and those letters stay put. The quota remains a relative limit,
-so the new letters have unproven capacity.
+K3 scores 44 and misses the 45 bar. K3.1 Pro scores 55. On hard coding,
+research, and innovation, Pro takes **A**, Max **B**, and Ultra **D**. Plus
+stays off those three boards. Removing Plus's $19 price from that curve moves
+Google AI Pro and Meta One Premium from **A** to **S**, and Kimi Max from
+**C** to **B**. Daily use, easy coding, medium coding, and writing already
+included these plans on K3, and those letters stay put. The quota remains a
+relative limit, so the new letters have unproven capacity.
 
 ## Catalog changes, October 22 2026
 

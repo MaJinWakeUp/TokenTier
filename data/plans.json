@@ -1133,7 +1133,7 @@
       "kind": "Subscription",
       "monthly": 19,
       "source": "https://www.kimi.ai/help/membership/membership-overview",
-      "note": "Annual billing is $180/year ($15/month equivalent) and is not the monthly headline. The overview lists Plus as more Agent credits, the baseline that Pro lists as 2×, with 2 parallel Agent tasks. Goal Mode and a dedicated Kimi Claw are not included. Kimi Code has a rolling 5-hour limit and no weekly limit. Membership features share one credit pool. https://www.kimi.ai/help/membership/membership-overview The launch post says Kimi K3.1 Pro is available on Kimi.ai, Kimi Work, and Kimi Code (https://www.kimi.ai/blog/kimi-k3-1-pro). The Kimi Code membership table gives Plus and above K3.1 Pro access, and Pro and above the 1M context window (https://www.kimi.com/code/docs/en/kimi-code/membership.html).",
+      "note": "Annual billing is $180/year ($15/month equivalent) and is not the monthly headline. The overview lists Plus as more Agent credits, the baseline that Pro lists as 2×, with 2 parallel Agent tasks. Goal Mode and a dedicated Kimi Claw are not included. Kimi Code has a rolling 5-hour limit and no weekly limit. Membership features share one credit pool. https://www.kimi.ai/help/membership/membership-overview The launch post says Kimi K3.1 Pro is available on Kimi.ai, Kimi Work, and Kimi Code (https://www.kimi.ai/blog/kimi-k3-1-pro). The Kimi Code models page gives Plus access to k3.1-pro and publishes the 1,048,576-token window for Pro and above (https://www.kimi.com/code/docs/en/kimi-code/models). Plus's own token count is not on that page, so this roster does not include the 1,048,576-token catalog row.",
       "quota": "Baseline Agent credits; 2 parallel Agent tasks; rolling 5-hour Kimi Code limit and no weekly limit",
       "evidence": "Official relative limit",
       "confidence": "High",
@@ -1141,8 +1141,7 @@
       "cacheRatio": 0.25,
       "verifiedAt": "2026-10-26",
       "modelIds": [
-        "kimi-k3",
-        "kimi-k3-1-pro"
+        "kimi-k3"
       ],
       "access": [
         "chat-app",
@@ -1249,7 +1248,7 @@
       "kind": "Subscription",
       "monthly": 19,
       "source": "https://www.kimi.ai/help/membership/membership-pricing",
-      "note": "Shared Kimi membership pool; task counts are vendor estimates based on typical token use and are not API calls. Legacy plan for existing subscribers. Moderato, Allegretto, Allegro, and Vivace are legacy plans (https://www.kimi.ai/help/membership/membership-pricing). Legacy plans keep the weekly Kimi Code limit in addition to the rolling 5-hour limit (https://www.kimi.ai/help/membership/update-rules). Comparable current plan: Kimi Plus. The Kimi Code membership table gives Moderato and above K3.1 Pro access, and Allegretto and above the 1M context window (https://www.kimi.com/code/docs/en/kimi-code/membership.html). The launch post says Kimi K3.1 Pro is available on Kimi.ai, Kimi Work, and Kimi Code (https://www.kimi.ai/blog/kimi-k3-1-pro).",
+      "note": "Shared Kimi membership pool; task counts are vendor estimates based on typical token use and are not API calls. Legacy plan for existing subscribers. Moderato, Allegretto, Allegro, and Vivace are legacy plans (https://www.kimi.ai/help/membership/membership-pricing). Legacy plans keep the weekly Kimi Code limit in addition to the rolling 5-hour limit (https://www.kimi.ai/help/membership/update-rules). Comparable current plan: Kimi Plus. The Kimi Code models page gives Moderato access to k3.1-pro and publishes the 1,048,576-token window for Allegretto and above (https://www.kimi.com/code/docs/en/kimi-code/models). Moderato's own token count is not on that page, so this roster does not include the 1,048,576-token catalog row. The launch post says Kimi K3.1 Pro is available on Kimi.ai, Kimi Work, and Kimi Code (https://www.kimi.ai/blog/kimi-k3-1-pro).",
       "quota": "60 Agent credits; 1× Kimi Code credits; 2,000 database calls",
       "evidence": "Official relative limit",
       "confidence": "High",
@@ -1257,8 +1256,7 @@
       "cacheRatio": 0.25,
       "verifiedAt": "2026-10-26",
       "modelIds": [
-        "kimi-k3",
-        "kimi-k3-1-pro"
+        "kimi-k3"
       ],
       "access": [
         "chat-app",
