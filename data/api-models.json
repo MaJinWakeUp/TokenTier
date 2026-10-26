@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "updatedAt": "2026-10-22",
+  "updatedAt": "2026-10-26",
   "currency": "USD",
   "unit": "per-million-tokens",
   "capabilityIndex": {
@@ -489,8 +489,8 @@
       "output": 4,
       "context": "256K",
       "source": "https://www.kimi.com/en/resources/kimi-k2-7-code",
-      "verifiedAt": "2026-09-17",
-      "note": "Coding-specialized API; not ranked for general writing or research.",
+      "verifiedAt": "2026-10-26",
+      "note": "Coding-specialized API; not ranked for general writing or research. Kimi's pricing page says K2 series models are closed to newly registered users from October 31, 2026, and all K2 series models are planned to retire by the end of December 2026 (https://platform.kimi.ai/docs/pricing/chat). Existing users are unaffected until then. The row stays because OpenCode Go, Go Plus, and Zen still list it.",
       "capability": {
         "metrics": {
           "intelligence": 26
@@ -875,6 +875,27 @@
         "indexVersion": "4.3.2",
         "source": "https://artificialanalysis.ai/models/minimax-m3-1-flash",
         "verifiedAt": "2026-10-19"
+      }
+    },
+    {
+      "id": "kimi-k3-1-pro",
+      "provider": "Kimi",
+      "name": "Kimi K3.1 Pro",
+      "input": 2,
+      "cached": 0.2,
+      "output": 10,
+      "context": "1.048576M",
+      "contextTokens": 1048576,
+      "source": "https://platform.kimi.ai/docs/pricing/chat",
+      "verifiedAt": "2026-10-26",
+      "note": "Released October 23, 2026. API id `kimi-k3.1-pro`. One published rate applies across the full window. The pricing page states a 1,048,576-token context window, recorded as 1.048576M. Kimi bills cache misses, cache writes, and cache hits as separate slices of the same input tokens. The default 5-minute cache write is $2 per million tokens, the same as input, and the caching guide says that write was already included in the input price, so the stored input and cached rates cover the default. The optional 1-hour cache write is $4 per million tokens (https://platform.kimi.ai/docs/guide/context-caching). The separate id `kimi-k3.1-pro-highspeed` is not listed. Kimi K3 remains the previous-generation model. Quickstart default max completion tokens is 131,072 and can be set up to 1,048,576. Sources: https://platform.kimi.ai/docs/pricing/chat , https://platform.kimi.ai/docs/guide/kimi-k3-1-pro-quickstart , and https://www.kimi.ai/blog/kimi-k3-1-pro .",
+      "capability": {
+        "metrics": {
+          "intelligence": 55
+        },
+        "indexVersion": "4.3.2",
+        "source": "https://artificialanalysis.ai/models/kimi-k3-1-pro",
+        "verifiedAt": "2026-10-26"
       }
     }
   ]

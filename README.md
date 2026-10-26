@@ -258,6 +258,84 @@ date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
 
+## Catalog changes, October 26 2026
+
+Re-read from Kimi's pricing page and OpenCode Go's docs on October 26. One new
+model row. OpenCode Go and Go Plus gain three models those pages now list.
+Kimi K2.7 Code stays, with a retirement note. No model price changes, and no
+plan price changes.
+
+### Kimi K3.1 Pro
+
+[Chat pricing](https://platform.kimi.ai/docs/pricing/chat) lists `kimi-k3.1-pro`
+at $2.00 input / $0.20 cached input / $10.00 output per million tokens, one
+rate across a 1,048,576-token window, recorded as 1.048576M. Kimi bills cache
+misses, cache writes, and cache hits as separate slices of the same input
+tokens. The default 5-minute cache write is $2 per million tokens, the same
+as input, and the caching guide says that write was already included in the
+input price, so the stored rates cover it. The optional 1-hour write is $4
+per million tokens and stays in the note. Released October 23, 2026.
+[The quickstart](https://platform.kimi.ai/docs/guide/kimi-k3-1-pro-quickstart)
+and [the launch post](https://www.kimi.ai/blog/kimi-k3-1-pro) name the same
+model. [Artificial Analysis](https://artificialanalysis.ai/models/kimi-k3-1-pro)
+scores it 55 on Intelligence Index v4.3.2. Kimi K3 stays listed as the
+previous-generation model. The catalog row is `kimi-k3-1-pro` only.
+
+The $2 / $0.20 / $10 rate matches Claude Sonnet 5 and GPT-6 Sol, so the new
+row joins that price group. It takes **C** on daily use, easy coding, medium
+coding, and writing, and **B** on hard coding, research, and innovation. Every
+other model's letter stays put.
+
+### OpenCode Go and Go Plus
+
+[opencode.ai/docs/go](https://opencode.ai/docs/go/) and
+[opencode.ai/go](https://opencode.ai/go) add three rows. Existing caps stay as
+they were.
+
+| Model | Go monthly cap | Go Plus monthly cap |
+| --- | --- | --- |
+| Kimi K3.1 Pro | $15 | $60 |
+| Gemini 4 Argon | $30 | $120 |
+| MiniMax M3.1 Flash | $20 | $80 |
+
+Gemini 4 Argon is the paid catalog model. The Go table shows its token rates
+at 50% off through November 30, 2026, matching Google's introductory rate, and
+the stored caps are the printed $30 and $120. MiniMax M3.1 Flash is the paid
+catalog model at $20 and $80. The earlier free promo row is a different offer
+and stays unmapped.
+
+GLM-5.3-Flash still buys the most calls on daily use, easy coding, medium
+coding, and writing. GLM-5.3 still does on hard coding, research, and
+innovation. Working models stay those two, and every plan letter stays put.
+
+### Kimi K2.7 Code
+
+[Chat pricing](https://platform.kimi.ai/docs/pricing/chat) says K2 series
+models are closed to newly registered users from October 31, 2026, and all K2
+series models are planned to retire by the end of December 2026. The row
+stays, with that note. OpenCode Go, Go Plus, and Zen still list it. The score
+is 26, so the row stays off every scenario board. No letter moves.
+
+### Kimi membership rosters
+
+[The launch post](https://www.kimi.ai/blog/kimi-k3-1-pro) says Kimi K3.1 Pro is
+available on Kimi.ai, Kimi Work, and Kimi Code.
+[The Kimi Code models page](https://www.kimi.com/code/docs/en/kimi-code/models)
+gives Plus and Moderato access to `k3.1-pro` and publishes the 1,048,576-token
+window for Pro and Allegretto and above. It does not publish Plus's or
+Moderato's token count. The catalog has one K3.1 Pro row, and that row is the
+1,048,576-token model, so Plus and Moderato do not list it. Pro, Max, Ultra,
+Allegretto, Allegro, and Vivace do. Moderato, Allegretto, Allegro, and Vivace
+stay legacy and stay off the new-buyer board.
+
+K3 scores 44 and misses the 45 bar. K3.1 Pro scores 55. On hard coding,
+research, and innovation, Pro takes **A**, Max **B**, and Ultra **D**. Plus
+stays off those three boards. Removing Plus's $19 price from that curve moves
+Google AI Pro and Meta One Premium from **A** to **S**, and Kimi Max from
+**C** to **B**. Daily use, easy coding, medium coding, and writing already
+included these plans on K3, and those letters stay put. The quota remains a
+relative limit, so the new letters have unproven capacity.
+
 ## Catalog changes, October 22 2026
 
 Re-read from the providers' own pages on October 22. Four current Kimi plans
