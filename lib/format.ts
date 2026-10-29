@@ -99,7 +99,7 @@ export function planPrice(plan: Plan) {
 // Plus only; Pro plans have no five-hour limit and fall back to the plan quota.
 const chatgptMessageRanges: Record<string, Record<string, string>> = {
   "chatgpt-plus": {
-    "gpt-6-astra": "5–45", "gpt-6-1-sol": "15–160", "gpt-6-sol": "15–150", "gpt-6-luna": "350–3,000",
+    "gpt-6-astra": "5–45", "gpt-6-1-sol": "15–160", "gpt-6-1-terra": "35–285", "gpt-6-sol": "15–150", "gpt-6-luna": "350–3,000",
   },
 };
 

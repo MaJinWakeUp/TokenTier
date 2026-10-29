@@ -312,9 +312,9 @@ note on each of those plans says it is not in Chat. Business, Enterprise, and
 Edu are not plans in this catalog. On medium coding, hard coding, research,
 and innovation the four plans are now judged on GPT-6.1 Terra instead of
 GPT-6.1 Sol. Daily use, easy coding, and writing stay on GPT-6 Luna, which is
-cheaper and still clears those bars. Plus does not publish a five-hour message
-range for Terra, so those four lanes fall back to the plan's quota sentence.
-No plan changes tier letter.
+cheaper and still clears those bars. Plus publishes 35–285 GPT-6.1 Terra local
+messages per five hours, so those four lanes show that range. No plan changes
+tier letter.
 
 The [API credits guide](https://developers.openai.com/api/docs/guides/chatgpt-api-credits)
 and the October 28 changelog give Pro a monthly OpenAI API credit equal to
@@ -324,13 +324,15 @@ days old to claim them. Plus is not eligible, and its note still says API
 platform usage is billed separately. The three Pro plans record the credit the
 same way Claude Max does: `includedApiValue`, `apiCreditClaimAfterDays: 7`,
 and `apiIncluded` of "Scoped credits". Each also lists `api` next to
-`chat-app`. The credit is the allowance only when the comparison asks for
-direct API access, and that reading uses the roster's working model. On an
-easy-coding month that both $100 credits cover, ChatGPT Pro ($100) and Claude
-Max (5x) tie on price and the lower id selects Pro, priced on GPT-6 Luna.
-Chat, Work, and Codex estimates stay on the unpublished app quota, so the
-credit is not counted as coverage of those apps. A comparison that accepts
-any surface still reads Max both ways; Pro keeps the app-quota reading there.
+`chat-app`. The credit is the allowance when the comparison asks for direct API
+access, and when it accepts any surface. Both readings price the credit on
+the cheapest model from that provider that clears the bar, at the workload's
+cache share. On an easy-coding month that both $100 credits cover, ChatGPT
+Pro ($100) and Claude Max (5x) tie on price and the lower id selects Pro,
+priced on GPT-6 Luna. Hard coding prices Pro's credit on GPT-6.1 Terra,
+because Luna misses that bar. Chat, Work, and Codex estimates stay on the
+unpublished app quota, so the credit is not counted as coverage of those
+apps.
 
 ## Catalog changes, October 26 2026
 
