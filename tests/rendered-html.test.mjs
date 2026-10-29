@@ -283,11 +283,11 @@ test("the catalog stays in validated data files", async () => {
   assert.ok(planById.get("opencode-go").modelIds.length > 5, "OpenCode Go lists the models its rate card publishes");
   // The roster has to carry the frontier model the plan actually reaches, or the
   // plan is judged on a weaker model than a subscriber would use. GPT-6 Astra
-  // was in the model catalog but on no plan until the v4.3 pass. Since September
-  // 30 2026 the plan's own page lists only the four GPT-6 models.
+  // was in the model catalog but on no plan until the v4.3 pass. The pricing
+  // page now also lists GPT-6.1 Terra for Work and Codex, and not for Chat.
   assert.deepEqual(
     planById.get("chatgpt-plus").modelIds,
-    ["gpt-6-luna", "gpt-6-sol", "gpt-6-1-sol", "gpt-6-astra"],
+    ["gpt-6-luna", "gpt-6-sol", "gpt-6-1-sol", "gpt-6-astra", "gpt-6-1-terra"],
   );
   for (const id of ["chatgpt-plus", "chatgpt-pro-5x", "chatgpt-pro-20x", "chatgpt-pro-500"]) {
     assert.ok(planById.get(id).modelIds.includes("gpt-6-astra"), `${id} reaches GPT-6 Astra`);

@@ -258,6 +258,76 @@ date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
 
+## Catalog changes, October 29 2026
+
+Re-read from OpenAI's model page, pricing page, changelog, and the ChatGPT
+pricing and API-credits guides on October 29. One new model row. Three ChatGPT
+Pro plans gain a monthly API credit. No model price changes, and no plan price
+changes. GPT-5.6 Terra stays. Kimi K2.7 Code stays. Legacy Kimi, Cursor, and
+SuperGrok plans stay retired.
+
+### Added: GPT-6.1 Terra
+
+| | GPT-6.1 Terra |
+| --- | --- |
+| Provider | OpenAI |
+| Input / cached / output | $1 / $0.05 / $5 |
+| Context | 1.05M, 128K maximum output |
+| Index v4.3.2 | 51 (max) |
+
+Released October 26, 2026.
+[The model page](https://developers.openai.com/api/docs/models/gpt-6.1-terra)
+publishes $1 input / $0.05 cached input / $5 output per million tokens.
+Prompts with more than 272K input tokens are priced at 2x input and cache
+rates and 1.5x output for the full request. The long-context band is that
+multiplier applied to the published rates: $2 input / $0.10 cached / $7.50
+output, threshold 272001. 30-minute cache writes are $1.25 and 12-hour cache
+writes are $2.50; the catalog has no cache-write field, so those rates stay
+in the note.
+[Pricing](https://developers.openai.com/api/docs/pricing) and the
+[changelog](https://developers.openai.com/api/docs/changelog) name the same
+model.
+[Artificial Analysis](https://artificialanalysis.ai/models/gpt-6-1-terra)
+scores the max variant at 51 on Intelligence Index v4.3.2.
+
+It is the cheapest model that clears the 45 bar, so it takes **S** on hard
+coding and research. It is second-cheapest on innovation and also **S** there.
+It takes **A** on daily use, easy coding, and medium coding, and **B** on
+writing. Adding it recuts the curves:
+
+- Daily use and easy coding: GLM-5.3 falls from **A** to **B**.
+- Medium coding: Gemini 3.8 Flash falls from **A** to **B**.
+- Hard coding: Qwen3.8-Max falls from **S** to **A**; Grok 4.7 falls from **A** to **B**.
+- Research and innovation: Qwen3.8-Max falls from **S** to **A**; GPT-6.1 Sol and Claude Sonnet 5.5 fall from **A** to **B**.
+
+No other model letter moves. Cursor and OpenCode Zen, Go, and Go Plus do not
+list it.
+
+### ChatGPT rosters and Pro API credits
+
+[ChatGPT pricing](https://learn.chatgpt.com/docs/pricing) says GPT-6.1 Terra
+is available in Work and Codex on Plus, Pro, Business, Enterprise, and Edu,
+and not in Chat. Plus, Pro ($100), Pro ($200), and Pro ($500) list it. The
+note on each of those plans says it is not in Chat. Business, Enterprise, and
+Edu are not plans in this catalog. On medium coding, hard coding, research,
+and innovation the four plans are now judged on GPT-6.1 Terra instead of
+GPT-6.1 Sol. Daily use, easy coding, and writing stay on GPT-6 Luna, which is
+cheaper and still clears those bars. Plus does not publish a five-hour message
+range for Terra, so those four lanes fall back to the plan's quota sentence.
+No plan changes tier letter.
+
+The [API credits guide](https://developers.openai.com/api/docs/guides/chatgpt-api-credits)
+and the October 28 changelog give Pro a monthly OpenAI API credit equal to
+the subscription price: $100, $200, and $500. The credits expire at the end of
+the billing cycle and do not roll over. The subscription must be at least 7
+days old to claim them. Plus is not eligible, and its note still says API
+platform usage is billed separately. The three Pro plans record the credit the
+same way Claude Max does: `includedApiValue`, `apiCreditClaimAfterDays: 7`,
+and `apiIncluded` of "Scoped credits". Each also lists `api` next to
+`chat-app`. The credit is the allowance only when the comparison asks for
+direct API access. Chat, Work, and Codex estimates stay on the unpublished
+app quota, so the credit is not counted as coverage of those apps.
+
 ## Catalog changes, October 26 2026
 
 Re-read from Kimi's pricing page and OpenCode Go's docs on October 26. One new
