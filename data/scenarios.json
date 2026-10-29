@@ -39,8 +39,8 @@
       "planPriceCap": 30,
       "gate": {
         "metric": "intelligence",
-        "minIndex": 27,
-        "anchor": "gemini-3-1-pro",
+        "minIndex": 18,
+        "anchor": "deepseek-v4-pro",
         "rationale": "Everyday questions still need a model that will not confidently invent an answer, which rules out the small-model tier."
       }
     },
@@ -56,8 +56,8 @@
       "planPriceCap": 30,
       "gate": {
         "metric": "intelligence",
-        "minIndex": 27,
-        "anchor": "gemini-3-1-pro",
+        "minIndex": 18,
+        "anchor": "deepseek-v4-pro",
         "rationale": "Even a self-contained function has to compile and pass its own test, so the bar sits above the small-model tier.",
         "preferredMetric": "codingAgent"
       }
@@ -74,8 +74,8 @@
       "planPriceCap": 100,
       "gate": {
         "metric": "intelligence",
-        "minIndex": 38,
-        "anchor": "claude-sonnet-5",
+        "minIndex": 29,
+        "anchor": "minimax-m3-1-flash",
         "rationale": "Shipping a multi-file feature means holding several files in mind at once; below this bar the edits stop being coherent with each other.",
         "preferredMetric": "codingAgent"
       }
@@ -92,7 +92,7 @@
       "planPriceCap": 200,
       "gate": {
         "metric": "intelligence",
-        "minIndex": 45,
+        "minIndex": 32,
         "anchor": "glm-5-3",
         "rationale": "An unfamiliar large repository punishes weak reasoning quietly, so hard coding admits only the frontier tier.",
         "preferredMetric": "codingAgent"
@@ -110,7 +110,7 @@
       "planPriceCap": 200,
       "gate": {
         "metric": "intelligence",
-        "minIndex": 45,
+        "minIndex": 32,
         "anchor": "glm-5-3",
         "rationale": "Holding a long document together and citing it accurately fails quietly rather than loudly, so research sits at the frontier bar.",
         "preferredMetric": "longContext"
@@ -128,8 +128,8 @@
       "planPriceCap": 100,
       "gate": {
         "metric": "intelligence",
-        "minIndex": 35,
-        "anchor": "gpt-5-6-luna",
+        "minIndex": 26,
+        "anchor": "mistral-large-4",
         "rationale": "Copy that ships without a rewrite needs more than fluent text, but it does not need frontier reasoning."
       }
     },
@@ -145,7 +145,7 @@
       "planPriceCap": 200,
       "gate": {
         "metric": "intelligence",
-        "minIndex": 45,
+        "minIndex": 32,
         "anchor": "glm-5-3",
         "rationale": "Novel ideation is where frontier capability separates from competence, so innovation admits only the frontier tier.",
         "preferredMetric": "agentic"
