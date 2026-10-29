@@ -385,7 +385,12 @@ test("Accepting any surface never reads a Max plan worse than API-only", () => {
     assert.equal(any.workingModel.id, api.workingModel.id);
     assert.match(any.estimate.basis.label, /Included API credit/);
   }
-  assert.equal(apiOnly.plans.best?.plan.id, "claude-max-5x");
+  // Pro ($100) carries the same monthly price and an API credit that covers this
+  // easy month on GPT-6 Luna, so the lower id wins the tie with Max 5x.
+  assert.equal(apiOnly.plans.best?.plan.id, "chatgpt-pro-5x");
+  const proApi = apiOnly.plans.evaluations.find((row) => row.plan.id === "chatgpt-pro-5x");
+  assert.equal(proApi.workingModel.id, "gpt-6-luna", "Pro's API credit is priced on the roster model that clears the bar");
+  assert.equal(proApi.estimate.basis.kind, "allowance");
   assert.equal(anySurface.plans.best?.plan.id, "claude-max-5x", "a looser surface must not pick a $200 plan over a $100 one");
 
   // Where the app quota is the only surface asked for, the credit still does not count.

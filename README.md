@@ -325,8 +325,12 @@ platform usage is billed separately. The three Pro plans record the credit the
 same way Claude Max does: `includedApiValue`, `apiCreditClaimAfterDays: 7`,
 and `apiIncluded` of "Scoped credits". Each also lists `api` next to
 `chat-app`. The credit is the allowance only when the comparison asks for
-direct API access. Chat, Work, and Codex estimates stay on the unpublished
-app quota, so the credit is not counted as coverage of those apps.
+direct API access, and that reading uses the roster's working model. On an
+easy-coding month that both $100 credits cover, ChatGPT Pro ($100) and Claude
+Max (5x) tie on price and the lower id selects Pro, priced on GPT-6 Luna.
+Chat, Work, and Codex estimates stay on the unpublished app quota, so the
+credit is not counted as coverage of those apps. A comparison that accepts
+any surface still reads Max both ways; Pro keeps the app-quota reading there.
 
 ## Catalog changes, October 26 2026
 
