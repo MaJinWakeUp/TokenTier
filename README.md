@@ -54,14 +54,15 @@ holds the workload's tokens. A plan that publishes a different monthly dollar
 cap per model is the exception: it is judged on the eligible model whose cap
 buys the most calls. That model then supplies the plan's capability score, its
 capacity estimate and its tier, and the interface names it (`via
-GLM-5.3-Flash`) wherever a plan number is shown.
+MiniMax M3.1 Flash`) wherever a plan number is shown.
 
 The effect is largest where a plan spans a wide price range. OpenCode Go's
-daily-use card is GLM-5.3-Flash at its $60 cap, about 111,000 calls. Haiku is
-cheaper per call, but its $15 cap buys fewer of them. Hard coding misses
-Flash, so the plan is judged on GLM-5.3 at its $15 cap, about 114 calls
-against a 1,500-call profile. The same subscription is generous for light work
-and short for heavy work. Judging it on one model hid both facts.
+daily-use card is MiniMax M3.1 Flash at its $20 cap, about 33,000 calls. Hard
+coding misses that model, so the plan is judged on Claude Haiku 5.5 at its $15
+cap, about 1,400 calls against a 1,500-call profile. The same subscription is
+generous for light work and close to the hard-coding profile on the monthly
+dollar cap. Both cards stay conditional, because the allowance is also capped
+on a five-hour window and a weekly window.
 
 A plan whose models all fall below a scenario's bar is off that board, and the
 reason names its closest miss.
@@ -107,7 +108,7 @@ Tiers are derived, never hand-graded. Two independent judgements are kept apart:
 1. **Can it do the work?** Every scenario in `data/scenarios.json` declares a
    minimum score on an external capability index — currently the
    [Artificial Analysis Intelligence Index](https://artificialanalysis.ai/),
-   a 0–100 composite of ten published evaluations. A model must clear that bar
+   a 0–100 composite of nine published evaluations. A model must clear that bar
    and hold the scenario's tokens in its context window to appear on the board.
    The bar is absolute, because "can it do this task" has a fixed answer.
 2. **Is it worth the money?** Among the options that cleared the bar, S/A/B/C/D
@@ -257,6 +258,173 @@ tier lists, recommendations, cost list, price book, source links, and update
 date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
+
+## Catalog changes, October 29 2026, Intelligence Index v5.0
+
+Rebased the catalog from Artificial Analysis Intelligence Index v4.3.2 onto
+**v5.0**, released October 27, 2026.
+[The methodology page](https://artificialanalysis.ai/methodology/intelligence-benchmarking)
+names it "Artificial Analysis Intelligence Index v5.0" and says it incorporates
+9 evaluations: AA-Briefcase v1.1, AutomationBench-AA, GDP.pdf, FrontierCode 2.0,
+Terminal-Bench 4.0, AA-Omniscience v1.1, HLE-Diamond, CritPt v2 (Hard Subset),
+and Terminal-Bench-Science 0.1.0. `capabilityIndex.version` is `5.0`. The scale
+line is "0-100 composite of nine published evaluations". No prices, rosters, or
+plan records changed. Gemini 4 Carbon leads the new index at 59 and is outside
+this catalog, so this pass does not add it.
+
+### How the bars moved
+
+Scores are not comparable across index versions, so every scenario bar moved
+with the scale. Where the anchor still has a v5.0 score, the bar moved by that
+anchor's delta and the gap stayed put. GLM-5.3 is the anchor for hard coding,
+research, and innovation. It fell from 45 to 32, a delta of −13, and those three
+bars moved from 45 to **32**. The gap stays 0.
+
+Daily use, easy coding, medium coding, and writing were anchored on models
+Artificial Analysis no longer scores (Gemini 3.1 Pro, Claude Sonnet 5, and
+GPT-5.6 Luna). Those bars cannot follow an anchor delta. They moved by the
+median delta of the 20 models published on both versions. Sorted deltas are
+−15, −13, −13, −13, −12, −12, −12, −11, −10, −9, −9, −9, −7, −4, −3, −2, 0, 0,
+3, 4. The median of the 10th and 11th is **−9**. Daily and easy coding moved
+from 27 to **18**. Medium coding moved from 38 to **29**. Writing moved from 35
+to **26**.
+
+An unscored model cannot stay an anchor. The replacement is the scored model
+with the smallest nonnegative headroom over the new bar, with an id tie-break.
+Daily and easy coding anchor on DeepSeek V4 Pro (23). Medium coding anchors on
+MiniMax M3.1 Flash (29), ahead of Step 5 Preview at the same score. Writing
+anchors on Mistral Large 4 (26). Hard coding, research, and innovation stay on
+GLM-5.3.
+
+Among the 20 models scored on both versions, daily and easy coding keep the
+same qualifiers. Medium coding loses Mistral Large 4, which fell 12 points
+while the bar fell 9. Writing loses DeepSeek V4 Pro, which fell 13 points while
+the bar fell 9. Hard coding, research, and innovation gain Claude Haiku 5.5,
+which fell 7 points while the frontier bar fell 13.
+
+### Scores
+
+Each number is the headline Intelligence Index on the model page the catalog
+already cited, read October 29, 2026, at the same effort variant. A page that
+shows N/A is recorded as `capability: null` with a note. No score was guessed.
+
+| Model | v4.3.2 | v5.0 | Variant |
+| --- | --- | --- | --- |
+| GPT-6 Astra | 53 | **57** | max |
+| Claude Fable 5.1 | 53 | **49** | max |
+| Gemini 3.8 Flash | 41 | **31** | high |
+| DeepSeek V4 Pro | 36 | **23** | max |
+| GLM-5.3 | 45 | **32** | max |
+| Muse Spark 1.3 | 48 | **36** | max |
+| Qwen3.8-Max | 45 | **34** | — |
+| Grok 4.7 | 46 | **34** | xhigh |
+| Step 5 Preview | 44 | **29** | — |
+| Claude Opus 5.5 | 58 | 58 | max |
+| GPT-6 Luna | 37 | **28** | max |
+| GPT-6.1 Sol | 52 | **55** | max |
+| Claude Sonnet 5.5 | 56 | **54** | max |
+| Claude Haiku 5.5 | 43 | **36** | max |
+| Mistral Large 4 | 38 | **26** | reasoning → **high** |
+| Gemini 4 Argon | 53 | **50** | high |
+| Muse Wonder | 52 | **43** | max |
+| MiniMax M3.1 Flash | 42 | **29** | — |
+| Kimi K3.1 Pro | 55 | **46** | — |
+| GPT-6.1 Terra | 51 | 51 | max |
+
+The Mistral Large 4 page the catalog already cites now titles the model
+"Mistral Large 4 (high)" and scores 26, so the variant field is `high`. The
+DeepSeek V4 Pro page at the same URL now titles "DeepSeek V4 Pro 0813 (max)"
+and scores 23. The catalog name stays DeepSeek V4 Pro. Grok 4.7 stays on the
+xhigh page, which scores 34.
+
+### No v5.0 score
+
+These rows stay listed and priced. `capability` is `null`, and the note says
+Artificial Analysis does not publish an Intelligence Index v5.0 score, checked
+2026-10-29.
+
+- GPT-5.6 Sol, GPT-5.6 Terra, GPT-5.6 Luna
+- Claude Opus 5, Claude Sonnet 5, Claude Haiku 4.5
+- Gemini 3.1 Pro
+- Grok 4.6, Grok 4.5
+- Mistral Large 3
+- GLM-5.3-Flash
+- Kimi K3, Kimi K2.7 Code
+- DeepSeek V4.1 Flash
+- GPT-6 Sol
+
+DeepSeek V4.1 Flash is N/A at
+`https://artificialanalysis.ai/models/deepseek-v4-1-flash`. The separate
+snapshot
+`https://artificialanalysis.ai/models/deepseek-v4-1-flash-1017` scores 32. That
+page is a different row, so 32 is not copied here. Grok Build 0.1 and Codestral
+were already unscored. Artificial Analysis has no model page for either, so
+v5.0 does not score them.
+
+### Grade changes
+
+Letters are still the cost curve among models that clear the bar. A cell shows
+the v4.3.2 letter, then the v5.0 letter when it moved. `below` means the model
+has a score and misses the bar. `unscored` means `capability` is null.
+
+| Model | v4.3.2 | v5.0 | Daily | Easy | Medium | Hard | Research | Writing | Innovation |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| GPT-6 Astra | 53 | 57 | D | D | D | D | D | D | D |
+| GPT-5.6 Sol | 47 | — | D→unscored | D→unscored | D→unscored | C→unscored | C→unscored | D→unscored | C→unscored |
+| GPT-5.6 Terra | 42 | — | C→unscored | C→unscored | C→unscored | below→unscored | below→unscored | C→unscored | below→unscored |
+| GPT-5.6 Luna | 37 | — | S→unscored | S→unscored | below→unscored | below→unscored | below→unscored | S→unscored | below→unscored |
+| Claude Opus 5 | 51 | — | D→unscored | D→unscored | D→unscored | C→unscored | C→unscored | D→unscored | C→unscored |
+| Claude Fable 5.1 | 53 | 49 | D | D | D | D | D | D | D |
+| Claude Sonnet 5 | 38 | — | C→unscored | C→unscored | C→unscored | below→unscored | below→unscored | C→unscored | below→unscored |
+| Claude Haiku 4.5 | 15 | — | below→unscored | below→unscored | below→unscored | below→unscored | below→unscored | below→unscored | below→unscored |
+| Gemini 3.1 Pro | 30 | — | C→unscored | C→unscored | below→unscored | below→unscored | below→unscored | below→unscored | below→unscored |
+| Gemini 3.8 Flash | 41 | 31 | B→C | B | B | below | below | B→C | below |
+| Grok 4.6 | 44 | — | B→unscored | B→unscored | B→unscored | below→unscored | below→unscored | B→unscored | below→unscored |
+| Grok 4.5 | 39 | — | B→unscored | B→unscored | B→unscored | below→unscored | below→unscored | B→unscored | below→unscored |
+| Grok Build 0.1 | — | — | unscored | unscored | unscored | unscored | unscored | unscored | unscored |
+| DeepSeek V4 Pro | 36 | 23 | A→S | A→S | below | below | below | A→below | below |
+| Mistral Large 3 | 9 | — | below→unscored | below→unscored | below→unscored | below→unscored | below→unscored | below→unscored | below→unscored |
+| Codestral | — | — | unscored | unscored | unscored | unscored | unscored | unscored | unscored |
+| GLM-5.3 | 45 | 32 | B | B | A | S→A | S→A | A | S→A |
+| GLM-5.3-Flash | 42 | — | S→unscored | S→unscored | S→unscored | below→unscored | below→unscored | S→unscored | below→unscored |
+| Kimi K3 | 44 | — | C→unscored | C→unscored | C→unscored | below→unscored | below→unscored | C→unscored | below→unscored |
+| Kimi K2.7 Code | 26 | — | below→unscored | below→unscored | below→unscored | below→unscored | below→unscored | below→unscored | below→unscored |
+| Muse Spark 1.3 | 48 | 36 | A | A | A | S | S | A | S |
+| Qwen3.8-Max | 45 | 34 | B | B | B | A | A | B | A |
+| DeepSeek V4.1 Flash | 39 | — | S→unscored | S→unscored | S→unscored | below→unscored | below→unscored | S→unscored | below→unscored |
+| Grok 4.7 | 46 | 34 | B | B→C | B | B | A→B | B | A→B |
+| Step 5 Preview | 44 | 29 | A→S | A→S | S | below | below | A→S | below |
+| Claude Opus 5.5 | 58 | 58 | C→D | C→D | C | B→C | B→C | C→D | B→C |
+| GPT-6 Sol | 48 | — | C→unscored | C→unscored | C→unscored | B→unscored | B→unscored | C→unscored | B→unscored |
+| GPT-6 Luna | 37 | 28 | S | S | below | below | below | S | below |
+| GPT-6.1 Sol | 52 | 55 | C | C | B→C | A→B | B | C | B |
+| Claude Sonnet 5.5 | 56 | 54 | C | C | B→C | A→B | B | C | B |
+| Claude Haiku 5.5 | 43 | 36 | S | S | S | below→S | below→S | S | below→S |
+| Mistral Large 4 | 38 | 26 | A | A | A→below | below | below | A | below |
+| Gemini 4 Argon | 53 | 50 | C→D | C→D | C | B→C | B→C | C→D | B→C |
+| Muse Wonder | 52 | 43 | C→D | C→D | C | B→C | B→C | C→D | B→C |
+| MiniMax M3.1 Flash | 42 | 29 | S | S | S | below | below | S | below |
+| Kimi K3.1 Pro | 55 | 46 | C | C | C | B→C | B→C | C | B→C |
+| GPT-6.1 Terra | 51 | 51 | A | A | A | S | S | B | S |
+
+### What that does to plans
+
+Plan letters move only where the qualifying population changed.
+
+- Daily use and easy coding: ChatGPT Plus and Claude Pro rise from **C** to **B**. Kimi Plus leaves both boards, because its only roster model, Kimi K3, has no v5.0 score.
+- Medium coding and writing: Kimi Plus leaves the boards. It was **S** on both.
+- Hard coding, research, and innovation: Kimi Plus was already below the bar. It is now unscored. Kimi Pro, Max, and Ultra stay put, because they include Kimi K3.1 Pro at 46.
+
+Working models move where the previous choice lost its score or a newly eligible cheaper model clears the bar.
+
+- OpenCode Go and Go Plus: daily use and writing use MiniMax M3.1 Flash ($20 and $80 caps). Easy coding, medium coding, hard coding, research, and innovation use Claude Haiku 5.5 ($15 and $60 caps). Go stays **S** on every lane. Go Plus stays over the price ceiling on daily use and easy coding, and **B** on the other five.
+- GLM Coding Lite, Pro, and Max: daily use, easy coding, medium coding, and writing move from GLM-5.3-Flash to GLM-5.3. Letters do not move.
+- X Subscription Premium, Super, and Ultra: daily use, easy coding, medium coding, and writing move from Grok 4.5 to Grok 4.7. Letters do not move.
+- OpenCode Zen: hard coding, research, and innovation move from Muse Spark 1.3 to Claude Haiku 5.5. Zen is unpriced, so it has no letter.
+- Legacy Cursor Pro, Pro+, and Ultra: hard coding, research, and innovation move from Grok 4.7 to Claude Haiku 5.5. They stay off the new-buyer board.
+- Legacy SuperGrok Lite, Super, Plus, and Heavy, plus Kimi Plus and legacy Kimi Moderato: daily use, easy coding, medium coding, and writing have no scored model left on the roster.
+
+ChatGPT Plus and the three Pro plans stay on GPT-6 Luna for daily use, easy coding, and writing, and on GPT-6.1 Terra for medium coding, hard coding, research, and innovation. Claude Max prices its API credit on Haiku 5.5 for hard coding, because Haiku now clears that bar and is cheaper than Sonnet 5.5. The chat roster stays Sonnet 5.5.
 
 ## Catalog changes, October 29 2026
 

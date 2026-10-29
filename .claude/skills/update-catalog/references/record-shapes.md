@@ -24,11 +24,11 @@ Optional: `note`, `rateBands`, `unsupportedBeyond`.
   "verifiedAt": "2026-09-06",
   "note": "Released 3 September 2026. Maximum output is 128K tokens.",
   "capability": {
-    "metrics": { "intelligence": 53 },
-    "indexVersion": "4.3",
+    "metrics": { "intelligence": 57 },
+    "indexVersion": "5.0",
     "variant": "max",
     "source": "https://artificialanalysis.ai/models/gpt-6-astra",
-    "verifiedAt": "2026-09-09"
+    "verifiedAt": "2026-10-29"
   }
 }
 ```
