@@ -385,12 +385,36 @@ test("Accepting any surface never reads a Max plan worse than API-only", () => {
     assert.equal(any.workingModel.id, api.workingModel.id);
     assert.match(any.estimate.basis.label, /Included API credit/);
   }
-  assert.equal(apiOnly.plans.best?.plan.id, "claude-max-5x");
-  assert.equal(anySurface.plans.best?.plan.id, "claude-max-5x", "a looser surface must not pick a $200 plan over a $100 one");
+  // Pro ($100) carries the same monthly price and an API credit that covers this
+  // easy month on GPT-6 Luna, so the lower id wins the tie with Max 5x.
+  // Any surface keeps that credit reading, so it cannot fall back to Max 20x.
+  assert.equal(apiOnly.plans.best?.plan.id, "chatgpt-pro-5x");
+  const proApi = apiOnly.plans.evaluations.find((row) => row.plan.id === "chatgpt-pro-5x");
+  assert.equal(proApi.workingModel.id, "gpt-6-luna", "Pro's API credit is priced on the cheapest OpenAI model that clears the bar");
+  assert.equal(proApi.estimate.basis.kind, "allowance");
+  const proAny = anySurface.plans.evaluations.find((row) => row.plan.id === "chatgpt-pro-5x");
+  assert.equal(proAny.coverage, proApi.coverage, "Pro keeps its API-credit coverage under any");
+  assert.equal(proAny.workingModel.id, proApi.workingModel.id);
+  assert.match(proAny.estimate.basis.label, /Included API credit/);
+  assert.equal(anySurface.plans.best?.plan.id, "chatgpt-pro-5x", "a looser surface must not pick a $200 plan over a $100 one");
 
   // Where the app quota is the only surface asked for, the credit still does not count.
   const chat = recommend(catalog, scenario, { ...workload, access: "chat-app" }, "cost");
   assert.notEqual(chat.plans.best?.plan.id, "claude-max-5x");
+  const proChat = chat.plans.evaluations.find((row) => row.plan.id === "chatgpt-pro-5x");
+  assert.equal(proChat.estimate.basis.kind, "unknown-quota", "Pro's chat quota stays unproven");
+  assert.equal(proChat.workingModel.id, "gpt-6-luna", "Pro's chat roster stays Luna on easy coding");
+
+  const hard = scenarioDoc.scenarios.find((entry) => entry.id === "code-hard");
+  const proHard = recommend(catalog, hard, {
+    ...workload,
+    scenarioId: hard.id,
+    input: hard.input,
+    output: hard.output,
+    calls: hard.calls,
+    cacheRatio: hard.cacheRatio,
+  }, "cost").plans.evaluations.find((row) => row.plan.id === "chatgpt-pro-5x");
+  assert.equal(proHard.workingModel.id, "gpt-6-1-terra", "Luna misses the hard-coding bar, so Pro's credit uses Terra");
 });
 
 test("an API-credit wait must be a whole number of days on a plan with a credit", () => {

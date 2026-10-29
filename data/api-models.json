@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "updatedAt": "2026-10-26",
+  "updatedAt": "2026-10-29",
   "currency": "USD",
   "unit": "per-million-tokens",
   "capabilityIndex": {
@@ -897,6 +897,37 @@
         "source": "https://artificialanalysis.ai/models/kimi-k3-1-pro",
         "verifiedAt": "2026-10-26"
       }
+    },
+    {
+      "id": "gpt-6-1-terra",
+      "provider": "OpenAI",
+      "name": "GPT-6.1 Terra",
+      "input": 1,
+      "cached": 0.05,
+      "output": 5,
+      "context": "1.05M",
+      "contextTokens": 1050000,
+      "maxOutputTokens": 128000,
+      "source": "https://developers.openai.com/api/docs/models/gpt-6.1-terra",
+      "verifiedAt": "2026-10-29",
+      "note": "Released October 26, 2026. Published short-context rate is $1 input / $0.05 cached / $5 output. The model page states that prompts with more than 272K input tokens are priced at 2x input and cache rates and 1.5x output for the full request. The long-context band ($2 input / $0.10 cached / $7.50 output) is derived from that multiplier applied to the published $1 / $0.05 / $5 rates. 30-minute cache writes are $1.25 per million tokens and 12-hour cache writes are $2.50. Maximum output is 128K tokens. GPT-5.6 Terra remains available. Sources: https://developers.openai.com/api/docs/models/gpt-6.1-terra , https://developers.openai.com/api/docs/pricing , and https://developers.openai.com/api/docs/changelog .",
+      "capability": {
+        "metrics": {
+          "intelligence": 51
+        },
+        "indexVersion": "4.3.2",
+        "variant": "max",
+        "source": "https://artificialanalysis.ai/models/gpt-6-1-terra",
+        "verifiedAt": "2026-10-29"
+      },
+      "rateBands": [
+        {
+          "input": 2,
+          "cached": 0.1,
+          "output": 7.5,
+          "threshold": 272001
+        }
+      ]
     }
   ]
 }

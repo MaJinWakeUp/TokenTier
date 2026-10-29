@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-10-26",
+  "updatedAt": "2026-10-29",
   "currency": "USD",
   "plans": [
     {
@@ -10,18 +10,19 @@
       "kind": "Subscription",
       "monthly": 20,
       "source": "https://learn.chatgpt.com/docs/pricing",
-      "note": "Covers ChatGPT, Work and Codex; API platform usage is billed separately. OpenAI publishes a per-model range of local messages per five hours, and weekly limits may also apply.",
+      "note": "Covers ChatGPT, Work and Codex; API platform usage is billed separately. Plus is not eligible for the monthly OpenAI API credits on Pro (https://developers.openai.com/api/docs/guides/chatgpt-api-credits). OpenAI publishes a per-model range of local messages per five hours, and weekly limits may also apply. The pricing page says GPT-6.1 Terra is available in Work and Codex on Plus, Pro, Business, Enterprise, and Edu, and not in Chat (https://learn.chatgpt.com/docs/pricing).",
       "quota": "Per-model local-message ranges per five hours; weekly limits may also apply",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.25,
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-29",
       "modelIds": [
         "gpt-6-luna",
         "gpt-6-sol",
         "gpt-6-1-sol",
-        "gpt-6-astra"
+        "gpt-6-astra",
+        "gpt-6-1-terra"
       ],
       "access": [
         "chat-app"
@@ -40,21 +41,25 @@
       "kind": "Subscription",
       "monthly": 100,
       "source": "https://learn.chatgpt.com/docs/pricing",
-      "note": "Everything in Plus, with no five-hour limit. OpenAI no longer publishes how much more usage Pro gives than Plus, so capacity cannot be converted to calls.",
+      "note": "Everything in Plus, with no five-hour limit. OpenAI no longer publishes how much more usage Pro gives than Plus, so capacity cannot be converted to calls. Each billing cycle includes $100 of OpenAI API credits (https://developers.openai.com/api/docs/guides/chatgpt-api-credits). The credits expire at the end of the billing cycle with no rollover and are not this plan's Chat, Work, or Codex allowance. A subscription must be at least 7 days old to claim them; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Plus is not eligible. The pricing page says GPT-6.1 Terra is available in Work and Codex on Plus, Pro, Business, Enterprise, and Edu, and not in Chat (https://learn.chatgpt.com/docs/pricing).",
       "quota": "No five-hour limit; weekly limits may apply and are not published",
       "evidence": "Official relative limit",
       "confidence": "Low",
-      "apiIncluded": "No",
+      "apiIncluded": "Scoped credits",
       "cacheRatio": 0.35,
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-29",
+      "includedApiValue": 100,
+      "apiCreditClaimAfterDays": 7,
       "modelIds": [
         "gpt-6-luna",
         "gpt-6-sol",
         "gpt-6-1-sol",
-        "gpt-6-astra"
+        "gpt-6-astra",
+        "gpt-6-1-terra"
       ],
       "access": [
-        "chat-app"
+        "chat-app",
+        "api"
       ],
       "quotaDetail": {
         "kind": "unknown",
@@ -70,21 +75,25 @@
       "kind": "Subscription",
       "monthly": 200,
       "source": "https://learn.chatgpt.com/docs/pricing",
-      "note": "Everything in Plus, with no five-hour limit. OpenAI no longer publishes how much more usage Pro gives than Plus, so capacity cannot be converted to calls.",
+      "note": "Everything in Plus, with no five-hour limit. OpenAI no longer publishes how much more usage Pro gives than Plus, so capacity cannot be converted to calls. Each billing cycle includes $200 of OpenAI API credits (https://developers.openai.com/api/docs/guides/chatgpt-api-credits). The credits expire at the end of the billing cycle with no rollover and are not this plan's Chat, Work, or Codex allowance. A subscription must be at least 7 days old to claim them; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Plus is not eligible. The pricing page says GPT-6.1 Terra is available in Work and Codex on Plus, Pro, Business, Enterprise, and Edu, and not in Chat (https://learn.chatgpt.com/docs/pricing).",
       "quota": "No five-hour limit; weekly limits may apply and are not published",
       "evidence": "Official relative limit",
       "confidence": "Low",
-      "apiIncluded": "No",
+      "apiIncluded": "Scoped credits",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-09-30",
+      "verifiedAt": "2026-10-29",
+      "includedApiValue": 200,
+      "apiCreditClaimAfterDays": 7,
       "modelIds": [
         "gpt-6-luna",
         "gpt-6-sol",
         "gpt-6-1-sol",
-        "gpt-6-astra"
+        "gpt-6-astra",
+        "gpt-6-1-terra"
       ],
       "access": [
-        "chat-app"
+        "chat-app",
+        "api"
       ],
       "quotaDetail": {
         "kind": "unknown",
@@ -100,20 +109,24 @@
       "kind": "Subscription",
       "monthly": 500,
       "source": "https://learn.chatgpt.com/docs/pricing",
-      "note": "Everything in Plus, with no five-hour limit. OpenAI no longer publishes how much more usage Pro gives than Plus, so capacity cannot be converted to calls. Adds GPT-6 Astra Ultrafast, which draws included usage at 8x the Standard rate.",
+      "note": "Everything in Plus, with no five-hour limit. OpenAI no longer publishes how much more usage Pro gives than Plus, so capacity cannot be converted to calls. Adds GPT-6 Astra Ultrafast, which draws included usage at 8x the Standard rate. Each billing cycle includes $500 of OpenAI API credits (https://developers.openai.com/api/docs/guides/chatgpt-api-credits). The credits expire at the end of the billing cycle with no rollover and are not this plan's Chat, Work, or Codex allowance. A subscription must be at least 7 days old to claim them; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Plus is not eligible. The pricing page says GPT-6.1 Terra is available in Work and Codex on Plus, Pro, Business, Enterprise, and Edu, and not in Chat (https://learn.chatgpt.com/docs/pricing).",
       "quota": "No five-hour limit; weekly limits may apply and are not published",
       "evidence": "Official relative limit",
       "confidence": "Low",
-      "apiIncluded": "No",
-      "verifiedAt": "2026-09-30",
+      "apiIncluded": "Scoped credits",
+      "verifiedAt": "2026-10-29",
+      "includedApiValue": 500,
+      "apiCreditClaimAfterDays": 7,
       "modelIds": [
         "gpt-6-luna",
         "gpt-6-sol",
         "gpt-6-1-sol",
-        "gpt-6-astra"
+        "gpt-6-astra",
+        "gpt-6-1-terra"
       ],
       "access": [
-        "chat-app"
+        "chat-app",
+        "api"
       ],
       "quotaDetail": {
         "kind": "unknown",

@@ -776,6 +776,9 @@ test("ChatGPT quotas never describe a model other than the working model", () =>
         assert.ok(!quota.includes(name), `${plan.id} on ${scenario.id} is judged via ${working?.name} but its quota mentions ${name}: ${quota}`);
       }
       if (/Pro/.test(plan.name)) assert.match(quota, /No five-hour limit/, `${plan.id} reflects Pro's published no-five-hour-limit terms`);
+      if (plan.id === "chatgpt-plus" && working?.id === "gpt-6-1-terra") {
+        assert.equal(quota, "35–285 GPT-6.1 Terra local messages / 5h");
+      }
     }
   }
 });

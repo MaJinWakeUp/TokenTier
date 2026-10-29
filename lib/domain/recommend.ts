@@ -96,18 +96,19 @@ function evaluateModel(
   };
 }
 
-// The Claude API credit can be spent on any Anthropic model the catalog prices,
-// not only the models included in the Max app. A shared dollar pool buys the
-// most calls on the cheapest model that clears the bar. Cost uses the
-// workload's cache share, not the app plan's cache behaviour.
-function anthropicApiCreditModel(
+// A scoped API credit can be spent on any catalog model from that provider,
+// not only the models on the app roster. A shared dollar pool buys the most
+// calls on the cheapest model that clears the bar. Cost uses the workload's
+// cache share, not the app plan's cache behaviour.
+function providerApiCreditModel(
+  plan: Plan,
   scenario: Scenario,
   settings: UsageSettings,
   modelById: Map<string, Model>,
 ): Model | null {
   const requiredTokens = settings.input + settings.output;
   const eligible = [...modelById.values()].filter((model) =>
-    model.provider === "Anthropic"
+    model.provider === plan.provider
     && gateModel(model, scenario, requiredTokens, settings.output) === null
     && !Number.isNaN(callCost(model, settings)),
   );
@@ -117,11 +118,10 @@ function anthropicApiCreditModel(
   )[0];
 }
 
-// A monthly API credit next to a relative app limit (Claude Max). It counts
-// only where direct API use is acceptable.
+// A monthly API credit next to a relative or unpublished app limit (Claude Max,
+// ChatGPT Pro). It counts only where direct API use is acceptable.
 function hasScopedApiCredit(plan: Plan): boolean {
-  return plan.provider === "Anthropic"
-    && plan.includedApiValue !== undefined
+  return plan.includedApiValue !== undefined
     && plan.includedApiValue > 0
     && (plan.quotaDetail?.kind === "relative-limit" || plan.quotaDetail?.kind === "unknown");
 }
@@ -174,7 +174,7 @@ function evaluatePlanOn(
   const scopedApiCredit = surface === "api" && hasScopedApiCredit(plan);
   const rosterModel = planWorkingModel(plan, scenario, settings, modelById);
   const workingModel = scopedApiCredit
-    ? anthropicApiCreditModel(scenario, settings, modelById) ?? rosterModel
+    ? providerApiCreditModel(plan, scenario, settings, modelById) ?? rosterModel
     : rosterModel;
   const meetsBar = workingModel !== null;
   const fallback = modelById.get(plan.modelIds[0]) ?? null;
