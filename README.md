@@ -269,13 +269,13 @@ Re-read from Claude's pricing page and the subscriber API credits guide, Mistral
 
 [The credits guide](https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers) lists Max at $100 and Ultra at $200, still with a 7-day wait before a new subscriber can claim them. Pro is not eligible. The guide's upgrade path is Max to Ultra. Max 20x is not on either page.
 
-`claude-max-5x` keeps its id. The name is now Claude Max. The quota text matches the current 5x window, including Fable up to half the weekly limit. The $100 credit, the 7-day wait, the roster, and the access list stay. It remains over the ceiling on daily use and easy coding, **D** on medium coding and writing, and **C** on hard coding, research, and innovation.
+`claude-max-5x` keeps its id. The name is now Claude Max. The quota text matches the current 5x window, including Fable up to half the weekly limit. The $100 credit, the 7-day wait, and the access list stay. It remains over the ceiling on daily use and easy coding, **D** on medium coding and writing, and **C** on hard coding, research, and innovation.
 
 `claude-ultra` is the new $200 plan. It copies Max's roster, access list, and credit fields, with a $200 credit and the same 7-day wait. It takes the board place Max 20x held: over the ceiling on daily use, easy coding, medium coding, and writing, and **D** on hard coding, research, and innovation. No other plan changes letter.
 
 `claude-max-20x` stays in the catalog with `availability: "legacy"` and `replacedBy` set to `claude-ultra`. It leaves Recommend and the new-buyer tier board. The recorded quota is still the former 20x allowance.
 
-The pricing comparison also marks Haiku as included on Max and Ultra. Both rosters stay Opus 5, Opus 5.5, and Sonnet 5.5, which is the list those plans were already judged on, so the working model stays Sonnet 5.5. Adding Haiku 5.5 would reprice both plans onto that cheaper model.
+The pricing comparison marks Haiku Yes on Max and Ultra, under the same plan limits as Opus and Sonnet. Both current rosters now list Haiku 5.5 with Opus 5, Opus 5.5, and Sonnet 5.5. Haiku 5.5 scores 36, which clears every preset bar, and it is the cheapest model on the roster, so the chat and coding-client working model on both plans is Haiku 5.5 on every preset. Plan letters do not move, because the board ranks plans by monthly price. The direct-API comparison was already priced on Haiku 5.5. Fable stays a half-week relative cap in the quota text. Claude Pro and legacy Max 20x keep their previous rosters.
 
 ### Mistral Large 4
 

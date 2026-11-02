@@ -171,7 +171,7 @@
       "kind": "Subscription",
       "monthly": 100,
       "source": "https://claude.com/pricing",
-      "note": "For all-day work. Everything in Pro, plus 5x Pro usage every 5 hours and every week, and Fable up to half the weekly limit (https://claude.com/pricing). Each billing cycle includes $100 of Claude API credits for the Claude API, Claude Managed Agents, the Claude Agent SDK, and playground (https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers). The credits do not cover Claude Code or extra usage in the Claude apps, expire at the end of the cycle with no rollover, and are not this plan's chat or coding-client allowance. A new subscriber can claim them after 7 days on the plan, by linking a Claude Console organization; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Pro is not eligible. Max 20x is no longer offered. The pricing comparison also marks Haiku as included. This roster stays Opus 5, Opus 5.5, and Sonnet 5.5.",
+      "note": "For all-day work. Everything in Pro, plus 5x Pro usage every 5 hours and every week, and Fable up to half the weekly limit (https://claude.com/pricing). Each billing cycle includes $100 of Claude API credits for the Claude API, Claude Managed Agents, the Claude Agent SDK, and playground (https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers). The credits do not cover Claude Code or extra usage in the Claude apps, expire at the end of the cycle with no rollover, and are not this plan's chat or coding-client allowance. A new subscriber can claim them after 7 days on the plan, by linking a Claude Console organization; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Pro is not eligible. Max 20x is no longer offered. The pricing comparison marks Haiku Yes on Max, under the same plan limits as Opus and Sonnet (https://claude.com/pricing). This roster lists Opus 5, Opus 5.5, Sonnet 5.5, and Haiku 5.5.",
       "quota": "5x Pro usage every 5 hours and every week; Fable up to half the weekly limit",
       "evidence": "Official relative limit",
       "confidence": "Medium",
@@ -183,7 +183,8 @@
       "modelIds": [
         "claude-opus-5",
         "claude-opus-5-5",
-        "claude-sonnet-5-5"
+        "claude-sonnet-5-5",
+        "claude-haiku-5-5"
       ],
       "access": [
         "chat-app",
@@ -204,7 +205,7 @@
       "kind": "Subscription",
       "monthly": 200,
       "source": "https://claude.com/pricing",
-      "note": "For the longest tasks. Everything in Max, plus 10x Pro usage every week and no 5-hour limit for verified accounts. Fable is included up to half the weekly limit (https://claude.com/pricing). Each billing cycle includes $200 of Claude API credits, up from $100 on Max, for the Claude API, Claude Managed Agents, the Claude Agent SDK, and playground (https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers). The credits do not cover Claude Code or extra usage in the Claude apps, expire at the end of the cycle with no rollover, and are not this plan's chat or coding-client allowance. A new subscriber can claim them after 7 days on the plan, by linking a Claude Console organization; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Pro is not eligible. The pricing comparison also marks Haiku as included. This roster stays Opus 5, Opus 5.5, and Sonnet 5.5.",
+      "note": "For the longest tasks. Everything in Max, plus 10x Pro usage every week and no 5-hour limit for verified accounts. Fable is included up to half the weekly limit (https://claude.com/pricing). Each billing cycle includes $200 of Claude API credits, up from $100 on Max, for the Claude API, Claude Managed Agents, the Claude Agent SDK, and playground (https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers). The credits do not cover Claude Code or extra usage in the Claude apps, expire at the end of the cycle with no rollover, and are not this plan's chat or coding-client allowance. A new subscriber can claim them after 7 days on the plan, by linking a Claude Console organization; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Pro is not eligible. The pricing comparison marks Haiku Yes on Ultra, under the same plan limits as Opus and Sonnet (https://claude.com/pricing). This roster lists Opus 5, Opus 5.5, Sonnet 5.5, and Haiku 5.5.",
       "quota": "10x Pro weekly usage, and no 5-hour limit for verified accounts; Fable up to half the weekly limit",
       "evidence": "Official relative limit",
       "confidence": "Medium",
@@ -216,7 +217,8 @@
       "modelIds": [
         "claude-opus-5",
         "claude-opus-5-5",
-        "claude-sonnet-5-5"
+        "claude-sonnet-5-5",
+        "claude-haiku-5-5"
       ],
       "access": [
         "chat-app",

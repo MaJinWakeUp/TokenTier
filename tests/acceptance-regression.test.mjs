@@ -358,11 +358,14 @@ test("Claude Max API credit counts only for a direct-API comparison", () => {
     cacheRatio: hard.cacheRatio,
   }, "cost").plans.evaluations.find((row) => row.plan.id === "claude-max-5x");
   assert.equal(hardRow.workingModel.id, "claude-haiku-5-5", "Haiku 5.5 clears the v5 hard-coding bar, so the credit uses Haiku");
-  const chatPlans = recommend(catalog, scenario, { ...workload, access: "chat-app" }, "cost").plans.evaluations;
-  for (const id of ["claude-max-5x", "claude-ultra"]) {
-    const row = chatPlans.find((entry) => entry.plan.id === id);
-    assert.equal(row.estimate.basis.kind, "unknown-quota", `${id} stays unproven on chat`);
-    assert.equal(row.workingModel.id, "claude-sonnet-5-5", `${id} chat roster stays Sonnet 5.5`);
+  for (const access of ["chat-app", "coding-client"]) {
+    const rows = recommend(catalog, scenario, { ...workload, access }, "cost").plans.evaluations;
+    for (const id of ["claude-max-5x", "claude-ultra"]) {
+      const row = rows.find((entry) => entry.plan.id === id);
+      assert.ok(row.plan.modelIds.includes("claude-haiku-5-5"), `${id} lists Haiku 5.5`);
+      assert.equal(row.estimate.basis.kind, "unknown-quota", `${id} stays unproven on ${access}`);
+      assert.equal(row.workingModel.id, "claude-haiku-5-5", `${id} ${access} roster uses Haiku 5.5`);
+    }
   }
 });
 
@@ -971,6 +974,8 @@ test("legacy models stay listed and leave new-buyer recommend", () => {
   assert.equal(ultra.includedApiValue, 200);
   assert.equal(ultra.apiCreditClaimAfterDays, 7);
   assert.deepEqual(ultra.modelIds, max.modelIds);
+  assert.ok(max.modelIds.includes("claude-haiku-5-5"));
+  assert.ok(!retired.modelIds.includes("claude-haiku-5-5"));
   assert.deepEqual(ultra.access, max.access);
   assert.equal(retired.availability, "legacy");
   assert.equal(retired.replacedBy, "claude-ultra");
