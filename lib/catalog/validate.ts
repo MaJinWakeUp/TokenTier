@@ -30,7 +30,15 @@ const requiredModelKeys = [
   "source",
   "verifiedAt",
 ];
-const allowedModelKeys = new Set([...requiredModelKeys, "note", "rateBands", "unsupportedBeyond", "maxOutputTokens"]);
+const allowedModelKeys = new Set([
+  ...requiredModelKeys,
+  "note",
+  "rateBands",
+  "unsupportedBeyond",
+  "maxOutputTokens",
+  "availability",
+  "replacedBy",
+]);
 const requiredCapabilityKeys = ["indexVersion", "metrics", "source", "verifiedAt"];
 const allowedCapabilityKeys = new Set([...requiredCapabilityKeys, "variant"]);
 const planKinds = new Set(["Subscription", "BYOK client", "Pay as you go"]);
@@ -250,6 +258,22 @@ function collectModelErrors(model: unknown, indexLabel: string): string[] {
     }
   }
 
+  // A deprecated model stays listed, but availability and replacedBy are a pair.
+  const hasAvailability = "availability" in model;
+  const hasReplacedBy = "replacedBy" in model;
+  if (hasAvailability !== hasReplacedBy) {
+    errors.push(`${location} must set both availability and replacedBy, or neither.`);
+  } else if (hasAvailability) {
+    if (!planAvailabilityValues.has(model.availability as string)) {
+      errors.push(`${location}.availability must be one of: ${[...planAvailabilityValues].join(", ")}.`);
+    }
+    if (typeof model.replacedBy !== "string" || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(model.replacedBy)) {
+      errors.push(`${location}.replacedBy must be a lowercase model slug.`);
+    } else if (model.replacedBy === model.id) {
+      errors.push(`${location}.replacedBy cannot point at the model itself.`);
+    }
+  }
+
   errors.push(...collectCapabilityErrors(model.capability, location));
   return errors;
 }
@@ -369,6 +393,23 @@ export function validateDataset(dataset: unknown): ModelCatalogDoc {
       }
     }
 
+    // replacedBy is checked after every model id is known, and a legacy model
+    // cannot name another legacy model as the new-buyer successor.
+    const modelById = new Map(
+      (dataset.models as Record<string, unknown>[])
+        .filter((model) => isRecord(model) && typeof model.id === "string")
+        .map((model) => [model.id as string, model]),
+    );
+    for (const model of dataset.models as Record<string, unknown>[]) {
+      if (!isRecord(model) || typeof model.id !== "string" || typeof model.replacedBy !== "string") continue;
+      const successor = modelById.get(model.replacedBy);
+      if (!successor) {
+        errors.push(`model ${model.id}.replacedBy "${model.replacedBy}" is not in the model catalog.`);
+      } else if (successor.availability === "legacy") {
+        errors.push(`model ${model.id}.replacedBy "${model.replacedBy}" must point at a current model, not another legacy model.`);
+      }
+    }
+
     const verifiedDates = (dataset.models as Record<string, unknown>[])
       .flatMap((model) => [model?.verifiedAt, (model?.capability as Record<string, unknown> | null)?.verifiedAt])
       .filter((date): date is string => isIsoDate(date));
@@ -412,7 +453,10 @@ function metricValue(model: Model | undefined, metric: string): number | null {
 // scenario's work. The CLI used to check the score only, so its qualifying
 // counts could disagree with the UI's.
 export function eligibleModels(dataset: ModelCatalogDoc, scenario: Scenario): Model[] {
-  return dataset.models.filter((model) => gateModel(model, scenario, scenarioTokens(scenario), scenario.output) === null);
+  return dataset.models.filter((model) =>
+    model.availability !== "legacy"
+    && gateModel(model, scenario, scenarioTokens(scenario), scenario.output) === null,
+  );
 }
 
 export function validateScenarios(scenarios: unknown, dataset: ModelCatalogDoc): ScenarioCatalogDoc {

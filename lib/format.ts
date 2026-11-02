@@ -169,6 +169,11 @@ export function placementReason(placement: Placement, scenario: Scenario, metric
     case "over-cap":
       return `$${placement.monthly}/mo is above the $${placement.cap} ceiling this board uses for ${scenario.label.toLowerCase()}. Set your own budget in Recommend to price it anyway.`;
     case "legacy":
+      if (placement.subject === "model") {
+        return placement.replacedByName
+          ? `Deprecated model kept in the catalog; new buyers should use ${placement.replacedByName}.`
+          : "Deprecated model kept in the catalog; not offered to new buyers.";
+      }
       return placement.replacedByName
         ? `Legacy plan for existing subscribers only; new customers start on ${placement.replacedByName}.`
         : "Legacy plan for existing subscribers only; not offered to new customers.";

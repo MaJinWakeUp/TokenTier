@@ -259,6 +259,46 @@ date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
 
+## Catalog changes, November 2 2026
+
+Re-read from Claude's pricing page and the subscriber API credits guide, Mistral's Large 4 card, inference pricing, and models overview, and OpenCode Go's docs on November 2. One new plan. One plan renamed in place. One plan marked legacy. One model repriced. One model marked legacy. No scenario bar moved. Kimi K2.7 Code, the DeepSeek model rows, and the Gemini rows stay as they were. Legacy SuperGrok, Cursor, and Kimi plans stay retired.
+
+### Claude Max and Claude Ultra
+
+[Claude pricing](https://claude.com/pricing) lists the paid personal tiers as Pro, Max, and Ultra. Max is $100 a month, with 5x Pro usage every 5 hours and every week, and Fable up to half the weekly limit. Ultra is $200 a month, with 10x Pro weekly usage and no 5-hour limit for verified accounts, and the same Fable cap. Max includes $100 a month of API credits. Ultra includes $200 a month, which the page describes as up from $100 on Max.
+
+[The credits guide](https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers) lists Max at $100 and Ultra at $200, still with a 7-day wait before a new subscriber can claim them. Pro is not eligible. The guide's upgrade path is Max to Ultra. Max 20x is not on either page.
+
+`claude-max-5x` keeps its id. The name is now Claude Max. The quota text matches the current 5x window, including Fable up to half the weekly limit. The $100 credit, the 7-day wait, and the access list stay. It remains over the ceiling on daily use and easy coding, **D** on medium coding and writing, and **C** on hard coding, research, and innovation.
+
+`claude-ultra` is the new $200 plan. It copies Max's roster, access list, and credit fields, with a $200 credit and the same 7-day wait. It takes the board place Max 20x held: over the ceiling on daily use, easy coding, medium coding, and writing, and **D** on hard coding, research, and innovation. No other plan changes letter.
+
+`claude-max-20x` stays in the catalog with `availability: "legacy"` and `replacedBy` set to `claude-ultra`. It leaves Recommend and the new-buyer tier board. The recorded quota is still the former 20x allowance.
+
+The pricing comparison marks Haiku Yes on Max and Ultra, under the same plan limits as Opus and Sonnet. Both current rosters now list Haiku 5.5 with Opus 5, Opus 5.5, and Sonnet 5.5. Haiku 5.5 scores 36, which clears every preset bar, and it is the cheapest model on the roster, so the chat and coding-client working model on both plans is Haiku 5.5 on every preset. Plan letters do not move, because the board ranks plans by monthly price. The direct-API comparison was already priced on Haiku 5.5. Fable stays a half-week relative cap in the quota text. Claude Pro and legacy Max 20x keep their previous rosters.
+
+### Mistral Large 4
+
+[The model card](https://docs.mistral.ai/models/mistral-large-4-0) and [inference pricing](https://docs.mistral.ai/inference/pricing) show $0.70 input / $0.07 cached / $2.10 output per 1M tokens. The card shows no sale wording. The license line is Mistral Ecosystem Open Weight License. The stored rates were $1.36 / $0.14 / $4.18. The score stays 26 on Intelligence Index v5.0, variant high.
+
+The cut moves letters only on lanes Large 4 already cleared:
+
+- Daily use and easy coding, bar 18: Large 4 rises from **A** to **S**. DeepSeek V4 Pro falls from **S** to **A**.
+- Writing, bar 26: Large 4 rises from **A** to **S**. Step 5 Preview falls from **S** to **A**.
+- Medium coding (bar 29), hard coding, research, and innovation (bar 32): 26 is still short. No letter moves.
+
+No plan was judged on Large 4, so no plan letter or working model moves from the price.
+
+### Mistral Large 3
+
+[The models overview](https://docs.mistral.ai/getting-started/models/) lists Mistral Large 3 (`mistral-large-2512`) in the deprecated and retired table: deprecated 10/31/2026, retirement 4/30/2027, alternative Mistral Large 4. The row stays, with `availability: "legacy"` and `replacedBy` set to `mistral-large-4`. The inference pricing page no longer lists it, so the stored $0.50 / $1.50 rates are the last published ones. It has no v5.0 score, and no plan lists it, so it was already off every board. It now also drops out of Recommend.
+
+### OpenCode Go DeepSeek caps
+
+[OpenCode Go](https://opencode.ai/docs/go/) raises the DeepSeek V4.1 Flash monthly cap from $80 to $100 on Go and from $160 to $200 on Go Plus. Each model's 5-hour limit stays 20% of its monthly cap, and the weekly limit stays 50%. The other caps printed on that page still match the stored figures, including Kimi K2.7 Code at $60 and $180.
+
+DeepSeek V4.1 Flash is not the working model on any preset. Daily use and writing use MiniMax M3.1 Flash. The other five lanes use Claude Haiku 5.5. Go stays **S** on every lane. Go Plus stays over the ceiling on daily use and easy coding, and **B** on the other five.
+
 ## Catalog changes, October 29 2026, Intelligence Index v5.0
 
 Rebased the catalog from Artificial Analysis Intelligence Index v4.3.2 onto

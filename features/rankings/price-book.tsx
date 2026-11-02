@@ -350,6 +350,18 @@ export function PriceBook({
                           </div>
                           <div className="model-cell-sub">
                             <small>{model.provider}</small>
+                            {model.availability === "legacy" && (
+                              <small
+                                className="estimate-detail"
+                                title={
+                                  model.replacedBy
+                                    ? `New buyers: see ${models.find((entry) => entry.id === model.replacedBy)?.name ?? model.replacedBy}`
+                                    : undefined
+                                }
+                              >
+                                Legacy
+                              </small>
+                            )}
                             {lag > 0 && <StaleMark verifiedAt={model.verifiedAt} lag={lag} />}
                             {banded && <BandMark input={settings.input} />}
                             {model.note && <details className="row-note"><summary>Note</summary><p>{model.note}</p></details>}

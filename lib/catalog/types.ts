@@ -125,11 +125,16 @@ export type Model = {
   // context window: a 1M-token window with a 64K output ceiling cannot answer a
   // request for 100K of output. Absent means no published ceiling.
   maxOutputTokens?: number;
+  // Set only when the provider has deprecated the model and named a successor.
+  // The row stays so existing references still resolve. Requires `replacedBy`.
+  availability?: PlanAvailability;
+  // Catalog id of the current model a new buyer should evaluate.
+  replacedBy?: string;
 };
 
-// Whether a plan is still sold to new customers. Omitted means current.
-// Legacy plans stay in the catalog for existing subscribers but are kept off
-// the recommendation and the new-buyer tier board.
+// Whether a plan or model is still sold to new customers. Omitted means current.
+// Legacy rows stay in the catalog but are kept off recommendations and the
+// new-buyer tier board.
 export type PlanAvailability = "legacy";
 
 export type Plan = {

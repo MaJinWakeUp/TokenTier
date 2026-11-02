@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "updatedAt": "2026-10-29",
+  "updatedAt": "2026-11-02",
   "currency": "USD",
   "unit": "per-million-tokens",
   "capabilityIndex": {
@@ -317,11 +317,13 @@
       "cached": null,
       "output": 1.5,
       "context": "256K",
-      "source": "https://mistral.ai/pricing/api/",
-      "verifiedAt": "2026-09-17",
-      "capability": null,
       "contextTokens": 256000,
-      "note": "Artificial Analysis does not publish an Intelligence Index v5.0 score for this model (checked 2026-10-29)."
+      "source": "https://docs.mistral.ai/getting-started/models/",
+      "verifiedAt": "2026-11-02",
+      "note": "Deprecated on 10/31/2026 and scheduled to retire on 4/30/2027. The models overview lists API id mistral-large-2512 and names Mistral Large 4 as the alternative (https://docs.mistral.ai/getting-started/models/). The inference pricing page no longer lists this model, so the stored rates are the last published ones. Artificial Analysis does not publish an Intelligence Index v5.0 score for this model (checked 2026-10-29).",
+      "capability": null,
+      "availability": "legacy",
+      "replacedBy": "mistral-large-4"
     },
     {
       "id": "codestral",
@@ -677,14 +679,14 @@
       "id": "mistral-large-4",
       "provider": "Mistral",
       "name": "Mistral Large 4",
-      "input": 1.36,
-      "cached": 0.14,
-      "output": 4.18,
+      "input": 0.7,
+      "cached": 0.07,
+      "output": 2.1,
       "context": "1M",
       "contextTokens": 1000000,
       "source": "https://docs.mistral.ai/models/mistral-large-4-0",
-      "verifiedAt": "2026-10-22",
-      "note": "Public Preview since October 6, 2026. Open-weight Mixture-of-Experts. The model card shows only the standard rate, $1.36 input / $0.14 cached / $4.18 output. The earlier 2-week 50% launch sale is no longer on the page (https://docs.mistral.ai/models/mistral-large-4-0).",
+      "verifiedAt": "2026-11-02",
+      "note": "Public Preview since October 6, 2026. Open-weight Mixture-of-Experts under the Mistral Ecosystem Open Weight License. The model card and the inference pricing table show $0.70 input / $0.07 cached input / $2.10 output per 1M tokens, with no sale wording (https://docs.mistral.ai/models/mistral-large-4-0, https://docs.mistral.ai/inference/pricing).",
       "capability": {
         "metrics": {
           "intelligence": 26

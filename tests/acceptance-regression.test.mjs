@@ -298,7 +298,7 @@ test("AC4: quotaDetail is authoritative over includedApiValue for relative-limit
 test("Claude Max API credit counts only for a direct-API comparison", () => {
   const scenario = scenarioDoc.scenarios.find((s) => s.id === "daily");
   const settings = { input: scenario.input, output: scenario.output, cacheRatio: scenario.cacheRatio };
-  for (const [id, credit] of [["claude-max-5x", 100], ["claude-max-20x", 200]]) {
+  for (const [id, credit] of [["claude-max-5x", 100], ["claude-ultra", 200], ["claude-max-20x", 200]]) {
     const plan = planDoc.plans.find((entry) => entry.id === id);
     assert.ok(plan.access.includes("api"), `${id} exposes the API the credit covers`);
     assert.equal(plan.includedApiValue, credit);
@@ -333,8 +333,9 @@ test("Claude Max API credit counts only for a direct-API comparison", () => {
   };
   const apiResult = recommend(catalog, scenario, workload, "cost").plans.evaluations;
   const apiIds = apiResult.map((row) => row.plan.id);
-  assert.ok(apiIds.includes("claude-max-5x"), "an API comparison lists Max 5x");
-  assert.ok(apiIds.includes("claude-max-20x"), "an API comparison lists Max 20x");
+  assert.ok(apiIds.includes("claude-max-5x"), "an API comparison lists Max");
+  assert.ok(apiIds.includes("claude-ultra"), "an API comparison lists Ultra");
+  assert.ok(!apiIds.includes("claude-max-20x"), "Max 20x is legacy and leaves new-buyer recommendations");
   const max5 = apiResult.find((row) => row.plan.id === "claude-max-5x");
   const haiku = modelById.get("claude-haiku-5-5");
   assert.equal(max5.workingModel.id, "claude-haiku-5-5", "the API credit is priced on Haiku, not the app roster");
@@ -357,11 +358,14 @@ test("Claude Max API credit counts only for a direct-API comparison", () => {
     cacheRatio: hard.cacheRatio,
   }, "cost").plans.evaluations.find((row) => row.plan.id === "claude-max-5x");
   assert.equal(hardRow.workingModel.id, "claude-haiku-5-5", "Haiku 5.5 clears the v5 hard-coding bar, so the credit uses Haiku");
-  const chatPlans = recommend(catalog, scenario, { ...workload, access: "chat-app" }, "cost").plans.evaluations;
-  for (const id of ["claude-max-5x", "claude-max-20x"]) {
-    const row = chatPlans.find((entry) => entry.plan.id === id);
-    assert.equal(row.estimate.basis.kind, "unknown-quota", `${id} stays unproven on chat`);
-    assert.equal(row.workingModel.id, "claude-sonnet-5-5", `${id} chat roster stays Sonnet 5.5`);
+  for (const access of ["chat-app", "coding-client"]) {
+    const rows = recommend(catalog, scenario, { ...workload, access }, "cost").plans.evaluations;
+    for (const id of ["claude-max-5x", "claude-ultra"]) {
+      const row = rows.find((entry) => entry.plan.id === id);
+      assert.ok(row.plan.modelIds.includes("claude-haiku-5-5"), `${id} lists Haiku 5.5`);
+      assert.equal(row.estimate.basis.kind, "unknown-quota", `${id} stays unproven on ${access}`);
+      assert.equal(row.workingModel.id, "claude-haiku-5-5", `${id} ${access} roster uses Haiku 5.5`);
+    }
   }
 });
 
@@ -378,7 +382,7 @@ test("Accepting any surface never reads a Max plan worse than API-only", () => {
   };
   const apiOnly = recommend(catalog, scenario, workload, "cost");
   const anySurface = recommend(catalog, scenario, { ...workload, access: "any" }, "cost");
-  for (const id of ["claude-max-5x", "claude-max-20x"]) {
+  for (const id of ["claude-max-5x", "claude-ultra"]) {
     const api = apiOnly.plans.evaluations.find((row) => row.plan.id === id);
     const any = anySurface.plans.evaluations.find((row) => row.plan.id === id);
     assert.equal(any.coverage, api.coverage, `${id} keeps its API-credit coverage under "any"`);
@@ -939,6 +943,68 @@ test("AC9: legacy plans stay in the catalog but leave new-buyer recommend", () =
       `${plan.id} is not evaluated for a new-buyer recommendation`,
     );
   }
+});
+
+test("legacy models stay listed and leave new-buyer recommend", () => {
+  const large3 = dataset.models.find((model) => model.id === "mistral-large-3");
+  const large4 = dataset.models.find((model) => model.id === "mistral-large-4");
+  assert.equal(large3.availability, "legacy");
+  assert.equal(large3.replacedBy, "mistral-large-4");
+  assert.match(large3.note, /10\/31\/2026/);
+  assert.match(large3.note, /4\/30\/2027/);
+  assert.equal(large4.input, 0.7);
+  assert.equal(large4.cached, 0.07);
+  assert.equal(large4.output, 2.1);
+  assert.equal(large4.availability, undefined);
+  assert.match(large4.note, /Mistral Ecosystem Open Weight License/);
+
+  const go = planDoc.plans.find((plan) => plan.id === "opencode-go");
+  const plus = planDoc.plans.find((plan) => plan.id === "opencode-go-plus");
+  assert.equal(go.modelAllowances["deepseek-v4-1-flash"], 100);
+  assert.equal(plus.modelAllowances["deepseek-v4-1-flash"], 200);
+  assert.match(go.note, /DeepSeek V4\.1 Flash is \$100/);
+  assert.match(plus.note, /DeepSeek V4\.1 Flash is \$200/);
+
+  const max = planDoc.plans.find((plan) => plan.id === "claude-max-5x");
+  const ultra = planDoc.plans.find((plan) => plan.id === "claude-ultra");
+  const retired = planDoc.plans.find((plan) => plan.id === "claude-max-20x");
+  assert.equal(max.name, "Claude Max");
+  assert.equal(ultra.name, "Claude Ultra");
+  assert.equal(ultra.monthly, 200);
+  assert.equal(ultra.includedApiValue, 200);
+  assert.equal(ultra.apiCreditClaimAfterDays, 7);
+  assert.deepEqual(ultra.modelIds, max.modelIds);
+  assert.ok(max.modelIds.includes("claude-haiku-5-5"));
+  assert.ok(!retired.modelIds.includes("claude-haiku-5-5"));
+  assert.deepEqual(ultra.access, max.access);
+  assert.equal(retired.availability, "legacy");
+  assert.equal(retired.replacedBy, "claude-ultra");
+
+  const scenario = scenarioDoc.scenarios.find((entry) => entry.id === "daily");
+  const placement = modelPlacements(dataset.models, scenario, scenarioDoc.tierCuts, scenarioDoc.ranking.models).get("mistral-large-3");
+  assert.equal(placement.state, "legacy");
+  assert.equal(placement.replacedByName, "Mistral Large 4");
+  const evaluated = recommend(catalog, scenario, {
+    scenarioId: scenario.id,
+    input: scenario.input,
+    output: scenario.output,
+    calls: scenario.calls,
+    cacheRatio: scenario.cacheRatio,
+    budget: 1000,
+    access: "api",
+  }, "cost");
+  assert.ok(!evaluated.api.evaluations.some((row) => row.model.id === "mistral-large-3"));
+  assert.ok(!evaluated.plans.evaluations.some((row) => row.plan.id === "claude-max-20x"));
+
+  const pointedAtLegacy = {
+    ...modelCatalog,
+    models: modelCatalog.models.map((model) => (
+      model.id === "mistral-large-4"
+        ? { ...model, availability: "legacy", replacedBy: "mistral-large-3" }
+        : model
+    )),
+  };
+  assert.throws(() => validateDataset(pointedAtLegacy), /must point at a current model/);
 });
 
 test("AC9: the ceiling bounds the board, never the recommendation", () => {

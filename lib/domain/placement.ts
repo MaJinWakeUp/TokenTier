@@ -38,14 +38,19 @@ export type Placement =
   // Priced above what this kind of work is worth paying for. The plan is real
   // and may well clear the bar; it is simply out of scope for this board.
   | { state: "over-cap"; monthly: number; cap: number }
-  // Closed to new customers. Kept in the catalog for existing subscribers, but
-  // not ranked against plans a new buyer can still purchase.
-  | { state: "legacy"; replacedBy?: string; replacedByName?: string }
+  // Closed to new customers. Kept in the catalog, but not ranked against
+  // options a new buyer can still purchase. `subject` chooses the reason text.
+  | { state: "legacy"; replacedBy?: string; replacedByName?: string; subject?: "model" | "plan" }
   | { state: "unscored" };
 
 /** True when the plan is still sold to new customers (availability omitted). */
 export function isCurrentPlan(plan: Plan): boolean {
   return plan.availability !== "legacy";
+}
+
+/** True when the model is still offered to new buyers (availability omitted). */
+export function isCurrentModel(model: Model): boolean {
+  return model.availability !== "legacy";
 }
 
 export const noPlacement: Placement = unscored as Placement;
@@ -140,6 +145,20 @@ export function modelPlacements(
   const eligible: Array<{ id: string; index: number; cost: number }> = [];
 
   for (const model of models) {
+    // A deprecated model stays in the price book, but the curve is for models
+    // a new buyer can still choose.
+    if (!isCurrentModel(model)) {
+      const successor = model.replacedBy
+        ? models.find((entry) => entry.id === model.replacedBy)
+        : undefined;
+      placed.set(model.id, {
+        state: "legacy",
+        replacedBy: model.replacedBy,
+        replacedByName: successor?.name,
+        subject: "model",
+      });
+      continue;
+    }
     const rejection = gateModel(model, scenario, requiredTokens, settings.output);
     if (rejection) {
       placed.set(model.id, rejection as Placement);
@@ -196,6 +215,7 @@ export function planWorkingModel(
   const eligible = plan.modelIds
     .map((id) => modelById.get(id))
     .filter((model): model is Model => Boolean(model))
+    .filter((model) => isCurrentModel(model))
     .filter((model) => gateModel(model, scenario, requiredTokens, settings.output) === null)
     // A credit-metered plan can only be costed on models it publishes multipliers for.
     .filter((model) => !plan.weeklyCredits || Boolean(plan.creditMultipliers?.[model.id]))

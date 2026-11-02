@@ -8,7 +8,8 @@ are exhaustive.
 
 Required: `id`, `provider`, `name`, `input`, `cached`, `output`, `context`,
 `contextTokens`, `source`, `verifiedAt`, `capability`.
-Optional: `note`, `rateBands`, `unsupportedBeyond`.
+Optional: `note`, `rateBands`, `unsupportedBeyond`, `maxOutputTokens`,
+`availability`, `replacedBy`.
 
 ```json
 {
@@ -50,6 +51,11 @@ Optional: `note`, `rateBands`, `unsupportedBeyond`.
 - `rateBands` is an ascending, unique-thresholded array of
   `{ threshold, input, cached, output }`; the top-level rates are the default
   band. Only add one from an official page.
+- `availability`: omit for a current model, or `legacy` when the provider has
+  deprecated it and a successor is named. Requires `replacedBy`. The row stays
+  in the price book and drops out of Recommend and the tier curve.
+- `replacedBy` names a current model id. A legacy model cannot point at another
+  legacy model.
 
 ## Plan record — `data/plans.json`
 
