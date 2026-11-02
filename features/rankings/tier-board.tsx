@@ -208,12 +208,16 @@ export function TierBoard({
                   <strong>{model.name}</strong>
                 </button>
                 <span className="gate-excluded-reason">
-                  {reasonFor(
-                    placement.state,
-                    scenarioId,
-                    placement.state === "below" ? placement.index : undefined,
-                    placement.state === "below" ? placement.minIndex : undefined,
-                  )}
+                  {placement.state === "legacy"
+                    ? (placement.replacedByName
+                      ? `Legacy · new buyers: ${placement.replacedByName}`
+                      : "Legacy")
+                    : reasonFor(
+                      placement.state,
+                      scenarioId,
+                      placement.state === "below" ? placement.index : undefined,
+                      placement.state === "below" ? placement.minIndex : undefined,
+                    )}
                 </span>
               </li>
             ))}

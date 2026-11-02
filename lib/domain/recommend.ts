@@ -108,7 +108,8 @@ function providerApiCreditModel(
 ): Model | null {
   const requiredTokens = settings.input + settings.output;
   const eligible = [...modelById.values()].filter((model) =>
-    model.provider === plan.provider
+    model.availability !== "legacy"
+    && model.provider === plan.provider
     && gateModel(model, scenario, requiredTokens, settings.output) === null
     && !Number.isNaN(callCost(model, settings)),
   );
@@ -263,6 +264,7 @@ export function recommend(
   const apiModelsEligible = workload.access === "any" || workload.access === "api";
 
   const apiEvaluations = catalog.models
+    .filter((model) => model.availability !== "legacy")
     .filter(() => apiModelsEligible)
     .map((model) =>
       evaluateModel(model, scenario, settings, workload.calls, workload.budget),

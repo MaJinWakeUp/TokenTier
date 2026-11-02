@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-10-29",
+  "updatedAt": "2026-11-02",
   "currency": "USD",
   "plans": [
     {
@@ -167,17 +167,17 @@
     {
       "id": "claude-max-5x",
       "provider": "Anthropic",
-      "name": "Claude Max (5x)",
+      "name": "Claude Max",
       "kind": "Subscription",
       "monthly": 100,
       "source": "https://claude.com/pricing",
-      "note": "Designed for intensive research and long-context analysis. Each billing cycle includes $100 of Claude API credits for the Claude API, Claude Managed Agents, the Claude Agent SDK, and playground (https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers). The credits do not cover Claude Code or extra usage in the Claude apps, expire at the end of the cycle with no rollover, and are not this plan's chat or coding-client allowance. A new subscriber can claim them after 7 days on the plan, by linking a Claude Console organization; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Pro is not eligible.",
-      "quota": "5x Pro allowance across Opus and Sonnet models",
+      "note": "For all-day work. Everything in Pro, plus 5x Pro usage every 5 hours and every week, and Fable up to half the weekly limit (https://claude.com/pricing). Each billing cycle includes $100 of Claude API credits for the Claude API, Claude Managed Agents, the Claude Agent SDK, and playground (https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers). The credits do not cover Claude Code or extra usage in the Claude apps, expire at the end of the cycle with no rollover, and are not this plan's chat or coding-client allowance. A new subscriber can claim them after 7 days on the plan, by linking a Claude Console organization; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Pro is not eligible. Max 20x is no longer offered. The pricing comparison also marks Haiku as included. This roster stays Opus 5, Opus 5.5, and Sonnet 5.5.",
+      "quota": "5x Pro usage every 5 hours and every week; Fable up to half the weekly limit",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "Scoped credits",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-10-08",
+      "verifiedAt": "2026-11-02",
       "includedApiValue": 100,
       "apiCreditClaimAfterDays": 7,
       "modelIds": [
@@ -192,9 +192,42 @@
       ],
       "quotaDetail": {
         "kind": "relative-limit",
-        "description": "5x Pro allowance across Opus and Sonnet models",
+        "description": "5x Pro usage every 5 hours and every week; Fable up to half the weekly limit",
         "source": "https://claude.com/pricing",
-        "verifiedAt": "2026-10-08"
+        "verifiedAt": "2026-11-02"
+      }
+    },
+    {
+      "id": "claude-ultra",
+      "provider": "Anthropic",
+      "name": "Claude Ultra",
+      "kind": "Subscription",
+      "monthly": 200,
+      "source": "https://claude.com/pricing",
+      "note": "For the longest tasks. Everything in Max, plus 10x Pro usage every week and no 5-hour limit for verified accounts. Fable is included up to half the weekly limit (https://claude.com/pricing). Each billing cycle includes $200 of Claude API credits, up from $100 on Max, for the Claude API, Claude Managed Agents, the Claude Agent SDK, and playground (https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers). The credits do not cover Claude Code or extra usage in the Claude apps, expire at the end of the cycle with no rollover, and are not this plan's chat or coding-client allowance. A new subscriber can claim them after 7 days on the plan, by linking a Claude Console organization; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Pro is not eligible. The pricing comparison also marks Haiku as included. This roster stays Opus 5, Opus 5.5, and Sonnet 5.5.",
+      "quota": "10x Pro weekly usage, and no 5-hour limit for verified accounts; Fable up to half the weekly limit",
+      "evidence": "Official relative limit",
+      "confidence": "Medium",
+      "apiIncluded": "Scoped credits",
+      "cacheRatio": 0.4,
+      "verifiedAt": "2026-11-02",
+      "includedApiValue": 200,
+      "apiCreditClaimAfterDays": 7,
+      "modelIds": [
+        "claude-opus-5",
+        "claude-opus-5-5",
+        "claude-sonnet-5-5"
+      ],
+      "access": [
+        "chat-app",
+        "coding-client",
+        "api"
+      ],
+      "quotaDetail": {
+        "kind": "relative-limit",
+        "description": "10x Pro weekly usage, and no 5-hour limit for verified accounts; Fable up to half the weekly limit",
+        "source": "https://claude.com/pricing",
+        "verifiedAt": "2026-11-02"
       }
     },
     {
@@ -204,13 +237,13 @@
       "kind": "Subscription",
       "monthly": 200,
       "source": "https://claude.com/pricing",
-      "note": "Highest personal tier with maximum capacity and priority queues. Each billing cycle includes $200 of Claude API credits for the Claude API, Claude Managed Agents, the Claude Agent SDK, and playground (https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers). The credits do not cover Claude Code or extra usage in the Claude apps, expire at the end of the cycle with no rollover, and are not this plan's chat or coding-client allowance. A new subscriber can claim them after 7 days on the plan, by linking a Claude Console organization; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Pro is not eligible.",
+      "note": "Legacy plan for existing subscribers only. Max 20x is no longer offered. Paid personal tiers are Pro, Max, and Ultra, and the upgrade path from Max is Ultra (https://claude.com/pricing). The credits doc lists Max at $100 and Ultra at $200 (https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers). The recorded quota is the former 20x Pro allowance. Each billing cycle included $200 of Claude API credits for the Claude API, Claude Managed Agents, the Claude Agent SDK, and playground. The credits do not cover Claude Code or extra usage in the Claude apps, expire at the end of the cycle with no rollover, and are not this plan's chat or coding-client allowance. A new subscriber can claim them after 7 days on the plan, by linking a Claude Console organization; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Pro is not eligible.",
       "quota": "20x Pro allowance and full context limits",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "Scoped credits",
       "cacheRatio": 0.45,
-      "verifiedAt": "2026-10-08",
+      "verifiedAt": "2026-11-02",
       "includedApiValue": 200,
       "apiCreditClaimAfterDays": 7,
       "modelIds": [
@@ -228,7 +261,9 @@
         "description": "20x Pro allowance and full context limits",
         "source": "https://claude.com/pricing",
         "verifiedAt": "2026-10-08"
-      }
+      },
+      "availability": "legacy",
+      "replacedBy": "claude-ultra"
     },
     {
       "id": "google-ai-pro",
@@ -680,13 +715,13 @@
       "kind": "Subscription",
       "monthly": 10,
       "source": "https://opencode.ai/docs/go/",
-      "note": "Usage is capped in dollars per model, not credits, and metered at the same per-token rates published for each model. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: DeepSeek V4.1 Flash is $80, GLM-5.3-Flash and Kimi K2.7 Code are $60, Gemini 4 Argon is $30, MiniMax M3.1 Flash is $20, and Grok 4.7, GPT-5.6 Luna, GLM-5.3, Kimi K3, Kimi K3.1 Pro, Qwen3.8-Max, DeepSeek V4 Pro, GPT-6 Luna, Claude Haiku 5.5, and Step 5 Preview are $15. Grok 4.6 is no longer on the Go model list. The $60 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ and https://opencode.ai/go on 2026-10-26. Gemini 4 Argon is the paid model; the Go table shows its token rates at 50% off through November 30, 2026, matching Google's introductory rate, and the stored cap is the printed $30. MiniMax M3.1 Flash is the paid model at $20; the earlier free promo row is not mapped onto this model. Kimi K3.1 Pro is $15. Step 5 Preview's table shows the standard $15. API usage beyond the cap is not included.",
+      "note": "Usage is capped in dollars per model, not credits, and metered at the same per-token rates published for each model. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: DeepSeek V4.1 Flash is $100, GLM-5.3-Flash and Kimi K2.7 Code are $60, Gemini 4 Argon is $30, MiniMax M3.1 Flash is $20, and Grok 4.7, GPT-5.6 Luna, GLM-5.3, Kimi K3, Kimi K3.1 Pro, Qwen3.8-Max, DeepSeek V4 Pro, GPT-6 Luna, Claude Haiku 5.5, and Step 5 Preview are $15. Grok 4.6 is no longer on the Go model list. The $60 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-11-02. DeepSeek V4.1 Flash's monthly cap rose, and the 5-hour limit stays 20% of the monthly cap and the weekly limit stays 50%. Gemini 4 Argon is the paid model; the Go table shows its token rates at 50% off through November 30, 2026, matching Google's introductory rate, and the stored cap is the printed $30. MiniMax M3.1 Flash is the paid model at $20; the earlier free promo row is not mapped onto this model. Kimi K3.1 Pro is $15. Step 5 Preview's table shows the standard $15. API usage beyond the cap is not included.",
       "quota": "Per-model monthly caps; 5-hour is 20% and weekly is 50% of the selected model's cap",
       "evidence": "Official quota",
       "confidence": "High",
       "apiIncluded": "Yes",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-10-26",
+      "verifiedAt": "2026-11-02",
       "includedApiValue": 60,
       "modelIds": [
         "grok-4-7",
@@ -714,7 +749,7 @@
         "amount": 60,
         "resetWindow": "monthly",
         "source": "https://opencode.ai/docs/go/",
-        "verifiedAt": "2026-10-26"
+        "verifiedAt": "2026-11-02"
       },
       "modelAllowances": {
         "grok-4-7": 15,
@@ -726,7 +761,7 @@
         "kimi-k2-7-code": 60,
         "qwen-3-8-max": 15,
         "deepseek-v4-pro": 15,
-        "deepseek-v4-1-flash": 80,
+        "deepseek-v4-1-flash": 100,
         "gpt-6-luna": 15,
         "claude-haiku-5-5": 15,
         "step-5-preview": 15,
@@ -755,13 +790,13 @@
       "kind": "Subscription",
       "monthly": 40,
       "source": "https://opencode.ai/docs/go/",
-      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go marketing page does not print a launch date; Go Plus was added to the former docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash and Kimi K2.7 Code are $180, DeepSeek V4.1 Flash is $160, GLM-5.3 and Gemini 4 Argon are $120, MiniMax M3.1 Flash is $80, and Kimi K3, Kimi K3.1 Pro, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, GPT-6 Luna, GPT-5.6 Luna, Claude Haiku 5.5, and Step 5 Preview are $60. Grok 4.6 is no longer on the Go Plus model list. The $180 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ and https://opencode.ai/go on 2026-10-26. Gemini 4 Argon is the paid model; the Go table shows its token rates at 50% off through November 30, 2026, matching Google's introductory rate, and the stored cap is the printed $120. MiniMax M3.1 Flash is the paid model at $80; the earlier free promo row is not mapped onto this model. Kimi K3.1 Pro is $60. Step 5 Preview's table shows the standard $60.",
+      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go marketing page does not print a launch date; Go Plus was added to the former docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash and Kimi K2.7 Code are $180, DeepSeek V4.1 Flash is $200, GLM-5.3 and Gemini 4 Argon are $120, MiniMax M3.1 Flash is $80, and Kimi K3, Kimi K3.1 Pro, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, GPT-6 Luna, GPT-5.6 Luna, Claude Haiku 5.5, and Step 5 Preview are $60. Grok 4.6 is no longer on the Go Plus model list. The $180 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-11-02. DeepSeek V4.1 Flash's monthly cap rose, and the 5-hour limit stays 20% of the monthly cap and the weekly limit stays 50%. Gemini 4 Argon is the paid model; the Go table shows its token rates at 50% off through November 30, 2026, matching Google's introductory rate, and the stored cap is the printed $120. MiniMax M3.1 Flash is the paid model at $80; the earlier free promo row is not mapped onto this model. Kimi K3.1 Pro is $60. Step 5 Preview's table shows the standard $60.",
       "quota": "Per-model monthly caps; 5-hour is 20% and weekly is 50% of the selected model's cap",
       "evidence": "Official quota",
       "confidence": "High",
       "apiIncluded": "Yes",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-10-26",
+      "verifiedAt": "2026-11-02",
       "includedApiValue": 180,
       "modelIds": [
         "grok-4-7",
@@ -789,7 +824,7 @@
         "amount": 180,
         "resetWindow": "monthly",
         "source": "https://opencode.ai/docs/go/",
-        "verifiedAt": "2026-10-26"
+        "verifiedAt": "2026-11-02"
       },
       "modelAllowances": {
         "grok-4-7": 60,
@@ -801,7 +836,7 @@
         "kimi-k2-7-code": 180,
         "qwen-3-8-max": 60,
         "deepseek-v4-pro": 60,
-        "deepseek-v4-1-flash": 160,
+        "deepseek-v4-1-flash": 200,
         "gpt-6-luna": 60,
         "claude-haiku-5-5": 60,
         "step-5-preview": 60,

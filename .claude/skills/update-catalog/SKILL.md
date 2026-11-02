@@ -130,9 +130,16 @@ A record must be **complete** — `update` replaces the whole record, it does no
 merge fields, so start from the existing record and change what moved. Shapes and
 required fields: `references/record-shapes.md`.
 
-The CLI has no `remove`. Retiring a model is a hand edit of `data/api-models.json`
-plus repointing every plan whose `modelIds` referenced it; validation catches the
-dangling reference if you forget.
+The CLI has no `remove`. Retiring a model that must stay in the catalog (the id
+is still a join key, or the price is still needed) is an `update`: set
+`availability: "legacy"` and `replacedBy` to the current model id, keep the last
+published rates, and say so in `note` with the official source URL and the
+deprecation and retirement dates. Validation rejects a dangling or
+legacy-to-legacy `replacedBy`. Legacy models stay in the price book and drop
+out of Recommend and the tier curve. Repoint every plan whose `modelIds`
+referenced it when the plan should no longer be judged on it; validation
+catches a dangling reference if you forget. Deleting the row is only for a
+model that no plan and no saved board still needs.
 
 **Plans and scenarios** are hand edits. Bump the file's own `updatedAt` when you
 touch `plans.json`.
