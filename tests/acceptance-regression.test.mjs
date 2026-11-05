@@ -1007,6 +1007,17 @@ test("legacy models stay listed and leave new-buyer recommend", () => {
   assert.throws(() => validateDataset(pointedAtLegacy), /must point at a current model/);
 });
 
+test("GPT-5.6 Sol promotional pricing runs until November 30, 2026", () => {
+  const sol = dataset.models.find((model) => model.id === "gpt-5-6-sol");
+  assert.equal(sol.input, 4);
+  assert.equal(sol.cached, 0.4);
+  assert.equal(sol.output, 20);
+  assert.equal(sol.verifiedAt, "2026-11-05");
+  assert.match(sol.note, /until November 30, 2026/);
+  assert.doesNotMatch(sol.note, /November 21/);
+  assert.equal(dataset.updatedAt, "2026-11-05");
+});
+
 test("AC9: the ceiling bounds the board, never the recommendation", () => {
   // Recommend uses the reader's own budget. A current plan above the board
   // ceiling must still be reachable for someone who says they will spend that.

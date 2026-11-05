@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "updatedAt": "2026-11-02",
+  "updatedAt": "2026-11-05",
   "currency": "USD",
   "unit": "per-million-tokens",
   "capabilityIndex": {
@@ -51,8 +51,8 @@
       "output": 20,
       "context": "1.05M",
       "source": "https://developers.openai.com/api/docs/pricing",
-      "verifiedAt": "2026-10-05",
-      "note": "OpenAI labels the published $4 input / $0.40 cached / $20 output rate as promotional pricing available at least through November 21, 2026. The pricing page does not state a separate post-promotion standard rate, so that published rate stays the headline. Prompts above 272K input tokens use the pricing table's long-context column, $8 input / $0.80 cached / $30 output, for the whole request. Maximum output is 128K tokens. Artificial Analysis does not publish an Intelligence Index v5.0 score for this model (checked 2026-10-29).",
+      "verifiedAt": "2026-11-05",
+      "note": "OpenAI labels the published $4 input / $0.40 cached / $20 output rate as promotional pricing available until November 30, 2026 (https://developers.openai.com/api/docs/models/gpt-5.6-sol and https://developers.openai.com/api/docs/pricing). The pricing page does not state a separate post-promotion standard rate, so that published rate stays the headline. Prompts above 272K input tokens use the pricing table's long-context column, $8 input / $0.80 cached / $30 output, for the whole request. Maximum output is 128K tokens. Artificial Analysis does not publish an Intelligence Index v5.0 score for this model (checked 2026-10-29).",
       "capability": null,
       "contextTokens": 1050000,
       "maxOutputTokens": 128000,
