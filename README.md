@@ -259,6 +259,10 @@ date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
 
+## Catalog changes, November 5 2026
+
+Re-read GPT-5.6 Sol from the [model page](https://developers.openai.com/api/docs/models/gpt-5.6-sol) and the [pricing page](https://developers.openai.com/api/docs/pricing) on November 5. The published rate is still $4 input / $0.40 cached / $20 output. Both pages now say the promotional pricing is available until November 30, 2026. The previous note said at least through November 21, 2026. Neither page states a separate post-promotion standard rate, so that published rate stays the headline. The long-context band stays $8 / $0.80 / $30. No score, roster, or scenario bar changed, so no letter or working model moves.
+
 ## Catalog changes, November 2 2026
 
 Re-read from Claude's pricing page and the subscriber API credits guide, Mistral's Large 4 card, inference pricing, and models overview, and OpenCode Go's docs on November 2. One new plan. One plan renamed in place. One plan marked legacy. One model repriced. One model marked legacy. No scenario bar moved. Kimi K2.7 Code, the DeepSeek model rows, and the Gemini rows stay as they were. Legacy SuperGrok, Cursor, and Kimi plans stay retired.
@@ -1196,8 +1200,8 @@ board.
 
 ### GPT-5.6 Sol stays on its published rate
 
-OpenAI calls the $4 / $0.40 / $20 price promotional pricing available at least
-through November 21, 2026. The pricing page does not state a separate
+OpenAI calls the $4 / $0.40 / $20 price promotional pricing available until
+November 30, 2026. The pricing page does not state a separate
 post-promotion standard rate, so the headline stays the only rate the page
 prints. The old note that called this a "standard rate reduced" was wrong about
 that, and now says it is promotional.
