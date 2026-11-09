@@ -263,7 +263,7 @@ that stale lock file, and retry.
 
 - Added **MiniMax M3** at [MiniMax’s standard API rates](https://platform.minimax.io/docs/pricing/overview): $0.30 input / $0.06 cached / $1.20 output per 1M tokens up to 512K input tokens, then $0.60 / $0.12 / $2.40. [OpenCode Go and Go Plus](https://opencode.ai/docs/console/go/) list monthly caps of $60 and $180 for M3, respectively. M3 is unscored here because its live [Artificial Analysis result](https://artificialanalysis.ai/models/minimax-m3) uses v5.0.1 and the catalog still uses v5.0.
 - [DeepSeek’s API docs](https://api-docs.deepseek.com/quick_start/pricing/) identify the current V4.1 Flash endpoint as the **1017** snapshot. Its existing ID now carries the snapshot’s [v5.0 Intelligence Index score of 32](https://artificialanalysis.ai/articles/artificial-analysis-intelligence-index-v5) at max reasoning, so it enters S on all seven preset boards and becomes the working model for Go and Go Plus across those presets. The two plans keep their previous letters and price ceilings. V4 Pro now records its published 384K output limit. Rates are unchanged; both notes clarify that Chinese public holidays are off-peak.
-- OpenCode still lists $100 and $200 monthly caps for DeepSeek V4.1 Flash, but [describes them as limited-time](https://opencode.ai/console/go) without an end date. No active catalog entries were confirmed retired in this pass.
+- [OpenCode lists](https://opencode.ai/docs/console/go/#usage-limits) monthly caps of $100 on Go and $200 on Go Plus for DeepSeek V4.1 Flash. No active catalog entries were confirmed retired in this pass.
 
 ## Catalog changes, November 5 2026
 
