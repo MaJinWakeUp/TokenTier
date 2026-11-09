@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "updatedAt": "2026-11-05",
+  "updatedAt": "2026-11-09",
   "currency": "USD",
   "unit": "per-million-tokens",
   "capabilityIndex": {
@@ -297,8 +297,8 @@
       "context": "1M",
       "contextTokens": 1000000,
       "source": "https://api-docs.deepseek.com/quick_start/pricing/",
-      "verifiedAt": "2026-09-17",
-      "note": "Input and output are the published peak rates ($1.32 in / $3.96 out). Peak hours are 01:00-04:00 and 06:00-10:00 UTC, Monday to Friday; all other hours bill at half those rates ($0.66 in / $1.98 out). The cached rate is not a published figure: it is a time-weighted blend of the $0.044 peak and $0.022 off-peak cache-hit rates, weighted by the 35 peak and 133 off-peak hours in a week.",
+      "verifiedAt": "2026-11-09",
+      "note": "DeepSeek lists the current endpoint as V4 Pro 0813. Headline input and output use the published peak rates. Off-peak input and output are $0.66 and $1.98 per 1M tokens. Peak hours are 01:00–04:00 and 06:00–10:00 UTC on weekdays, excluding Chinese public holidays. The displayed $0.0266 cache rate approximates a non-holiday week using 35 hours at $0.044 and 133 at $0.022.",
       "capability": {
         "metrics": {
           "intelligence": 23
@@ -307,7 +307,8 @@
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/deepseek-v4-pro",
         "verifiedAt": "2026-10-29"
-      }
+      },
+      "maxOutputTokens": 384000
     },
     {
       "id": "mistral-large-3",
@@ -456,9 +457,17 @@
       "context": "1M",
       "contextTokens": 1000000,
       "source": "https://api-docs.deepseek.com/quick_start/pricing/",
-      "verifiedAt": "2026-09-17",
-      "note": "Replaces DeepSeek V4 Flash; called as `deepseek-flash`, and the legacy `deepseek-v4-flash` identifier still routes here at Flash pricing. Input and output are the published peak rates ($0.30 in / $1.20 out). Peak hours are 01:00-04:00 and 06:00-10:00 UTC, Monday to Friday; all other hours bill at half those rates ($0.15 in / $0.60 out). The cached rate is not a published figure: it is a time-weighted blend of the $0.006 peak and $0.003 off-peak cache-hit rates, weighted by the 35 peak and 133 off-peak hours in a week. Maximum output is 384K tokens. Artificial Analysis does not publish an Intelligence Index v5.0 score on https://artificialanalysis.ai/models/deepseek-v4-1-flash (checked 2026-10-29). The separate snapshot page https://artificialanalysis.ai/models/deepseek-v4-1-flash-1017 scores 32 and is not this row.",
-      "capability": null,
+      "verifiedAt": "2026-11-09",
+      "note": "DeepSeek identifies the current deepseek-flash endpoint as V4.1 Flash 1017; the retired V4 Flash aliases route to it. Headline input and output use the published peak rates. Off-peak input and output are $0.15 and $0.60 per 1M tokens. Peak hours are 01:00–04:00 and 06:00–10:00 UTC on weekdays, excluding Chinese public holidays. The displayed $0.0036 cache rate approximates a non-holiday week using 35 hours at $0.006 and 133 at $0.003. The score of 32 is for the 1017 snapshot on Intelligence Index v5.0, from the v5 launch report.",
+      "capability": {
+        "metrics": {
+          "intelligence": 32
+        },
+        "indexVersion": "5.0",
+        "variant": "max",
+        "source": "https://artificialanalysis.ai/articles/artificial-analysis-intelligence-index-v5",
+        "verifiedAt": "2026-11-09"
+      },
       "maxOutputTokens": 384000
     },
     {
@@ -812,6 +821,28 @@
           "cached": 0.1,
           "output": 7.5,
           "threshold": 272001
+        }
+      ]
+    },
+    {
+      "id": "minimax-m3",
+      "provider": "MiniMax",
+      "name": "MiniMax M3",
+      "input": 0.3,
+      "cached": 0.06,
+      "output": 1.2,
+      "context": "1M",
+      "contextTokens": 1000000,
+      "source": "https://platform.minimax.io/docs/pricing/overview",
+      "verifiedAt": "2026-11-09",
+      "note": "Standard API rates after MiniMax’s stated permanent discount. Above 512K input tokens the full request uses $0.60 input / $0.12 cached input / $2.40 output per 1M tokens. The live Artificial Analysis result is v5.0.1; this catalog uses v5.0, so the model is listed without a comparable score.",
+      "capability": null,
+      "rateBands": [
+        {
+          "input": 0.6,
+          "cached": 0.12,
+          "output": 2.4,
+          "threshold": 512001
         }
       ]
     }

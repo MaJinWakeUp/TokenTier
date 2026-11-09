@@ -259,6 +259,12 @@ date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
 
+## Catalog changes, November 9 2026
+
+- Added **MiniMax M3** at [MiniMax’s standard API rates](https://platform.minimax.io/docs/pricing/overview): $0.30 input / $0.06 cached / $1.20 output per 1M tokens up to 512K input tokens, then $0.60 / $0.12 / $2.40. [OpenCode Go and Go Plus](https://opencode.ai/docs/console/go/) list monthly caps of $60 and $180 for M3, respectively. M3 is unscored here because its live [Artificial Analysis result](https://artificialanalysis.ai/models/minimax-m3) uses v5.0.1 and the catalog still uses v5.0.
+- [DeepSeek’s API docs](https://api-docs.deepseek.com/quick_start/pricing/) identify the current V4.1 Flash endpoint as the **1017** snapshot. Its existing ID now carries the snapshot’s [v5.0 Intelligence Index score of 32](https://artificialanalysis.ai/articles/artificial-analysis-intelligence-index-v5) at max reasoning, so it enters S on all seven preset boards and becomes the working model for Go and Go Plus across those presets. The two plans keep their previous letters and price ceilings. V4 Pro now records its published 384K output limit. Rates are unchanged; both notes clarify that Chinese public holidays are off-peak.
+- [OpenCode lists](https://opencode.ai/docs/console/go/#usage-limits) monthly caps of $100 on Go and $200 on Go Plus for DeepSeek V4.1 Flash. No active catalog entries were confirmed retired in this pass.
+
 ## Catalog changes, November 5 2026
 
 Re-read GPT-5.6 Sol from the [model page](https://developers.openai.com/api/docs/models/gpt-5.6-sol) and the [pricing page](https://developers.openai.com/api/docs/pricing) on November 5. The published rate is still $4 input / $0.40 cached / $20 output. Both pages now say the promotional pricing is available until November 30, 2026. The previous note said at least through November 21, 2026. Neither page states a separate post-promotion standard rate, so that published rate stays the headline. The long-context band stays $8 / $0.80 / $30. No score, roster, or scenario bar changed, so no letter or working model moves.
