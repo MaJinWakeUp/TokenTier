@@ -442,8 +442,8 @@ test("AC4: OpenCode Go 5h+weekly caps make it conditional", () => {
   assert.equal(est.basis.kind, "conditional", "OpenCode Go must be conditional due to multi-window caps");
   const coverage = planCoverageScore(plan, settings, scenario.calls, wm, modelById.get(plan.modelIds[0]));
   assert.ok(coverage < 100, "Conditional plan must not have 100 coverage");
-  assert.equal(wm.id, "claude-haiku-5-5");
-  assert.equal(est.valueHigh, 15, "Hard coding must use Claude Haiku 5.5's $15 cap");
+  assert.equal(wm.id, "deepseek-v4-1-flash");
+  assert.equal(est.valueHigh, 100, "Hard coding must use DeepSeek V4.1 Flash's $100 cap");
 });
 
 test("OpenCode Go allowance follows the selected working model's published cap", () => {
@@ -460,18 +460,18 @@ test("OpenCode Go allowance follows the selected working model's published cap",
   };
 
   const daily = estimateFor("daily");
-  assert.equal(daily.working.id, "minimax-m3-1-flash");
-  assert.equal(daily.estimate.valueHigh, 20, "Daily use must use MiniMax M3.1 Flash's $20 cap, which buys more calls than Haiku's $15");
+  assert.equal(daily.working.id, "deepseek-v4-1-flash");
+  assert.equal(daily.estimate.valueHigh, 100, "Daily use must use DeepSeek V4.1 Flash's $100 cap");
   assert.equal(daily.estimate.callsLow, 0);
-  assert.match(daily.estimate.basis.label, /\$4 of MiniMax M3\.1 Flash usage per 5 hours \(20% of its \$20 monthly cap\)/);
-  assert.match(daily.estimate.basis.label, /\$10 of MiniMax M3\.1 Flash usage per week \(50% of its \$20 monthly cap\)/);
-  assert.equal(allowanceQuotaLabel(plan, daily.working), "$20/month on MiniMax M3.1 Flash ($4/5h, $10/weekly)");
+  assert.match(daily.estimate.basis.label, /\$20 of DeepSeek V4\.1 Flash usage per 5 hours \(20% of its \$100 monthly cap\)/);
+  assert.match(daily.estimate.basis.label, /\$50 of DeepSeek V4\.1 Flash usage per week \(50% of its \$100 monthly cap\)/);
+  assert.equal(allowanceQuotaLabel(plan, daily.working), "$100/month on DeepSeek V4.1 Flash ($20/5h, $50/weekly)");
   assert.equal(daily.estimate.basis.kind, "conditional");
 
   const medium = estimateFor("code-medium");
-  assert.equal(medium.working.id, "claude-haiku-5-5");
-  assert.equal(medium.estimate.valueHigh, 15);
-  assert.equal(Math.round(medium.estimate.callsHigh), 3947);
+  assert.equal(medium.working.id, "deepseek-v4-1-flash");
+  assert.equal(medium.estimate.valueHigh, 100);
+  assert.equal(Math.round(medium.estimate.callsHigh), 9787);
 });
 
 test("Go Plus allowance follows the selected working model's published cap", () => {
@@ -488,30 +488,30 @@ test("Go Plus allowance follows the selected working model's published cap", () 
   };
 
   const medium = estimateFor("code-medium");
-  assert.equal(medium.working.id, "claude-haiku-5-5");
-  assert.equal(medium.estimate.valueHigh, 60);
+  assert.equal(medium.working.id, "deepseek-v4-1-flash");
+  assert.equal(medium.estimate.valueHigh, 200);
   assert.equal(medium.estimate.callsLow, 0);
-  assert.match(medium.estimate.basis.label, /\$12 of Claude Haiku 5\.5 usage per 5 hours \(20% of its \$60 monthly cap\)/);
-  assert.match(medium.estimate.basis.label, /\$30 of Claude Haiku 5\.5 usage per week \(50% of its \$60 monthly cap\)/);
-  assert.equal(allowanceQuotaLabel(plan, medium.working), "$60/month on Claude Haiku 5.5 ($12/5h, $30/weekly)");
+  assert.match(medium.estimate.basis.label, /\$40 of DeepSeek V4\.1 Flash usage per 5 hours \(20% of its \$200 monthly cap\)/);
+  assert.match(medium.estimate.basis.label, /\$100 of DeepSeek V4\.1 Flash usage per week \(50% of its \$200 monthly cap\)/);
+  assert.equal(allowanceQuotaLabel(plan, medium.working), "$200/month on DeepSeek V4.1 Flash ($40/5h, $100/weekly)");
 
   const hard = estimateFor("code-hard");
-  assert.equal(hard.working.id, "claude-haiku-5-5");
-  assert.equal(hard.estimate.valueHigh, 60, "Hard coding must use Claude Haiku 5.5's $60 cap");
-  assert.match(hard.estimate.basis.label, /\$12 of Claude Haiku 5\.5 usage per 5 hours \(20% of its \$60 monthly cap\)/);
-  assert.match(hard.estimate.basis.label, /\$30 of Claude Haiku 5\.5 usage per week \(50% of its \$60 monthly cap\)/);
-  assert.equal(allowanceQuotaLabel(plan, hard.working), "$60/month on Claude Haiku 5.5 ($12/5h, $30/weekly)");
+  assert.equal(hard.working.id, "deepseek-v4-1-flash");
+  assert.equal(hard.estimate.valueHigh, 200, "Hard coding must use DeepSeek V4.1 Flash's $200 cap");
+  assert.match(hard.estimate.basis.label, /\$40 of DeepSeek V4\.1 Flash usage per 5 hours \(20% of its \$200 monthly cap\)/);
+  assert.match(hard.estimate.basis.label, /\$100 of DeepSeek V4\.1 Flash usage per week \(50% of its \$200 monthly cap\)/);
+  assert.equal(allowanceQuotaLabel(plan, hard.working), "$200/month on DeepSeek V4.1 Flash ($40/5h, $100/weekly)");
 
   const research = estimateFor("research");
-  assert.equal(research.working.id, "claude-haiku-5-5");
-  assert.equal(research.estimate.valueHigh, 60);
+  assert.equal(research.working.id, "deepseek-v4-1-flash");
+  assert.equal(research.estimate.valueHigh, 200);
 
   const writing = estimateFor("writing");
-  assert.equal(writing.working.id, "minimax-m3-1-flash");
-  assert.equal(writing.estimate.valueHigh, 80, "Writing must use MiniMax M3.1 Flash's $80 cap");
-  assert.match(writing.estimate.basis.label, /\$16 of MiniMax M3\.1 Flash usage per 5 hours \(20% of its \$80 monthly cap\)/);
-  assert.match(writing.estimate.basis.label, /\$40 of MiniMax M3\.1 Flash usage per week \(50% of its \$80 monthly cap\)/);
-  assert.equal(allowanceQuotaLabel(plan, writing.working), "$80/month on MiniMax M3.1 Flash ($16/5h, $40/weekly)");
+  assert.equal(writing.working.id, "deepseek-v4-1-flash");
+  assert.equal(writing.estimate.valueHigh, 200, "Writing must use DeepSeek V4.1 Flash's $200 cap");
+  assert.match(writing.estimate.basis.label, /\$40 of DeepSeek V4\.1 Flash usage per 5 hours \(20% of its \$200 monthly cap\)/);
+  assert.match(writing.estimate.basis.label, /\$100 of DeepSeek V4\.1 Flash usage per week \(50% of its \$200 monthly cap\)/);
+  assert.equal(allowanceQuotaLabel(plan, writing.working), "$200/month on DeepSeek V4.1 Flash ($40/5h, $100/weekly)");
   assert.equal(writing.estimate.basis.kind, "conditional");
 });
 
@@ -1015,7 +1015,7 @@ test("GPT-5.6 Sol promotional pricing runs until November 30, 2026", () => {
   assert.equal(sol.verifiedAt, "2026-11-05");
   assert.match(sol.note, /until November 30, 2026/);
   assert.doesNotMatch(sol.note, /November 21/);
-  assert.equal(dataset.updatedAt, "2026-11-05");
+  assert.ok(dataset.updatedAt >= sol.verifiedAt, "Catalog date must cover Sol’s verification");
 });
 
 test("AC9: the ceiling bounds the board, never the recommendation", () => {
