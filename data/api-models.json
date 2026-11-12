@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "updatedAt": "2026-11-09",
+  "updatedAt": "2026-11-12",
   "currency": "USD",
   "unit": "per-million-tokens",
   "capabilityIndex": {
@@ -843,6 +843,67 @@
           "cached": 0.12,
           "output": 2.4,
           "threshold": 512001
+        }
+      ]
+    },
+    {
+      "id": "claude-fable-5-2",
+      "provider": "Anthropic",
+      "name": "Claude Fable 5.2",
+      "input": 8,
+      "cached": 0.2,
+      "output": 40,
+      "context": "1M",
+      "contextTokens": 1000000,
+      "maxOutputTokens": 128000,
+      "source": "https://platform.claude.com/docs/en/models/fable-5-2/overview",
+      "verifiedAt": "2026-11-12",
+      "note": "Released November 9, 2026. Standard global API rates apply across the full context window; cache reads cost 0.025× input. Fast mode costs $16 input / $80 output per 1M tokens and is not the headline rate. Artificial Analysis currently reports this model under Intelligence Index v5.0.1; no comparable v5.0 score is recorded here. Sources: https://platform.claude.com/docs/en/about-claude/pricing and https://artificialanalysis.ai/models/claude-fable-5-2.",
+      "capability": null
+    },
+    {
+      "id": "gemini-4-carbon",
+      "provider": "Google",
+      "name": "Gemini 4 Carbon",
+      "input": 4,
+      "cached": 0.2,
+      "output": 20,
+      "context": "1M",
+      "contextTokens": 1000000,
+      "maxOutputTokens": 1000000,
+      "source": "https://aistudio.google.com/docs/pricing#gemini-4-carbon",
+      "verifiedAt": "2026-11-12",
+      "note": "Generally available on the paid Gemini API since November 10, 2026. Headline rates are the standard rates from December 1, 2026; introductory rates are $2 input / $0.10 cached / $10 output per 1M tokens through November 30. Implicit caching only. The unified input/output context limit is 1,048,576 tokens; synchronous output defaults to 65,536, and long decode supports up to 1,048,576. Numeric limits use the same conservative 1M catalog bound as Argon. The high-effort score is the published October 28 Intelligence Index v5 launch result, not a v5.0.1 result. Model details: https://aistudio.google.com/docs/models/gemini-4-carbon.",
+      "capability": {
+        "metrics": {
+          "intelligence": 59
+        },
+        "indexVersion": "5.0",
+        "variant": "high",
+        "source": "https://artificialanalysis.ai/articles/gemini-4-carbon-new-number-1",
+        "verifiedAt": "2026-11-12"
+      }
+    },
+    {
+      "id": "meta-muse-ember-1-0",
+      "provider": "Meta",
+      "name": "Muse Ember",
+      "input": 0.1,
+      "cached": 0.004,
+      "output": 0.5,
+      "context": "1.048576M",
+      "contextTokens": 1048576,
+      "maxOutputTokens": 524288,
+      "source": "https://dev.meta.ai/docs/pricing-rate-limits#model-pricing",
+      "verifiedAt": "2026-11-12",
+      "note": "API id muse-ember-1.0. Standard mode only on Model API; Contributor mode is not available there. For requests over 200K input tokens, cached tokens included, the entire request uses $0.30 input / $0.012 cached / $1.50 output per 1M tokens. Muse Ember is included in every Muse Code subscription. Its current Artificial Analysis result uses v5.0.1, so no comparable v5.0 score is recorded here. Model limits: https://dev.meta.ai/docs/muse-ember. Benchmark: https://artificialanalysis.ai/models/muse-ember.",
+      "capability": null,
+      "rateBands": [
+        {
+          "input": 0.3,
+          "cached": 0.012,
+          "output": 1.5,
+          "threshold": 200001
         }
       ]
     }

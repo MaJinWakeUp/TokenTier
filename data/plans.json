@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-11-09",
+  "updatedAt": "2026-11-12",
   "currency": "USD",
   "plans": [
     {
@@ -142,13 +142,13 @@
       "kind": "Subscription",
       "monthly": 20,
       "source": "https://claude.com/pricing",
-      "note": "The $20 monthly credit covers Claude Agent SDK usage in your own projects only — not interactive Claude Code, web chat or Cowork — and usage past it bills at standard API rates. App-level rate limits apply and vary with context size and demand.",
+      "note": "The $20 monthly credit covers Claude Agent SDK usage in your own projects only — not interactive Claude Code, web chat or Cowork — and usage past it bills at standard API rates. App-level rate limits apply and vary with context size and demand. Fable 5.1 and 5.2 require separately paid usage credits on Pro and are not part of its included model roster (https://support.claude.com/en/articles/15424964-claude-fable-models-on-your-plan).",
       "quota": "$20/month of Agent SDK credit; app usage is \"more usage\" than Free with no published multiple",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "Optional",
       "cacheRatio": 0.3,
-      "verifiedAt": "2026-10-05",
+      "verifiedAt": "2026-11-12",
       "modelIds": [
         "claude-sonnet-5",
         "claude-sonnet-5-5"
@@ -171,20 +171,22 @@
       "kind": "Subscription",
       "monthly": 100,
       "source": "https://claude.com/pricing",
-      "note": "For all-day work. Everything in Pro, plus 5x Pro usage every 5 hours and every week, and Fable up to half the weekly limit (https://claude.com/pricing). Each billing cycle includes $100 of Claude API credits for the Claude API, Claude Managed Agents, the Claude Agent SDK, and playground (https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers). The credits do not cover Claude Code or extra usage in the Claude apps, expire at the end of the cycle with no rollover, and are not this plan's chat or coding-client allowance. A new subscriber can claim them after 7 days on the plan, by linking a Claude Console organization; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Pro is not eligible. Max 20x is no longer offered. The pricing comparison marks Haiku Yes on Max, under the same plan limits as Opus and Sonnet (https://claude.com/pricing). This roster lists Opus 5, Opus 5.5, Sonnet 5.5, and Haiku 5.5.",
+      "note": "For all-day work. Everything in Pro, plus 5x Pro usage every 5 hours and every week, and Fable up to half the weekly limit (https://claude.com/pricing). Each billing cycle includes $100 of Claude API credits for the Claude API, Claude Managed Agents, the Claude Agent SDK, and playground (https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers). The credits do not cover Claude Code or extra usage in the Claude apps, expire at the end of the cycle with no rollover, and are not this plan's chat or coding-client allowance. A new subscriber can claim them after 7 days on the plan, by linking a Claude Console organization; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Pro is not eligible. Max 20x is no longer offered. The pricing comparison marks Haiku Yes on Max, under the same plan limits as Opus and Sonnet (https://claude.com/pricing). This roster lists Opus 5, Opus 5.5, Sonnet 5.5, Haiku 5.5, Fable 5.1, and Fable 5.2. Fable 5.1 and 5.2 share the included cap of up to half the weekly usage limit (https://support.claude.com/en/articles/15424964-claude-fable-models-on-your-plan).",
       "quota": "5x Pro usage every 5 hours and every week; Fable up to half the weekly limit",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "Scoped credits",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-11-02",
+      "verifiedAt": "2026-11-12",
       "includedApiValue": 100,
       "apiCreditClaimAfterDays": 7,
       "modelIds": [
         "claude-opus-5",
         "claude-opus-5-5",
         "claude-sonnet-5-5",
-        "claude-haiku-5-5"
+        "claude-haiku-5-5",
+        "claude-fable-5-1",
+        "claude-fable-5-2"
       ],
       "access": [
         "chat-app",
@@ -195,7 +197,7 @@
         "kind": "relative-limit",
         "description": "5x Pro usage every 5 hours and every week; Fable up to half the weekly limit",
         "source": "https://claude.com/pricing",
-        "verifiedAt": "2026-11-02"
+        "verifiedAt": "2026-11-12"
       }
     },
     {
@@ -205,20 +207,22 @@
       "kind": "Subscription",
       "monthly": 200,
       "source": "https://claude.com/pricing",
-      "note": "For the longest tasks. Everything in Max, plus 10x Pro usage every week and no 5-hour limit for verified accounts. Fable is included up to half the weekly limit (https://claude.com/pricing). Each billing cycle includes $200 of Claude API credits, up from $100 on Max, for the Claude API, Claude Managed Agents, the Claude Agent SDK, and playground (https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers). The credits do not cover Claude Code or extra usage in the Claude apps, expire at the end of the cycle with no rollover, and are not this plan's chat or coding-client allowance. A new subscriber can claim them after 7 days on the plan, by linking a Claude Console organization; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Pro is not eligible. The pricing comparison marks Haiku Yes on Ultra, under the same plan limits as Opus and Sonnet (https://claude.com/pricing). This roster lists Opus 5, Opus 5.5, Sonnet 5.5, and Haiku 5.5.",
+      "note": "For the longest tasks. Everything in Max, plus 10x Pro usage every week and no 5-hour limit for verified accounts. Fable is included up to half the weekly limit (https://claude.com/pricing). Each billing cycle includes $200 of Claude API credits, up from $100 on Max, for the Claude API, Claude Managed Agents, the Claude Agent SDK, and playground (https://platform.claude.com/docs/en/about-claude/api-credits-for-subscribers). The credits do not cover Claude Code or extra usage in the Claude apps, expire at the end of the cycle with no rollover, and are not this plan's chat or coding-client allowance. A new subscriber can claim them after 7 days on the plan, by linking a Claude Console organization; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Pro is not eligible. The pricing comparison marks Haiku Yes on Ultra, under the same plan limits as Opus and Sonnet (https://claude.com/pricing). This roster lists Opus 5, Opus 5.5, Sonnet 5.5, Haiku 5.5, Fable 5.1, and Fable 5.2. Fable 5.1 and 5.2 share the included cap of up to half the weekly usage limit (https://support.claude.com/en/articles/15424964-claude-fable-models-on-your-plan).",
       "quota": "10x Pro weekly usage, and no 5-hour limit for verified accounts; Fable up to half the weekly limit",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "Scoped credits",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-11-02",
+      "verifiedAt": "2026-11-12",
       "includedApiValue": 200,
       "apiCreditClaimAfterDays": 7,
       "modelIds": [
         "claude-opus-5",
         "claude-opus-5-5",
         "claude-sonnet-5-5",
-        "claude-haiku-5-5"
+        "claude-haiku-5-5",
+        "claude-fable-5-1",
+        "claude-fable-5-2"
       ],
       "access": [
         "chat-app",
@@ -229,7 +233,7 @@
         "kind": "relative-limit",
         "description": "10x Pro weekly usage, and no 5-hour limit for verified accounts; Fable up to half the weekly limit",
         "source": "https://claude.com/pricing",
-        "verifiedAt": "2026-11-02"
+        "verifiedAt": "2026-11-12"
       }
     },
     {
@@ -304,17 +308,18 @@
       "kind": "Subscription",
       "monthly": 99.99,
       "source": "https://gemini.google/us/subscriptions/",
-      "note": "Higher Gemini and Antigravity limits plus 10,000 monthly Flow credits. Production Gemini API usage remains separate.",
+      "note": "Higher Gemini and Antigravity limits plus 10,000 monthly Flow credits. Production Gemini API usage remains separate. Includes Gemini 4 Carbon in the Gemini app.",
       "quota": "5× Google AI Pro limits; 10,000 Flow credits / month",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-10-15",
+      "verifiedAt": "2026-11-12",
       "modelIds": [
         "gemini-3-1-pro",
         "gemini-3-8-flash",
-        "gemini-4-argon"
+        "gemini-4-argon",
+        "gemini-4-carbon"
       ],
       "access": [
         "chat-app",
@@ -324,7 +329,7 @@
         "kind": "relative-limit",
         "description": "5× Google AI Pro limits; 10,000 Flow credits / month",
         "source": "https://gemini.google/us/subscriptions/",
-        "verifiedAt": "2026-10-15"
+        "verifiedAt": "2026-11-12"
       }
     },
     {
@@ -334,17 +339,18 @@
       "kind": "Subscription",
       "monthly": 199.99,
       "source": "https://gemini.google/us/subscriptions/",
-      "note": "Google's highest consumer limits plus 25,000 monthly Flow credits. Production Gemini API usage remains separate.",
+      "note": "Google's highest consumer limits plus 25,000 monthly Flow credits. Production Gemini API usage remains separate. Includes Gemini 4 Carbon in the Gemini app.",
       "quota": "20× Google AI Pro limits; 25,000 Flow credits / month",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.45,
-      "verifiedAt": "2026-10-15",
+      "verifiedAt": "2026-11-12",
       "modelIds": [
         "gemini-3-1-pro",
         "gemini-3-8-flash",
-        "gemini-4-argon"
+        "gemini-4-argon",
+        "gemini-4-carbon"
       ],
       "access": [
         "chat-app",
@@ -354,7 +360,7 @@
         "kind": "relative-limit",
         "description": "20× Google AI Pro limits; 25,000 Flow credits / month",
         "source": "https://gemini.google/us/subscriptions/",
-        "verifiedAt": "2026-10-15"
+        "verifiedAt": "2026-11-12"
       }
     },
     {
@@ -871,12 +877,12 @@
       "kind": "Pay as you go",
       "monthly": null,
       "source": "https://opencode.ai/docs/zen/",
-      "note": "Pay-as-you-go proxy routing to multiple foundation models with unified billing.",
+      "note": "Pay-as-you-go proxy routing to multiple foundation models with unified billing. The current Console model list includes Claude Fable 5.2, Gemini 4 Carbon, and Muse Ember (https://opencode.ai/docs/console/models).",
       "quota": "Direct token pass-through with no monthly fee",
       "evidence": "Price break-even",
       "confidence": "Low",
       "apiIncluded": "Yes",
-      "verifiedAt": "2026-10-22",
+      "verifiedAt": "2026-11-12",
       "modelIds": [
         "gpt-6-astra",
         "gpt-6-1-sol",
@@ -908,7 +914,10 @@
         "glm-5-3",
         "glm-5-3-flash",
         "kimi-k3",
-        "kimi-k2-7-code"
+        "kimi-k2-7-code",
+        "claude-fable-5-2",
+        "gemini-4-carbon",
+        "meta-muse-ember-1-0"
       ],
       "access": [
         "api"
@@ -1106,15 +1115,16 @@
       "kind": "Subscription",
       "monthly": 15,
       "source": "https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription",
-      "note": "High Usage is $15/month and includes everything in Everyday Usage: Muse Spark, Muse Wonder, and Muse Image, at 5× Everyday Usage. Everyday Usage is 10-50 prompts every 5 hours and costs $5/month, under the catalog floor, so it is not a row. Prices and the model list are on https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription and https://dev.meta.ai/products/muse-code; the plan matrix is also at https://dev.meta.ai/docs/muse-code/subscriptions. Muse Spark 1.3 and Muse Spark 1.2 are on every Muse Code plan (https://dev.meta.ai/docs/models); 1.2 is not a catalog row, so the roster is Muse Spark 1.3 plus Muse Wonder. Contributor mode is the default and can be turned off; the page does not publish a separate Standard-mode prompt count. The subscription key works only in the Muse Code CLI; other API keys are pay-as-you-go. Muse Wonder is unavailable in South Korea.",
+      "note": "High Usage is $15/month and includes everything in Everyday Usage: Muse Ember, Muse Spark, Muse Wonder, and Muse Image, at 5× Everyday Usage. Everyday Usage is 10-50 prompts every 5 hours and costs $5/month, under the catalog floor, so it is not a row. Prices and the model list are on https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription and https://dev.meta.ai/products/muse-code; the plan matrix is also at https://dev.meta.ai/docs/muse-code/subscriptions. Muse Spark 1.3 and Muse Spark 1.2 are on every Muse Code plan (https://dev.meta.ai/docs/models); 1.2 is not a catalog row, so the roster is Muse Ember, Muse Spark 1.3, and Muse Wonder. Contributor mode is the default and can be turned off; the page does not publish a separate Standard-mode prompt count. The subscription key works only in the Muse Code CLI; other API keys are pay-as-you-go. Muse Wonder is unavailable in South Korea. Muse Ember is included on every tier (https://dev.meta.ai/docs/muse-code/subscriptions).",
       "quota": "5× Everyday Usage; Everyday is 10-50 prompts every 5 hours",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "No",
-      "verifiedAt": "2026-10-19",
+      "verifiedAt": "2026-11-12",
       "modelIds": [
         "meta-muse-spark-1-3",
-        "meta-muse-wonder-1-0"
+        "meta-muse-wonder-1-0",
+        "meta-muse-ember-1-0"
       ],
       "access": [
         "coding-client"
@@ -1123,7 +1133,7 @@
         "kind": "relative-limit",
         "description": "5× Everyday Usage; Everyday is 10-50 prompts every 5 hours",
         "source": "https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription",
-        "verifiedAt": "2026-10-19"
+        "verifiedAt": "2026-11-12"
       }
     },
     {
@@ -1133,15 +1143,16 @@
       "kind": "Subscription",
       "monthly": 50,
       "source": "https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription",
-      "note": "Power Usage is $50/month. It includes everything in High Usage, plus Muse Wonder Full, at 20× Everyday Usage, with early access to new features and higher file uploads. Everyday Usage is 10-50 prompts every 5 hours. Muse Wonder Full has no public API price, so it is not a catalog row. Prices and the model list: https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription and https://dev.meta.ai/products/muse-code. Plan matrix: https://dev.meta.ai/docs/muse-code/subscriptions. Availability: https://dev.meta.ai/docs/models. Muse Spark 1.2 is on every Muse Code plan and is not a catalog row; the roster is Muse Spark 1.3 plus Muse Wonder. Contributor mode is the default and can be turned off; no separate Standard-mode prompt count is published. The subscription key works only in the Muse Code CLI; other API keys are pay-as-you-go. Muse Wonder and Muse Wonder Full are unavailable in South Korea.",
+      "note": "Power Usage is $50/month. It includes everything in High Usage, plus Muse Wonder Full, at 20× Everyday Usage, with early access to new features and higher file uploads. Everyday Usage is 10-50 prompts every 5 hours. Muse Wonder Full has no public API price, so it is not a catalog row. Prices and the model list: https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription and https://dev.meta.ai/products/muse-code. Plan matrix: https://dev.meta.ai/docs/muse-code/subscriptions. Availability: https://dev.meta.ai/docs/models. Muse Spark 1.2 is on every Muse Code plan and is not a catalog row; the roster is Muse Ember, Muse Spark 1.3, and Muse Wonder. Contributor mode is the default and can be turned off; no separate Standard-mode prompt count is published. The subscription key works only in the Muse Code CLI; other API keys are pay-as-you-go. Muse Wonder and Muse Wonder Full are unavailable in South Korea. Muse Ember is included on every tier (https://dev.meta.ai/docs/muse-code/subscriptions).",
       "quota": "20× Everyday Usage, including Muse Wonder Full; Everyday is 10-50 prompts every 5 hours",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "No",
-      "verifiedAt": "2026-10-19",
+      "verifiedAt": "2026-11-12",
       "modelIds": [
         "meta-muse-spark-1-3",
-        "meta-muse-wonder-1-0"
+        "meta-muse-wonder-1-0",
+        "meta-muse-ember-1-0"
       ],
       "access": [
         "coding-client"
@@ -1150,7 +1161,7 @@
         "kind": "relative-limit",
         "description": "20× Everyday Usage, including Muse Wonder Full; Everyday is 10-50 prompts every 5 hours",
         "source": "https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription",
-        "verifiedAt": "2026-10-19"
+        "verifiedAt": "2026-11-12"
       }
     },
     {
@@ -1160,15 +1171,16 @@
       "kind": "Subscription",
       "monthly": 200,
       "source": "https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription",
-      "note": "Maximum Usage is $200/month. It includes everything in Power Usage, including Muse Wonder Full, at 80× Everyday Usage. Everyday Usage is 10-50 prompts every 5 hours. Muse Wonder Full has no public API price, so it is not a catalog row. Prices and the model list: https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription and https://dev.meta.ai/products/muse-code. Plan matrix: https://dev.meta.ai/docs/muse-code/subscriptions. Availability: https://dev.meta.ai/docs/models. Muse Spark 1.2 is on every Muse Code plan and is not a catalog row; the roster is Muse Spark 1.3 plus Muse Wonder. Contributor mode is the default and can be turned off; no separate Standard-mode prompt count is published. The subscription key works only in the Muse Code CLI; other API keys are pay-as-you-go. On Maximum Usage, hitting the limit means waiting for the refresh rather than upgrading. Muse Wonder and Muse Wonder Full are unavailable in South Korea.",
+      "note": "Maximum Usage is $200/month. It includes everything in Power Usage, including Muse Wonder Full, at 80× Everyday Usage. Everyday Usage is 10-50 prompts every 5 hours. Muse Wonder Full has no public API price, so it is not a catalog row. Prices and the model list: https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription and https://dev.meta.ai/products/muse-code. Plan matrix: https://dev.meta.ai/docs/muse-code/subscriptions. Availability: https://dev.meta.ai/docs/models. Muse Spark 1.2 is on every Muse Code plan and is not a catalog row; the roster is Muse Ember, Muse Spark 1.3, and Muse Wonder. Contributor mode is the default and can be turned off; no separate Standard-mode prompt count is published. The subscription key works only in the Muse Code CLI; other API keys are pay-as-you-go. On Maximum Usage, hitting the limit means waiting for the refresh rather than upgrading. Muse Wonder and Muse Wonder Full are unavailable in South Korea. Muse Ember is included on every tier (https://dev.meta.ai/docs/muse-code/subscriptions).",
       "quota": "80× Everyday Usage, including Muse Wonder Full; Everyday is 10-50 prompts every 5 hours",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "No",
-      "verifiedAt": "2026-10-19",
+      "verifiedAt": "2026-11-12",
       "modelIds": [
         "meta-muse-spark-1-3",
-        "meta-muse-wonder-1-0"
+        "meta-muse-wonder-1-0",
+        "meta-muse-ember-1-0"
       ],
       "access": [
         "coding-client"
@@ -1177,7 +1189,7 @@
         "kind": "relative-limit",
         "description": "80× Everyday Usage, including Muse Wonder Full; Everyday is 10-50 prompts every 5 hours",
         "source": "https://dev.meta.ai/help/subscriptions/what-is-a-muse-code-subscription",
-        "verifiedAt": "2026-10-19"
+        "verifiedAt": "2026-11-12"
       }
     },
     {
