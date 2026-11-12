@@ -259,6 +259,20 @@ date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
 
+## Catalog changes, November 12 2026
+
+Added three models after checking their published API rates, token limits, and plan access.
+
+- **[Claude Fable 5.2](https://platform.claude.com/docs/en/models/fable-5-2/overview)**: $8 input / $0.20 cached / $40 output per 1M tokens, with 1M context and 128K maximum output. The headline uses standard global pricing; fast mode is a separate rate. [Max and Ultra include Fable 5.1 and 5.2](https://support.claude.com/en/articles/15424964-claude-fable-models-on-your-plan) up to half their weekly limit, so both models join those rosters. Pro requires extra usage credits for Fable and does not gain included Fable access.
+- **[Gemini 4 Carbon](https://aistudio.google.com/docs/models/gemini-4-carbon)**: generally available on the paid API since [November 10](https://aistudio.google.com/docs/changelog#11-10-2026). The headline is the [standard $4 / $0.20 / $20 rate](https://aistudio.google.com/docs/pricing#gemini-4-carbon); the $2 / $0.10 / $10 introduction through November 30 stays in the note. Its unified 1,048,576-token context and long-decode ceiling use the same conservative 1M catalog bound as Argon. Both [Google AI Ultra tiers](https://gemini.google/us/subscriptions/) now include it.
+- **[Muse Ember](https://dev.meta.ai/docs/muse-ember)**: $0.10 input / $0.004 cached / $0.50 output up to 200K input tokens; [above that boundary the full request uses $0.30 / $0.012 / $1.50](https://dev.meta.ai/docs/pricing-rate-limits). The model has 1,048,576 context tokens and 524,288 maximum output tokens. It joins all three listed [Muse Code subscriptions](https://dev.meta.ai/docs/muse-code/subscriptions); their prices and relative limits stay the same.
+
+[OpenCode’s Console model list](https://opencode.ai/docs/console/models) also includes all three additions, so they join the OpenCode Zen pay-as-you-go roster.
+
+Carbon carries its [published October 28 Intelligence Index v5 result of 59 at high effort](https://artificialanalysis.ai/articles/gemini-4-carbon-new-number-1). It enters **D** on daily use, easy coding, medium coding, and writing, and **C** on hard coding, research, and innovation. No existing model changes letter; no plan changes letter or working model. Fable 5.2 and Ember stay listed without tiers because their current Artificial Analysis results use v5.0.1, while this catalog uses v5.0.
+
+[Anthropic still lists Fable 5.1 as active](https://platform.claude.com/docs/en/about-claude/model-deprecations), so its existing record stays. No additional retirement was confirmed. This pass does not rebase the index or change scenario bars.
+
 ## Catalog changes, November 9 2026
 
 - Added **MiniMax M3** at [MiniMax’s standard API rates](https://platform.minimax.io/docs/pricing/overview): $0.30 input / $0.06 cached / $1.20 output per 1M tokens up to 512K input tokens, then $0.60 / $0.12 / $2.40. [OpenCode Go and Go Plus](https://opencode.ai/docs/console/go/) list monthly caps of $60 and $180 for M3, respectively. M3 is unscored here because its live [Artificial Analysis result](https://artificialanalysis.ai/models/minimax-m3) uses v5.0.1 and the catalog still uses v5.0.
