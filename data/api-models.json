@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "updatedAt": "2026-11-12",
+  "updatedAt": "2026-11-16",
   "currency": "USD",
   "unit": "per-million-tokens",
   "capabilityIndex": {
@@ -906,6 +906,21 @@
           "threshold": 200001
         }
       ]
+    },
+    {
+      "id": "gemini-4-hydrogen",
+      "provider": "Google",
+      "name": "Gemini 4 Hydrogen",
+      "input": 1.5,
+      "cached": 0.075,
+      "output": 7.5,
+      "context": "1M",
+      "contextTokens": 1000000,
+      "maxOutputTokens": 1000000,
+      "source": "https://aistudio.google.com/docs/pricing#gemini-4-hydrogen",
+      "verifiedAt": "2026-11-16",
+      "note": "Generally available since November 12, 2026. Standard paid-tier rates shown; the API also offers a free tier. Implicit caching only. The unified input/output context window is 1,048,576 tokens; synchronous output defaults to 65,536, and long decode supports up to 1,048,576. Numeric limits use the same conservative 1M catalog bound as Argon and Carbon. Thinking levels are low, medium, high (default), and xhigh. The current Artificial Analysis result uses Intelligence Index v5.0.1, so no comparable v5.0 score is recorded here. Sources: https://aistudio.google.com/docs/models/gemini-4-hydrogen, https://aistudio.google.com/docs/changelog#11-12-2026, and https://artificialanalysis.ai/models/gemini-4-hydrogen.",
+      "capability": null
     }
   ]
 }

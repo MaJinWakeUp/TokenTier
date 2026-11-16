@@ -259,6 +259,14 @@ date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
 
+## Catalog changes, November 16 2026
+
+Added **[Gemini 4 Hydrogen](https://aistudio.google.com/docs/models/gemini-4-hydrogen)**, generally available since [November 12](https://aistudio.google.com/docs/changelog#11-12-2026). Its [standard paid-tier rates](https://aistudio.google.com/docs/pricing#gemini-4-hydrogen) are $1.50 input / $0.075 cached / $7.50 output per 1M tokens. Google also offers an API free tier. Implicit caching is supported; explicit caching is not. The unified input/output window and long-decode output ceiling are 1,048,576 tokens, recorded at the same conservative 1M bound as Argon and Carbon. Default synchronous output is 65,536 tokens.
+
+[Google AI Pro and both Ultra tiers](https://gemini.google/us/subscriptions/) include Hydrogen. Their prices and quota fields stay the same. [OpenCode’s Console model list](https://opencode.ai/docs/console/models) lists it too, so it joins the Zen pay-as-you-go roster. Google AI Plus also includes it, but its $4.99 monthly price remains below this catalog’s $10 floor.
+
+Hydrogen is listed without a tier: its [current Artificial Analysis result](https://artificialanalysis.ai/models/gemini-4-hydrogen) uses Intelligence Index v5.0.1, while this catalog uses v5.0. No existing model or plan changes letter or working model, and no scenario bar changes. No additional catalog model or plan was confirmed retired in this pass.
+
 ## Catalog changes, November 12 2026
 
 Added three models after checking their published API rates, token limits, and plan access.
