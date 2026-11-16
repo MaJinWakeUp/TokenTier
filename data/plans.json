@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-11-12",
+  "updatedAt": "2026-11-16",
   "currency": "USD",
   "plans": [
     {
@@ -278,17 +278,18 @@
       "kind": "Subscription",
       "monthly": 19.99,
       "source": "https://gemini.google/us/subscriptions/",
-      "note": "Expanded Gemini, Deep Research, AI Studio, and Antigravity access. It does not include production Gemini API credit.",
+      "note": "Expanded Gemini, Deep Research, AI Studio, and Antigravity access. It does not include production Gemini API credit. Includes Gemini 4 Hydrogen in the Gemini app (https://gemini.google/us/subscriptions/).",
       "quota": "4× Free Gemini limits with expanded Pro model and Deep Research access",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.35,
-      "verifiedAt": "2026-10-15",
+      "verifiedAt": "2026-11-16",
       "modelIds": [
         "gemini-3-1-pro",
         "gemini-3-8-flash",
-        "gemini-4-argon"
+        "gemini-4-argon",
+        "gemini-4-hydrogen"
       ],
       "access": [
         "chat-app",
@@ -308,18 +309,19 @@
       "kind": "Subscription",
       "monthly": 99.99,
       "source": "https://gemini.google/us/subscriptions/",
-      "note": "Higher Gemini and Antigravity limits plus 10,000 monthly Flow credits. Production Gemini API usage remains separate. Includes Gemini 4 Carbon in the Gemini app.",
+      "note": "Higher Gemini and Antigravity limits plus 10,000 monthly Flow credits. Production Gemini API usage remains separate. Includes Gemini 4 Carbon in the Gemini app. Includes Gemini 4 Hydrogen in the Gemini app (https://gemini.google/us/subscriptions/).",
       "quota": "5× Google AI Pro limits; 10,000 Flow credits / month",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-11-12",
+      "verifiedAt": "2026-11-16",
       "modelIds": [
         "gemini-3-1-pro",
         "gemini-3-8-flash",
         "gemini-4-argon",
-        "gemini-4-carbon"
+        "gemini-4-carbon",
+        "gemini-4-hydrogen"
       ],
       "access": [
         "chat-app",
@@ -339,18 +341,19 @@
       "kind": "Subscription",
       "monthly": 199.99,
       "source": "https://gemini.google/us/subscriptions/",
-      "note": "Google's highest consumer limits plus 25,000 monthly Flow credits. Production Gemini API usage remains separate. Includes Gemini 4 Carbon in the Gemini app.",
+      "note": "Google's highest consumer limits plus 25,000 monthly Flow credits. Production Gemini API usage remains separate. Includes Gemini 4 Carbon in the Gemini app. Includes Gemini 4 Hydrogen in the Gemini app (https://gemini.google/us/subscriptions/).",
       "quota": "20× Google AI Pro limits; 25,000 Flow credits / month",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.45,
-      "verifiedAt": "2026-11-12",
+      "verifiedAt": "2026-11-16",
       "modelIds": [
         "gemini-3-1-pro",
         "gemini-3-8-flash",
         "gemini-4-argon",
-        "gemini-4-carbon"
+        "gemini-4-carbon",
+        "gemini-4-hydrogen"
       ],
       "access": [
         "chat-app",
@@ -877,12 +880,12 @@
       "kind": "Pay as you go",
       "monthly": null,
       "source": "https://opencode.ai/docs/zen/",
-      "note": "Pay-as-you-go proxy routing to multiple foundation models with unified billing. The current Console model list includes Claude Fable 5.2, Gemini 4 Carbon, and Muse Ember (https://opencode.ai/docs/console/models).",
+      "note": "Pay-as-you-go proxy routing to multiple foundation models with unified billing. The current Console model list includes Claude Fable 5.2, Gemini 4 Carbon, and Muse Ember (https://opencode.ai/docs/console/models). The Console model list also includes Gemini 4 Hydrogen (https://opencode.ai/docs/console/models).",
       "quota": "Direct token pass-through with no monthly fee",
       "evidence": "Price break-even",
       "confidence": "Low",
       "apiIncluded": "Yes",
-      "verifiedAt": "2026-11-12",
+      "verifiedAt": "2026-11-16",
       "modelIds": [
         "gpt-6-astra",
         "gpt-6-1-sol",
@@ -917,7 +920,8 @@
         "kimi-k2-7-code",
         "claude-fable-5-2",
         "gemini-4-carbon",
-        "meta-muse-ember-1-0"
+        "meta-muse-ember-1-0",
+        "gemini-4-hydrogen"
       ],
       "access": [
         "api"
