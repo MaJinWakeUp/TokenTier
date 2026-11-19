@@ -287,7 +287,7 @@ test("the catalog stays in validated data files", async () => {
   // page now also lists GPT-6.1 Terra for Work and Codex, and not for Chat.
   assert.deepEqual(
     planById.get("chatgpt-plus").modelIds,
-    ["gpt-6-luna", "gpt-6-sol", "gpt-6-1-sol", "gpt-6-astra", "gpt-6-1-terra"],
+    ["gpt-6-luna", "gpt-6-sol", "gpt-6-1-sol", "gpt-6-astra", "gpt-6-1-terra", "gpt-6-2-astra", "gpt-6-2-sol"],
   );
   for (const id of ["chatgpt-plus", "chatgpt-pro-5x", "chatgpt-pro-20x", "chatgpt-pro-500"]) {
     assert.ok(planById.get(id).modelIds.includes("gpt-6-astra"), `${id} reaches GPT-6 Astra`);
