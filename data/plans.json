@@ -27,7 +27,8 @@
         "gpt-6-2-sol"
       ],
       "access": [
-        "chat-app"
+        "chat-app",
+        "coding-client"
       ],
       "quotaDetail": {
         "kind": "relative-limit",
@@ -63,6 +64,7 @@
       ],
       "access": [
         "chat-app",
+        "coding-client",
         "api"
       ],
       "quotaDetail": {
@@ -99,6 +101,7 @@
       ],
       "access": [
         "chat-app",
+        "coding-client",
         "api"
       ],
       "quotaDetail": {
@@ -134,6 +137,7 @@
       ],
       "access": [
         "chat-app",
+        "coding-client",
         "api"
       ],
       "quotaDetail": {

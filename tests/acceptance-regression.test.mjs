@@ -421,6 +421,36 @@ test("Accepting any surface never reads a Max plan worse than API-only", () => {
   assert.equal(proHard.workingModel.id, "gpt-6-1-terra", "Luna misses the hard-coding bar, so Pro's credit uses Terra");
 });
 
+test("ChatGPT Codex plans appear for coding-client workloads without spending API credits", () => {
+  const scenario = scenarioDoc.scenarios.find((entry) => entry.id === "code-easy");
+  const workload = {
+    scenarioId: scenario.id,
+    input: scenario.input,
+    output: scenario.output,
+    calls: scenario.calls,
+    cacheRatio: scenario.cacheRatio,
+    budget: 500,
+    access: "coding-client",
+  };
+  const rows = recommend(catalog, scenario, workload, "cost").plans.evaluations;
+  for (const id of ["chatgpt-plus", "chatgpt-pro-5x", "chatgpt-pro-20x", "chatgpt-pro-500"]) {
+    const row = rows.find((entry) => entry.plan.id === id);
+    assert.ok(row, `${id} must be available through Codex`);
+    assert.equal(row.estimate.basis.kind, "unknown-quota", `${id} coding usage is not its API credit`);
+    assert.equal(row.coverage, null, `${id} has no proven coding-client call quota`);
+    assert.equal(row.sufficientCoverage, null);
+  }
+
+  const chatOnlyCatalog = {
+    ...catalog,
+    plans: catalog.plans.map((plan) => (
+      plan.id === "chatgpt-plus" ? { ...plan, access: ["chat-app"] } : plan
+    )),
+  };
+  const chatOnlyRows = recommend(chatOnlyCatalog, scenario, workload, "cost").plans.evaluations;
+  assert.ok(!chatOnlyRows.some((entry) => entry.plan.id === "chatgpt-plus"), "chat-only access remains excluded");
+});
+
 test("an API-credit wait must be a whole number of days on a plan with a credit", () => {
   const max = planDoc.plans.find((p) => p.id === "claude-max-5x");
   const withPlans = (plan) => ({ ...planCatalog, plans: planCatalog.plans.map((p) => (p.id === plan.id ? plan : p)) });
