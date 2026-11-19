@@ -259,6 +259,25 @@ date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
 
+## Catalog changes, November 19 2026
+
+Added four models, using published standard rates in USD per 1M tokens:
+
+| Model | Input | Cached input | Output |
+| --- | --- | --- | --- |
+| [GPT-6.2 Astra](https://developers.openai.com/api/docs/models/gpt-6.2-astra) | $8 | $0.40 | $40 |
+| [GPT-6.2 Sol](https://developers.openai.com/api/docs/models/gpt-6.2-sol) | $2 | $0.10 | $10 |
+| [Gemini 4 Neon](https://aistudio.google.com/docs/pricing#gemini-4-neon) | $3 | $0.15 | $15 |
+| [Qwen4-Max](https://www.alibabacloud.com/help/en/model-studio/qwen4-max) | $1.50 | $0.075 | $4.50 |
+
+The GPT-6.2 rows have typed price bands above 272K input tokens: input and cache rates double, while output costs 1.5x. Their 1.05M context window includes a 922K input ceiling and 128K output ceiling. The pricing engine stops quoting requests beyond that input ceiling. Neon uses the same conservative 1M unified context bound as the other Gemini 4 rows; its synchronous output default is 65,536, with longer output through long decode. Qwen4-Max records Singapore International pricing and default thinking-mode limits: 983,616 input and 262,144 output tokens. [Alibaba’s International console](https://modelstudio.console.alibabacloud.com/ap-southeast-1/model/market/detail/qwen4-max) confirms the cached rate.
+
+[ChatGPT Plus and Pro](https://learn.chatgpt.com/docs/pricing) gain GPT-6.2 Astra and Sol in Work and Codex. Plus’s model-specific quota labels now show 6–50 and 17–180 local messages per five hours respectively. [Google AI Pro and both Ultra tiers](https://gemini.google/us/subscriptions/) gain Neon. [OpenCode’s public pay-as-you-go model API](https://opencode.ai/inference/v1/models) lists both GPT-6.2 models and Neon; they join the Zen roster.
+
+[OpenCode’s Go model API](https://opencode.ai/inference/go/v1/models) lists Qwen4-Max with $15 and $60 monthly caps on Go and Go Plus. Those plans gain the model. The same API currently shows GLM-5.3 at $500 and $1,000, but [the Go docs](https://opencode.ai/docs/console/go/) say the higher limits end November 22. Following the existing temporary-multiplier policy, the standing GLM-5.3 caps remain $15 and $120, and the dated boost is in the notes.
+
+No comparable Intelligence Index v5.0 scores were verified for these additions, so they are listed without tiers. All seven existing model and plan boards and working models stay unchanged. No additional catalog model or plan was confirmed retired; this pass does not rebase the index or alter scenario bars.
+
 ## Catalog changes, November 16 2026
 
 Added **[Gemini 4 Hydrogen](https://aistudio.google.com/docs/models/gemini-4-hydrogen)**, generally available since [November 12](https://aistudio.google.com/docs/changelog#11-12-2026). Its [standard paid-tier rates](https://aistudio.google.com/docs/pricing#gemini-4-hydrogen) are $1.50 input / $0.075 cached / $7.50 output per 1M tokens. Google also offers an API free tier. Implicit caching is supported; explicit caching is not. The unified input/output window and long-decode output ceiling are 1,048,576 tokens, recorded at the same conservative 1M bound as Argon and Carbon. Default synchronous output is 65,536 tokens.

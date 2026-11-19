@@ -1,6 +1,6 @@
 {
   "schemaVersion": 3,
-  "updatedAt": "2026-11-16",
+  "updatedAt": "2026-11-19",
   "currency": "USD",
   "unit": "per-million-tokens",
   "capabilityIndex": {
@@ -920,6 +920,85 @@
       "source": "https://aistudio.google.com/docs/pricing#gemini-4-hydrogen",
       "verifiedAt": "2026-11-16",
       "note": "Generally available since November 12, 2026. Standard paid-tier rates shown; the API also offers a free tier. Implicit caching only. The unified input/output context window is 1,048,576 tokens; synchronous output defaults to 65,536, and long decode supports up to 1,048,576. Numeric limits use the same conservative 1M catalog bound as Argon and Carbon. Thinking levels are low, medium, high (default), and xhigh. The current Artificial Analysis result uses Intelligence Index v5.0.1, so no comparable v5.0 score is recorded here. Sources: https://aistudio.google.com/docs/models/gemini-4-hydrogen, https://aistudio.google.com/docs/changelog#11-12-2026, and https://artificialanalysis.ai/models/gemini-4-hydrogen.",
+      "capability": null
+    },
+    {
+      "id": "gpt-6-2-astra",
+      "provider": "OpenAI",
+      "name": "GPT-6.2 Astra",
+      "input": 8,
+      "cached": 0.4,
+      "output": 40,
+      "context": "1.05M",
+      "contextTokens": 1050000,
+      "maxOutputTokens": 128000,
+      "unsupportedBeyond": 922001,
+      "source": "https://developers.openai.com/api/docs/models/gpt-6.2-astra",
+      "verifiedAt": "2026-11-19",
+      "note": "Standard API rates. Input is limited to 922,000 tokens. Above 272K input tokens the full request costs $16 input / $0.80 cached / $60 output per 1M tokens. No comparable Intelligence Index v5.0 score was verified for this model; its current benchmark page is https://artificialanalysis.ai/models/gpt-6-2-astra.",
+      "capability": null,
+      "rateBands": [
+        {
+          "input": 16,
+          "cached": 0.8,
+          "output": 60,
+          "threshold": 272001
+        }
+      ]
+    },
+    {
+      "id": "gpt-6-2-sol",
+      "provider": "OpenAI",
+      "name": "GPT-6.2 Sol",
+      "input": 2,
+      "cached": 0.1,
+      "output": 10,
+      "context": "1.05M",
+      "contextTokens": 1050000,
+      "maxOutputTokens": 128000,
+      "unsupportedBeyond": 922001,
+      "source": "https://developers.openai.com/api/docs/models/gpt-6.2-sol",
+      "verifiedAt": "2026-11-19",
+      "note": "Standard API rates. Input is limited to 922,000 tokens. Above 272K input tokens the full request costs $4 input / $0.20 cached / $15 output per 1M tokens. No comparable Intelligence Index v5.0 score was verified for this model; its current benchmark page is https://artificialanalysis.ai/models/gpt-6-2-sol.",
+      "capability": null,
+      "rateBands": [
+        {
+          "input": 4,
+          "cached": 0.2,
+          "output": 15,
+          "threshold": 272001
+        }
+      ]
+    },
+    {
+      "id": "gemini-4-neon",
+      "provider": "Google",
+      "name": "Gemini 4 Neon",
+      "input": 3,
+      "cached": 0.15,
+      "output": 15,
+      "context": "1M",
+      "contextTokens": 1000000,
+      "maxOutputTokens": 1000000,
+      "source": "https://aistudio.google.com/docs/pricing#gemini-4-neon",
+      "verifiedAt": "2026-11-19",
+      "note": "Generally available November 18, 2026 on the paid API. Implicit caching only. The unified input/output window is 1,048,576 tokens; synchronous output defaults to 65,536, and long decode supports the remaining unified window. Numeric limits use the same conservative 1M bound as the other Gemini 4 rows. No comparable Intelligence Index v5.0 score was verified. Model limits: https://aistudio.google.com/docs/models/gemini-4-neon. Benchmark: https://artificialanalysis.ai/models/gemini-4-neon.",
+      "capability": null
+    },
+    {
+      "id": "qwen-4-max",
+      "provider": "Alibaba",
+      "name": "Qwen4-Max",
+      "input": 1.5,
+      "cached": 0.075,
+      "output": 4.5,
+      "context": "1M",
+      "contextTokens": 1000000,
+      "maxOutputTokens": 262144,
+      "unsupportedBeyond": 983617,
+      "source": "https://www.alibabacloud.com/help/en/model-studio/qwen4-max",
+      "verifiedAt": "2026-11-19",
+      "note": "Singapore International rates, in default thinking mode with a 983,616-token input ceiling and 262,144-token output ceiling. Cached reads cost $0.075 per 1M tokens on the official International console: https://modelstudio.console.alibabacloud.com/ap-southeast-1/model/market/detail/qwen4-max. No comparable Intelligence Index v5.0 score was verified. Benchmark: https://artificialanalysis.ai/models/qwen4-max.",
       "capability": null
     }
   ]

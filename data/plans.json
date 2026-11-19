@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-11-16",
+  "updatedAt": "2026-11-19",
   "currency": "USD",
   "plans": [
     {
@@ -10,19 +10,21 @@
       "kind": "Subscription",
       "monthly": 20,
       "source": "https://learn.chatgpt.com/docs/pricing",
-      "note": "Covers ChatGPT, Work and Codex; API platform usage is billed separately. Plus is not eligible for the monthly OpenAI API credits on Pro (https://developers.openai.com/api/docs/guides/chatgpt-api-credits). OpenAI publishes a per-model range of local messages per five hours, and weekly limits may also apply. The pricing page says GPT-6.1 Terra is available in Work and Codex on Plus, Pro, Business, Enterprise, and Edu, and not in Chat (https://learn.chatgpt.com/docs/pricing).",
+      "note": "Covers ChatGPT, Work and Codex; API platform usage is billed separately. Plus is not eligible for the monthly OpenAI API credits on Pro (https://developers.openai.com/api/docs/guides/chatgpt-api-credits). OpenAI publishes a per-model range of local messages per five hours, and weekly limits may also apply. The pricing page says GPT-6.1 Terra is available in Work and Codex on Plus, Pro, Business, Enterprise, and Edu, and not in Chat (https://learn.chatgpt.com/docs/pricing). GPT-6.2 Astra and Sol are available in Work and Codex on this plan (https://learn.chatgpt.com/docs/pricing).",
       "quota": "Per-model local-message ranges per five hours; weekly limits may also apply",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.25,
-      "verifiedAt": "2026-10-29",
+      "verifiedAt": "2026-11-19",
       "modelIds": [
         "gpt-6-luna",
         "gpt-6-sol",
         "gpt-6-1-sol",
         "gpt-6-astra",
-        "gpt-6-1-terra"
+        "gpt-6-1-terra",
+        "gpt-6-2-astra",
+        "gpt-6-2-sol"
       ],
       "access": [
         "chat-app"
@@ -41,13 +43,13 @@
       "kind": "Subscription",
       "monthly": 100,
       "source": "https://learn.chatgpt.com/docs/pricing",
-      "note": "Everything in Plus, with no five-hour limit. OpenAI no longer publishes how much more usage Pro gives than Plus, so capacity cannot be converted to calls. Each billing cycle includes $100 of OpenAI API credits (https://developers.openai.com/api/docs/guides/chatgpt-api-credits). The credits expire at the end of the billing cycle with no rollover and are not this plan's Chat, Work, or Codex allowance. A subscription must be at least 7 days old to claim them; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Plus is not eligible. The pricing page says GPT-6.1 Terra is available in Work and Codex on Plus, Pro, Business, Enterprise, and Edu, and not in Chat (https://learn.chatgpt.com/docs/pricing).",
+      "note": "Everything in Plus, with no five-hour limit. OpenAI no longer publishes how much more usage Pro gives than Plus, so capacity cannot be converted to calls. Each billing cycle includes $100 of OpenAI API credits (https://developers.openai.com/api/docs/guides/chatgpt-api-credits). The credits expire at the end of the billing cycle with no rollover and are not this plan's Chat, Work, or Codex allowance. A subscription must be at least 7 days old to claim them; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Plus is not eligible. The pricing page says GPT-6.1 Terra is available in Work and Codex on Plus, Pro, Business, Enterprise, and Edu, and not in Chat (https://learn.chatgpt.com/docs/pricing). GPT-6.2 Astra and Sol are available in Work and Codex on this plan (https://learn.chatgpt.com/docs/pricing).",
       "quota": "No five-hour limit; weekly limits may apply and are not published",
       "evidence": "Official relative limit",
       "confidence": "Low",
       "apiIncluded": "Scoped credits",
       "cacheRatio": 0.35,
-      "verifiedAt": "2026-10-29",
+      "verifiedAt": "2026-11-19",
       "includedApiValue": 100,
       "apiCreditClaimAfterDays": 7,
       "modelIds": [
@@ -55,7 +57,9 @@
         "gpt-6-sol",
         "gpt-6-1-sol",
         "gpt-6-astra",
-        "gpt-6-1-terra"
+        "gpt-6-1-terra",
+        "gpt-6-2-astra",
+        "gpt-6-2-sol"
       ],
       "access": [
         "chat-app",
@@ -75,13 +79,13 @@
       "kind": "Subscription",
       "monthly": 200,
       "source": "https://learn.chatgpt.com/docs/pricing",
-      "note": "Everything in Plus, with no five-hour limit. OpenAI no longer publishes how much more usage Pro gives than Plus, so capacity cannot be converted to calls. Each billing cycle includes $200 of OpenAI API credits (https://developers.openai.com/api/docs/guides/chatgpt-api-credits). The credits expire at the end of the billing cycle with no rollover and are not this plan's Chat, Work, or Codex allowance. A subscription must be at least 7 days old to claim them; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Plus is not eligible. The pricing page says GPT-6.1 Terra is available in Work and Codex on Plus, Pro, Business, Enterprise, and Edu, and not in Chat (https://learn.chatgpt.com/docs/pricing).",
+      "note": "Everything in Plus, with no five-hour limit. OpenAI no longer publishes how much more usage Pro gives than Plus, so capacity cannot be converted to calls. Each billing cycle includes $200 of OpenAI API credits (https://developers.openai.com/api/docs/guides/chatgpt-api-credits). The credits expire at the end of the billing cycle with no rollover and are not this plan's Chat, Work, or Codex allowance. A subscription must be at least 7 days old to claim them; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Plus is not eligible. The pricing page says GPT-6.1 Terra is available in Work and Codex on Plus, Pro, Business, Enterprise, and Edu, and not in Chat (https://learn.chatgpt.com/docs/pricing). GPT-6.2 Astra and Sol are available in Work and Codex on this plan (https://learn.chatgpt.com/docs/pricing).",
       "quota": "No five-hour limit; weekly limits may apply and are not published",
       "evidence": "Official relative limit",
       "confidence": "Low",
       "apiIncluded": "Scoped credits",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-10-29",
+      "verifiedAt": "2026-11-19",
       "includedApiValue": 200,
       "apiCreditClaimAfterDays": 7,
       "modelIds": [
@@ -89,7 +93,9 @@
         "gpt-6-sol",
         "gpt-6-1-sol",
         "gpt-6-astra",
-        "gpt-6-1-terra"
+        "gpt-6-1-terra",
+        "gpt-6-2-astra",
+        "gpt-6-2-sol"
       ],
       "access": [
         "chat-app",
@@ -109,12 +115,12 @@
       "kind": "Subscription",
       "monthly": 500,
       "source": "https://learn.chatgpt.com/docs/pricing",
-      "note": "Everything in Plus, with no five-hour limit. OpenAI no longer publishes how much more usage Pro gives than Plus, so capacity cannot be converted to calls. Adds GPT-6 Astra Ultrafast, which draws included usage at 8x the Standard rate. Each billing cycle includes $500 of OpenAI API credits (https://developers.openai.com/api/docs/guides/chatgpt-api-credits). The credits expire at the end of the billing cycle with no rollover and are not this plan's Chat, Work, or Codex allowance. A subscription must be at least 7 days old to claim them; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Plus is not eligible. The pricing page says GPT-6.1 Terra is available in Work and Codex on Plus, Pro, Business, Enterprise, and Edu, and not in Chat (https://learn.chatgpt.com/docs/pricing).",
+      "note": "Everything in Plus, with no five-hour limit. OpenAI no longer publishes how much more usage Pro gives than Plus, so capacity cannot be converted to calls. Adds GPT-6 Astra Ultrafast, which draws included usage at 8x the Standard rate. Each billing cycle includes $500 of OpenAI API credits (https://developers.openai.com/api/docs/guides/chatgpt-api-credits). The credits expire at the end of the billing cycle with no rollover and are not this plan's Chat, Work, or Codex allowance. A subscription must be at least 7 days old to claim them; apiCreditClaimAfterDays records that wait. includedApiValue is that credit, and it is the allowance only when the comparison asks for direct API access. Plus is not eligible. The pricing page says GPT-6.1 Terra is available in Work and Codex on Plus, Pro, Business, Enterprise, and Edu, and not in Chat (https://learn.chatgpt.com/docs/pricing). GPT-6.2 Astra and Sol are available in Work and Codex on this plan (https://learn.chatgpt.com/docs/pricing).",
       "quota": "No five-hour limit; weekly limits may apply and are not published",
       "evidence": "Official relative limit",
       "confidence": "Low",
       "apiIncluded": "Scoped credits",
-      "verifiedAt": "2026-10-29",
+      "verifiedAt": "2026-11-19",
       "includedApiValue": 500,
       "apiCreditClaimAfterDays": 7,
       "modelIds": [
@@ -122,7 +128,9 @@
         "gpt-6-sol",
         "gpt-6-1-sol",
         "gpt-6-astra",
-        "gpt-6-1-terra"
+        "gpt-6-1-terra",
+        "gpt-6-2-astra",
+        "gpt-6-2-sol"
       ],
       "access": [
         "chat-app",
@@ -278,18 +286,19 @@
       "kind": "Subscription",
       "monthly": 19.99,
       "source": "https://gemini.google/us/subscriptions/",
-      "note": "Expanded Gemini, Deep Research, AI Studio, and Antigravity access. It does not include production Gemini API credit. Includes Gemini 4 Hydrogen in the Gemini app (https://gemini.google/us/subscriptions/).",
+      "note": "Expanded Gemini, Deep Research, AI Studio, and Antigravity access. It does not include production Gemini API credit. Includes Gemini 4 Hydrogen in the Gemini app (https://gemini.google/us/subscriptions/). Includes Gemini 4 Neon in the Gemini app (https://gemini.google/us/subscriptions/).",
       "quota": "4× Free Gemini limits with expanded Pro model and Deep Research access",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.35,
-      "verifiedAt": "2026-11-16",
+      "verifiedAt": "2026-11-19",
       "modelIds": [
         "gemini-3-1-pro",
         "gemini-3-8-flash",
         "gemini-4-argon",
-        "gemini-4-hydrogen"
+        "gemini-4-hydrogen",
+        "gemini-4-neon"
       ],
       "access": [
         "chat-app",
@@ -309,19 +318,20 @@
       "kind": "Subscription",
       "monthly": 99.99,
       "source": "https://gemini.google/us/subscriptions/",
-      "note": "Higher Gemini and Antigravity limits plus 10,000 monthly Flow credits. Production Gemini API usage remains separate. Includes Gemini 4 Carbon in the Gemini app. Includes Gemini 4 Hydrogen in the Gemini app (https://gemini.google/us/subscriptions/).",
+      "note": "Higher Gemini and Antigravity limits plus 10,000 monthly Flow credits. Production Gemini API usage remains separate. Includes Gemini 4 Carbon in the Gemini app. Includes Gemini 4 Hydrogen in the Gemini app (https://gemini.google/us/subscriptions/). Includes Gemini 4 Neon in the Gemini app (https://gemini.google/us/subscriptions/).",
       "quota": "5× Google AI Pro limits; 10,000 Flow credits / month",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-11-16",
+      "verifiedAt": "2026-11-19",
       "modelIds": [
         "gemini-3-1-pro",
         "gemini-3-8-flash",
         "gemini-4-argon",
         "gemini-4-carbon",
-        "gemini-4-hydrogen"
+        "gemini-4-hydrogen",
+        "gemini-4-neon"
       ],
       "access": [
         "chat-app",
@@ -341,19 +351,20 @@
       "kind": "Subscription",
       "monthly": 199.99,
       "source": "https://gemini.google/us/subscriptions/",
-      "note": "Google's highest consumer limits plus 25,000 monthly Flow credits. Production Gemini API usage remains separate. Includes Gemini 4 Carbon in the Gemini app. Includes Gemini 4 Hydrogen in the Gemini app (https://gemini.google/us/subscriptions/).",
+      "note": "Google's highest consumer limits plus 25,000 monthly Flow credits. Production Gemini API usage remains separate. Includes Gemini 4 Carbon in the Gemini app. Includes Gemini 4 Hydrogen in the Gemini app (https://gemini.google/us/subscriptions/). Includes Gemini 4 Neon in the Gemini app (https://gemini.google/us/subscriptions/).",
       "quota": "20× Google AI Pro limits; 25,000 Flow credits / month",
       "evidence": "Official relative limit",
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.45,
-      "verifiedAt": "2026-11-16",
+      "verifiedAt": "2026-11-19",
       "modelIds": [
         "gemini-3-1-pro",
         "gemini-3-8-flash",
         "gemini-4-argon",
         "gemini-4-carbon",
-        "gemini-4-hydrogen"
+        "gemini-4-hydrogen",
+        "gemini-4-neon"
       ],
       "access": [
         "chat-app",
@@ -726,13 +737,13 @@
       "kind": "Subscription",
       "monthly": 10,
       "source": "https://opencode.ai/docs/go/",
-      "note": "Usage is capped in dollars per model, not credits, and metered at the same per-token rates published for each model. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: DeepSeek V4.1 Flash is $100, GLM-5.3-Flash and Kimi K2.7 Code are $60, Gemini 4 Argon is $30, MiniMax M3.1 Flash is $20, and Grok 4.7, GPT-5.6 Luna, GLM-5.3, Kimi K3, Kimi K3.1 Pro, Qwen3.8-Max, DeepSeek V4 Pro, GPT-6 Luna, Claude Haiku 5.5, and Step 5 Preview are $15. Grok 4.6 is no longer on the Go model list. The $60 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-11-09. Gemini 4 Argon is the paid model; the Go table shows its token rates at 50% off through November 30, 2026, matching Google's introductory rate, and the stored cap is the printed $30. MiniMax M3.1 Flash is the paid model at $20; the earlier free promo row is not mapped onto this model. Kimi K3.1 Pro is $15. Step 5 Preview's table shows the standard $15. API usage beyond the cap is not included. MiniMax M3 has a $60 monthly cap across both context bands.",
+      "note": "Usage is capped in dollars per model, not credits, and metered at the same per-token rates published for each model. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: DeepSeek V4.1 Flash is $100, GLM-5.3-Flash and Kimi K2.7 Code are $60, Gemini 4 Argon is $30, MiniMax M3.1 Flash is $20, and Grok 4.7, GPT-5.6 Luna, GLM-5.3, Kimi K3, Kimi K3.1 Pro, Qwen3.8-Max, DeepSeek V4 Pro, GPT-6 Luna, Claude Haiku 5.5, and Step 5 Preview are $15. Grok 4.6 is no longer on the Go model list. The $60 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-11-09. Gemini 4 Argon is the paid model; the Go table shows its token rates at 50% off through November 30, 2026, matching Google's introductory rate, and the stored cap is the printed $30. MiniMax M3.1 Flash is the paid model at $20; the earlier free promo row is not mapped onto this model. Kimi K3.1 Pro is $15. Step 5 Preview's table shows the standard $15. API usage beyond the cap is not included. MiniMax M3 has a $60 monthly cap across both context bands. Qwen4-Max has a $15 monthly cap (https://opencode.ai/inference/go/v1/models). GLM-5.3 has a temporary $500 cap through November 22, 2026 (https://opencode.ai/docs/console/go/); modelAllowances retains the last published standing $15 cap, following the catalog policy for temporary multipliers.",
       "quota": "Per-model monthly caps; 5-hour is 20% and weekly is 50% of the selected model's cap",
       "evidence": "Official quota",
       "confidence": "High",
       "apiIncluded": "Yes",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-11-09",
+      "verifiedAt": "2026-11-19",
       "includedApiValue": 60,
       "modelIds": [
         "grok-4-7",
@@ -750,7 +761,8 @@
         "step-5-preview",
         "gemini-4-argon",
         "minimax-m3-1-flash",
-        "minimax-m3"
+        "minimax-m3",
+        "qwen-4-max"
       ],
       "access": [
         "coding-client",
@@ -779,7 +791,8 @@
         "step-5-preview": 15,
         "gemini-4-argon": 30,
         "minimax-m3-1-flash": 20,
-        "minimax-m3": 60
+        "minimax-m3": 60,
+        "qwen-4-max": 15
       },
       "conditionalLimits": [
         {
@@ -803,13 +816,13 @@
       "kind": "Subscription",
       "monthly": 40,
       "source": "https://opencode.ai/docs/go/",
-      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go marketing page does not print a launch date; Go Plus was added to the former docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash and Kimi K2.7 Code are $180, DeepSeek V4.1 Flash is $200, GLM-5.3 and Gemini 4 Argon are $120, MiniMax M3.1 Flash is $80, and Kimi K3, Kimi K3.1 Pro, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, GPT-6 Luna, GPT-5.6 Luna, Claude Haiku 5.5, and Step 5 Preview are $60. Grok 4.6 is no longer on the Go Plus model list. The $180 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-11-09. Gemini 4 Argon is the paid model; the Go table shows its token rates at 50% off through November 30, 2026, matching Google's introductory rate, and the stored cap is the printed $120. MiniMax M3.1 Flash is the paid model at $80; the earlier free promo row is not mapped onto this model. Kimi K3.1 Pro is $60. Step 5 Preview's table shows the standard $60. MiniMax M3 has a $180 monthly cap across both context bands.",
+      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go marketing page does not print a launch date; Go Plus was added to the former docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash and Kimi K2.7 Code are $180, DeepSeek V4.1 Flash is $200, GLM-5.3 and Gemini 4 Argon are $120, MiniMax M3.1 Flash is $80, and Kimi K3, Kimi K3.1 Pro, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, GPT-6 Luna, GPT-5.6 Luna, Claude Haiku 5.5, and Step 5 Preview are $60. Grok 4.6 is no longer on the Go Plus model list. The $180 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-11-09. Gemini 4 Argon is the paid model; the Go table shows its token rates at 50% off through November 30, 2026, matching Google's introductory rate, and the stored cap is the printed $120. MiniMax M3.1 Flash is the paid model at $80; the earlier free promo row is not mapped onto this model. Kimi K3.1 Pro is $60. Step 5 Preview's table shows the standard $60. MiniMax M3 has a $180 monthly cap across both context bands. Qwen4-Max has a $60 monthly cap (https://opencode.ai/inference/go/v1/models). GLM-5.3 has a temporary $1000 cap through November 22, 2026 (https://opencode.ai/docs/console/go/); modelAllowances retains the last published standing $120 cap, following the catalog policy for temporary multipliers.",
       "quota": "Per-model monthly caps; 5-hour is 20% and weekly is 50% of the selected model's cap",
       "evidence": "Official quota",
       "confidence": "High",
       "apiIncluded": "Yes",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-11-09",
+      "verifiedAt": "2026-11-19",
       "includedApiValue": 180,
       "modelIds": [
         "grok-4-7",
@@ -827,7 +840,8 @@
         "step-5-preview",
         "gemini-4-argon",
         "minimax-m3-1-flash",
-        "minimax-m3"
+        "minimax-m3",
+        "qwen-4-max"
       ],
       "access": [
         "coding-client",
@@ -856,7 +870,8 @@
         "step-5-preview": 60,
         "gemini-4-argon": 120,
         "minimax-m3-1-flash": 80,
-        "minimax-m3": 180
+        "minimax-m3": 180,
+        "qwen-4-max": 60
       },
       "conditionalLimits": [
         {
@@ -880,12 +895,12 @@
       "kind": "Pay as you go",
       "monthly": null,
       "source": "https://opencode.ai/docs/zen/",
-      "note": "Pay-as-you-go proxy routing to multiple foundation models with unified billing. The current Console model list includes Claude Fable 5.2, Gemini 4 Carbon, and Muse Ember (https://opencode.ai/docs/console/models). The Console model list also includes Gemini 4 Hydrogen (https://opencode.ai/docs/console/models).",
+      "note": "Pay-as-you-go proxy routing to multiple foundation models with unified billing. The current Console model list includes Claude Fable 5.2, Gemini 4 Carbon, and Muse Ember (https://opencode.ai/docs/console/models). The Console model list also includes Gemini 4 Hydrogen (https://opencode.ai/docs/console/models). The public Console model API lists GPT-6.2 Astra, GPT-6.2 Sol, and Gemini 4 Neon (https://opencode.ai/inference/v1/models).",
       "quota": "Direct token pass-through with no monthly fee",
       "evidence": "Price break-even",
       "confidence": "Low",
       "apiIncluded": "Yes",
-      "verifiedAt": "2026-11-16",
+      "verifiedAt": "2026-11-19",
       "modelIds": [
         "gpt-6-astra",
         "gpt-6-1-sol",
@@ -921,7 +936,10 @@
         "claude-fable-5-2",
         "gemini-4-carbon",
         "meta-muse-ember-1-0",
-        "gemini-4-hydrogen"
+        "gemini-4-hydrogen",
+        "gpt-6-2-astra",
+        "gpt-6-2-sol",
+        "gemini-4-neon"
       ],
       "access": [
         "api"

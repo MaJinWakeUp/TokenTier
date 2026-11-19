@@ -766,6 +766,14 @@ test("PR8: each feature migrates its own legacy data", () => {
 // message ranges are per model, so a range for any other model, or wording
 // about a model no longer on the roster, contradicts the "via" label.
 test("ChatGPT quotas never describe a model other than the working model", () => {
+  const plus = planDoc.plans.find((plan) => plan.id === "chatgpt-plus");
+  for (const [id, expected] of [
+    ["gpt-6-2-astra", "6–50 GPT-6.2 Astra local messages / 5h"],
+    ["gpt-6-2-sol", "17–180 GPT-6.2 Sol local messages / 5h"],
+  ]) {
+    assert.equal(planQuota(plus, modelById.get(id)), expected);
+  }
+
   const modelNames = dataset.models.filter((m) => m.provider === "OpenAI").map((m) => m.name);
   for (const plan of planDoc.plans.filter((p) => p.provider === "OpenAI")) {
     for (const scenario of scenarioDoc.scenarios) {
