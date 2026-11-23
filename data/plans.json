@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-11-19",
+  "updatedAt": "2026-11-23",
   "currency": "USD",
   "plans": [
     {
@@ -16,7 +16,7 @@
       "confidence": "Medium",
       "apiIncluded": "No",
       "cacheRatio": 0.25,
-      "verifiedAt": "2026-11-19",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "gpt-6-luna",
         "gpt-6-sol",
@@ -34,7 +34,7 @@
         "kind": "relative-limit",
         "description": "Per-model local-message ranges per five hours; weekly limits may also apply",
         "source": "https://learn.chatgpt.com/docs/pricing",
-        "verifiedAt": "2026-09-30"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -50,7 +50,7 @@
       "confidence": "Low",
       "apiIncluded": "Scoped credits",
       "cacheRatio": 0.35,
-      "verifiedAt": "2026-11-19",
+      "verifiedAt": "2026-11-23",
       "includedApiValue": 100,
       "apiCreditClaimAfterDays": 7,
       "modelIds": [
@@ -71,7 +71,7 @@
         "kind": "unknown",
         "description": "No five-hour limit; weekly limits may apply and are not published",
         "source": "https://learn.chatgpt.com/docs/pricing",
-        "verifiedAt": "2026-09-30"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -87,7 +87,7 @@
       "confidence": "Low",
       "apiIncluded": "Scoped credits",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-11-19",
+      "verifiedAt": "2026-11-23",
       "includedApiValue": 200,
       "apiCreditClaimAfterDays": 7,
       "modelIds": [
@@ -108,7 +108,7 @@
         "kind": "unknown",
         "description": "No five-hour limit; weekly limits may apply and are not published",
         "source": "https://learn.chatgpt.com/docs/pricing",
-        "verifiedAt": "2026-09-30"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -123,7 +123,7 @@
       "evidence": "Official relative limit",
       "confidence": "Low",
       "apiIncluded": "Scoped credits",
-      "verifiedAt": "2026-11-19",
+      "verifiedAt": "2026-11-23",
       "includedApiValue": 500,
       "apiCreditClaimAfterDays": 7,
       "modelIds": [
@@ -144,7 +144,7 @@
         "kind": "unknown",
         "description": "No five-hour limit; weekly limits may apply and are not published",
         "source": "https://learn.chatgpt.com/docs/pricing",
-        "verifiedAt": "2026-09-30"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -154,13 +154,13 @@
       "kind": "Subscription",
       "monthly": 20,
       "source": "https://claude.com/pricing",
-      "note": "The $20 monthly credit covers Claude Agent SDK usage in your own projects only — not interactive Claude Code, web chat or Cowork — and usage past it bills at standard API rates. App-level rate limits apply and vary with context size and demand. Fable 5.1 and 5.2 require separately paid usage credits on Pro and are not part of its included model roster (https://support.claude.com/en/articles/15424964-claude-fable-models-on-your-plan).",
-      "quota": "$20/month of Agent SDK credit; app usage is \"more usage\" than Free with no published multiple",
+      "note": "Claude Agent SDK and claude -p usage signed in with a Claude plan draw from subscription limits. The previously announced SDK billing changes were paused; Pro has no included monthly API credit (https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan). App limits apply every 5 hours and every week and vary with the model and task. Fable 5.1 and 5.2 require separately paid usage credits on Pro and are not part of its included model roster (https://claude.com/pricing).",
+      "quota": "More usage than Free, every 5 hours and every week; no published multiple",
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "Optional",
       "cacheRatio": 0.3,
-      "verifiedAt": "2026-11-12",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "claude-sonnet-5",
         "claude-sonnet-5-5"
@@ -171,9 +171,9 @@
       ],
       "quotaDetail": {
         "kind": "relative-limit",
-        "description": "App usage is \"more usage\" than Free with no published multiple; the $20 monthly credit is scoped to Claude Agent SDK projects and does not meter this plan's chat or coding-client surfaces",
+        "description": "More usage than Free, every 5 hours and every week; no published multiple",
         "source": "https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan",
-        "verifiedAt": "2026-10-02"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -189,7 +189,7 @@
       "confidence": "Medium",
       "apiIncluded": "Scoped credits",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-11-12",
+      "verifiedAt": "2026-11-23",
       "includedApiValue": 100,
       "apiCreditClaimAfterDays": 7,
       "modelIds": [
@@ -209,7 +209,7 @@
         "kind": "relative-limit",
         "description": "5x Pro usage every 5 hours and every week; Fable up to half the weekly limit",
         "source": "https://claude.com/pricing",
-        "verifiedAt": "2026-11-12"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -225,7 +225,7 @@
       "confidence": "Medium",
       "apiIncluded": "Scoped credits",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-11-12",
+      "verifiedAt": "2026-11-23",
       "includedApiValue": 200,
       "apiCreditClaimAfterDays": 7,
       "modelIds": [
@@ -245,7 +245,7 @@
         "kind": "relative-limit",
         "description": "10x Pro weekly usage, and no 5-hour limit for verified accounts; Fable up to half the weekly limit",
         "source": "https://claude.com/pricing",
-        "verifiedAt": "2026-11-12"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -296,7 +296,7 @@
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.35,
-      "verifiedAt": "2026-11-19",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "gemini-3-1-pro",
         "gemini-3-8-flash",
@@ -312,7 +312,7 @@
         "kind": "relative-limit",
         "description": "4× Free Gemini limits with expanded Pro model and Deep Research access",
         "source": "https://gemini.google/us/subscriptions/",
-        "verifiedAt": "2026-10-15"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -328,7 +328,7 @@
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-11-19",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "gemini-3-1-pro",
         "gemini-3-8-flash",
@@ -345,7 +345,7 @@
         "kind": "relative-limit",
         "description": "5× Google AI Pro limits; 10,000 Flow credits / month",
         "source": "https://gemini.google/us/subscriptions/",
-        "verifiedAt": "2026-11-12"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -361,7 +361,7 @@
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.45,
-      "verifiedAt": "2026-11-19",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "gemini-3-1-pro",
         "gemini-3-8-flash",
@@ -378,7 +378,7 @@
         "kind": "relative-limit",
         "description": "20× Google AI Pro limits; 25,000 Flow credits / month",
         "source": "https://gemini.google/us/subscriptions/",
-        "verifiedAt": "2026-11-12"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -510,7 +510,7 @@
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-10-15",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -524,7 +524,7 @@
         "kind": "relative-limit",
         "description": "4× Plus weekly shared Cursor-models usage pool across Cursor, Grok apps, and Grok Bot",
         "source": "https://cursor.com/docs/models-and-pricing",
-        "verifiedAt": "2026-10-15"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -540,7 +540,7 @@
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-10-15",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -554,7 +554,7 @@
         "kind": "relative-limit",
         "description": "15× Plus weekly shared Cursor-models usage pool across Cursor, Grok apps, and Grok Bot, with priority access at peak times",
         "source": "https://cursor.com/docs/models-and-pricing",
-        "verifiedAt": "2026-10-15"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -570,7 +570,7 @@
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.45,
-      "verifiedAt": "2026-10-15",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -584,7 +584,7 @@
         "kind": "relative-limit",
         "description": "50× Plus weekly shared Cursor-models usage pool across Cursor, Grok apps, and Grok Bot, with earliest access to new products and models",
         "source": "https://cursor.com/docs/models-and-pricing",
-        "verifiedAt": "2026-10-15"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -593,7 +593,7 @@
       "name": "Cursor Pro",
       "kind": "Subscription",
       "monthly": 20,
-      "source": "https://cursor.com/docs/models-and-pricing",
+      "source": "https://cursor.com/docs/account/pricing/legacy-cursor-plans",
       "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Premium ($30) (https://cursor.com/help/account-and-billing/pricing, https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing Cursor Pro subscribers keep this plan until they switch or cancel (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $20 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit. Muse Wonder draws from the Other Models pool at API list price (https://cursor.com/docs/models/muse-wonder). The X Subscription does not include third-party models; Premium and above bill them from prepaid credit (https://cursor.com/docs/models-and-pricing, https://cursor.com/docs/account/pricing/legacy-cursor-plans).",
       "quota": "$20 Other Models usage plus Cursor Models pool",
       "evidence": "Official credit",
@@ -601,7 +601,7 @@
       "apiIncluded": "Editor pool",
       "includedApiValue": 20,
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-10-19",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -642,7 +642,7 @@
       "name": "Cursor Pro Plus",
       "kind": "Subscription",
       "monthly": 60,
-      "source": "https://cursor.com/docs/models-and-pricing",
+      "source": "https://cursor.com/docs/account/pricing/legacy-cursor-plans",
       "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Super ($100) (https://cursor.com/help/account-and-billing/pricing, https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing Cursor Pro+ subscribers keep this plan until they switch or cancel (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $70 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit. Muse Wonder draws from the Other Models pool at API list price (https://cursor.com/docs/models/muse-wonder). The X Subscription does not include third-party models; Premium and above bill them from prepaid credit (https://cursor.com/docs/models-and-pricing, https://cursor.com/docs/account/pricing/legacy-cursor-plans).",
       "quota": "$70 Other Models usage plus Cursor Models pool",
       "evidence": "Official credit",
@@ -650,7 +650,7 @@
       "apiIncluded": "Editor pool",
       "includedApiValue": 70,
       "cacheRatio": 0.4,
-      "verifiedAt": "2026-10-19",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -691,7 +691,7 @@
       "name": "Cursor Ultra",
       "kind": "Subscription",
       "monthly": 200,
-      "source": "https://cursor.com/docs/models-and-pricing",
+      "source": "https://cursor.com/docs/account/pricing/legacy-cursor-plans",
       "note": "Legacy plan for existing subscribers only; not offered to new customers. Comparable X Subscription plan: Ultra ($200) (https://cursor.com/help/account-and-billing/pricing, https://x.ai/news/x-subscription, https://docs.x.ai/x-subscription/pricing). Existing Cursor Ultra subscribers keep this plan until they switch or cancel (https://cursor.com/docs/account/pricing/legacy-cursor-plans, https://cursor.com/help/the-x-subscription/overview). Includes a $400 Other Models editor pool plus separate generous usage for Cursor models. This is not general API credit. Muse Wonder draws from the Other Models pool at API list price (https://cursor.com/docs/models/muse-wonder). The X Subscription does not include third-party models; Premium and above bill them from prepaid credit (https://cursor.com/docs/models-and-pricing, https://cursor.com/docs/account/pricing/legacy-cursor-plans).",
       "quota": "$400 Other Models usage plus Cursor Models pool",
       "evidence": "Official credit",
@@ -699,7 +699,7 @@
       "apiIncluded": "Editor pool",
       "includedApiValue": 400,
       "cacheRatio": 0.45,
-      "verifiedAt": "2026-10-19",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "grok-4-7",
         "grok-4-6",
@@ -740,14 +740,14 @@
       "name": "OpenCode Go",
       "kind": "Subscription",
       "monthly": 10,
-      "source": "https://opencode.ai/docs/go/",
-      "note": "Usage is capped in dollars per model, not credits, and metered at the same per-token rates published for each model. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: DeepSeek V4.1 Flash is $100, GLM-5.3-Flash and Kimi K2.7 Code are $60, Gemini 4 Argon is $30, MiniMax M3.1 Flash is $20, and Grok 4.7, GPT-5.6 Luna, GLM-5.3, Kimi K3, Kimi K3.1 Pro, Qwen3.8-Max, DeepSeek V4 Pro, GPT-6 Luna, Claude Haiku 5.5, and Step 5 Preview are $15. Grok 4.6 is no longer on the Go model list. The $60 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-11-09. Gemini 4 Argon is the paid model; the Go table shows its token rates at 50% off through November 30, 2026, matching Google's introductory rate, and the stored cap is the printed $30. MiniMax M3.1 Flash is the paid model at $20; the earlier free promo row is not mapped onto this model. Kimi K3.1 Pro is $15. Step 5 Preview's table shows the standard $15. API usage beyond the cap is not included. MiniMax M3 has a $60 monthly cap across both context bands. Qwen4-Max has a $15 monthly cap (https://opencode.ai/inference/go/v1/models). GLM-5.3 has a temporary $500 cap through November 22, 2026 (https://opencode.ai/docs/console/go/); modelAllowances retains the last published standing $15 cap, following the catalog policy for temporary multipliers.",
+      "source": "https://opencode.ai/docs/console/go/",
+      "note": "Usage is capped in dollars per model, not credits, and metered at the same per-token rates published for each model. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: DeepSeek V4.1 Flash is $100, GLM-5.3-Flash and Kimi K2.7 Code are $60, Gemini 4 Argon is $30, MiniMax M3.1 Flash is $20, GLM-5.3 is $200, and Grok 4.7, GPT-5.6 Luna, Kimi K3, Kimi K3.1 Pro, Qwen3.8-Max, DeepSeek V4 Pro, GPT-6 Luna, Claude Haiku 5.5, and Step 5 Preview are $15. Grok 4.6 is no longer on the Go model list. The $60 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/inference/go/v1/models on 2026-11-23. Gemini 4 Argon is the paid model; the Go table shows its token rates at 50% off through November 30, 2026, matching Google's introductory rate, and the stored cap is the printed $30. MiniMax M3.1 Flash is the paid model at $20; the earlier free promo row is not mapped onto this model. Kimi K3.1 Pro is $15. Step 5 Preview's table shows the standard $15. API usage beyond the cap is not included. MiniMax M3 has a $60 monthly cap across both context bands. Qwen4-Max has a $15 monthly cap (https://opencode.ai/inference/go/v1/models). The November 22 GLM-5.3 promotion has ended; the current model API publishes $200 as this tier's monthly GLM-5.3 cap with no dated promotion attached. This is shared model-weighted usage, not a separate pool per model.",
       "quota": "Per-model monthly caps; 5-hour is 20% and weekly is 50% of the selected model's cap",
       "evidence": "Official quota",
       "confidence": "High",
       "apiIncluded": "Yes",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-11-19",
+      "verifiedAt": "2026-11-23",
       "includedApiValue": 60,
       "modelIds": [
         "grok-4-7",
@@ -776,14 +776,14 @@
         "kind": "dollar-allowance",
         "amount": 60,
         "resetWindow": "monthly",
-        "source": "https://opencode.ai/docs/go/",
-        "verifiedAt": "2026-11-09"
+        "source": "https://opencode.ai/docs/console/go/",
+        "verifiedAt": "2026-11-23"
       },
       "modelAllowances": {
         "grok-4-7": 15,
         "gpt-5-6-luna": 15,
         "glm-5-3-flash": 60,
-        "glm-5-3": 15,
+        "glm-5-3": 200,
         "kimi-k3": 15,
         "kimi-k3-1-pro": 15,
         "kimi-k2-7-code": 60,
@@ -819,14 +819,14 @@
       "name": "OpenCode Go Plus",
       "kind": "Subscription",
       "monthly": 40,
-      "source": "https://opencode.ai/docs/go/",
-      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go marketing page does not print a launch date; Go Plus was added to the former docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash and Kimi K2.7 Code are $180, DeepSeek V4.1 Flash is $200, GLM-5.3 and Gemini 4 Argon are $120, MiniMax M3.1 Flash is $80, and Kimi K3, Kimi K3.1 Pro, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, GPT-6 Luna, GPT-5.6 Luna, Claude Haiku 5.5, and Step 5 Preview are $60. Grok 4.6 is no longer on the Go Plus model list. The $180 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/docs/go/ on 2026-11-09. Gemini 4 Argon is the paid model; the Go table shows its token rates at 50% off through November 30, 2026, matching Google's introductory rate, and the stored cap is the printed $120. MiniMax M3.1 Flash is the paid model at $80; the earlier free promo row is not mapped onto this model. Kimi K3.1 Pro is $60. Step 5 Preview's table shows the standard $60. MiniMax M3 has a $180 monthly cap across both context bands. Qwen4-Max has a $60 monthly cap (https://opencode.ai/inference/go/v1/models). GLM-5.3 has a temporary $1000 cap through November 22, 2026 (https://opencode.ai/docs/console/go/); modelAllowances retains the last published standing $120 cap, following the catalog policy for temporary multipliers.",
+      "source": "https://opencode.ai/docs/console/go/",
+      "note": "Same models and per-token prices as OpenCode Go, with higher per-model monthly caps. The Go marketing page does not print a launch date; Go Plus was added to the former docs on September 28, 2026. Each model's 5-hour limit is 20% of its monthly cap and its weekly limit is 50%. Capacity uses the selected working model's published monthly cap: GLM-5.3-Flash and Kimi K2.7 Code are $180, DeepSeek V4.1 Flash is $200, GLM-5.3 is $400, Gemini 4 Argon is $120, MiniMax M3.1 Flash is $80, and Kimi K3, Kimi K3.1 Pro, Qwen3.8-Max, DeepSeek V4 Pro, Grok 4.7, GPT-6 Luna, GPT-5.6 Luna, Claude Haiku 5.5, and Step 5 Preview are $60. Grok 4.6 is no longer on the Go Plus model list. The $180 on quotaDetail is GLM-5.3-Flash's cap. Caps re-read from https://opencode.ai/inference/go/v1/models on 2026-11-23. Gemini 4 Argon is the paid model; the Go table shows its token rates at 50% off through November 30, 2026, matching Google's introductory rate, and the stored cap is the printed $120. MiniMax M3.1 Flash is the paid model at $80; the earlier free promo row is not mapped onto this model. Kimi K3.1 Pro is $60. Step 5 Preview's table shows the standard $60. MiniMax M3 has a $180 monthly cap across both context bands. Qwen4-Max has a $60 monthly cap (https://opencode.ai/inference/go/v1/models). The November 22 GLM-5.3 promotion has ended; the current model API publishes $400 as this tier's monthly GLM-5.3 cap with no dated promotion attached. This is shared model-weighted usage, not a separate pool per model.",
       "quota": "Per-model monthly caps; 5-hour is 20% and weekly is 50% of the selected model's cap",
       "evidence": "Official quota",
       "confidence": "High",
       "apiIncluded": "Yes",
       "cacheRatio": 0.2,
-      "verifiedAt": "2026-11-19",
+      "verifiedAt": "2026-11-23",
       "includedApiValue": 180,
       "modelIds": [
         "grok-4-7",
@@ -855,14 +855,14 @@
         "kind": "dollar-allowance",
         "amount": 180,
         "resetWindow": "monthly",
-        "source": "https://opencode.ai/docs/go/",
-        "verifiedAt": "2026-11-09"
+        "source": "https://opencode.ai/docs/console/go/",
+        "verifiedAt": "2026-11-23"
       },
       "modelAllowances": {
         "grok-4-7": 60,
         "gpt-5-6-luna": 60,
         "glm-5-3-flash": 180,
-        "glm-5-3": 120,
+        "glm-5-3": 400,
         "kimi-k3": 60,
         "kimi-k3-1-pro": 60,
         "kimi-k2-7-code": 180,
@@ -904,7 +904,7 @@
       "evidence": "Price break-even",
       "confidence": "Low",
       "apiIncluded": "Yes",
-      "verifiedAt": "2026-11-19",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "gpt-6-astra",
         "gpt-6-1-sol",
@@ -952,7 +952,7 @@
         "kind": "unknown",
         "description": "Direct token pass-through with no monthly fee",
         "source": "https://opencode.ai/docs/zen/",
-        "verifiedAt": "2026-10-22"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -962,14 +962,14 @@
       "kind": "Subscription",
       "monthly": 18,
       "source": "https://docs.z.ai/devpack/overview",
-      "note": "Credits are charged as (input x 6.9 + cached input x 1.7 + output x 24) / 10,000 for GLM-5.3; GLM-5.3-Flash bills at roughly a third of that. Off-peak hours cost half, which is the upper end of the range shown. The weekly cap binds before the 5-hour one. Reference model moved from GLM-5.2 to GLM-5.3 when GLM-5.2 left the catalog.",
+      "note": "Credits are charged as (input x 6.9 + cached input x 1.7 + output x 24) / 10,000 for GLM-5.3; GLM-5.3-Flash bills at roughly a third of that. Off-peak hours cost half, which is the upper end of the range shown. The weekly cap binds before the 5-hour one. Reference model moved from GLM-5.2 to GLM-5.3 when GLM-5.2 left the catalog. All tiers also support GLM-5.4 with published credit multipliers (4.6 input / 1.1 cached / 16 output), compared with GLM-5.3 (6.9 / 1.7 / 24). The shared credit pools are unchanged; the model costs fewer credits. GLM-5.4 is not yet an API catalog row because official API token prices and exact model limits are unpublished (https://docs.z.ai/devpack/overview, https://docs.z.ai/guides/overview/pricing).",
       "quota": "2,000 credits per 5 hours and 10,000 per week",
       "evidence": "Official credit",
       "confidence": "High",
       "apiIncluded": "Coding endpoint",
       "weeklyCredits": 10000,
       "cacheRatio": 0.3,
-      "verifiedAt": "2026-09-03",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "glm-5-3",
         "glm-5-3-flash"
@@ -996,7 +996,7 @@
         "resetWindow": "weekly",
         "modelMeter": "credit-multipliers",
         "source": "https://docs.z.ai/devpack/overview",
-        "verifiedAt": "2026-09-03"
+        "verifiedAt": "2026-11-23"
       },
       "conditionalLimits": [
         {
@@ -1013,7 +1013,7 @@
       "kind": "Subscription",
       "monthly": 80,
       "source": "https://z.ai/subscribe",
-      "note": "Credits are charged as (input x 6.9 + cached input x 1.7 + output x 24) / 10,000 for GLM-5.3. Off-peak hours cost half, which is the upper end of the range shown. Reference model moved from GLM-5.2 to GLM-5.3 when GLM-5.2 left the catalog.",
+      "note": "Credits are charged as (input x 6.9 + cached input x 1.7 + output x 24) / 10,000 for GLM-5.3. Off-peak hours cost half, which is the upper end of the range shown. Reference model moved from GLM-5.2 to GLM-5.3 when GLM-5.2 left the catalog. All tiers also support GLM-5.4 with published credit multipliers (4.6 input / 1.1 cached / 16 output), compared with GLM-5.3 (6.9 / 1.7 / 24). The shared credit pools are unchanged; the model costs fewer credits. GLM-5.4 is not yet an API catalog row because official API token prices and exact model limits are unpublished (https://docs.z.ai/devpack/overview, https://docs.z.ai/guides/overview/pricing). Plan price retains its earlier verification date; the public subscription page did not expose the current dollar amount in this pass.",
       "quota": "12,000 credits per 5 hours and 60,000 per week",
       "evidence": "Official credit",
       "confidence": "High",
@@ -1046,8 +1046,8 @@
         "amount": 60000,
         "resetWindow": "weekly",
         "modelMeter": "credit-multipliers",
-        "source": "https://z.ai/subscribe",
-        "verifiedAt": "2026-09-03"
+        "source": "https://docs.z.ai/devpack/overview",
+        "verifiedAt": "2026-11-23"
       },
       "conditionalLimits": [
         {
@@ -1064,7 +1064,7 @@
       "kind": "Subscription",
       "monthly": 168,
       "source": "https://z.ai/subscribe",
-      "note": "Credits are charged as (input x 6.9 + cached input x 1.7 + output x 24) / 10,000 for GLM-5.3. Off-peak hours cost half, which is the upper end of the range shown. Reference model moved from GLM-5.2 to GLM-5.3 when GLM-5.2 left the catalog.",
+      "note": "Credits are charged as (input x 6.9 + cached input x 1.7 + output x 24) / 10,000 for GLM-5.3. Off-peak hours cost half, which is the upper end of the range shown. Reference model moved from GLM-5.2 to GLM-5.3 when GLM-5.2 left the catalog. All tiers also support GLM-5.4 with published credit multipliers (4.6 input / 1.1 cached / 16 output), compared with GLM-5.3 (6.9 / 1.7 / 24). The shared credit pools are unchanged; the model costs fewer credits. GLM-5.4 is not yet an API catalog row because official API token prices and exact model limits are unpublished (https://docs.z.ai/devpack/overview, https://docs.z.ai/guides/overview/pricing). Plan price retains its earlier verification date; the public subscription page did not expose the current dollar amount in this pass.",
       "quota": "28,000 credits per 5 hours and 140,000 per week",
       "evidence": "Official credit",
       "confidence": "High",
@@ -1097,8 +1097,8 @@
         "amount": 140000,
         "resetWindow": "weekly",
         "modelMeter": "credit-multipliers",
-        "source": "https://z.ai/subscribe",
-        "verifiedAt": "2026-09-03"
+        "source": "https://docs.z.ai/devpack/overview",
+        "verifiedAt": "2026-11-23"
       },
       "conditionalLimits": [
         {
@@ -1120,7 +1120,7 @@
       "evidence": "Official relative limit",
       "confidence": "Low",
       "apiIncluded": "No",
-      "verifiedAt": "2026-09-22",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "meta-muse-spark-1-3"
       ],
@@ -1131,7 +1131,7 @@
         "kind": "relative-limit",
         "description": "Meta's largest individual Meta AI allowance; no numeric allowance published",
         "source": "https://about.fb.com/news/2026/09/introducing-meta-one-subscription-service-more-features-ai/",
-        "verifiedAt": "2026-09-22"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -1231,7 +1231,7 @@
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.25,
-      "verifiedAt": "2026-10-26",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "kimi-k3"
       ],
@@ -1243,7 +1243,7 @@
         "kind": "relative-limit",
         "description": "Baseline Agent credits; 2 parallel Agent tasks; rolling 5-hour Kimi Code limit and no weekly limit",
         "source": "https://www.kimi.ai/help/membership/membership-overview",
-        "verifiedAt": "2026-10-22"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -1259,7 +1259,7 @@
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.25,
-      "verifiedAt": "2026-10-26",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "kimi-k3",
         "kimi-k3-1-pro"
@@ -1272,7 +1272,7 @@
         "kind": "relative-limit",
         "description": "2× Agent credits; 2 parallel Agent tasks; Goal Mode and a dedicated Kimi Claw; rolling 5-hour Kimi Code limit and no weekly limit",
         "source": "https://www.kimi.ai/help/membership/membership-overview",
-        "verifiedAt": "2026-10-22"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -1288,7 +1288,7 @@
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.3,
-      "verifiedAt": "2026-10-26",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "kimi-k3",
         "kimi-k3-1-pro"
@@ -1301,7 +1301,7 @@
         "kind": "relative-limit",
         "description": "5× Agent credits; 4 parallel Agent tasks; Goal Mode and a dedicated Kimi Claw; rolling 5-hour Kimi Code limit and no weekly limit",
         "source": "https://www.kimi.ai/help/membership/membership-overview",
-        "verifiedAt": "2026-10-22"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -1317,7 +1317,7 @@
       "confidence": "High",
       "apiIncluded": "No",
       "cacheRatio": 0.35,
-      "verifiedAt": "2026-10-26",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "kimi-k3",
         "kimi-k3-1-pro"
@@ -1330,7 +1330,7 @@
         "kind": "relative-limit",
         "description": "10× Agent credits; 4 parallel Agent tasks; Goal Mode and a dedicated Kimi Claw; rolling 5-hour Kimi Code limit and no weekly limit",
         "source": "https://www.kimi.ai/help/membership/membership-overview",
-        "verifiedAt": "2026-10-22"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -1468,7 +1468,7 @@
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "Yes",
-      "verifiedAt": "2026-10-19",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "minimax-m3-1-flash"
       ],
@@ -1480,7 +1480,7 @@
         "kind": "relative-limit",
         "description": "Baseline M Plan usage; 5-hour and weekly windows; no numeric allowance published",
         "source": "https://platform.minimax.io/docs/m-plan/intro",
-        "verifiedAt": "2026-10-19"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -1495,7 +1495,7 @@
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "Yes",
-      "verifiedAt": "2026-10-19",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "minimax-m3-1-flash"
       ],
@@ -1507,7 +1507,7 @@
         "kind": "relative-limit",
         "description": "3× Go usage; 5-hour and weekly windows; no numeric Go allowance published",
         "source": "https://platform.minimax.io/docs/m-plan/intro",
-        "verifiedAt": "2026-10-19"
+        "verifiedAt": "2026-11-23"
       }
     },
     {
@@ -1522,7 +1522,7 @@
       "evidence": "Official relative limit",
       "confidence": "Medium",
       "apiIncluded": "Yes",
-      "verifiedAt": "2026-10-19",
+      "verifiedAt": "2026-11-23",
       "modelIds": [
         "minimax-m3-1-flash"
       ],
@@ -1534,7 +1534,7 @@
         "kind": "relative-limit",
         "description": "7.5× Go usage; 5-hour and weekly windows; no numeric Go allowance published",
         "source": "https://platform.minimax.io/docs/m-plan/intro",
-        "verifiedAt": "2026-10-19"
+        "verifiedAt": "2026-11-23"
       }
     }
   ]

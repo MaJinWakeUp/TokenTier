@@ -19,8 +19,8 @@ available under the MIT License.
 - Consumer subscription prices and their theoretical API-cost equivalents
 
 The equivalence figures are economic comparisons, not provider quotas or API
-credits. Prices were checked against official provider sources on September 17,
-2026; temporary, threshold, and volatile prices are labeled in the interface.
+credits. Each record carries its own official source and verification date;
+temporary, threshold, and volatile prices are labeled in the interface.
 
 ## Workload profiles
 
@@ -57,12 +57,11 @@ capacity estimate and its tier, and the interface names it (`via
 MiniMax M3.1 Flash`) wherever a plan number is shown.
 
 The effect is largest where a plan spans a wide price range. OpenCode Go's
-daily-use card is MiniMax M3.1 Flash at its $20 cap, about 33,000 calls. Hard
-coding misses that model, so the plan is judged on Claude Haiku 5.5 at its $15
-cap, about 1,400 calls against a 1,500-call profile. The same subscription is
-generous for light work and close to the hard-coding profile on the monthly
-dollar cap. Both cards stay conditional, because the allowance is also capped
-on a five-hour window and a weekly window.
+daily-use card is GLM-5.3-Flash at its $60 cap, about 111,000 calls. Hard
+coding misses that model, so the plan is judged on DeepSeek V4.1 Flash at its
+$100 cap, about 3,500 calls against a 1,500-call profile. Both cards stay
+conditional, because the allowance is also capped on a five-hour window and a
+weekly window.
 
 A plan whose models all fall below a scenario's bar is off that board, and the
 reason names its closest miss.
@@ -258,6 +257,32 @@ tier lists, recommendations, cost list, price book, source links, and update
 date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
+
+## Catalog changes, November 23 2026
+
+Added **[GLM-5.3-FlashX](https://docs.z.ai/guides/vlm/glm-5.3-flash)** at the [published API rates](https://docs.z.ai/guides/overview/pricing) of $0.37 input / $0.075 cached input / $1.25 output per 1M tokens, with a 1M context window and 128K maximum output. It remains unscored and is not included in GLM Coding plans. [GLM-5.4 is included on every Coding tier](https://docs.z.ai/devpack/overview), with credit multipliers of 4.6 / 1.1 / 16 rather than GLM-5.3's 6.9 / 1.7 / 24. The shared credit pools are unchanged. The plan notes record that access; an API model row is deferred because Z.ai has not published its API token rates or exact model limits.
+
+Rebased all 22 existing scored models together onto [Artificial Analysis Intelligence Index v5.0.1](https://artificialanalysis.ai/models), preserving each effort variant. The four scenario anchors keep their previous scores, so all seven bars and their anchor gaps remain unchanged. Nine existing models now have comparable scores:
+
+| Model | Variant | Index v5.0.1 |
+| --- | --- | --- |
+| [Claude Fable 5.2](https://artificialanalysis.ai/models/claude-fable-5-2) | max | 65 |
+| [GPT-6.2 Astra](https://artificialanalysis.ai/models/gpt-6-2-astra) | max | 62 |
+| [Gemini 4 Neon](https://artificialanalysis.ai/models/gemini-4-neon) | high | 60 |
+| [GPT-6.2 Sol](https://artificialanalysis.ai/models/gpt-6-2-sol) | max | 57 |
+| [Gemini 4 Hydrogen](https://artificialanalysis.ai/models/gemini-4-hydrogen) | high | 51 |
+| [Qwen4-Max](https://artificialanalysis.ai/models/qwen4-max) | published variant | 43 |
+| [Muse Ember](https://artificialanalysis.ai/models/muse-ember) | max | 36 |
+| [GLM-5.3-Flash](https://artificialanalysis.ai/models/glm-5-3-flash) | published variant | 28 |
+| [MiniMax M3](https://artificialanalysis.ai/models/minimax-m3) | published variant | 19 |
+
+There are now 47 models, 31 scored. Qualifying model counts change from 22 to 31 on daily use and easy coding, 19 to 26 on medium coding, 16 to 23 on hard coding, research and innovation, and 21 to 29 on writing. Muse Ember replaces Haiku 5.5 as the cheapest qualified API on every preset; Fable 5.2 replaces Carbon as the most capable. Google plans use Hydrogen, Muse Code plans use Ember, and Go and GLM Coding use GLM-5.3-Flash on daily use, easy coding and writing. Other model letters can move with the enlarged curve; no plan changes price tier. Workload profiles, ranking rules and plan price floors stay the same.
+
+[OpenAI's current pricing table](https://developers.openai.com/api/docs/pricing) now explicitly prices long-context cache reads for GPT-5.6 Terra at $0.40 and Luna at $0.04, correcting the former $0.20 and $0.02 bands above 272K input tokens. The older GPT-5.6 and GPT-6 rows also gain their documented 922,000-token input ceiling. [Grok Build 0.1](https://docs.x.ai/developers/models/grok-build-0.1) now records the published 500K context window. [Mistral now publishes Codestral's $0.03 cached-input rate](https://docs.mistral.ai/inference/pricing), replacing the unknown cached rate. Claude Pro's obsolete $20 Agent SDK credit wording is removed: [the SDK changes were paused](https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan), and signed-in usage draws from subscription limits.
+
+After the November 22 promotion ended, [OpenCode's current Go model API](https://opencode.ai/inference/go/v1/models) publishes GLM-5.3 monthly caps of $200 on Go and $400 on Go Plus. Those replace $15 and $120; the same shared allowance and 20% five-hour / 50% weekly limits still apply. No model or plan was newly confirmed retired, and existing legacy IDs remain available for saved boards.
+
+Official prices and quota evidence were re-read across the represented providers. Verification dates advance only for checked facts. The stale-record count falls from 79 to 18: GLM Pro/Max dollar prices could not be re-read from the public subscription page; the other remaining old records are historical quotas or terms on legacy SuperGrok, Cursor, Kimi and Max 20x plans. Their previous values and dates are retained, so the strict 30-day freshness check still fails. This pass does not claim those terms were freshly verified.
 
 ## Catalog changes, November 19 2026
 

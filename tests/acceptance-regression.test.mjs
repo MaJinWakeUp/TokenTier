@@ -490,12 +490,12 @@ test("OpenCode Go allowance follows the selected working model's published cap",
   };
 
   const daily = estimateFor("daily");
-  assert.equal(daily.working.id, "deepseek-v4-1-flash");
-  assert.equal(daily.estimate.valueHigh, 100, "Daily use must use DeepSeek V4.1 Flash's $100 cap");
+  assert.equal(daily.working.id, "glm-5-3-flash");
+  assert.equal(daily.estimate.valueHigh, 60, "Daily use must use GLM-5.3-Flash's $60 cap");
   assert.equal(daily.estimate.callsLow, 0);
-  assert.match(daily.estimate.basis.label, /\$20 of DeepSeek V4\.1 Flash usage per 5 hours \(20% of its \$100 monthly cap\)/);
-  assert.match(daily.estimate.basis.label, /\$50 of DeepSeek V4\.1 Flash usage per week \(50% of its \$100 monthly cap\)/);
-  assert.equal(allowanceQuotaLabel(plan, daily.working), "$100/month on DeepSeek V4.1 Flash ($20/5h, $50/weekly)");
+  assert.match(daily.estimate.basis.label, /\$12 of GLM-5\.3-Flash usage per 5 hours \(20% of its \$60 monthly cap\)/);
+  assert.match(daily.estimate.basis.label, /\$30 of GLM-5\.3-Flash usage per week \(50% of its \$60 monthly cap\)/);
+  assert.equal(allowanceQuotaLabel(plan, daily.working), "$60/month on GLM-5.3-Flash ($12/5h, $30/weekly)");
   assert.equal(daily.estimate.basis.kind, "conditional");
 
   const medium = estimateFor("code-medium");
@@ -537,11 +537,11 @@ test("Go Plus allowance follows the selected working model's published cap", () 
   assert.equal(research.estimate.valueHigh, 200);
 
   const writing = estimateFor("writing");
-  assert.equal(writing.working.id, "deepseek-v4-1-flash");
-  assert.equal(writing.estimate.valueHigh, 200, "Writing must use DeepSeek V4.1 Flash's $200 cap");
-  assert.match(writing.estimate.basis.label, /\$40 of DeepSeek V4\.1 Flash usage per 5 hours \(20% of its \$200 monthly cap\)/);
-  assert.match(writing.estimate.basis.label, /\$100 of DeepSeek V4\.1 Flash usage per week \(50% of its \$200 monthly cap\)/);
-  assert.equal(allowanceQuotaLabel(plan, writing.working), "$200/month on DeepSeek V4.1 Flash ($40/5h, $100/weekly)");
+  assert.equal(writing.working.id, "glm-5-3-flash");
+  assert.equal(writing.estimate.valueHigh, 180, "Writing must use GLM-5.3-Flash's $180 cap");
+  assert.match(writing.estimate.basis.label, /\$36 of GLM-5\.3-Flash usage per 5 hours \(20% of its \$180 monthly cap\)/);
+  assert.match(writing.estimate.basis.label, /\$90 of GLM-5\.3-Flash usage per week \(50% of its \$180 monthly cap\)/);
+  assert.equal(allowanceQuotaLabel(plan, writing.working), "$180/month on GLM-5.3-Flash ($36/5h, $90/weekly)");
   assert.equal(writing.estimate.basis.kind, "conditional");
 });
 
@@ -556,7 +556,7 @@ test("a per-model allowance is already monthly and is not scaled by resetWindow"
       conditionalLimits: [],
     };
     const estimate = planEstimate(shifted, settings, model, model);
-    assert.equal(estimate.valueHigh, 120, `${resetWindow} must not scale GLM-5.3's monthly cap`);
+    assert.equal(estimate.valueHigh, 400, `${resetWindow} must not scale GLM-5.3's monthly cap`);
   }
 });
 
@@ -691,6 +691,20 @@ test("AC5: credit plan working model uses credits per call, not cheapest API rat
 });
 
 // -- AC7: boundary tests for unsupportedBeyond --------------------------------
+
+test("OpenAI input ceilings price the valid 922,000-token maximum", () => {
+  const ids = [
+    "gpt-6-astra", "gpt-5-6-sol", "gpt-5-6-terra", "gpt-5-6-luna",
+    "gpt-6-sol", "gpt-6-luna", "gpt-6-1-sol", "gpt-6-1-terra",
+  ];
+  for (const id of ids) {
+    const model = modelById.get(id);
+    assert.ok(model, `${id} must remain in the catalog`);
+    const settings = { input: 922_000, output: 1, cacheRatio: 0.25 };
+    assert.ok(Number.isFinite(callCost(model, settings)), `${id} must price its valid maximum`);
+    assert.ok(Number.isNaN(callCost(model, { ...settings, input: 922_001 })), `${id} must refuse input above its maximum`);
+  }
+});
 
 // unsupportedBeyond marks the input ceiling above which a model's published
 // rates stop. The catalog carried it on gemini-3-1-pro and grok-4-5 until both
@@ -1042,7 +1056,7 @@ test("GPT-5.6 Sol promotional pricing runs until November 30, 2026", () => {
   assert.equal(sol.input, 4);
   assert.equal(sol.cached, 0.4);
   assert.equal(sol.output, 20);
-  assert.equal(sol.verifiedAt, "2026-11-05");
+  assert.ok(sol.verifiedAt >= "2026-11-05", "Sol’s rate must retain or advance its verification date");
   assert.match(sol.note, /until November 30, 2026/);
   assert.doesNotMatch(sol.note, /November 21/);
   assert.ok(dataset.updatedAt >= sol.verifiedAt, "Catalog date must cover Sol’s verification");
