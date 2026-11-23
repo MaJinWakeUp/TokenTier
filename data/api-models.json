@@ -41,7 +41,7 @@
           "threshold": 272001
         }
       ],
-      "unsupportedBeyond": 922000
+      "unsupportedBeyond": 922001
     },
     {
       "id": "gpt-5-6-sol",
@@ -65,7 +65,7 @@
           "threshold": 272001
         }
       ],
-      "unsupportedBeyond": 922000
+      "unsupportedBeyond": 922001
     },
     {
       "id": "gpt-5-6-terra",
@@ -89,7 +89,7 @@
           "threshold": 272001
         }
       ],
-      "unsupportedBeyond": 922000
+      "unsupportedBeyond": 922001
     },
     {
       "id": "gpt-5-6-luna",
@@ -113,7 +113,7 @@
           "threshold": 272001
         }
       ],
-      "unsupportedBeyond": 922000
+      "unsupportedBeyond": 922001
     },
     {
       "id": "claude-opus-5",
@@ -580,7 +580,7 @@
           "threshold": 272001
         }
       ],
-      "unsupportedBeyond": 922000
+      "unsupportedBeyond": 922001
     },
     {
       "id": "gpt-6-luna",
@@ -612,7 +612,7 @@
           "threshold": 272001
         }
       ],
-      "unsupportedBeyond": 922000
+      "unsupportedBeyond": 922001
     },
     {
       "id": "gpt-6-1-sol",
@@ -644,7 +644,7 @@
           "threshold": 272001
         }
       ],
-      "unsupportedBeyond": 922000
+      "unsupportedBeyond": 922001
     },
     {
       "id": "claude-sonnet-5-5",
@@ -839,7 +839,7 @@
           "threshold": 272001
         }
       ],
-      "unsupportedBeyond": 922000
+      "unsupportedBeyond": 922001
     },
     {
       "id": "minimax-m3",

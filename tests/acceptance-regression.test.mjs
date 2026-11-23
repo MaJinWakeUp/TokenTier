@@ -692,6 +692,20 @@ test("AC5: credit plan working model uses credits per call, not cheapest API rat
 
 // -- AC7: boundary tests for unsupportedBeyond --------------------------------
 
+test("OpenAI input ceilings price the valid 922,000-token maximum", () => {
+  const ids = [
+    "gpt-6-astra", "gpt-5-6-sol", "gpt-5-6-terra", "gpt-5-6-luna",
+    "gpt-6-sol", "gpt-6-luna", "gpt-6-1-sol", "gpt-6-1-terra",
+  ];
+  for (const id of ids) {
+    const model = modelById.get(id);
+    assert.ok(model, `${id} must remain in the catalog`);
+    const settings = { input: 922_000, output: 1, cacheRatio: 0.25 };
+    assert.ok(Number.isFinite(callCost(model, settings)), `${id} must price its valid maximum`);
+    assert.ok(Number.isNaN(callCost(model, { ...settings, input: 922_001 })), `${id} must refuse input above its maximum`);
+  }
+});
+
 // unsupportedBeyond marks the input ceiling above which a model's published
 // rates stop. The catalog carried it on gemini-3-1-pro and grok-4-5 until both
 // providers published their above-200K rates; pinning the boundary behaviour to
