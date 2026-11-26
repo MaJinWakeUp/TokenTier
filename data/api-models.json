@@ -1,11 +1,11 @@
 {
   "schemaVersion": 3,
-  "updatedAt": "2026-11-23",
+  "updatedAt": "2026-11-26",
   "currency": "USD",
   "unit": "per-million-tokens",
   "capabilityIndex": {
     "name": "Artificial Analysis Intelligence Index",
-    "version": "5.0.1",
+    "version": "5.0.2",
     "scale": "0-100 composite of nine published evaluations",
     "source": "https://artificialanalysis.ai/",
     "attribution": "Capability scores are published by Artificial Analysis and reproduced with attribution."
@@ -26,10 +26,10 @@
         "metrics": {
           "intelligence": 57
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/gpt-6-astra",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       },
       "contextTokens": 1050000,
       "maxOutputTokens": 128000,
@@ -53,7 +53,7 @@
       "context": "1.05M",
       "source": "https://developers.openai.com/api/docs/pricing",
       "verifiedAt": "2026-11-23",
-      "note": "OpenAI labels the published $4 input / $0.40 cached / $20 output rate as promotional pricing available until November 30, 2026 (https://developers.openai.com/api/docs/models/gpt-5.6-sol and https://developers.openai.com/api/docs/pricing). The pricing page does not state a separate post-promotion standard rate, so that published rate stays the headline. Prompts above 272K input tokens use the pricing table's long-context column, $8 input / $0.80 cached / $30 output, for the whole request. Maximum output is 128K tokens. No Intelligence Index v5.0.1 score has been verified for this row. The model documentation limits input to 922,000 tokens of the 1.05M combined window.",
+      "note": "OpenAI labels the published $4 input / $0.40 cached / $20 output rate as promotional pricing available until November 30, 2026 (https://developers.openai.com/api/docs/models/gpt-5.6-sol and https://developers.openai.com/api/docs/pricing). The pricing page does not state a separate post-promotion standard rate, so that published rate stays the headline. Prompts above 272K input tokens use the pricing table's long-context column, $8 input / $0.80 cached / $30 output, for the whole request. Maximum output is 128K tokens. No Intelligence Index v5.0.2 score has been verified for this row. The model documentation limits input to 922,000 tokens of the 1.05M combined window.",
       "capability": null,
       "contextTokens": 1050000,
       "maxOutputTokens": 128000,
@@ -77,8 +77,16 @@
       "context": "1.05M",
       "source": "https://developers.openai.com/api/docs/pricing",
       "verifiedAt": "2026-11-23",
-      "note": "Published short-context rates are $2 input / $0.20 cached / $12 output per 1M tokens. For prompts above 272K input tokens, the pricing table publishes $4 input / $0.40 cached / $18 output for the whole request. Maximum input is 922,000 tokens and maximum output is 128,000 tokens of the 1.05M combined window. Artificial Analysis does not publish a comparable Intelligence Index score for this model.",
-      "capability": null,
+      "note": "Published short-context rates are $2 input / $0.20 cached / $12 output per 1M tokens. For prompts above 272K input tokens, the pricing table publishes $4 input / $0.40 cached / $18 output for the whole request. Maximum input is 922,000 tokens and maximum output is 128,000 tokens of the 1.05M combined window.",
+      "capability": {
+        "metrics": {
+          "intelligence": 32
+        },
+        "indexVersion": "5.0.2",
+        "variant": "max",
+        "source": "https://artificialanalysis.ai/models/gpt-5-6-terra",
+        "verifiedAt": "2026-11-26"
+      },
       "contextTokens": 1050000,
       "maxOutputTokens": 128000,
       "rateBands": [
@@ -101,8 +109,16 @@
       "context": "1.05M",
       "source": "https://developers.openai.com/api/docs/pricing",
       "verifiedAt": "2026-11-23",
-      "note": "Published short-context rates are $0.20 input / $0.02 cached / $1.20 output per 1M tokens. For prompts above 272K input tokens, the pricing table publishes $0.40 input / $0.04 cached / $1.80 output for the whole request. Maximum input is 922,000 tokens and maximum output is 128,000 tokens of the 1.05M combined window. Artificial Analysis does not publish a comparable Intelligence Index score for this model.",
-      "capability": null,
+      "note": "Published short-context rates are $0.20 input / $0.02 cached / $1.20 output per 1M tokens. For prompts above 272K input tokens, the pricing table publishes $0.40 input / $0.04 cached / $1.80 output for the whole request. Maximum input is 922,000 tokens and maximum output is 128,000 tokens of the 1.05M combined window.",
+      "capability": {
+        "metrics": {
+          "intelligence": 24
+        },
+        "indexVersion": "5.0.2",
+        "variant": "max",
+        "source": "https://artificialanalysis.ai/models/gpt-5-6-luna",
+        "verifiedAt": "2026-11-26"
+      },
       "contextTokens": 1050000,
       "maxOutputTokens": 128000,
       "rateBands": [
@@ -125,8 +141,16 @@
       "context": "1M",
       "source": "https://claude.com/pricing",
       "verifiedAt": "2026-11-23",
-      "note": "Frontier reasoning and agentic model; succeeds Opus 4.8. No Intelligence Index v5.0.1 score has been verified for this row.",
-      "capability": null,
+      "note": "Frontier reasoning and agentic model; succeeds Opus 4.8.",
+      "capability": {
+        "metrics": {
+          "intelligence": 44
+        },
+        "indexVersion": "5.0.2",
+        "variant": "max",
+        "source": "https://artificialanalysis.ai/models/claude-opus-5",
+        "verifiedAt": "2026-11-26"
+      },
       "contextTokens": 1000000
     },
     {
@@ -144,10 +168,10 @@
         "metrics": {
           "intelligence": 49
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/claude-fable-5-1",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       },
       "contextTokens": 1000000
     },
@@ -161,7 +185,7 @@
       "context": "1M",
       "source": "https://www.anthropic.com/news/claude-sonnet-5",
       "verifiedAt": "2026-11-23",
-      "note": "Permanent standard rate ($2 input / $10 output / $0.20 cached). No Intelligence Index v5.0.1 score has been verified for this row.",
+      "note": "Permanent standard rate ($2 input / $10 output / $0.20 cached). No Intelligence Index v5.0.2 score has been verified for this row.",
       "capability": null,
       "contextTokens": 1000000
     },
@@ -175,7 +199,7 @@
       "context": "200K",
       "source": "https://platform.claude.com/docs/en/about-claude/pricing",
       "verifiedAt": "2026-11-23",
-      "note": "Prices unchanged at $1 input / $0.10 cache read / $5 output. The Sonnet 5.5 model comparison lists a 200K context window and 64K maximum output (https://platform.claude.com/docs/en/models/sonnet-5-5/overview). The models overview lists Claude Haiku 4.5 among Legacy models that remain available (https://platform.claude.com/docs/en/about-claude/models/overview). The deprecations table lists claude-haiku-4-5-20251001 as Active, with retirement not sooner than October 15, 2026 (https://platform.claude.com/docs/en/about-claude/model-deprecations). No Intelligence Index v5.0.1 score has been verified for this row.",
+      "note": "Prices unchanged at $1 input / $0.10 cache read / $5 output. The Sonnet 5.5 model comparison lists a 200K context window and 64K maximum output (https://platform.claude.com/docs/en/models/sonnet-5-5/overview). The models overview lists Claude Haiku 4.5 among Legacy models that remain available (https://platform.claude.com/docs/en/about-claude/models/overview). The deprecations table lists claude-haiku-4-5-20251001 as Active, with retirement not sooner than October 15, 2026 (https://platform.claude.com/docs/en/about-claude/model-deprecations). No Intelligence Index v5.0.2 score has been verified for this row.",
       "capability": null,
       "contextTokens": 200000,
       "maxOutputTokens": 64000
@@ -191,7 +215,7 @@
       "contextTokens": 1000000,
       "source": "https://ai.google.dev/gemini-api/docs/pricing",
       "verifiedAt": "2026-11-23",
-      "note": "Standard price shown for prompts up to 200K tokens (inclusive). Prompts above 200K bill $4 input, $0.40 cached input, and $18 output per million tokens. No Intelligence Index v5.0.1 score has been verified for this row.",
+      "note": "Standard price shown for prompts up to 200K tokens (inclusive). Prompts above 200K bill $4 input, $0.40 cached input, and $18 output per million tokens. No Intelligence Index v5.0.2 score has been verified for this row.",
       "rateBands": [
         {
           "input": 4,
@@ -217,10 +241,10 @@
         "metrics": {
           "intelligence": 31
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "high",
         "source": "https://artificialanalysis.ai/models/gemini-3-8-flash",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       },
       "contextTokens": 1000000,
       "maxOutputTokens": 64000
@@ -235,8 +259,16 @@
       "context": "500K",
       "source": "https://docs.x.ai/developers/models/grok-4.6",
       "verifiedAt": "2026-11-23",
-      "note": "Prompts at or above 200K use $4 input, $1 cached input, and $12 output per million tokens. No Intelligence Index v5.0.1 score has been verified for this row.",
-      "capability": null,
+      "note": "Prompts at or above 200K use $4 input, $1 cached input, and $12 output per million tokens.",
+      "capability": {
+        "metrics": {
+          "intelligence": 31
+        },
+        "indexVersion": "5.0.2",
+        "variant": "xhigh",
+        "source": "https://artificialanalysis.ai/models/grok-4-6",
+        "verifiedAt": "2026-11-26"
+      },
       "contextTokens": 500000,
       "rateBands": [
         {
@@ -258,7 +290,7 @@
       "contextTokens": 500000,
       "source": "https://docs.x.ai/developers/pricing",
       "verifiedAt": "2026-11-23",
-      "note": "Prompts at or above 200K use $4 input, $0.60 cached input, and $12 output per million tokens. No Intelligence Index v5.0.1 score has been verified for this row.",
+      "note": "Prompts at or above 200K use $4 input, $0.60 cached input, and $12 output per million tokens. No Intelligence Index v5.0.2 score has been verified for this row.",
       "rateBands": [
         {
           "input": 4,
@@ -277,9 +309,9 @@
       "cached": 0.2,
       "output": 2,
       "context": "500K",
-      "source": "https://docs.x.ai/developers/models/grok-build-0.1",
-      "verifiedAt": "2026-11-23",
-      "note": "Agentic coding and tool-calling model. Prompts at or above 200K tokens use $2 input, $0.40 cached input, and $4 output per million tokens for the whole request. The current model page and pricing table publish a 500,000-token context window. No Intelligence Index v5.0.1 score has been verified for this row.",
+      "source": "https://docs.x.ai/developers/release-notes",
+      "verifiedAt": "2026-11-26",
+      "note": "The official release notes confirm grok-build-0.1 reached end of life on November 19, 2026 and is no longer served on the xAI API. The former model URL redirects to the current model list. The last published rates and 500K context are retained for historical comparisons, including $2 input / $0.40 cached / $4 output per 1M above the 200K input threshold. Grok 4.7 is the catalog replacement with its own prices; no automatic provider redirect is asserted. OpenCode still advertises this ID in its public model list (https://opencode.ai/inference/v1/models), but that conflicts with the upstream retirement notice and is not treated as verified current access.",
       "capability": null,
       "contextTokens": 500000,
       "rateBands": [
@@ -289,7 +321,9 @@
           "output": 4,
           "threshold": 200000
         }
-      ]
+      ],
+      "availability": "legacy",
+      "replacedBy": "grok-4-7"
     },
     {
       "id": "deepseek-v4-pro",
@@ -307,10 +341,10 @@
         "metrics": {
           "intelligence": 23
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/deepseek-v4-pro",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       },
       "maxOutputTokens": 384000
     },
@@ -325,7 +359,7 @@
       "contextTokens": 256000,
       "source": "https://docs.mistral.ai/getting-started/models/",
       "verifiedAt": "2026-11-02",
-      "note": "Deprecated on 10/31/2026 and scheduled to retire on 4/30/2027. The models overview lists API id mistral-large-2512 and names Mistral Large 4 as the alternative (https://docs.mistral.ai/getting-started/models/). The inference pricing page no longer lists this model, so the stored rates are the last published ones. No Intelligence Index v5.0.1 score has been verified for this row.",
+      "note": "Deprecated on 10/31/2026 and scheduled to retire on 4/30/2027. The models overview lists API id mistral-large-2512 and names Mistral Large 4 as the alternative (https://docs.mistral.ai/getting-started/models/). The inference pricing page no longer lists this model, so the stored rates are the last published ones. No Intelligence Index v5.0.2 score has been verified for this row.",
       "capability": null,
       "availability": "legacy",
       "replacedBy": "mistral-large-4"
@@ -337,11 +371,11 @@
       "input": 0.3,
       "cached": 0.03,
       "output": 0.9,
-      "context": "256K",
-      "contextTokens": 256000,
-      "source": "https://docs.mistral.ai/inference/pricing",
-      "verifiedAt": "2026-11-23",
-      "note": "Specialized model for code generation and Fill-in-the-Middle (FIM) workflows. The current official inference pricing page publishes $0.30 input / $0.03 cached input / $0.90 output per 1M tokens. No comparable Artificial Analysis Intelligence Index score is published for this model.",
+      "context": "128K",
+      "contextTokens": 128000,
+      "source": "https://docs.mistral.ai/models/codestral-25-08",
+      "verifiedAt": "2026-11-26",
+      "note": "Codestral v25.08 (codestral-latest) publishes a 128K context window and $0.30 input / $0.90 output per 1M tokens. The current pricing table does not print a separate cached-input rate. The stored $0.03 rate is derived as 10% of $0.30 under the official prompt-caching billing rule, for tokens reported as cache hits (https://docs.mistral.ai/inference/conversations/advanced/prompt-caching). No Intelligence Index score has been verified for this row.",
       "capability": null
     },
     {
@@ -359,10 +393,10 @@
         "metrics": {
           "intelligence": 32
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/glm-5-3",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       },
       "contextTokens": 1000000,
       "maxOutputTokens": 128000
@@ -382,9 +416,10 @@
         "metrics": {
           "intelligence": 28
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
+        "variant": "max",
         "source": "https://artificialanalysis.ai/models/glm-5-3-flash",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       },
       "contextTokens": 1000000,
       "maxOutputTokens": 128000
@@ -399,8 +434,16 @@
       "context": "1M",
       "source": "https://www.kimi.com/resources/kimi-k3-pricing",
       "verifiedAt": "2026-11-23",
-      "note": "Also available through OpenCode Zen; web search is billed separately. No Intelligence Index v5.0.1 score has been verified for this row.",
-      "capability": null,
+      "note": "Also available through OpenCode Zen; web search is billed separately. Only the low-effort variant has a published v5.0.2 score in this pass; the max-effort score is unpublished. This row records low effort and does not estimate max effort.",
+      "capability": {
+        "metrics": {
+          "intelligence": 17
+        },
+        "indexVersion": "5.0.2",
+        "variant": "low",
+        "source": "https://artificialanalysis.ai/models/kimi-k3",
+        "verifiedAt": "2026-11-26"
+      },
       "contextTokens": 1000000
     },
     {
@@ -412,8 +455,8 @@
       "output": 4,
       "context": "256K",
       "source": "https://www.kimi.com/en/resources/kimi-k2-7-code",
-      "verifiedAt": "2026-10-26",
-      "note": "Coding-specialized API; not ranked for general writing or research. Kimi's pricing page says K2 series models are closed to newly registered users from October 31, 2026, and all K2 series models are planned to retire by the end of December 2026 (https://platform.kimi.ai/docs/pricing/chat). Existing users are unaffected until then. The row stays because OpenCode Go, Go Plus, and Zen still list it. No Intelligence Index v5.0.1 score has been verified for this row.",
+      "verifiedAt": "2026-11-26",
+      "note": "Coding-specialized API; not ranked for general writing or research. Kimi's pricing page says K2 series models are closed to newly registered users from October 31, 2026, and all K2 series models are planned to retire by the end of December 2026 (https://platform.kimi.ai/docs/pricing/chat). Existing users are unaffected until then. The row stays because OpenCode Go, Go Plus, and Zen still list it. No Intelligence Index v5.0.2 score has been verified for this row.",
       "capability": null,
       "contextTokens": 256000
     },
@@ -432,10 +475,10 @@
         "metrics": {
           "intelligence": 37
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/muse-spark-1-3",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       },
       "contextTokens": 1000000
     },
@@ -454,9 +497,9 @@
         "metrics": {
           "intelligence": 34
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "source": "https://artificialanalysis.ai/models/qwen3-8-max",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       },
       "contextTokens": 1000000
     },
@@ -474,12 +517,12 @@
       "note": "DeepSeek identifies the current deepseek-flash endpoint as V4.1 Flash 1017; the retired V4 Flash aliases route to it. Headline input and output use the published peak rates. Off-peak input and output are $0.15 and $0.60 per 1M tokens. Peak hours are 01:00–04:00 and 06:00–10:00 UTC on weekdays, excluding Chinese public holidays. The displayed $0.0036 cache rate approximates a non-holiday week using 35 hours at $0.006 and 133 at $0.003. The Intelligence Index score uses the 1017 snapshot at max effort.",
       "capability": {
         "metrics": {
-          "intelligence": 33
+          "intelligence": 32
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/deepseek-v4-1-flash-1017",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       },
       "maxOutputTokens": 384000
     },
@@ -507,10 +550,10 @@
         "metrics": {
           "intelligence": 35
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "xhigh",
         "source": "https://artificialanalysis.ai/models/grok-4-7",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       }
     },
     {
@@ -529,9 +572,9 @@
         "metrics": {
           "intelligence": 29
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "source": "https://artificialanalysis.ai/models/step-5",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       },
       "maxOutputTokens": 64000
     },
@@ -552,10 +595,10 @@
         "metrics": {
           "intelligence": 59
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/claude-opus-5-5",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       }
     },
     {
@@ -570,8 +613,16 @@
       "maxOutputTokens": 128000,
       "source": "https://developers.openai.com/api/docs/models/gpt-6-sol",
       "verifiedAt": "2026-11-23",
-      "note": "GPT-6 mid tier, built for complex coding and agentic work. Half the published GPT-5.6 Sol price. Maximum output is 128K tokens. The model page states that prompts with more than 272K input tokens are priced at 2x input and cache rates and 1.5x output for the whole request. The long-context band ($4 input / $0.40 cached / $15 output) is derived from that multiplier applied to the published $2 / $0.20 / $10 rates. The current pricing table also publishes these long-context rates. No Intelligence Index v5.0.1 score has been verified for this row. The model documentation limits input to 922,000 tokens of the 1.05M combined window.",
-      "capability": null,
+      "note": "GPT-6 mid tier, built for complex coding and agentic work. Half the published GPT-5.6 Sol price. Maximum output is 128K tokens. The model page states that prompts with more than 272K input tokens are priced at 2x input and cache rates and 1.5x output for the whole request. The long-context band ($4 input / $0.40 cached / $15 output) is derived from that multiplier applied to the published $2 / $0.20 / $10 rates. The current pricing table also publishes these long-context rates. The model documentation limits input to 922,000 tokens of the 1.05M combined window.",
+      "capability": {
+        "metrics": {
+          "intelligence": 44
+        },
+        "indexVersion": "5.0.2",
+        "variant": "max",
+        "source": "https://artificialanalysis.ai/models/gpt-6-sol",
+        "verifiedAt": "2026-11-26"
+      },
       "rateBands": [
         {
           "input": 4,
@@ -599,10 +650,10 @@
         "metrics": {
           "intelligence": 28
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/gpt-6-luna",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       },
       "rateBands": [
         {
@@ -631,10 +682,10 @@
         "metrics": {
           "intelligence": 55
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/gpt-6-1-sol",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       },
       "rateBands": [
         {
@@ -663,10 +714,10 @@
         "metrics": {
           "intelligence": 55
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/claude-sonnet-5-5",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       }
     },
     {
@@ -684,12 +735,12 @@
       "note": "Released October 7, 2026. Prompts up to 100,000 tokens are $0.10 input / $0.01 cache read / $0.50 output; prompts over 100,000 tokens are $0.50 / $0.05 / $2.50 for the whole request. 5-minute cache writes are $0.125 below that line and $0.625 above it; 1-hour cache writes are $0.20 and $1. The Batch API is 50% off input and output. Synchronous maximum output is 128K tokens; the Message Batches API allows 300K with the output-300k-2026-03-24 beta header. Retirement is not sooner than October 7, 2027.",
       "capability": {
         "metrics": {
-          "intelligence": 36
+          "intelligence": 37
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/claude-haiku-5-5",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       },
       "rateBands": [
         {
@@ -716,10 +767,10 @@
         "metrics": {
           "intelligence": 26
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "high",
         "source": "https://artificialanalysis.ai/models/mistral-large-4",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       }
     },
     {
@@ -737,12 +788,12 @@
       "note": "GA October 13, 2026. Standard rate from December 1, 2026 shown. An introductory rate of $2 input / $0.10 cached / $10 output runs through November 30, 2026. Implicit caching only (explicit caching not supported). One published rate applies across the full context window. Batch and Flex are 50% of standard; Priority is 1.8×. Context window is 1,048,576 tokens. Default synchronous max output is 65,536; long decode / background execution raises the hard ceiling to 1,048,576, and maxOutputTokens records that ceiling at the catalog 1M context bound. Sources: https://ai.google.dev/gemini-api/docs/pricing and https://ai.google.dev/gemini-api/docs/models/gemini-4-argon.",
       "capability": {
         "metrics": {
-          "intelligence": 50
+          "intelligence": 51
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "high",
         "source": "https://artificialanalysis.ai/models/gemini-4-argon",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       }
     },
     {
@@ -761,10 +812,10 @@
         "metrics": {
           "intelligence": 44
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/muse-wonder",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       }
     },
     {
@@ -783,9 +834,9 @@
         "metrics": {
           "intelligence": 29
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "source": "https://artificialanalysis.ai/models/minimax-m3-1-flash",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       }
     },
     {
@@ -797,16 +848,16 @@
       "output": 10,
       "context": "1.048576M",
       "contextTokens": 1048576,
-      "source": "https://platform.kimi.ai/docs/pricing/chat",
-      "verifiedAt": "2026-10-26",
+      "source": "https://www.kimi.ai/resources/kimi-k3-1-pro-pricing",
+      "verifiedAt": "2026-11-26",
       "note": "Released October 23, 2026. API id `kimi-k3.1-pro`. One published rate applies across the full window. The pricing page states a 1,048,576-token context window, recorded as 1.048576M. Kimi bills cache misses, cache writes, and cache hits as separate slices of the same input tokens. The default 5-minute cache write is $2 per million tokens, the same as input, and the caching guide says that write was already included in the input price, so the stored input and cached rates cover the default. The optional 1-hour cache write is $4 per million tokens (https://platform.kimi.ai/docs/guide/context-caching). The separate id `kimi-k3.1-pro-highspeed` is not listed. Kimi K3 remains the previous-generation model. Quickstart default max completion tokens is 131,072 and can be set up to 1,048,576. Sources: https://platform.kimi.ai/docs/pricing/chat , https://platform.kimi.ai/docs/guide/kimi-k3-1-pro-quickstart , and https://www.kimi.ai/blog/kimi-k3-1-pro .",
       "capability": {
         "metrics": {
-          "intelligence": 46
+          "intelligence": 47
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "source": "https://artificialanalysis.ai/models/kimi-k3-1-pro",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       }
     },
     {
@@ -826,10 +877,10 @@
         "metrics": {
           "intelligence": 51
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/gpt-6-1-terra",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       },
       "rateBands": [
         {
@@ -857,9 +908,9 @@
         "metrics": {
           "intelligence": 19
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "source": "https://artificialanalysis.ai/models/minimax-m3",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       },
       "rateBands": [
         {
@@ -887,10 +938,10 @@
         "metrics": {
           "intelligence": 65
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/claude-fable-5-2",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       }
     },
     {
@@ -905,15 +956,15 @@
       "maxOutputTokens": 1000000,
       "source": "https://aistudio.google.com/docs/pricing#gemini-4-carbon",
       "verifiedAt": "2026-11-12",
-      "note": "Generally available on the paid Gemini API since November 10, 2026. Headline rates are the standard rates from December 1, 2026; introductory rates are $2 input / $0.10 cached / $10 output per 1M tokens through November 30. Implicit caching only. The unified input/output context limit is 1,048,576 tokens; synchronous output defaults to 65,536, and long decode supports up to 1,048,576. Numeric limits use the same conservative 1M catalog bound as Argon. The high-effort score is from the current Intelligence Index v5.0.1 model page. Model details: https://aistudio.google.com/docs/models/gemini-4-carbon.",
+      "note": "Generally available on the paid Gemini API since November 10, 2026. Headline rates are the standard rates from December 1, 2026; introductory rates are $2 input / $0.10 cached / $10 output per 1M tokens through November 30. Implicit caching only. The unified input/output context limit is 1,048,576 tokens; synchronous output defaults to 65,536, and long decode supports up to 1,048,576. Numeric limits use the same conservative 1M catalog bound as Argon. The high-effort score is from the current Intelligence Index v5.0.2 model page. Model details: https://aistudio.google.com/docs/models/gemini-4-carbon.",
       "capability": {
         "metrics": {
           "intelligence": 60
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "high",
         "source": "https://artificialanalysis.ai/models/gemini-4-carbon",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       }
     },
     {
@@ -933,10 +984,10 @@
         "metrics": {
           "intelligence": 36
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/muse-ember",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       },
       "rateBands": [
         {
@@ -964,10 +1015,10 @@
         "metrics": {
           "intelligence": 51
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "high",
         "source": "https://artificialanalysis.ai/models/gemini-4-hydrogen",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       }
     },
     {
@@ -988,10 +1039,10 @@
         "metrics": {
           "intelligence": 62
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/gpt-6-2-astra",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       },
       "rateBands": [
         {
@@ -1020,10 +1071,10 @@
         "metrics": {
           "intelligence": 57
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "max",
         "source": "https://artificialanalysis.ai/models/gpt-6-2-sol",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       },
       "rateBands": [
         {
@@ -1051,10 +1102,10 @@
         "metrics": {
           "intelligence": 60
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "variant": "high",
         "source": "https://artificialanalysis.ai/models/gemini-4-neon",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       }
     },
     {
@@ -1075,9 +1126,9 @@
         "metrics": {
           "intelligence": 43
         },
-        "indexVersion": "5.0.1",
+        "indexVersion": "5.0.2",
         "source": "https://artificialanalysis.ai/models/qwen4-max",
-        "verifiedAt": "2026-11-23"
+        "verifiedAt": "2026-11-26"
       }
     },
     {
@@ -1093,6 +1144,20 @@
       "source": "https://docs.z.ai/guides/overview/pricing",
       "verifiedAt": "2026-11-23",
       "note": "Fast inference variant of GLM-5.3-Flash. The official model documentation confirms a 1M context window and 128K maximum output (https://docs.z.ai/guides/vlm/glm-5.3-flash). FlashX is not yet available on the GLM Coding Plan. Cached input storage is free for a limited time. No independently verified Intelligence Index score is available for this variant.",
+      "capability": null
+    },
+    {
+      "id": "kimi-k3-1-pro-highspeed",
+      "provider": "Kimi",
+      "name": "Kimi K3.1 Pro Highspeed",
+      "input": 4,
+      "cached": 0.2,
+      "output": 20,
+      "context": "1.048576M",
+      "contextTokens": 1048576,
+      "source": "https://www.kimi.ai/resources/kimi-k3-1-pro-pricing",
+      "verifiedAt": "2026-11-26",
+      "note": "API ID kimi-k3.1-pro-highspeed. The official pricing page publishes a 1,048,576-token context window and flat rates across it. Regular input and output cost twice standard K3.1 Pro; cache hits retain the same $0.20 rate. Cache writes and tools are billed separately. Pro, Max and Ultra memberships include Highspeed in Kimi web, Work and Code; API usage is billed separately. No independent Intelligence Index score has been verified for this speed variant, so it does not borrow the standard model score.",
       "capability": null
     }
   ]

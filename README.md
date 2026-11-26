@@ -258,6 +258,33 @@ date. Only one write runs at a time. If an updater is force-terminated and
 leaves `data/api-models.json.lock`, confirm no update is still running, delete
 that stale lock file, and retry.
 
+## Catalog changes, November 26 2026
+
+Added **[Kimi K3.1 Pro Highspeed](https://www.kimi.ai/resources/kimi-k3-1-pro-pricing)** at $4 input / $0.20 cached input / $20 output per 1M tokens, with a 1,048,576-token window. Its cache-hit rate equals standard K3.1 Pro's; regular input and output cost twice as much. It remains unscored rather than borrowing the standard model's benchmark. Pro, Max and Ultra memberships, plus the corresponding legacy coding tiers, gain the verified Highspeed roster entry. Their limits and prices do not change. [The official Kimi Code membership guide](https://www.kimi.com/code/docs/en/kimi-code/membership.html) supplies the legacy access and context mapping.
+
+Rebased all 31 existing scored models together to [Artificial Analysis Intelligence Index v5.0.2](https://artificialanalysis.ai/models), which now uses Terminal-Bench 4.1. Recorded effort variants are preserved; GLM-5.3-Flash's previously unnamed benchmark is now explicitly labeled max by its source. Six previously unscored rows gain published scores:
+
+| Model | Variant | Index v5.0.2 |
+| --- | --- | --- |
+| [Claude Opus 5](https://artificialanalysis.ai/models/claude-opus-5) | max | 44 |
+| [GPT-6 Sol](https://artificialanalysis.ai/models/gpt-6-sol) | max | 44 |
+| [GPT-5.6 Terra](https://artificialanalysis.ai/models/gpt-5-6-terra) | max | 32 |
+| [Grok 4.6](https://artificialanalysis.ai/models/grok-4-6) | xhigh | 31 |
+| [GPT-5.6 Luna](https://artificialanalysis.ai/models/gpt-5-6-luna) | max | 24 |
+| [Kimi K3](https://artificialanalysis.ai/models/kimi-k3) | low | 17 |
+
+Kimi K3's max-effort score is unpublished; the row explicitly records low effort and clears none of the scenario bars. Existing scores change for DeepSeek V4.1 Flash (33→32), Haiku 5.5 (36→37), Argon (50→51), and Kimi K3.1 Pro (46→47). The four anchor scores stay fixed, so every scenario bar and anchor gap stays fixed too.
+
+There are now 48 model records, 37 scored. Qualifying populations change from 31 to 36 on daily use and easy coding, 26 to 30 on medium coding, 23 to 26 on hard coding, research and innovation, and 29 to 33 on writing. Muse Ember remains the cheapest qualified API and Fable 5.2 the most capable on every preset. The larger curve moves some existing letters: Kimi K3.1 Pro moves C→B and Fable 5.2 C→D on hard coding, research and innovation. Plan price tiers stay fixed. The X Subscription plans now use Grok 4.6 on daily use, easy/medium coding and writing: it clears those bars and ties 4.7 on price, so the existing ID tie-break chooses it. Harder scenarios still use 4.7.
+
+**Grok Build 0.1 is retired.** [The upstream release notes](https://docs.x.ai/developers/release-notes) confirm its API end of life on November 19. Its stable ID and last published rates remain as a legacy record, with Grok 4.7 as the catalog alternative, and it leaves Zen's verified current roster. [OpenCode's public model API](https://opencode.ai/inference/v1/models) still advertises the old ID; that conflicting listing is documented rather than treated as proof of current upstream access.
+
+**Codestral's current alias is v25.08 with 128K context**, correcting 256K from [the official model page](https://docs.mistral.ai/models/codestral-25-08). The [pricing table](https://docs.mistral.ai/inference/pricing) no longer prints a separate cached-input rate. The $0.03 cache rate stays, now explicitly derived from [Mistral's 10% cache-hit billing rule](https://docs.mistral.ai/inference/conversations/advanced/prompt-caching) applied to $0.30 input, rather than described as a printed model-specific price.
+
+[OpenCode's Go model API](https://opencode.ai/inference/go/v1/models) now gives standard Kimi K3.1 Pro $60/month on Go and $120/month on Go Plus, replacing $15/$60. All other stored model caps were checked and remain the same; usage still shares the allowance with 20% five-hour and 50% weekly limits. No scenario profiles, ranking rules, plan price floors or dependencies change.
+
+The stale Kimi K2.7 Code and K3.1 Pro prices were reverified from official pages. Twenty-two other old records retain their earlier dates: GLM Pro/Max dollar prices remain inaccessible in the public subscription page, while legacy plan prices or quota amounts are not restated in the pages checked. The strict 30-day freshness check still fails; those terms are not claimed freshly verified. GLM-5.4 still has no published standard API price, so its Coding Plan access remains in notes rather than an invented API row.
+
 ## Catalog changes, November 23 2026
 
 Added **[GLM-5.3-FlashX](https://docs.z.ai/guides/vlm/glm-5.3-flash)** at the [published API rates](https://docs.z.ai/guides/overview/pricing) of $0.37 input / $0.075 cached input / $1.25 output per 1M tokens, with a 1M context window and 128K maximum output. It remains unscored and is not included in GLM Coding plans. [GLM-5.4 is included on every Coding tier](https://docs.z.ai/devpack/overview), with credit multipliers of 4.6 / 1.1 / 16 rather than GLM-5.3's 6.9 / 1.7 / 24. The shared credit pools are unchanged. The plan notes record that access; an API model row is deferred because Z.ai has not published its API token rates or exact model limits.
